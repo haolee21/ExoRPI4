@@ -5,6 +5,9 @@ CMakeFiles/exo_o.dir/src/ADC.cpp.o: ../include/ADC.hpp
 CMakeFiles/exo_o.dir/src/ADC.cpp.o: ../include/Pin.hpp
 CMakeFiles/exo_o.dir/src/ADC.cpp.o: ../src/ADC.cpp
 
+CMakeFiles/exo_o.dir/src/Common.cpp.o: ../include/Common.hpp
+CMakeFiles/exo_o.dir/src/Common.cpp.o: ../src/Common.cpp
+
 CMakeFiles/exo_o.dir/src/Encoder.cpp.o: ../include/Encoder.hpp
 CMakeFiles/exo_o.dir/src/Encoder.cpp.o: ../include/Pin.hpp
 CMakeFiles/exo_o.dir/src/Encoder.cpp.o: ../src/Encoder.cpp
@@ -25,6 +28,7 @@ CMakeFiles/exo_o.dir/src/PWM.cpp.o: ../src/PWM.cpp
 CMakeFiles/exo_o.dir/src/Pin.cpp.o: ../include/Pin.hpp
 CMakeFiles/exo_o.dir/src/Pin.cpp.o: ../src/Pin.cpp
 
+CMakeFiles/exo_o.dir/src/SensorHub.cpp.o: ../include/Common.hpp
 CMakeFiles/exo_o.dir/src/SensorHub.cpp.o: ../include/Encoder.hpp
 CMakeFiles/exo_o.dir/src/SensorHub.cpp.o: ../include/Encoder_L.hpp
 CMakeFiles/exo_o.dir/src/SensorHub.cpp.o: ../include/Encoder_R.hpp

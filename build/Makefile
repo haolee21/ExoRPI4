@@ -174,6 +174,33 @@ src/ADC.cpp.s:
 	$(MAKE) -f CMakeFiles/exo_o.dir/build.make CMakeFiles/exo_o.dir/src/ADC.cpp.s
 .PHONY : src/ADC.cpp.s
 
+src/Common.o: src/Common.cpp.o
+
+.PHONY : src/Common.o
+
+# target to build an object file
+src/Common.cpp.o:
+	$(MAKE) -f CMakeFiles/exo_o.dir/build.make CMakeFiles/exo_o.dir/src/Common.cpp.o
+.PHONY : src/Common.cpp.o
+
+src/Common.i: src/Common.cpp.i
+
+.PHONY : src/Common.i
+
+# target to preprocess a source file
+src/Common.cpp.i:
+	$(MAKE) -f CMakeFiles/exo_o.dir/build.make CMakeFiles/exo_o.dir/src/Common.cpp.i
+.PHONY : src/Common.cpp.i
+
+src/Common.s: src/Common.cpp.s
+
+.PHONY : src/Common.s
+
+# target to generate assembly for a file
+src/Common.cpp.s:
+	$(MAKE) -f CMakeFiles/exo_o.dir/build.make CMakeFiles/exo_o.dir/src/Common.cpp.s
+.PHONY : src/Common.cpp.s
+
 src/Encoder.o: src/Encoder.cpp.o
 
 .PHONY : src/Encoder.o
@@ -431,6 +458,9 @@ help:
 	@echo "... src/ADC.o"
 	@echo "... src/ADC.i"
 	@echo "... src/ADC.s"
+	@echo "... src/Common.o"
+	@echo "... src/Common.i"
+	@echo "... src/Common.s"
 	@echo "... src/Encoder.o"
 	@echo "... src/Encoder.i"
 	@echo "... src/Encoder.s"

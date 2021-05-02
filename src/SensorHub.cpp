@@ -13,6 +13,8 @@
 
 #include <malloc.h>
 #include <sys/resource.h> // needed for getrusage
+#include "Common.hpp"
+#include <chrono>
 #define MEMSIZE (100*1024) // 100kB
 // static functions
 SensorHub &SensorHub::GetInstance()
@@ -88,24 +90,33 @@ void *SensorHub::SenUpdate(void *data)
     struct timespec t;
     long int interval = SAMPT* USEC;
     clock_gettime(CLOCK_MONOTONIC, &t);
+
+    int loopCount=0;
+    
+    auto start = std::chrono::high_resolution_clock::now();
     while(SensorHub::GetInstance().senUpdate_flag){
         
-        senHub.EncData[0]= senHub.LHipF_Enc.ReadPos();
-        senHub.EncData[1]= senHub.LHipF_Enc.ReadPos();
-        senHub.EncData[2]= senHub.LHipF_Enc.ReadPos();
-        senHub.EncData[3]= senHub.LHipF_Enc.ReadPos();
-        senHub.EncData[4]= senHub.LHipF_Enc.ReadPos();
-        senHub.EncData[5]= senHub.LHipF_Enc.ReadPos();
-        senHub.EncData[6]= senHub.LHipF_Enc.ReadPos();
-        senHub.EncData[7]= senHub.LHipF_Enc.ReadPos();
-
+        senHub.EncData[0]= senHub.LHipS_Enc.ReadPos();
+        senHub.EncData[1]= senHub.LHipS_Enc.ReadPos();
+        senHub.EncData[2]= senHub.LHipS_Enc.ReadPos();
+        senHub.EncData[3]= senHub.LHipS_Enc.ReadPos();
+        senHub.EncData[4]= senHub.LHipS_Enc.ReadPos();
+        senHub.EncData[5]= senHub.LHipS_Enc.ReadPos();
+        senHub.EncData[6]= senHub.LHipS_Enc.ReadPos();
+        senHub.EncData[7]= senHub.LHipS_Enc.ReadPos();
         
         
+    
 
 
         t.tv_nsec+=interval;
         Timer::Sleep(&t);
+        loopCount++;
+        
     }
+    auto elapsed = std::chrono::high_resolution_clock::now() - start;
+    auto duration =std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+    std::cout<<"avg samp time(us): "<<duration/loopCount<<std::endl;
 
 
 }
@@ -114,70 +125,10 @@ int SensorHub::Start()
 { //ref from https://wiki.linuxfoundation.org/realtime/documentation/howto/applications/application_base
 
     SensorHub::GetInstance().senUpdate_flag=true;
-    struct sched_param param;
-    pthread_attr_t attr;
-   
-    int ret;
-    // lock memory
-    if (mlockall(MCL_CURRENT | MCL_FUTURE) == -1)
-    {
-        printf("mlockall failed: %m\n");
-        exit(-2);
-    }
-    // force page fault to make sure all page are locked on memory
-    // ref: https://rt.wiki.kernel.org/index.php/Simple_memory_locking_example
-    struct rusage usage;
-    int page_size = sysconf(_SC_PAGESIZE);
-    char *buffer = (char*)malloc(MEMSIZE);
-    int i;
-    for(i=0;i<MEMSIZE;i+=page_size){
-        buffer[i] = 0;
-        getrusage(RUSAGE_SELF, &usage);
-        printf("Major-pagefaults:%ld, Minor Pagefaults:%ld\n", usage.ru_majflt, usage.ru_minflt);
-    }
-    free(buffer); //free the buffer, but due to mlockall, we will have MEMSIZE memory won't cause page fault
-
-    /* Initialize pthread attributes (default values) */
-    ret = pthread_attr_init(&attr);
-    if (ret)
-    {
-        printf("init pthread attributes failed\n");
-        goto out;
-    }
-
-    /* Set scheduler policy and priority of pthread */
-    ret = pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
-    if (ret)
-    {
-        printf("pthread setschedpolicy failed\n");
-        goto out;
-    }
-    param.sched_priority = 80;
-    ret = pthread_attr_setschedparam(&attr, &param);
-    if (ret)
-    {
-        printf("pthread setschedparam failed\n");
-        goto out;
-    }
-    /* Use scheduling parameters of attr */
-    ret = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
-    if (ret)
-    {
-        printf("pthread setinheritsched failed\n");
-        goto out;
-    }
-
-    /* Create a pthread with specified attributes */
-    ret = pthread_create(&SensorHub::GetInstance().rt_thread, &attr, SensorHub::SenUpdate,NULL);
-    if (ret)
-    {
-        printf("create pthread failed\n");
-        goto out;
-    }
 
 
-
-out:
+    RT::Init();
+    int ret = RT::StartThread(SensorHub::GetInstance().rt_thread,SensorHub::SenUpdate,90);
     return ret;
 }
 

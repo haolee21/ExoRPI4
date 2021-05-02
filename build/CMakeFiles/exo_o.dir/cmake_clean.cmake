@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/exo_o.dir/src/ADC.cpp.o"
+  "CMakeFiles/exo_o.dir/src/Common.cpp.o"
   "CMakeFiles/exo_o.dir/src/Encoder.cpp.o"
   "CMakeFiles/exo_o.dir/src/Encoder_L.cpp.o"
   "CMakeFiles/exo_o.dir/src/Encoder_R.cpp.o"

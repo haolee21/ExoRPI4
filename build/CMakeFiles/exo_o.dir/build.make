@@ -81,9 +81,33 @@ CMakeFiles/exo_o.dir/src/ADC.cpp.o.provides: CMakeFiles/exo_o.dir/src/ADC.cpp.o.
 CMakeFiles/exo_o.dir/src/ADC.cpp.o.provides.build: CMakeFiles/exo_o.dir/src/ADC.cpp.o
 
 
+CMakeFiles/exo_o.dir/src/Common.cpp.o: CMakeFiles/exo_o.dir/flags.make
+CMakeFiles/exo_o.dir/src/Common.cpp.o: ../src/Common.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/exo_o.dir/src/Common.cpp.o"
+	arm-linux-gnueabihf-g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/exo_o.dir/src/Common.cpp.o -c /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/Common.cpp
+
+CMakeFiles/exo_o.dir/src/Common.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/exo_o.dir/src/Common.cpp.i"
+	arm-linux-gnueabihf-g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/Common.cpp > CMakeFiles/exo_o.dir/src/Common.cpp.i
+
+CMakeFiles/exo_o.dir/src/Common.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/exo_o.dir/src/Common.cpp.s"
+	arm-linux-gnueabihf-g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/Common.cpp -o CMakeFiles/exo_o.dir/src/Common.cpp.s
+
+CMakeFiles/exo_o.dir/src/Common.cpp.o.requires:
+
+.PHONY : CMakeFiles/exo_o.dir/src/Common.cpp.o.requires
+
+CMakeFiles/exo_o.dir/src/Common.cpp.o.provides: CMakeFiles/exo_o.dir/src/Common.cpp.o.requires
+	$(MAKE) -f CMakeFiles/exo_o.dir/build.make CMakeFiles/exo_o.dir/src/Common.cpp.o.provides.build
+.PHONY : CMakeFiles/exo_o.dir/src/Common.cpp.o.provides
+
+CMakeFiles/exo_o.dir/src/Common.cpp.o.provides.build: CMakeFiles/exo_o.dir/src/Common.cpp.o
+
+
 CMakeFiles/exo_o.dir/src/Encoder.cpp.o: CMakeFiles/exo_o.dir/flags.make
 CMakeFiles/exo_o.dir/src/Encoder.cpp.o: ../src/Encoder.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/exo_o.dir/src/Encoder.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/exo_o.dir/src/Encoder.cpp.o"
 	arm-linux-gnueabihf-g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/exo_o.dir/src/Encoder.cpp.o -c /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/Encoder.cpp
 
 CMakeFiles/exo_o.dir/src/Encoder.cpp.i: cmake_force
@@ -107,7 +131,7 @@ CMakeFiles/exo_o.dir/src/Encoder.cpp.o.provides.build: CMakeFiles/exo_o.dir/src/
 
 CMakeFiles/exo_o.dir/src/Encoder_L.cpp.o: CMakeFiles/exo_o.dir/flags.make
 CMakeFiles/exo_o.dir/src/Encoder_L.cpp.o: ../src/Encoder_L.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/exo_o.dir/src/Encoder_L.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/exo_o.dir/src/Encoder_L.cpp.o"
 	arm-linux-gnueabihf-g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/exo_o.dir/src/Encoder_L.cpp.o -c /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/Encoder_L.cpp
 
 CMakeFiles/exo_o.dir/src/Encoder_L.cpp.i: cmake_force
@@ -131,7 +155,7 @@ CMakeFiles/exo_o.dir/src/Encoder_L.cpp.o.provides.build: CMakeFiles/exo_o.dir/sr
 
 CMakeFiles/exo_o.dir/src/Encoder_R.cpp.o: CMakeFiles/exo_o.dir/flags.make
 CMakeFiles/exo_o.dir/src/Encoder_R.cpp.o: ../src/Encoder_R.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/exo_o.dir/src/Encoder_R.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/exo_o.dir/src/Encoder_R.cpp.o"
 	arm-linux-gnueabihf-g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/exo_o.dir/src/Encoder_R.cpp.o -c /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/Encoder_R.cpp
 
 CMakeFiles/exo_o.dir/src/Encoder_R.cpp.i: cmake_force
@@ -155,7 +179,7 @@ CMakeFiles/exo_o.dir/src/Encoder_R.cpp.o.provides.build: CMakeFiles/exo_o.dir/sr
 
 CMakeFiles/exo_o.dir/src/PWM.cpp.o: CMakeFiles/exo_o.dir/flags.make
 CMakeFiles/exo_o.dir/src/PWM.cpp.o: ../src/PWM.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/exo_o.dir/src/PWM.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/exo_o.dir/src/PWM.cpp.o"
 	arm-linux-gnueabihf-g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/exo_o.dir/src/PWM.cpp.o -c /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/PWM.cpp
 
 CMakeFiles/exo_o.dir/src/PWM.cpp.i: cmake_force
@@ -179,7 +203,7 @@ CMakeFiles/exo_o.dir/src/PWM.cpp.o.provides.build: CMakeFiles/exo_o.dir/src/PWM.
 
 CMakeFiles/exo_o.dir/src/Pin.cpp.o: CMakeFiles/exo_o.dir/flags.make
 CMakeFiles/exo_o.dir/src/Pin.cpp.o: ../src/Pin.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/exo_o.dir/src/Pin.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/exo_o.dir/src/Pin.cpp.o"
 	arm-linux-gnueabihf-g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/exo_o.dir/src/Pin.cpp.o -c /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/Pin.cpp
 
 CMakeFiles/exo_o.dir/src/Pin.cpp.i: cmake_force
@@ -203,7 +227,7 @@ CMakeFiles/exo_o.dir/src/Pin.cpp.o.provides.build: CMakeFiles/exo_o.dir/src/Pin.
 
 CMakeFiles/exo_o.dir/src/SensorHub.cpp.o: CMakeFiles/exo_o.dir/flags.make
 CMakeFiles/exo_o.dir/src/SensorHub.cpp.o: ../src/SensorHub.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/exo_o.dir/src/SensorHub.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/exo_o.dir/src/SensorHub.cpp.o"
 	arm-linux-gnueabihf-g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/exo_o.dir/src/SensorHub.cpp.o -c /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/SensorHub.cpp
 
 CMakeFiles/exo_o.dir/src/SensorHub.cpp.i: cmake_force
@@ -227,7 +251,7 @@ CMakeFiles/exo_o.dir/src/SensorHub.cpp.o.provides.build: CMakeFiles/exo_o.dir/sr
 
 CMakeFiles/exo_o.dir/src/Timer.cpp.o: CMakeFiles/exo_o.dir/flags.make
 CMakeFiles/exo_o.dir/src/Timer.cpp.o: ../src/Timer.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/exo_o.dir/src/Timer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/exo_o.dir/src/Timer.cpp.o"
 	arm-linux-gnueabihf-g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/exo_o.dir/src/Timer.cpp.o -c /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/Timer.cpp
 
 CMakeFiles/exo_o.dir/src/Timer.cpp.i: cmake_force
@@ -251,7 +275,7 @@ CMakeFiles/exo_o.dir/src/Timer.cpp.o.provides.build: CMakeFiles/exo_o.dir/src/Ti
 
 CMakeFiles/exo_o.dir/src/ValveCon.cpp.o: CMakeFiles/exo_o.dir/flags.make
 CMakeFiles/exo_o.dir/src/ValveCon.cpp.o: ../src/ValveCon.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/exo_o.dir/src/ValveCon.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/exo_o.dir/src/ValveCon.cpp.o"
 	arm-linux-gnueabihf-g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/exo_o.dir/src/ValveCon.cpp.o -c /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/ValveCon.cpp
 
 CMakeFiles/exo_o.dir/src/ValveCon.cpp.i: cmake_force
@@ -275,7 +299,7 @@ CMakeFiles/exo_o.dir/src/ValveCon.cpp.o.provides.build: CMakeFiles/exo_o.dir/src
 
 CMakeFiles/exo_o.dir/src/main.cpp.o: CMakeFiles/exo_o.dir/flags.make
 CMakeFiles/exo_o.dir/src/main.cpp.o: ../src/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/exo_o.dir/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/exo_o.dir/src/main.cpp.o"
 	arm-linux-gnueabihf-g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/exo_o.dir/src/main.cpp.o -c /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/main.cpp
 
 CMakeFiles/exo_o.dir/src/main.cpp.i: cmake_force
@@ -300,6 +324,7 @@ CMakeFiles/exo_o.dir/src/main.cpp.o.provides.build: CMakeFiles/exo_o.dir/src/mai
 # Object files for target exo_o
 exo_o_OBJECTS = \
 "CMakeFiles/exo_o.dir/src/ADC.cpp.o" \
+"CMakeFiles/exo_o.dir/src/Common.cpp.o" \
 "CMakeFiles/exo_o.dir/src/Encoder.cpp.o" \
 "CMakeFiles/exo_o.dir/src/Encoder_L.cpp.o" \
 "CMakeFiles/exo_o.dir/src/Encoder_R.cpp.o" \
@@ -314,6 +339,7 @@ exo_o_OBJECTS = \
 exo_o_EXTERNAL_OBJECTS =
 
 exo_o: CMakeFiles/exo_o.dir/src/ADC.cpp.o
+exo_o: CMakeFiles/exo_o.dir/src/Common.cpp.o
 exo_o: CMakeFiles/exo_o.dir/src/Encoder.cpp.o
 exo_o: CMakeFiles/exo_o.dir/src/Encoder_L.cpp.o
 exo_o: CMakeFiles/exo_o.dir/src/Encoder_R.cpp.o
@@ -328,7 +354,7 @@ exo_o: /home/lowlimb/tools/ARM/boost_1_75_0/stage/lib/libboost_serialization.a
 exo_o: /home/lowlimb/tools/ARM/boost_1_75_0/stage/lib/libboost_date_time.a
 exo_o: /home/lowlimb/tools/ARM/boost_1_75_0/stage/lib/libboost_filesystem.a
 exo_o: CMakeFiles/exo_o.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable exo_o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Linking CXX executable exo_o"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/exo_o.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -337,6 +363,7 @@ CMakeFiles/exo_o.dir/build: exo_o
 .PHONY : CMakeFiles/exo_o.dir/build
 
 CMakeFiles/exo_o.dir/requires: CMakeFiles/exo_o.dir/src/ADC.cpp.o.requires
+CMakeFiles/exo_o.dir/requires: CMakeFiles/exo_o.dir/src/Common.cpp.o.requires
 CMakeFiles/exo_o.dir/requires: CMakeFiles/exo_o.dir/src/Encoder.cpp.o.requires
 CMakeFiles/exo_o.dir/requires: CMakeFiles/exo_o.dir/src/Encoder_L.cpp.o.requires
 CMakeFiles/exo_o.dir/requires: CMakeFiles/exo_o.dir/src/Encoder_R.cpp.o.requires

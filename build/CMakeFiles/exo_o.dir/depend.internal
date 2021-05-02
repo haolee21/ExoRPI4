@@ -5,6 +5,9 @@ CMakeFiles/exo_o.dir/src/ADC.cpp.o
  ../include/ADC.hpp
  ../include/Pin.hpp
  /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/ADC.cpp
+CMakeFiles/exo_o.dir/src/Common.cpp.o
+ ../include/Common.hpp
+ /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/Common.cpp
 CMakeFiles/exo_o.dir/src/Encoder.cpp.o
  ../include/Encoder.hpp
  ../include/Pin.hpp
@@ -26,6 +29,7 @@ CMakeFiles/exo_o.dir/src/Pin.cpp.o
  ../include/Pin.hpp
  /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/Pin.cpp
 CMakeFiles/exo_o.dir/src/SensorHub.cpp.o
+ ../include/Common.hpp
  ../include/Encoder.hpp
  ../include/Encoder_L.hpp
  ../include/Encoder_R.hpp

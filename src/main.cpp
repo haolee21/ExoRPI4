@@ -6,7 +6,7 @@ int main()
 {
 
     struct timespec t;
-    long int interval = 100*SAMPT* USEC;
+    long int interval = 100000* USEC;
     SensorHub::Start();
     clock_gettime(CLOCK_MONOTONIC, &t);
     

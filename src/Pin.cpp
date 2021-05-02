@@ -124,7 +124,7 @@ void Pin::On() const
             cout << "Failed to set " << this->pinId << "on\n";
     }
     else
-        cout << "This pin is input\n";
+        cout <<"Pin"<<this->pinId<< " is input\n";
 }
 void Pin::Off() const
 {
@@ -135,7 +135,7 @@ void Pin::Off() const
     }
     else
     {
-        cout << "This pin is output\n";
+        cout <<"Pin"<<this->pinId<< " is input\n";
     }
 }
 
@@ -176,11 +176,12 @@ Pin::Pin(int _pinId, Pin::IO_TYPE _io_type)
 
 Pin::~Pin()
 {
-    
-    this->Off();
+    if(this->iotype==Pin::IO_TYPE::Output)
+        this->Off();
     if(this->writingFlag){
         close(this->fd_wirte);
     }
+    std::cout<<"Pin "<<this->pinId<<" destoried\n";
     // For some reason if I disapble gpio, I will run into error the next time I try to enable it
     // if (-1 == this->GPIOUnexport(this->pinId))
     //     cout << "Failed to disable gpio " << this->pinId << endl;
