@@ -57,6 +57,8 @@ limits.h
 -
 vector
 -
+sched.h
+-
 
 ../include/Encoder.hpp
 sys/ioctl.h
@@ -111,6 +113,10 @@ pthread.h
 -
 Timer.hpp
 ../include/Timer.hpp
+ADC.hpp
+../include/ADC.hpp
+chrono
+-
 
 ../include/Timer.hpp
 time.h
@@ -167,23 +173,9 @@ SensorHub.hpp
 /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/SensorHub.hpp
 functional
 -
-limits.h
--
-sched.h
--
-stdio.h
--
-stdlib.h
--
-sys/mman.h
--
-malloc.h
--
-sys/resource.h
--
 Common.hpp
 /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/Common.hpp
-chrono
+future
 -
 
 /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/Timer.cpp

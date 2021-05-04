@@ -12,6 +12,7 @@
 #include <pthread.h>
 #include <limits.h>
 #include <vector>
+#include <sched.h>
 
 #define PRE_ALLOCATION_SIZE (100 * 1024 * 1024) /* 100MB pagefault free buffer */
 #define MY_STACK_SIZE (1024 * 1024)              /* 1MB for each thread. */

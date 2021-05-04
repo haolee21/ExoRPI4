@@ -116,7 +116,7 @@ int RT::StartThread(pthread_t &thread, void *(*task)(void *),int priority)
         exit(1);
     }
 
-    if (pthread_attr_setschedpolicy(&attr, SCHED_FIFO))
+    if (pthread_attr_setschedpolicy(&attr, SCHED_RR))
     {
         std::cout << "pthread setschedpolicy failed\n";
         exit(1);

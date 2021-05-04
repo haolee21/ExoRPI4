@@ -142,7 +142,7 @@ int Encoder::ReadPos()
     // this->txBuf[0]=0x00;
     while (this->rxBuf[0] != 0x10)
     {
-        usleep(20);
+        // usleep(20);
         this->_spiTxRx(1);
         
     }

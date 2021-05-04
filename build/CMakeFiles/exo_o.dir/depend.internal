@@ -29,6 +29,7 @@ CMakeFiles/exo_o.dir/src/Pin.cpp.o
  ../include/Pin.hpp
  /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/Pin.cpp
 CMakeFiles/exo_o.dir/src/SensorHub.cpp.o
+ ../include/ADC.hpp
  ../include/Common.hpp
  ../include/Encoder.hpp
  ../include/Encoder_L.hpp
@@ -44,6 +45,7 @@ CMakeFiles/exo_o.dir/src/ValveCon.cpp.o
  ../include/ValveCon.hpp
  /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/src/ValveCon.cpp
 CMakeFiles/exo_o.dir/src/main.cpp.o
+ ../include/ADC.hpp
  ../include/Encoder.hpp
  ../include/Encoder_L.hpp
  ../include/Encoder_R.hpp

@@ -6,7 +6,7 @@
 #define USEC (1000 * NSEC)
 #define MSEC (1000 * USEC)
 #define SEC (1000 * MSEC)
-#define SAMPT 2000
+#define SAMPT 1250
 class Timer
 {
 private:

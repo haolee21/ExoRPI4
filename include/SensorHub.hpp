@@ -7,8 +7,8 @@
 #include "Encoder_R.hpp"
 #include <pthread.h>
 #include "Timer.hpp"
-
-
+#include "ADC.hpp"
+#include <chrono>
 
 
 class SensorHub
@@ -18,8 +18,8 @@ class SensorHub
 public:
     
     ~SensorHub();
-    const static int NUMENC = 6;    
-    const static int NUMPRE = 6;
+    const static int NUMENC = 10;    
+    const static int NUMPRE = 8;
     static SensorHub& GetInstance();
     static const std::array<short,NUMENC>& GetEncData(); //I did not use lock here since they will be read-only arrays
     static const std::array<short,NUMPRE>& GetPreData(); //While data may not be sync, but it will be the most recent one
@@ -36,7 +36,6 @@ public:
 private:
     
     std::array<short,NUMENC> EncData;
-    std::array<short,NUMPRE> PreData;
 
     // Encoders, S is for sagittal plane, F is for frontal plane
     Encoder_L LHipS_Enc,LHipF_Enc,LKneS_Enc,LAnkS_Enc,LAnkF_Enc;
@@ -44,13 +43,18 @@ private:
     SensorHub();
     void ResetEncImpl(SensorHub::EncName);//the reset function is implement so I can avoid using a lot of SensorHub::Encorder since it is a member function
 
+    // ADC 
+    ADC adc0;
+
     //Sensor update
     // we are using a real-time thread for sensor update
     static void *SenUpdate(void*);
     bool senUpdate_flag;
     pthread_t rt_thread;
     
-    
+    static void UpdateLEnc();//we will use std::async to launch sensor update tasks to improve speed
+    static void UpdateREnc();
+
 
 };
 
