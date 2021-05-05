@@ -1,5 +1,0 @@
-/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles/rebuild_cache.dir
-/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles/edit_cache.dir
-/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles/test.dir
-/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles/lib.dir
-/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI4/build/CMakeFiles/exo_o.dir
