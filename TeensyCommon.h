@@ -1,0 +1,3 @@
+#define VALVE_CON_ADDRESS 0x002D
+#define PWM_VAL_NUM 6
+#define SW_VAL_NUM 8

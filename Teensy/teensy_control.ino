@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "../TeensyCommon.h"
 #include "i2c_driver.h"
 #include "imx_rt1060_i2c_driver.h"
 #include "PWM_valve.h"
@@ -10,19 +11,17 @@ IntervalTimer pwm_timer;
 volatile bool led_high = false;
 void blink_isr();
 
-const uint16_t slave_address = 0x002D;
 I2CSlave& slave = Slave;
 void after_receive(int size);
 
 const int duty_unit = 200; //in micro second, suppose total period is 50Hz
-const int num_pwm = 6;
-const int num_val = 8;
+
 
 int pwm_idx=0;//this is for record the valve id, not the pin id (e.g., pwm1 is pin 8)
 int val_idx=0;
 
 // create two lists for pwm_valves, pwm_list is the original list, pwm_sort_list is after sorting
-PWM_valve pwm_list[num_pwm] = {
+PWM_valve pwm_list[PWM_VAL_NUM] = {
   PWM_valve(pwm_idx++,8, duty_unit),
   PWM_valve(pwm_idx++,9, duty_unit),
   PWM_valve(pwm_idx++,23, duty_unit),
@@ -30,10 +29,10 @@ PWM_valve pwm_list[num_pwm] = {
   PWM_valve(pwm_idx++,21, duty_unit),
   PWM_valve(pwm_idx++,14, duty_unit),
 };
-PWM_valve pwm_sort_list[num_pwm];
+PWM_valve pwm_sort_list[PWM_VAL_NUM];
 
 // normal valve list
-Valve valve_list[num_val] = {
+Valve valve_list[SW_VAL_NUM] = {
     Valve(0),
     Valve(1),
     Valve(2),
@@ -141,12 +140,12 @@ void blink_isr() {
 void decode_msg()
 {
 //  Serial.print("set duty:");
-  for (int i = 0; i < num_pwm; i++) {
+  for (int i = 0; i < PWM_VAL_NUM; i++) {
     pwm_list[i].setDuty((int)slave_rx_buffer_2[i]);
 //    Serial.print((int)slave_rx_buffer_2[i]);
 //    Serial.print(',');
   }
-  for (int i = num_pwm; i < num_pwm + num_val;i++){
+  for (int i = PWM_VAL_NUM; i < PWM_VAL_NUM + SW_VAL_NUM;i++){
     if((bool)slave_rx_buffer_2[i]){
       valve_list[i].on();
     }
@@ -155,8 +154,8 @@ void decode_msg()
     }
   }
 //    Serial.print('\n');
-  memcpy(pwm_sort_list, pwm_list, sizeof(PWM_valve) * num_pwm);
-  heapSort(pwm_sort_list, num_pwm);
+  memcpy(pwm_sort_list, pwm_list, sizeof(PWM_valve) * PWM_VAL_NUM);
+  heapSort(pwm_sort_list, PWM_VAL_NUM);
 }
 // reference from https://www.geeksforgeeks.org/heap-sort/
 void heapify(PWM_valve arr[], int n, int i)
@@ -201,12 +200,12 @@ void heapSort(PWM_valve arr[], int n)
 void PWM_valve_on_off()
 {
   
-  for (int i = 0; i < num_pwm; i++)
+  for (int i = 0; i < PWM_VAL_NUM; i++)
   {
     pwm_sort_list[i].on();
   }
   int pre_duty = 0;
-  for (int i = 0; i < num_pwm; i++)
+  for (int i = 0; i < PWM_VAL_NUM; i++)
   {
     int cur_sleep_t = pwm_sort_list[i].cal_off_t(pre_duty);
     delayMicroseconds(duty_unit*cur_sleep_t);

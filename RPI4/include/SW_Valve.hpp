@@ -1,19 +1,18 @@
 #ifndef SW_VALVE_HPP
 #define SW_VALVE_HPP
+#include <string>
 class SW_Valve
 {
 private:
-    /* data */
+    bool condition=false;
+    std::string name;
 public:
-    SW_Valve(/* args */);
+    SW_Valve(std::string name);
     ~SW_Valve();
+    const bool& GetValCond();
+    void On();
+    void Off();
 };
 
-SW_Valve::SW_Valve(/* args */)
-{
-}
 
-SW_Valve::~SW_Valve()
-{
-}
 #endif //SW_VALVE_HPP

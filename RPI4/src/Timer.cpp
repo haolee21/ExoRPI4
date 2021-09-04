@@ -1,11 +1,19 @@
 #include "Timer.hpp"
 
-Timer::Timer(/* args */)
+Timer::Timer(std::function<void()>_tickFunction)
 {
+    this->tickFunction = _tickFunction;
+    this->timeStamp =0;
 }
-
 Timer::~Timer()
 {
+}
+void Timer::ClockTick(){
+    this->timeStamp++;
+    this->tickFunction();
+}
+unsigned Timer::GetCurTime(){
+    return this->timeStamp;
 }
 void Timer::tsnorm(struct timespec *ts)
 {

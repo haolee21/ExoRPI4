@@ -5,8 +5,9 @@
 #include <linux/spi/spidev.h>
 #include <fcntl.h>
 #include <iostream>
-#include <cstring>
+#include <string>
 #include "Pin.hpp"
+#include <cstring>
 
 //index for CE of encoders
 

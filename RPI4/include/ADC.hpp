@@ -2,6 +2,7 @@
 #define ADC_HPP
 
 
+#include <string>
 #include <cstring>
 #include "Pin.hpp"
 #include <memory>

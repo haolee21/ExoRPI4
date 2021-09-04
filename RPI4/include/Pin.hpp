@@ -32,7 +32,7 @@ private:
     IO_TYPE iotype;
 
     //parameters need to declare first to make write function faster
-    int fd_wirte;
+    int fd_write;
     bool writingFlag=false; //since we will keep it open during operation, we need a flag to track it
 };
 

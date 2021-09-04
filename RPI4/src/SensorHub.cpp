@@ -2,7 +2,7 @@
 #include <functional>
 
 
-#include "Common.hpp"
+#include "RT.hpp"
 
 #include <future>
 #define MEMSIZE (100 * 1024) // 100kB
@@ -31,7 +31,7 @@ SensorHub::~SensorHub()
     munlockall();
 }
 SensorHub::SensorHub() //initialize member in list since Encoder has no default constructor
-    : LHipS_Enc(Encoder_L(0)), LHipF_Enc(Encoder_L(1)), LKneS_Enc(Encoder_L(2)), LAnkS_Enc(Encoder_L(3)), LAnkF_Enc(Encoder_L(4)), RHipS_Enc(Encoder_R(0)), RHipF_Enc(Encoder_R(1)), RKneS_Enc(Encoder_R(2)), RAnkS_Enc(Encoder_R(3)), RAnkF_Enc(Encoder_R(4)), adc0(ADC(0))
+    : LHipS_Enc(Encoder_L(0)), LHipF_Enc(Encoder_L(1)), LKneS_Enc(Encoder_L(2)), LAnkS_Enc(Encoder_L(3)), LAnkF_Enc(Encoder_L(4)), RHipS_Enc(Encoder_R(0)), RHipF_Enc(Encoder_R(1)), RKneS_Enc(Encoder_R(2)), RAnkS_Enc(Encoder_R(3)), RAnkF_Enc(Encoder_R(4)),adc0(ADC(0)),adc1(ADC(1))
 {
     this->senUpdate_flag = false;
 }
@@ -85,7 +85,7 @@ void *SensorHub::SenUpdate(void *data)
     // auto start = std::chrono::high_resolution_clock::now();
 
 
-    //we do a dry run of updating sensor here, can somehow decrease the later loop time
+    //we do a dry run of updating sensor here, can somehow decrease the later loop time since the thread/future's are already created
     std::future<void> update1 = std::async(std::launch::async, SensorHub::UpdateLEnc);
     std::future<void> update2 = std::async(std::launch::async, SensorHub::UpdateREnc);
     update1.wait();
@@ -122,6 +122,8 @@ void *SensorHub::SenUpdate(void *data)
         update2.wait();
         update1.get();
         update2.get();
+
+        SensorHub::GetInstance().mainTimer->ClockTick();
     }
 
     // elapsed = std::chrono::high_resolution_clock::now() - start;
@@ -137,11 +139,11 @@ void *SensorHub::SenUpdate(void *data)
 void SensorHub::UpdateLEnc()
 {
     SensorHub &senHub = SensorHub::GetInstance();
-    senHub.EncData[0] = senHub.LHipS_Enc.ReadPos();
-    senHub.EncData[1] = senHub.LHipS_Enc.ReadPos();
-    senHub.EncData[2] = senHub.LHipS_Enc.ReadPos();
-    senHub.EncData[3] = senHub.LHipS_Enc.ReadPos();
-    senHub.EncData[4] = senHub.LHipS_Enc.ReadPos();
+    senHub.EncData[0] = senHub.LAnkS_Enc.ReadPos();
+    senHub.EncData[1] = senHub.LAnkS_Enc.ReadPos();
+    senHub.EncData[2] = senHub.LAnkS_Enc.ReadPos();
+    senHub.EncData[3] = senHub.LAnkS_Enc.ReadPos();
+    senHub.EncData[4] = senHub.LAnkS_Enc.ReadPos();
 }
 void SensorHub::UpdateREnc()
 {
@@ -152,12 +154,18 @@ void SensorHub::UpdateREnc()
     // senHub.EncData[8]=senHub.LHipS_Enc.ReadPos();
     // senHub.EncData[9]=senHub.LHipS_Enc.ReadPos();
 }
+void SensorHub::UpdatePre()
+{
+    SensorHub & senHub = SensorHub::GetInstance();
 
-int SensorHub::Start()
+
+}
+
+int SensorHub::Start(std::shared_ptr<Timer> _mainTimer)
 { //ref from https://wiki.linuxfoundation.org/realtime/documentation/howto/applications/application_base
 
     SensorHub::GetInstance().senUpdate_flag = true;
-
+    SensorHub::GetInstance().mainTimer = _mainTimer;
     RT::Init();
     int ret = RT::StartThread(SensorHub::GetInstance().rt_thread, SensorHub::SenUpdate, 80);
     return ret;

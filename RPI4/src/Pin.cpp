@@ -95,7 +95,7 @@ int Pin::GPIORead(int pin)
 
     close(fd);
 
-    return (atoi(value_str));
+    return (atoi(value_str)); //I am not sure why atoi a char?? it it is an int, shouldn't it be 4 byptes? 
 }
 
 int Pin::GPIOWrite(int value) const
@@ -105,7 +105,7 @@ int Pin::GPIOWrite(int value) const
 
 
 
-    if (1 != write(this->fd_wirte, &s_values_str[LOW == value ? 0 : 1], 1))
+    if (1 != write(this->fd_write, &s_values_str[LOW == value ? 0 : 1], 1))
     {
         fprintf(stderr, "Failed to write value!\n");
         return (-1);
@@ -166,8 +166,8 @@ Pin::Pin(int _pinId, Pin::IO_TYPE _io_type)
     //declare parameter that GPIOWrite need earlier
     char path_write[VALUE_MAX];
     snprintf(path_write, VALUE_MAX, "/sys/class/gpio/gpio%d/value", _pinId);
-    this->fd_wirte = open(path_write, O_WRONLY);
-    if (-1 == this->fd_wirte)
+    this->fd_write = open(path_write, O_WRONLY);
+    if (-1 == this->fd_write)
     {
         fprintf(stderr, "Failed to open gpio value for writing!\n");
         
@@ -179,7 +179,7 @@ Pin::~Pin()
     if(this->iotype==Pin::IO_TYPE::Output)
         this->Off();
     if(this->writingFlag){
-        close(this->fd_wirte);
+        close(this->fd_write);
     }
     std::cout<<"Pin "<<this->pinId<<" destoried\n";
     // For some reason if I disapble gpio, I will run into error the next time I try to enable it

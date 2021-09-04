@@ -1,0 +1,8 @@
+{
+    "cSpell.words": [
+        "tsnorm",
+        "Unexport"
+    ],
+    "cmake.configureOnOpen": true,
+    "cmake.sourceDirectory": "${workspaceFolder}/RPI4"
+}
