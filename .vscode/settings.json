@@ -4,5 +4,8 @@
         "Unexport"
     ],
     "cmake.configureOnOpen": true,
-    "cmake.sourceDirectory": "${workspaceFolder}/RPI4"
+    "cmake.sourceDirectory": "${workspaceFolder}/RPI4",
+    "files.associations": {
+        "xstring": "cpp"
+    }
 }
