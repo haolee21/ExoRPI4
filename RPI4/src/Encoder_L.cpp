@@ -1,5 +1,5 @@
 #include "Encoder_L.hpp"
-Encoder_L::Encoder_L(int pinId)
+Encoder_L::Encoder_L(uint8_t pinId)
 :Encoder(pinId,Encoder_L::SPI_IDX)
 {
 }

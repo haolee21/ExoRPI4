@@ -3,7 +3,7 @@
 #include <sstream>
 
 using namespace std;
-Encoder::Encoder(int pinId,int spi_num)
+Encoder::Encoder(uint8_t pinId,int spi_num)
 {
     int ret = 0;
 
@@ -53,7 +53,7 @@ Encoder::Encoder(int pinId,int spi_num)
 Encoder::~Encoder()
 {
 }
-void Encoder::_initCE(int pinId)
+void Encoder::_initCE(uint8_t pinId)
 {
     switch (pinId)
     {

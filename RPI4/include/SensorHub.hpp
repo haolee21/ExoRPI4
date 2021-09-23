@@ -21,6 +21,9 @@ public:
     ~SensorHub();
     const static int NUMENC = 10;    
     const static int NUMPRE = 8;
+    const float ENC_DEN = 4096.0;
+    const float PRE_DEN = 65536;
+
     static SensorHub& GetInstance();
     static const std::array<short,NUMENC>& GetEncData(); //I did not use lock here since they will be read-only arrays
     static const std::array<short,NUMPRE>& GetPreData(); //While data may not be sync, but it will be the most recent one

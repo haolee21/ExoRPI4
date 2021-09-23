@@ -5,9 +5,8 @@
 #include <linux/spi/spidev.h>
 #include <fcntl.h>
 #include <iostream>
-#include <string>
-#include "Pin.hpp"
 #include <cstring>
+#include "Pin.hpp"
 
 //index for CE of encoders
 
@@ -15,7 +14,7 @@
 class Encoder
 {
 protected:
-    void _initCE(int pinId); //set the chip select pin
+    void _initCE(uint8_t pinId); //set the chip select pin
     virtual void _setCE()=0; //this function will only be realize in Encoder_R and Encoder_L, so we will have to define it pure virtual
     bool pinA;
     bool pinB;
@@ -31,7 +30,7 @@ protected:
     char LSB;
 
 public:
-    Encoder(int pinId,int spi_num);
+    Encoder(uint8_t pinId,int spi_num); //spi_num has to be int
     ~Encoder();
     void SetZero();
     int ReadPos();

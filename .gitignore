@@ -1,4 +1,8 @@
 RPI4/build/*
 RPI4/.vscode/*
 build/*
+*.exe
+_pycache_
+TODO.txt
+FunctionTest/build/*
 

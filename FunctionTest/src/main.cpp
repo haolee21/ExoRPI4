@@ -6,7 +6,7 @@
 #include <array>
 int main()
 {
-    Encoder_L LAnk1(3);
+    Encoder_L LAnk1(Encoder_L::ANK2);
     ADC adc1(0);
     for(int i=0;i<1000;i++){
         std::cout<<"loop"<<i<<"\n";
@@ -14,7 +14,7 @@ int main()
 
         std::array<int,8> adcRes = adc1.ReadData();
         std::cout<<"adc: ";
-        for(int i2 =0;i2<adcRes.size();i2++){
+        for(unsigned i2 =0;i2<adcRes.size();i2++){
             std::cout<<adcRes[i2]<<',';
         }
         std::cout<<std::endl;

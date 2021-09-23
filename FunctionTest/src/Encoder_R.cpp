@@ -2,7 +2,7 @@
 #include "Encoder_R.hpp"
 
 
-Encoder_R::Encoder_R(int pinId)
+Encoder_R::Encoder_R(uint8_t pinId)
 : Encoder(pinId,Encoder_R::SPI_IDX)
 {
 }
