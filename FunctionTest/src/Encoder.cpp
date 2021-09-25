@@ -9,7 +9,7 @@ Encoder::Encoder(uint8_t pinId,int spi_num)
 
     this->_initCE(pinId);
     stringstream ss;
-    ss<<spi_num;
+    ss<<spi_num; 
     string spi_port = "/dev/spidev"+ss.str()+".0";
     this->fd = open(spi_port.c_str(), O_RDWR);
     unsigned int speed = 1000000;

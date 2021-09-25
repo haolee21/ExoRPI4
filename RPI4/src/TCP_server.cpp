@@ -1,114 +1,106 @@
-#include "TCP_server.h"
-#include "Timer.hpp"
-using namespace boost::asio;
+#include "TCP_server.hpp"
 TCP_server::TCP_server()
 {
-    this->flag_on=true;
-    this->flag_isConnect=false;
-    this->thread_checkClient.reset(new std::thread(&TCP_server::CheckConnLoop,this));
-    this->thread_interpretCMD.reset(new std::thread(&TCP_server::InterpretCMDLoop,this));
-    
+    this->flag=true;
+    std::cout<<"SYS:TCP_server:init starts\n";
+    this->acceptor.reset(new boost::asio::ip::tcp::acceptor(this->ioc,boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),TCP_PORT)));
+    this->recv_th.reset(new std::thread(&TCP_server::RecvCmd,this));
     
 }
-
+void TCP_server::Off(){
+    this->flag = false;
+    
+}
 TCP_server::~TCP_server()
 {
-    this->flag_on=false;
-    this->thread_interpretCMD->join();
-    this->thread_checkClient->join();
-    this->socket->close();
-
+    std::cout<<"SYS:TCP_server:Thread join starts\n";
+    this->recv_th->join();
+    std::cout<<"SYS:TCP_server:Thread join\n";
 }
-bool TCP_server::Listen(){
-    try{
-        
-        io_service ios;
-        ip::tcp::acceptor acceptor (ios,ip::tcp::endpoint(ip::tcp::v4(),TCP_PORT));
-        this->socket.reset(new ip::tcp::socket(ios));
-        acceptor.accept(*(this->socket));
-    return true;
-        
-    }catch(const std::exception &e){
-        return false;
-    }
-    
-}
-
-void TCP_server::CheckConnLoop(){
-    struct timespec t;
-    clock_gettime(CLOCK_MONOTONIC, &t);
-    while(this->flag_on){
-
-        if(!this->flag_isConnect){
-            this->flag_isConnect = this->Listen();
-        }
-
-        t.tv_nsec += SEC*this->CHECK_T_S;
-        Timer::Sleep(&t);
-    }
-}
-void TCP_server::InterpretCMDLoop(){
-    struct timespec t;
-    clock_gettime(CLOCK_MONOTONIC,&t);
-    while(this->flag_on){
-        if(this->flag_isConnect){
-            //consider the exceptions since it is possible that server disconnected but flag not updated
-            std::string cmd;
-            std::size_t cmd_len = this->Read(cmd);
-            std::size_t cmd_idx=0;
-            if(cmd_len!=0){
-                std::string cmd_sub = this->Sub_cmd(cmd,cmd_idx,':');
-                if(cmd_sub.compare("REQ")==0){
-                    cmd_sub = this->Sub_cmd(cmd,cmd_idx,':');
-                    if(cmd_sub.compare("MEAS")==0){
-                        //TODO: return measurements' data
-                    }
-                    else if (cmd_sub.compare("CONT")==0)
-                    {
-                        //TODO: return control parameter(what functions are activated)
-                    }
-                    else{
-                        //TODO: cmd_error
-                    }
-                    
-                }
-                
-
-
-            }
-        }
-        t.tv_nsec+=MSEC*this->CHECK_CMD_T_MS;
-        Timer::Sleep(&t);
-    }
-}
-
-void TCP_server::SendData(const char* msg, const unsigned len){
-    if(this->flag_isConnect){
-        this->socket->send(buffer(msg,len));
-    }
-    //won't show any error if no client connected since it is possible the client disconnected
-}
-std::size_t TCP_server::Read(std::string &cmd){
-
-    //check if there are bytes to read, ref: https://stackoverflow.com/questions/6748412/check-if-boostasio-buffer-data-is-present-before-read
-    socket_base::bytes_readable command(true);
-    this->socket->io_control(command);
-    std::size_t bytes2Read = command.get();
-    if(bytes2Read!=0){
-        streambuf buf;
-        read_until(*(this->socket),buf,'\n');//TODO: there is possibility that a cmd is sent without \n, need to take care of it
-        cmd = buffer_cast<const char*>(buf.data());
+void TCP_server::RecvCallback(const boost::system::error_code& error,
+                         std::size_t recv_len,
+                         char recv_str[],std::string &ret_str)
+{
+    if(error)
+    {
+        std::cout<<"SYS:TCP_server:"<<error.message()<<'\n';
     }
     else{
-        cmd = "";
+        ret_str = std::string(recv_str,recv_str+recv_len);
+        
     }
-
-    return bytes2Read;
 }
+void TCP_server::RecvCmd(){
+    
+    
+    while(this->flag){
+        std::shared_ptr<boost::asio::ip::tcp::socket> socket(new boost::asio::ip::tcp::socket(this->ioc));
+        this->acceptor->accept(*socket);
+        char recv_str[1024]={};
+        std::string ret_str{""};
+        socket->async_receive(boost::asio::buffer(recv_str),
+                         std::bind(&TCP_server::RecvCallback,std::placeholders::_1,std::placeholders::_2,recv_str,std::ref(ret_str)));
+        
+        this->ioc.run();
+        this->ioc.restart();
+        //cmd interpret
+        std::size_t cmd_idx=0;
+        std::string cmd_class = this->Sub_cmd(ret_str,cmd_idx,':');
+        std::string cmd_subClass = this->Sub_cmd(ret_str,cmd_idx,':');
+        if(cmd_class.compare("REQ")==0){
+            if(cmd_subClass.compare("MEAS")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
+                if(cmd_device.compare("DATA")==0){
+                    //TODO: add callback to reply measurements
+                    this->Send_cmd(std::string{"Reply Data\n"},socket);
+                }
+            }
+        }
+        else if(cmd_class.compare("ACT")==0){
+            if(cmd_subClass.compare("STOP")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
+                if(cmd_device.compare("CONN")==0){
+                    this->flag=false;
+                }
+            }
+        }
 
+        
+        this->ioc.run();
+        this->ioc.restart();
+
+
+        
+    }
+    std::cout<<"SYS:TCP_server:Loop ends\n";
+}
 std::string TCP_server::Sub_cmd(std::string cmd,std::size_t &idx1,char delim){
-    std::size_t idx2= cmd.find(delim,idx1);
+    std::size_t idx2 = cmd.find(delim,idx1);
     std::string sub_cmd = cmd.substr(idx1,idx2-idx1);
     idx1 = idx2+1;
     return sub_cmd;
+}
+
+void TCP_server::SendCallback(const boost::system::error_code& error,
+                             std::size_t bytes_transferred,
+                             std::shared_ptr<boost::asio::ip::tcp::socket> socket,
+                             std::string str)
+{
+    if(error)
+        std::cout<<error.message()<<std::endl;
+    else if (bytes_transferred == str.size()){
+        
+    }
+    else{//recursive so we don't need to write another function to check byte_transferred
+        socket->async_send(
+            boost::asio::buffer(str.c_str()+bytes_transferred,str.size()-bytes_transferred),
+            std::bind(&TCP_server::SendCallback,std::placeholders::_1,std::placeholders::_2,socket,str)
+        );
+    }
+}
+
+void TCP_server::Send_cmd(std::string reply,std::shared_ptr<boost::asio::ip::tcp::socket> socket){
+    socket->async_send(boost::asio::buffer(reply),
+                       std::bind(&TCP_server::SendCallback,std::placeholders::_1,std::placeholders::_2,socket,reply));
+
 }
