@@ -324,6 +324,7 @@ class MW(QMainWindow):
                 self.timer = QtCore.QTimer()
                 self.timer.timeout.connect(self.tcp_port.DataUpdate)
                 self.timer.start(20)
+                
         else:
             self.timer.stop()
             print('Disconnect   ',self.tcp_port.SendCmd('CON:STOP',2).decode())

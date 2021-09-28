@@ -23,13 +23,14 @@ class TCP:
         self.port = port
     
     def Connect(self):
-        try:
-            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.s.connect((self.ip_address,self.port))
-            self.flag=True
-            print('server connected')
-        except:
-            print('server refused')
+        self.flag=True
+        # try:
+        #     self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #     self.s.connect((self.ip_address,self.port))
+        #     self.flag=True
+        #     print('server connected')
+        # except:
+        #     print('server refused')
        
         
         
@@ -45,7 +46,7 @@ class TCP:
     def Disconnect(self):
         if self.flag:
             self.flag=False
-            self.s.close()
+            
     def MP_test(self):
         print('this is the test function for testing multiprocess')
     def DataUpdate(self):
@@ -73,14 +74,34 @@ class TCP:
             
     def SendCmd(self,cmd,byte_to_read):
         cmd = cmd+'\n'
+        response = b''
         try:
-            self.s.send(cmd.encode('utf-8'))
+            with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
+                
+                s.connect((self.ip_address,self.port))
+                print('connected')
+                s.sendall(cmd.encode())
+
+                # s.settimeout(0.1)
+                response = s.recv(byte_to_read)
+                # response = response[:-1]
+                print('recv length',len(response))
 
         except:
-            print('tcp failed to send command: ',cmd)
-        response = self.s.recv(byte_to_read+1)#include \n
+            print('TCP:Failed\n')
+            self.flag=False
+            
+
+
+        # cmd = cmd+'\n'
+        # try:
+        #     self.s.send(cmd.encode('utf-8'))
+
+        # except:
+        #     print('tcp failed to send command: ',cmd)
+        # response = self.s.recv(byte_to_read+1)#include \n
     
-        response = response[:-1]
+        # response = response[:-1]
       
         return response
 
