@@ -20,6 +20,6 @@ TeensyI2C::~TeensyI2C()
 
 
 void TeensyI2C::WriteCmd(const std::array<char,TeensyI2C::CMDLEN>&cmd){
-    if(write(this->fd,&cmd,TeensyI2C::CMDLEN)!=TeensyI2C::CMDLEN) //write length is different from the original design
+    if(write(this->fd,&cmd,TeensyI2C::CMDLEN)!=TeensyI2C::CMDLEN) //write length is different from the requirement (has to be identical to pwm_num+val_num)
         std::cout<<"I2C error writing\n";
 }
