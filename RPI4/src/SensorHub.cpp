@@ -33,7 +33,7 @@ SensorHub::~SensorHub()
 SensorHub::SensorHub() //initialize member in list since Encoder has no default constructor
     : LHipS_Enc(Encoder_L(0)), LHipF_Enc(Encoder_L(1)), LKneS_Enc(Encoder_L(2)), LAnkS_Enc(Encoder_L(3)), LAnkF_Enc(Encoder_L(4)), RHipS_Enc(Encoder_R(0)), RHipF_Enc(Encoder_R(1)), RKneS_Enc(Encoder_R(2)), RAnkS_Enc(Encoder_R(3)), RAnkF_Enc(Encoder_R(4)),adc0(ADC(0)),adc1(ADC(1))
 {
-    this->senUpdate_flag = false;
+    
 }
 
 void SensorHub::ResetEncImpl(SensorHub::EncName EncName)
@@ -72,118 +72,27 @@ void SensorHub::ResetEncImpl(SensorHub::EncName EncName)
     }
 }
 
-void *SensorHub::SenUpdate(void *data)
-{
-    std::cout << "update thread starts\n";
-    // SensorHub &senHub =  SensorHub::GetInstance();
-    struct timespec t;
-    long int interval = SAMPT * USEC;
-
-    // int loopCount = 0;
-    // int64_t cur_last = 0;
-    // std::array<int64_t, 100000> diffTime;
-    // auto start = std::chrono::high_resolution_clock::now();
-
-
-    //we do a dry run of updating sensor here, can somehow decrease the later loop time since the thread/future's are already created
-    std::future<void> update1 = std::async(std::launch::async, SensorHub::UpdateLEnc);
-    std::future<void> update2 = std::async(std::launch::async, SensorHub::UpdateREnc);
-    update1.wait();
-    update2.wait();
-    update1.get();
-    update2.get();
-    // std::chrono::nanoseconds elapsed;
-    // int64_t duration;
-
-
-
-    clock_gettime(CLOCK_MONOTONIC, &t);
-    // ref to https://linux.die.net/man/2/clock_gettime, maybe can improve stability
-    // clock_gettime(CLOCK_BOOTTIME,&t);
-    while (SensorHub::GetInstance().senUpdate_flag)
-    {
-
-        update1 = std::async(std::launch::async, SensorHub::UpdateLEnc); //the efficiency increase dramatically, I am not sure why it can make such difference
-        update2 = std::async(std::launch::async, SensorHub::UpdateREnc);
-
-        t.tv_nsec += interval;
-
-        // elapsed = std::chrono::high_resolution_clock::now() - start;
-        // duration = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-        // if (loopCount < diffTime.size())
-        // {
-        //     diffTime[loopCount] = duration - cur_last;
-        //     cur_last = duration;
-        // }
-
-        Timer::Sleep(&t);  //sleep before join, free the resources to the tasks
-        // loopCount++;
-        update1.wait();
-        update2.wait();
-        update1.get();
-        update2.get();
-
-        SensorHub::GetInstance().mainTimer->ClockTick();
-    }
-
-    // elapsed = std::chrono::high_resolution_clock::now() - start;
-    // duration = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-    // std::cout << "time diff: ";
-    // for (int i = 0; i < loopCount; i++)
-    // {
-    //     std::cout << diffTime[i] - SAMPT << ',';
-    // }
-    // std::cout << "avg samp time(us): " << duration / loopCount << std::endl;
-}
-
 void SensorHub::UpdateLEnc()
 {
     SensorHub &senHub = SensorHub::GetInstance();
-    senHub.EncData[0] = senHub.LAnkF_Enc.ReadPos();   //TODO: add robustness to ReadPos() when encoder is offline
-    senHub.EncData[1] = senHub.LAnkF_Enc.ReadPos();   //TODO: read the correct encoder when encoders connected
-    senHub.EncData[2] = senHub.LAnkF_Enc.ReadPos();
-    senHub.EncData[3] = senHub.LAnkF_Enc.ReadPos();
-    senHub.EncData[4] = senHub.LAnkF_Enc.ReadPos();
-
-    
-
-    
+    senHub.EncData[SensorHub::LHipS] = senHub.LAnkF_Enc.ReadPos();   //TODO: add robustness to ReadPos() when encoder is offline
+    senHub.EncData[SensorHub::LHipF] = senHub.LAnkF_Enc.ReadPos();   //TODO: read the correct encoder when encoders connected
+    senHub.EncData[SensorHub::LKneS] = senHub.LAnkF_Enc.ReadPos();
+    senHub.EncData[SensorHub::LAnkS] = senHub.LAnkF_Enc.ReadPos();
+    senHub.EncData[SensorHub::LAnkF] = senHub.LAnkF_Enc.ReadPos();    
 }
 void SensorHub::UpdateREnc()
 {
     SensorHub &senHub = SensorHub::GetInstance();
-    senHub.EncData[5]=senHub.RKneS_Enc.ReadPos();   ////TODO: read the correct encoder when encoders connected
-    senHub.EncData[6]=senHub.RKneS_Enc.ReadPos();
-    senHub.EncData[7]=senHub.RKneS_Enc.ReadPos();
-    senHub.EncData[8]=senHub.RKneS_Enc.ReadPos();
-    senHub.EncData[9]=senHub.RKneS_Enc.ReadPos();
+    senHub.EncData[SensorHub::RHipS]=senHub.RKneS_Enc.ReadPos();   ////TODO: read the correct encoder when encoders connected
+    senHub.EncData[SensorHub::RHipF]=senHub.RKneS_Enc.ReadPos();
+    senHub.EncData[SensorHub::RKneS]=senHub.RKneS_Enc.ReadPos();
+    senHub.EncData[SensorHub::RAnkS]=senHub.RKneS_Enc.ReadPos();
+    senHub.EncData[SensorHub::RAnkF]=senHub.RKneS_Enc.ReadPos();
     
-    
 }
-void SensorHub::UpdatePre()
-{
-    SensorHub & senHub = SensorHub::GetInstance();
+// void SensorHub::UpdatePre()
+// {
+//     SensorHub & senHub = SensorHub::GetInstance();
+// }
 
-
-}
-
-int SensorHub::Start(std::shared_ptr<Timer> _mainTimer)
-{ //ref from https://wiki.linuxfoundation.org/realtime/documentation/howto/applications/application_base
-
-    SensorHub::GetInstance().senUpdate_flag = true;
-    SensorHub::GetInstance().mainTimer = _mainTimer;
-    RT::Init();
-    int ret = RT::StartThread(SensorHub::GetInstance().rt_thread, SensorHub::SenUpdate, 80);
-    return ret;
-}
-
-int SensorHub::Stop()
-{
-    SensorHub::GetInstance().senUpdate_flag = false;
-    /* Join the thread and wait until it is done */
-    int ret = pthread_join(SensorHub::GetInstance().rt_thread, NULL);
-    // if (ret)
-    //     printf("join pthread failed: %m\n");
-    //print the line outside
-    return ret;
-}

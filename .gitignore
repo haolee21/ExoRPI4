@@ -6,3 +6,4 @@ _pycache_
 TODO.txt
 FunctionTest/build/*
 exo_gui/__pycache__/*
+Teensy_pio/.pio

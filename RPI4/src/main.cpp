@@ -13,10 +13,12 @@ int main()
     struct timespec t;
     long int interval = 100000* USEC;
 
-    std::function<void()> tickCallBack = [](){Valves_hub::UpdateValve();};
-    std::shared_ptr<Timer> baseTimer(new Timer(tickCallBack)); //both sensorHub and ValvesHub share the same timer, yet this method is far from ideal.....
-    SensorHub::Start(baseTimer);
-    Valves_hub::SetBaseTimer(baseTimer);
+    
+   
+    
+    Timer::Add_senCallback(SensorHub::UpdateLEnc);
+    Timer::Add_senCallback(SensorHub::UpdateREnc);
+    Timer::StartRT();
 
 
 
@@ -40,7 +42,7 @@ int main()
         Timer::Sleep(&t);
     }
 
+    Timer::StopRT();
     
-    SensorHub::Stop();
     return 0;
 }

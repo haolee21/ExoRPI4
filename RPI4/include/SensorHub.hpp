@@ -34,13 +34,18 @@ public:
         LHipS,LHipF,LKneS,LAnkS,LAnkF,
         RHipS,RHipF,RKneS,RAnkS,RAnkF
     };
+
     static void ResetEnc(SensorHub::EncName);
-    static int Start(std::shared_ptr<Timer> baseTimer);//start the sensor update thread, since it is real-time, we will have to create the thread last and lock the memory
-                                                       // a timer that is created in main is shared among SensorHub and ValveHub, I wish I have better way to do it
-    static int Stop();
+    static void UpdateLEnc();//we will use std::async to launch sensor update tasks to improve speed
+    static void UpdateREnc();
+    // static void UpdatePre(); //we don't this now since updating pressure sensor only need to read adc with SPI
+
+                       
+    
 private:
     
     std::array<u_int16_t,NUMENC> EncData;
+    std::array<u_int16_t,NUMPRE> PreData;
 
     // Encoders, S is for sagittal plane, F is for frontal plane
     Encoder_L LHipS_Enc,LHipF_Enc,LKneS_Enc,LAnkS_Enc,LAnkF_Enc;
@@ -54,21 +59,12 @@ private:
 
     //Sensor update
     // we are using a real-time thread for sensor update
-    static void *SenUpdate(void*);
-    bool senUpdate_flag;
-    pthread_t rt_thread;
-    std::shared_ptr<Timer> mainTimer;
+    
 
     
 
-    static void UpdateLEnc();//we will use std::async to launch sensor update tasks to improve speed
-    static void UpdateREnc();
-    static void UpdatePre();
-
+    
 
 };
-
-
-
 
 #endif

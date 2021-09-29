@@ -36,8 +36,9 @@ public:
 
     ~RT();
 
-    static int StartThread(pthread_t &thread,void*(*)(void*),int priority);
+    static int StartThread(pthread_t &thread,void*(*)(void*),int32_t priority);
 
     static void Init();
+    static const int32_t RT_PRIORITY = 80;
 };
 #endif

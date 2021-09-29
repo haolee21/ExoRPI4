@@ -99,7 +99,7 @@ void RT::Init()
     }
 }
 
-int RT::StartThread(pthread_t &thread, void *(*task)(void *),int priority)
+int RT::StartThread(pthread_t &thread, void *(*task)(void *),int32_t priority)
 {
     if (!RT::GetInstance().init_flag)
     {
