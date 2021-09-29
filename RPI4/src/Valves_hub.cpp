@@ -45,7 +45,7 @@ void Valves_hub::On(Valves_hub::SW_ID valve){
         break;
     default:
         throw std::invalid_argument( "cannot find this sw valve to turn on" );
-        break;
+        
     }
 }
 void Valves_hub::Off(Valves_hub::SW_ID valve){
@@ -69,7 +69,7 @@ void Valves_hub::Off(Valves_hub::SW_ID valve){
         break;
     default:
         throw std::invalid_argument( "cannot find this sw valve to trun off" );
-        break;
+        
     }
 }
 void Valves_hub::SendValveCmd(){

@@ -12,7 +12,7 @@ class Valves_hub
 {
 public:
     static Valves_hub& GetInstance();
-    static Valves_hub& GetInstance(std::array<int,SensorHub::NUMENC>&,std::array<int,SensorHub::NUMPRE>&); // ideally this initializer should be called first
+    // static Valves_hub& GetInstance(std::array<u_int16_t,SensorHub::NUMENC>&,std::array<u_int16_t,SensorHub::NUMPRE>&); // ideally this initializer should be called first
 
     Valves_hub(const Valves_hub&)=delete; //no copy
     static void SetBaseTimer(std::shared_ptr<Timer>); //this singleton class shared a timer with SensorHub, really hope I can find a better way to write this

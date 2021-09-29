@@ -6,6 +6,7 @@
     "cmake.configureOnOpen": true,
     "cmake.sourceDirectory": "${workspaceFolder}/RPI4",
     "files.associations": {
-        "xstring": "cpp"
+        "xstring": "cpp",
+        "array": "cpp"
     }
 }
