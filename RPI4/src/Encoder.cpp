@@ -146,6 +146,7 @@ int Encoder::ReadPos()
         this->_spiTxRx(1);
         
     }
+    
     // usleep(20);
     
     this->txBuf[0] = 0x00;

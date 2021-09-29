@@ -121,7 +121,7 @@ char ADC::_spiTxRx(unsigned int len)
     //since we have already assign rxData to spi.rx_buf, it will directly writes to it
 }
 
-const std::array<short,8>& ADC::ReadData(){
+const std::array<u_int16_t,8>& ADC::ReadData(){
     for (int i = 0; i < 8; i++)
     {
         // this->txBuf[0] = this->ch_list[0];

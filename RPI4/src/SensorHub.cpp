@@ -16,11 +16,11 @@ void SensorHub::ResetEnc(SensorHub::EncName encName)
 {
     SensorHub::GetInstance().ResetEncImpl(encName);
 }
-const std::array<short, SensorHub::NUMENC> &SensorHub::GetEncData()
+const std::array<u_int16_t, SensorHub::NUMENC> &SensorHub::GetEncData()
 {
     return std::cref(SensorHub::GetInstance().EncData);
 }
-const std::array<short, SensorHub::NUMPRE> &SensorHub::GetPreData()
+const std::array<u_int16_t, SensorHub::NUMPRE> &SensorHub::GetPreData()
 {
     return std::cref(SensorHub::GetInstance().adc0.ReadData());
 }
@@ -139,11 +139,11 @@ void *SensorHub::SenUpdate(void *data)
 void SensorHub::UpdateLEnc()
 {
     SensorHub &senHub = SensorHub::GetInstance();
-    senHub.EncData[0] = senHub.LAnkS_Enc.ReadPos();
-    senHub.EncData[1] = senHub.LAnkS_Enc.ReadPos();
-    senHub.EncData[2] = senHub.LAnkS_Enc.ReadPos();
-    senHub.EncData[3] = senHub.LAnkS_Enc.ReadPos();
-    senHub.EncData[4] = senHub.LAnkS_Enc.ReadPos();
+    senHub.EncData[0] = senHub.LAnkF_Enc.ReadPos();   //TODO: add robustness to ReadPos() when encoder is offline
+    senHub.EncData[1] = senHub.LAnkF_Enc.ReadPos();
+    senHub.EncData[2] = senHub.LAnkF_Enc.ReadPos();
+    senHub.EncData[3] = senHub.LAnkF_Enc.ReadPos();
+    senHub.EncData[4] = senHub.LAnkF_Enc.ReadPos();
 }
 void SensorHub::UpdateREnc()
 {

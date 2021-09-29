@@ -25,8 +25,8 @@ public:
     const float PRE_DEN = 65536;
 
     static SensorHub& GetInstance();
-    static const std::array<short,NUMENC>& GetEncData(); //I did not use lock here since they will be read-only arrays
-    static const std::array<short,NUMPRE>& GetPreData(); //While data may not be sync, but it will be the most recent one
+    static const std::array<u_int16_t,NUMENC>& GetEncData(); //I did not use lock here since they will be read-only arrays
+    static const std::array<u_int16_t,NUMPRE>& GetPreData(); //While data may not be sync, but it will be the most recent one
     
     SensorHub(const SensorHub&) = delete; // prevent copy singleton
 
@@ -40,7 +40,7 @@ public:
     static int Stop();
 private:
     
-    std::array<short,NUMENC> EncData;
+    std::array<u_int16_t,NUMENC> EncData;
 
     // Encoders, S is for sagittal plane, F is for frontal plane
     Encoder_L LHipS_Enc,LHipF_Enc,LKneS_Enc,LAnkS_Enc,LAnkF_Enc;

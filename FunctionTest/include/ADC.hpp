@@ -35,10 +35,10 @@ public:
     static const short SEN7= 7;
     static const short SEN8= 0;
     static const short DATALEN=8;
-    const std::array<int,DATALEN>& ReadData();
+    const std::array<u_int16_t,DATALEN>& ReadData();
 private:
     // int *data;
-    std::array<int,8> data;
+    std::array<u_int16_t,8> data;
     void startConv();
 
 
