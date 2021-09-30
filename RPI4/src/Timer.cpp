@@ -7,17 +7,18 @@ Timer::Timer()
 Timer::~Timer()
 {
 }
+Timer& Timer::GetInstance(){
+    static Timer instance;
+    return instance;
+}
 
-bool Timer::updateFlag = false;
-std::vector<std::function<void()>> Timer::senCallbacks;
-std::vector<std::function<void()>> Timer::conCallbacks;
-std::vector<std::future<void>> Timer::senFutures;
-std::vector<std::future<void>> Timer::conFutures;
-pthread_t Timer::rt_thread;
-unsigned Timer::timeStamp;
+
+
+
 
 unsigned Timer::GetCurTime(){
-    return Timer::timeStamp;
+    
+    return Timer::GetInstance().timeStamp;
 }
 void Timer::tsnorm(struct timespec *ts)
 {
@@ -34,14 +35,14 @@ void Timer::Sleep(struct timespec *ts){
 }
 int Timer::StartRT(){
     RT::Init();
-    Timer::timeStamp=0;
-    Timer::updateFlag = true;
-    int ret = RT::StartThread(Timer::rt_thread,Timer::TimerTick,RT::RT_PRIORITY);
+    Timer::GetInstance().timeStamp=0;
+    Timer::GetInstance().updateFlag = true;
+    int ret = RT::StartThread(Timer::GetInstance().rt_thread,Timer::TimerTick,RT::RT_PRIORITY);
     return ret;
 }
 int Timer::StopRT(){
-    Timer::updateFlag=false;
-    int ret = pthread_join(Timer::rt_thread,NULL);
+    Timer::GetInstance().updateFlag=false;
+    int ret = pthread_join(Timer::GetInstance().rt_thread,NULL);
     return ret;
 }
 
@@ -50,32 +51,35 @@ void* Timer::TimerTick(void*){
     struct timespec t;
     long int interval = SAMPT*USEC;
     clock_gettime(CLOCK_MONOTONIC,&t);
-    while(Timer::updateFlag){
+    Timer &timer = Timer::GetInstance();
+    while(timer.updateFlag){
         //update sensor 
-        for(unsigned i=0;i<Timer::senCallbacks.size();i++){
-            Timer::senFutures[i]=std::async(std::launch::async,Timer::senCallbacks[i]);
+        for(unsigned i=0;i<timer.senCallbacks.size();i++){
+            timer.senFutures[i]=std::async(std::launch::async,timer.senCallbacks[i]);
         }
         t.tv_nsec+=interval;  //TODO: finish this, need to think about how to make it efficient
         Timer::Sleep(&t);
-        for(unsigned i=0;i<Timer::senCallbacks.size();i++){
-            Timer::senFutures[i].wait();
+        for(unsigned i=0;i<timer.senCallbacks.size();i++){
+            timer.senFutures[i].wait();
         }
-        for(unsigned i=0;i<Timer::senCallbacks.size();i++){
-            Timer::senFutures[i].get();
+        for(unsigned i=0;i<timer.senCallbacks.size();i++){
+            timer.senFutures[i].get();
         }
-        Timer::timeStamp++;
+        timer.timeStamp++;
     }
+    return 0;
 }
 void Timer::Add_senCallback(std::function<void()> fun){
-    
-    Timer::senCallbacks.push_back(fun);
-    Timer::senFutures.push_back(std::async(std::launch::async,fun));
-    Timer::senFutures.back().wait();
-    Timer::senFutures.back().get();
+    Timer& timer=Timer::GetInstance();
+    timer.senCallbacks.push_back(fun);
+    timer.senFutures.push_back(std::async(std::launch::async,fun));
+    timer.senFutures.back().wait();
+    timer.senFutures.back().get();
 }
 void Timer::Add_conCallback(std::function<void()> fun){
-    Timer::conCallbacks.push_back(fun);
-    Timer::conFutures.push_back(std::async(std::launch::async,fun));
-    Timer::conFutures.back().wait();
-    Timer::conFutures.back().get();
+    Timer& timer=Timer::GetInstance();
+    timer.conCallbacks.push_back(fun);
+    timer.conFutures.push_back(std::async(std::launch::async,fun));
+    timer.conFutures.back().wait();
+    timer.conFutures.back().get();
 }

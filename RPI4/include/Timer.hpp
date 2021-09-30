@@ -19,8 +19,11 @@ class Timer
     //this class has mix usage. Static functions are for real-time clocks nano sleep or number rounding
     //member functions are timer for both SensorHub and ValveHub
     public:
-    Timer();
+    
     ~Timer();
+    Timer(const Timer&)=delete;
+    static Timer& GetInstance();
+
     
     static unsigned GetCurTime();
     static void Sleep(struct timespec *ts);
@@ -32,17 +35,18 @@ class Timer
     static std::function<void()> senUpdateFun;
     static std::function<void()> controlUpdateFun;
 private:
+    Timer();
     // sensor/controller update functions, will ran in timer tick function
-    static std::vector<std::function<void()>> senCallbacks;
-    static std::vector<std::function<void()>> conCallbacks;
+    std::vector<std::function<void()>> senCallbacks;
+    std::vector<std::function<void()>> conCallbacks;
     
-    static std::vector<std::future<void>> senFutures;
-    static std::vector<std::future<void>> conFutures;
-    static pthread_t rt_thread;
-    static bool updateFlag;
+    std::vector<std::future<void>> senFutures;
+    std::vector<std::future<void>> conFutures;
+    pthread_t rt_thread;
+    bool updateFlag;
     static void* TimerTick(void*);
 
-    static unsigned timeStamp; //the time scale will be 1/sampFreq
+    unsigned timeStamp; //the time scale will be 1/sampFreq
 
     //below static functions are for real-time nano clocks     
     static void tsnorm(struct timespec *ts);
