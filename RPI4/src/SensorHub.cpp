@@ -91,8 +91,9 @@ void SensorHub::UpdateREnc()
     senHub.EncData[SensorHub::RAnkF]=senHub.RKneS_Enc.ReadPos();
     
 }
-// void SensorHub::UpdatePre()
-// {
-//     SensorHub & senHub = SensorHub::GetInstance();
-// }
+void SensorHub::UpdatePre()
+{
+    SensorHub & senHub = SensorHub::GetInstance();
+    senHub.PreData = senHub.adc1.ReadData();
+}
 

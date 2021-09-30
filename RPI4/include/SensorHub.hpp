@@ -12,6 +12,8 @@
 #include <memory>
 #include <Timer.hpp>
 
+#define DEG (360.0f/4096.0f)
+
 class SensorHub
 // this is a singleton class since it is directly link to the hardware, 
 // config will not change unless I modify the hardware
@@ -30,15 +32,21 @@ public:
     
     SensorHub(const SensorHub&) = delete; // prevent copy singleton
 
+
+    // data index
+    // we use enum for encoder since the order can be determined by ourself (read ENC order)
     enum EncName{
         LHipS,LHipF,LKneS,LAnkS,LAnkF,
         RHipS,RHipF,RKneS,RAnkS,RAnkF
     };
+    // Pressure sensor index need to be assigned since it is determine by ADC channels
+    static const u_int8_t LKneP=0,RKneP=1,LAnkP=2,RAnkP=3,LTank=4,RTank=5; //TODO: check the order before use
+
 
     static void ResetEnc(SensorHub::EncName);
     static void UpdateLEnc();//we will use std::async to launch sensor update tasks to improve speed
     static void UpdateREnc();
-    // static void UpdatePre(); //we don't this now since updating pressure sensor only need to read adc with SPI
+    static void UpdatePre(); //we don't this now since updating pressure sensor only need to read adc with SPI
 
                        
     
@@ -57,8 +65,7 @@ private:
     ADC adc0,adc1;
 
 
-    //Sensor update
-    // we are using a real-time thread for sensor update
+    
     
 
     
