@@ -50,8 +50,16 @@ void* Timer::TimerTick(void*){
     std::cout<<"RT Task Start\n";
     struct timespec t;
     long int interval = SAMPT*USEC;
-    clock_gettime(CLOCK_MONOTONIC,&t);
+
+    //////////////////////////////////////////////////////////
+    unsigned timeDiff_idx=0; //TODO: testing loop period only, should be commented in final version
+    std::array<float,60*1000> timeDiff; //can only run around 60 sec
+    auto t_start=std::chrono::high_resolution_clock::now();
+    auto t_end = std::chrono::high_resolution_clock::now();
+    ///////////////////////////////////////////////////////////
+
     Timer &timer = Timer::GetInstance();
+    clock_gettime(CLOCK_MONOTONIC,&t);
     while(timer.updateFlag){
         //update sensor 
         for(unsigned i=0;i<timer.senCallbacks.size();i++){
@@ -59,18 +67,43 @@ void* Timer::TimerTick(void*){
         }
         t.tv_nsec+=interval;  //TODO: finish this, need to think about how to make it efficient
         Timer::Sleep(&t);
+
+        ///////////////////////////////////////////////// TODO: testing loop period only
+        t_end = std::chrono::high_resolution_clock::now();
+        timeDiff[timeDiff_idx++]=std::chrono::duration<float,std::micro>(t_end-t_start).count();
+        t_start = t_end;
+        /////////////////////////////////////////////////
+
+
         for(unsigned i=0;i<timer.senCallbacks.size();i++){
             timer.senFutures[i].wait();
+            // timer.senFutures[i].get();
         }
         for(unsigned i=0;i<timer.senCallbacks.size();i++){
             timer.senFutures[i].get();
         }
+        
+        //update valve
+        for(unsigned i=0;i<timer.conCallbacks.size();i++){
+
+        }
+
+
         timer.timeStamp++;
     }
+    /////////////////////////////////////////// TODO: testing loop period only
+    std::cout<<"Time diff: \n";
+    for(unsigned i=0;i<timeDiff_idx;i++){
+        std::cout<<timeDiff[i]<<',';
+    }
+    ////////////////////////////////////////////
+
+    
     return 0;
 }
 void Timer::Add_senCallback(std::function<void()> fun){
     Timer& timer=Timer::GetInstance();
+
     timer.senCallbacks.push_back(fun);
     timer.senFutures.push_back(std::async(std::launch::async,fun));
     timer.senFutures.back().wait();
