@@ -26,15 +26,15 @@ public:
     ~ADC();
     
 
-    static const short SEN1=1;
-    static const short SEN2= 2;
-    static const short SEN3= 3;
-    static const short SEN4= 4;
-    static const short SEN5= 5;
-    static const short SEN6= 6;
-    static const short SEN7= 7;
-    static const short SEN8= 0;
-    static const short DATALEN=8;
+    static const uint8_t SEN1= 1;
+    static const uint8_t SEN2= 2;
+    static const uint8_t SEN3= 3;
+    static const uint8_t SEN4= 4;
+    static const uint8_t SEN5= 5;
+    static const uint8_t SEN6= 6;
+    static const uint8_t SEN7= 7;
+    static const uint8_t SEN8= 0;
+    static const uint8_t DATALEN=8;
     const std::array<u_int16_t,DATALEN>& ReadData();
 private:
     // int *data;

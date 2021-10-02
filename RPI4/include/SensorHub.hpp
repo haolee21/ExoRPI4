@@ -21,8 +21,9 @@ class SensorHub
 public:
     
     ~SensorHub();
-    const static int NUMENC = 10;    
-    const static int NUMPRE = 8;
+    const static int NUMENC = 6;    
+    const static int NUMPRE = 5; //always 8 since ADC has 8 channels
+    
     const float ENC_DEN = 4096.0;
     const float PRE_DEN = 65536;
 
@@ -36,11 +37,11 @@ public:
     // data index
     // we use enum for encoder since the order can be determined by ourself (read ENC order)
     enum EncName{
-        LHipS,LHipF,LKneS,LAnkS,LAnkF,
-        RHipS,RHipF,RKneS,RAnkS,RAnkF
+        LHipS,LKneS,LAnkS,//,LHipF,LAnkF
+        RHipS,RKneS,RAnkS//RHipF,RAnkF
     };
     // Pressure sensor index need to be assigned since it is determine by ADC channels
-    static const u_int8_t LKneP=0,RKneP=1,LAnkP=2,RAnkP=3,LTank=4,RTank=5; //TODO: check the order before use
+    static const u_int8_t LKneP=0,RKneP=1,LAnkP=2,RAnkP=3,TankP=4;//TODO: check the order before use
 
 
     static void ResetEnc(SensorHub::EncName);
@@ -56,8 +57,8 @@ private:
     std::array<u_int16_t,NUMPRE> PreData;
 
     // Encoders, S is for sagittal plane, F is for frontal plane
-    Encoder_L LHipS_Enc,LHipF_Enc,LKneS_Enc,LAnkS_Enc,LAnkF_Enc;
-    Encoder_R RHipS_Enc,RHipF_Enc,RKneS_Enc,RAnkS_Enc,RAnkF_Enc;
+    Encoder_L LHipS_Enc,LKneS_Enc,LAnkS_Enc; //LHipF_Enc,LAnkF_Enc
+    Encoder_R RHipS_Enc,RKneS_Enc,RAnkS_Enc;//,RHipF_Enc,RAnkF_Enc
     SensorHub();
     void ResetEncImpl(SensorHub::EncName);//the reset function is implement so I can avoid using a lot of SensorHub::Encorder since it is a member function
 

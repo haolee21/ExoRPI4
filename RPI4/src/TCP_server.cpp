@@ -13,6 +13,7 @@ void TCP_server::Off(){
 }
 TCP_server::~TCP_server()
 {
+    this->Off(); //turn itself off when finished
     std::cout<<"SYS:TCP_server:Thread join starts\n";
     this->recv_th->join();
     std::cout<<"SYS:TCP_server:Thread join\n";
@@ -52,7 +53,12 @@ void TCP_server::RecvCmd(){
                 std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
                 if(cmd_device.compare("DATA")==0){
                     //TODO: add callback to reply measurements
-                    this->Send_cmd(std::string{"Reply Data\n"},socket);
+                    std::array<char,(SensorHub::NUMENC+SensorHub::NUMPRE)*sizeof(uint16_t)> meaData;
+                    const std::array<u_int16_t,SensorHub::NUMENC> &encData=SensorHub::GetEncData();
+                    std::memcpy(meaData.begin(),encData.begin(),sizeof(u_int16_t)*encData.size());
+                    const std::array<u_int16_t,SensorHub::NUMPRE> &preData=SensorHub::GetPreData();
+                    std::memcpy(meaData.begin()+encData.size(),preData.begin(),sizeof(u_int16_t)*preData.size());
+                    TCP_server::Send_cmd(std::string(meaData.begin(),meaData.end()),socket);
                 }
             }
         }

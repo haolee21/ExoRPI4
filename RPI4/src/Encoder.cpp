@@ -18,36 +18,36 @@ Encoder::Encoder(uint8_t pinId,int spi_num)
     auto mode = SPI_MODE_0;
     ret = ioctl(this->fd, SPI_IOC_WR_MODE, &mode);
     if (ret == -1)
-        cout << "cannot set spi write mode\n";
+        cout << "SYS:ENCODER:spi"<<spi_num<<":cannot set spi write mode\n";
 
     ret = ioctl(this->fd, SPI_IOC_RD_MODE, &mode);
     if (ret == -1)
-        cout << "cannot set spi read mode\n";
+        cout << "SYS:ENCODER:spi"<<spi_num<<":cannot set spi read mode\n";
 
     uint8_t bits = 8;
     ret = ioctl(this->fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
     if (ret < 0)
-        cout << "cannot set bits per work\n";
+        cout << "SYS:ENCODER:spi"<<spi_num<<":cannot set bits per work\n";
 
     ret = ioctl(this->fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
     if (ret < 0)
-        cout << "cannot set bits per work\n";
+        cout << "SYS:ENCODER:spi"<<spi_num<<":cannot set bits per work\n";
 
     
     ret = ioctl(this->fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
     if (ret < 0)
-        cout << "cannot set write speed\n";
+        cout << "SYS:ENCODER:spi"<<spi_num<<":cannot set write speed\n";
     ret = ioctl(this->fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
     if (ret < 0)
-        cout << "cannot set read speed\n";
+        cout << "SYS:ENCODER:spi"<<spi_num<<":cannot set read speed\n";
 
     int lsb_first = 0;
     ret = ioctl(this->fd, SPI_IOC_RD_LSB_FIRST, &lsb_first);
     if (ret < 0)
-        cout << "cannot set read MSB first\n";
+        cout << "SYS:ENCODER:spi"<<spi_num<<":cannot set read MSB first\n";
     ret = ioctl(this->fd, SPI_IOC_WR_LSB_FIRST, &lsb_first);
     if (ret < 0)
-        cout << "cannot set write MSB first\n";
+        cout << "SYS:ENCODER:spi"<<spi_num<<":cannot set write MSB first\n";
 }
 
 Encoder::~Encoder()

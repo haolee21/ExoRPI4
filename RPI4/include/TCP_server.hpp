@@ -6,7 +6,9 @@
 #include <functional>
 #include <thread>
 #include <cstring>
-
+#include <SensorHub.hpp>
+#include <Valves_hub.hpp>
+#include <functional>
 
 #define TCP_PORT 1234
 class TCP_server
@@ -35,7 +37,11 @@ private:
     std::string Sub_cmd(std::string cmd,std::size_t &idx1,char delim);
     void Cmd_handler(char[],size_t len);
 
-    void Send_cmd(std::string cmd,std::shared_ptr<boost::asio::ip::tcp::socket> socket);
+    static void Send_cmd(std::string cmd,std::shared_ptr<boost::asio::ip::tcp::socket> socket);
+
+    //Callback functions
+    
+    
 public:
     TCP_server();
     ~TCP_server();
