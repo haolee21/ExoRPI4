@@ -126,12 +126,13 @@ char ADC::_spiTxRx(unsigned int len)
 const std::array<u_int16_t,8>& ADC::ReadData(){
     for (int i = 0; i < 8; i++)
     {
+        ADC::conv.On();
         // this->txBuf[0] = this->ch_list[0];
         this->txBuf[0] = 0b11010000;
         this->txBuf[1] = 0b00000000;
         
         
-        ADC::conv.On();
+        
   
 
         this->_spiTxRx(2);

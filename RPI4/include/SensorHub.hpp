@@ -63,7 +63,7 @@ private:
     void ResetEncImpl(SensorHub::EncName);//the reset function is implement so I can avoid using a lot of SensorHub::Encorder since it is a member function
 
     // ADC 
-    ADC adc0,adc1;
+    ADC adc0;
 
 
     

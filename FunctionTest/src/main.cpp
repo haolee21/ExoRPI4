@@ -6,11 +6,11 @@
 #include <array>
 int main()
 {
-    Encoder_R RKnee(Encoder_R::KNEE);
-    ADC adc1(0);
+    Encoder_L enc(Encoder_L::KNEE);
+    ADC adc1(1);
     for(int i=0;i<1000;i++){
         std::cout<<"loop"<<i<<"\n";
-        std::cout<<"Pos: "<<RKnee.ReadPos()<<std::endl;
+        std::cout<<"Pos: "<<enc.ReadPos()<<std::endl;
 
         std::array<u_int16_t,8> adcRes = adc1.ReadData();
         std::cout<<"adc: ";

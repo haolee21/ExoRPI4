@@ -10,10 +10,10 @@ JOINT_DATA_LEN=12
 PRE_DATA_LEN=10
 class TCP:
     port =1234
-    ip_address='127.0.0.1'
+    ip_address='192.168.0.100'
     def __init__(self):
         self.flag = False
-        self.updateProcess=None
+        
         
         
 
@@ -39,10 +39,12 @@ class TCP:
         # except:
         #     print('sock connecting failed')
         return self.flag
-    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun):
+    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback):
         self.updateJoint = updateJointFun
         self.updatePre = updatePreFun
         self.updateTank = updateTankFun
+        self.disConCcallback = disConCallback
+        
     def Disconnect(self):
         if self.flag:
             self.flag=False
@@ -51,7 +53,7 @@ class TCP:
         print('this is the test function for testing multiprocess')
     def DataUpdate(self):
         if self.flag:
-            receive = self.SendCmd('REQ:MEAS',JOINT_DATA_LEN+PRE_DATA_LEN)
+            receive = self.SendCmd('REQ:MEAS:DATA',JOINT_DATA_LEN+PRE_DATA_LEN)
             # receive =b''
             # # while True:
             # #     cur_data = self.s.recv(1)
@@ -70,7 +72,7 @@ class TCP:
             self.updateTank(int.from_bytes(receive[-2:],'big'))
         else:
             print('error: tcp port not connected')
-            
+            self.disConCcallback()
             
     def SendCmd(self,cmd,byte_to_read):
         cmd = cmd+'\n'
@@ -79,17 +81,18 @@ class TCP:
             with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
                 
                 s.connect((self.ip_address,self.port))
-                print('connected')
+                
                 s.sendall(cmd.encode())
 
                 # s.settimeout(0.1)
                 response = s.recv(byte_to_read)
                 # response = response[:-1]
-                print('recv length',len(response))
+                
 
         except:
             print('TCP:Failed\n')
             self.flag=False
+            
             
 
 

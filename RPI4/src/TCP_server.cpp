@@ -4,6 +4,7 @@ TCP_server::TCP_server()
     this->flag=true;
     std::cout<<"SYS:TCP_server:init starts\n";
     this->acceptor.reset(new boost::asio::ip::tcp::acceptor(this->ioc,boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),TCP_PORT)));
+    
     this->recv_th.reset(new std::thread(&TCP_server::RecvCmd,this));
     
 }
@@ -37,6 +38,7 @@ void TCP_server::RecvCmd(){
     while(this->flag){
         std::shared_ptr<boost::asio::ip::tcp::socket> socket(new boost::asio::ip::tcp::socket(this->ioc));
         this->acceptor->accept(*socket);
+        
         char recv_str[1024]={};
         std::string ret_str{""};
         socket->async_receive(boost::asio::buffer(recv_str),
@@ -57,8 +59,9 @@ void TCP_server::RecvCmd(){
                     const std::array<u_int16_t,SensorHub::NUMENC> &encData=SensorHub::GetEncData();
                     std::memcpy(meaData.begin(),encData.begin(),sizeof(u_int16_t)*encData.size());
                     const std::array<u_int16_t,SensorHub::NUMPRE> &preData=SensorHub::GetPreData();
-                    std::memcpy(meaData.begin()+encData.size(),preData.begin(),sizeof(u_int16_t)*preData.size());
+                    std::memcpy(meaData.begin()+encData.size()*sizeof(u_int16_t),preData.begin(),sizeof(u_int16_t)*preData.size());
                     TCP_server::Send_cmd(std::string(meaData.begin(),meaData.end()),socket);
+                    
                 }
             }
         }
