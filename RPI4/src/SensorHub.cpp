@@ -18,11 +18,11 @@ void SensorHub::ResetEnc(SensorHub::EncName encName)
 }
 const std::array<u_int16_t, SensorHub::NUMENC> &SensorHub::GetEncData()
 {
-    return std::cref(SensorHub::GetInstance().EncData);
+    return std::ref(SensorHub::GetInstance().EncData);
 }
 const std::array<u_int16_t, SensorHub::NUMPRE> &SensorHub::GetPreData()
 {
-    return std::cref(SensorHub::GetInstance().PreData);
+    return std::ref(SensorHub::GetInstance().PreData);
     // return std::cref(SensorHub::GetInstance().adc0.ReadData());
 }
 
