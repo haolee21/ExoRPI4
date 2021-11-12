@@ -69,7 +69,7 @@ class TCP:
             # else:
             self.updateJoint(receive[:JOINT_DATA_LEN]) 
             self.updatePre(receive[JOINT_DATA_LEN:-2])
-            self.updateTank(int.from_bytes(receive[-2:],'big'))
+            self.updateTank(int.from_bytes(receive[-2:],'little'))
         else:
             print('error: tcp port not connected')
             self.disConCcallback()

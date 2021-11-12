@@ -404,7 +404,7 @@
      <string>Test Functions</string>
     </property>
     <addaction name="actionTest_SW_Valves"/>
-    <addaction name="actionTest_PWM_Valves"/>
+    <addaction name="act_testPWM_valves"/>
    </widget>
    <addaction name="menuConnection"/>
    <addaction name="menuGraphs"/>
@@ -432,7 +432,7 @@
     <string>Test SW Valves</string>
    </property>
   </action>
-  <action name="actionTest_PWM_Valves">
+  <action name="act_testPWM_valves">
    <property name="text">
     <string>Test PWM Valves</string>
    </property>

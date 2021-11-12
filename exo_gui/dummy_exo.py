@@ -5,8 +5,8 @@ import pdb
 # HOST='192.168.1.194'
 HOST = '127.0.0.1'
 PORT=1234
-JOINT_DATA_LEN=12
-PRE_DATA_LEN=10
+JOINT_DATA_LEN=12 #6 joints
+PRE_DATA_LEN=10 
 
          
 old_cmd=b''
@@ -37,11 +37,11 @@ while True:
                         #     recv_cmd=old_cmd+data[:idx]
                         #     old_cmd = data[idx+1:]
                         #     break
-                    if recv_cmd == b'REQ:MEAS':
-                        receiveNum = (np.random.randint(100,size=int((JOINT_DATA_LEN+PRE_DATA_LEN)/2))).tolist()
+                    if recv_cmd == b'REQ:MEAS:DATA':
+                        receiveNum = np.random.randint(100,size=int(JOINT_DATA_LEN/2)).tolist()+np.random.randint(2**16,size=int(PRE_DATA_LEN/2)).tolist()
                         receive = b''
                         for c in receiveNum:
-                            receive = receive+c.to_bytes(2,'big')
+                            receive = receive+c.to_bytes(2,'little')
                         receive = receive+b'\n'
                         print('send ',len(receive))
                         conn.send(receive)
