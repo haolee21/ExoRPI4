@@ -14,15 +14,16 @@ int main()
     long int interval = 1*SEC;
 
     
-   
+    
     
     Timer::Add_senCallback(SensorHub::UpdateLEnc);
     Timer::Add_senCallback(SensorHub::UpdateREnc);
     Timer::Add_senCallback(SensorHub::UpdatePre);
+    Timer::Add_conCallback(Valves_hub::UpdateValve);
     TCP_server tcp_server;
     Timer::StartRT();
     
-
+    
 
     clock_gettime(CLOCK_MONOTONIC, &t);
     

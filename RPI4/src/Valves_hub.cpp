@@ -14,11 +14,6 @@ Valves_hub& Valves_hub::GetInstance(){
 }
 
 
-void Valves_hub::UpdateValve(){
-
-    
-}
-
 void Valves_hub::On(Valves_hub::SW_ID valve){
     switch (valve)
     {
@@ -59,13 +54,14 @@ void Valves_hub::Off(Valves_hub::SW_ID valve){
         
     }
 }
-void Valves_hub::SendValveCmd(){
+void Valves_hub::UpdateValve(){
+    Valves_hub& hub = Valves_hub::GetInstance();
     std::array<char,TeensyI2C::CMDLEN> cmd;
 
-    std::memcpy(cmd.begin(),this->PWM_Duty.begin(),sizeof(uint8_t)*PWM_VAL_NUM);
-    std::memcpy(cmd.begin()+PWM_VAL_NUM*sizeof(uint8_t),this->SW_ValCond.begin(),sizeof(bool)*SW_VAL_NUM);
+    std::memcpy(cmd.begin(),hub.PWM_Duty.begin(),sizeof(uint8_t)*PWM_VAL_NUM);
+    std::memcpy(cmd.begin()+PWM_VAL_NUM*sizeof(uint8_t),hub.SW_ValCond.begin(),sizeof(bool)*SW_VAL_NUM);
     
-    this->teensyValveCon.WriteCmd(cmd);
+    hub.teensyValveCon.WriteCmd(cmd);
     
 }
 

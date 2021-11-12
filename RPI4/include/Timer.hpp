@@ -6,7 +6,7 @@
 #define USEC (1000 * NSEC)
 #define MSEC (1000 * USEC)
 #define SEC (1000 * MSEC)
-#define SAMPT 1250
+#define SAMPT 4000  //sampling period in uS
 
 #include <functional>
 #include <pthread.h>
@@ -14,6 +14,7 @@
 #include <future>
 #include <vector>
 #include <iostream>
+#include "Valves_hub.hpp"
 class Timer
 {
     //this class has mix usage. Static functions are for real-time clocks nano sleep or number rounding
@@ -32,6 +33,7 @@ class Timer
 
     static void Add_senCallback(std::function<void()> fun);
     static void Add_conCallback(std::function<void()> fun);
+    
     static std::function<void()> senUpdateFun;
     static std::function<void()> controlUpdateFun;
 private:
@@ -39,6 +41,7 @@ private:
     // sensor/controller update functions, will ran in timer tick function
     std::vector<std::function<void()>> senCallbacks;
     std::vector<std::function<void()>> conCallbacks;
+    
     
     std::vector<std::future<void>> senFutures;
     std::vector<std::future<void>> conFutures;

@@ -84,9 +84,7 @@ void* Timer::TimerTick(void*){
         }
         
         //update valve
-        for(unsigned i=0;i<timer.conCallbacks.size();i++){
-
-        }
+        Valves_hub::UpdateValve();
 
 
         timer.timeStamp++;

@@ -13,7 +13,7 @@ public:
     // static Valves_hub& GetInstance(std::array<u_int16_t,SensorHub::NUMENC>&,std::array<u_int16_t,SensorHub::NUMPRE>&); // ideally this initializer should be called first
 
     Valves_hub(const Valves_hub&)=delete; //no copy
-
+    
     static void UpdateValve();
     ~Valves_hub();
     enum SW_ID{
@@ -44,7 +44,7 @@ private:
     
 
 
-    void SendValveCmd();
+    
 
 
     
