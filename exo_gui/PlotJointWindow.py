@@ -97,17 +97,17 @@ class PlotJointWindow(QWidget):
         
 
         self.r_hipData.popleft()
-        self.parent.rtplot_data[3]=int.from_bytes(data[6:8],'little')*-0.087890625
+        self.parent.rtplot_data[3]=int.from_bytes(data[6:8],'little')*0.087890625
         self.r_hipData.append(self.parent.rtplot_data[3])
         self.right_hip_line.setData(self.r_hipData)
         
         self.r_kneeData.popleft()
-        self.parent.rtplot_data[4]=int.from_bytes(data[8:10],'little')*-0.087890625
+        self.parent.rtplot_data[4]=int.from_bytes(data[8:10],'little')*0.087890625
         self.r_kneeData.append(self.parent.rtplot_data[4])
         self.right_knee_line.setData(self.r_kneeData)
 
         self.r_ankData.popleft()
-        self.parent.rtplot_data[5]=int.from_bytes(data[10:12],'little')*-0.087890625
+        self.parent.rtplot_data[5]=int.from_bytes(data[10:12],'little')*0.087890625
         self.r_ankData.append(self.parent.rtplot_data[5])
         self.right_ankle_line.setData(self.r_ankData)
 

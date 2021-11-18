@@ -5,6 +5,7 @@
 #include "Teensy.hpp"
 #include "Timer.hpp"
 #include "SensorHub.hpp"
+#include <stdexcept>
 
 class Valves_hub
 {
@@ -17,10 +18,12 @@ public:
     static void UpdateValve();
     ~Valves_hub();
     enum SW_ID{
-        LKNEBAL,LANKBAL,RKNEBAL,RANKBAL,LTANKPRE,RTANKPRE
+        LKNEBAL,LANKBAL,RKNEBAL,RANKBAL,
+        FIRST_SW=LKNEBAL,LAST_SW=RANKBAL
     };
     enum PWM_ID{
-        LKNEPRE,LANKPRE,RKNEPRE,RANKPRE,TANKPRE
+        LKNEPRE,LANKPRE,RKNEPRE,RANKPRE,LTANKPRE,RTANKPRE,
+        FIRST_PWM=LKNEPRE,LAST_PWM=RTANKPRE
     };
 
     static void SetDuty(uint8_t duty,Valves_hub::PWM_ID id);
@@ -42,6 +45,9 @@ private:
     void On(Valves_hub::SW_ID sw_valve);//turn on or off the valve
     void Off(Valves_hub::SW_ID sw_valve);
     
+    bool valChanged_flag;
+
+
 
 
     

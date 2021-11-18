@@ -3,7 +3,7 @@
 class Controller
 {
 private:
-    /* data */
+    bool TestPWM;
 public:
     Controller(/* args */);
     ~Controller();

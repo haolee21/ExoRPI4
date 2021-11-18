@@ -54,6 +54,7 @@ void TCP_server::RecvCmd(){
             if(cmd_subClass.compare("MEAS")==0){
                 std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
                 if(cmd_device.compare("DATA")==0){
+                    
                     //TODO: add callback to reply measurements
                     std::array<char,(SensorHub::NUMENC+SensorHub::NUMPRE)*sizeof(uint16_t)> meaData;
                     const std::array<u_int16_t,SensorHub::NUMENC> &encData=SensorHub::GetEncData();
@@ -71,6 +72,26 @@ void TCP_server::RecvCmd(){
                 if(cmd_device.compare("CONN")==0){
                     this->flag=false;
                 }
+            }
+        }
+        else if(cmd_class.compare("SET")==0){
+            
+            
+            if(cmd_subClass.compare("PWM")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
+                uint8_t input = std::stoi(Sub_cmd(ret_str,cmd_idx,'\n'));
+                if(cmd_device.compare("LKNE")==0) {Valves_hub::SetDuty(input,Valves_hub::LKNEPRE);}
+                else if(cmd_device.compare("LANK")==0) {Valves_hub::SetDuty(input,Valves_hub::LANKPRE);}
+                else if(cmd_device.compare("LTANK")==0){Valves_hub::SetDuty(input,Valves_hub::LTANKPRE);}
+                else if(cmd_device.compare("RKNE")==0){Valves_hub::SetDuty(input,Valves_hub::RKNEPRE);}
+                else if(cmd_device.compare("RANK")==0){Valves_hub::SetDuty(input,Valves_hub::RANKPRE);}
+                else if(cmd_device.compare("RTANK")==0){Valves_hub::SetDuty(input,Valves_hub::RTANKPRE);}
+                TCP_server::Send_cmd(std::string("1"),socket);
+            }
+            
+
+            else{
+                TCP_server::Send_cmd(std::string("0"),socket);
             }
         }
 

@@ -76,19 +76,19 @@ void SensorHub::ResetEncImpl(SensorHub::EncName EncName)
 void SensorHub::UpdateLEnc()
 {
     SensorHub &senHub = SensorHub::GetInstance();
-    // senHub.EncData[SensorHub::LHipS] = senHub.LKneS_Enc.ReadPos();   //TODO: add robustness to ReadPos() when encoder is offline
-    // senHub.EncData[SensorHub::LKneS] = senHub.LKneS_Enc.ReadPos();   //TODO: read the correct encoder when encoders connected
-    // senHub.EncData[SensorHub::LAnkS] = senHub.LKneS_Enc.ReadPos();
+    senHub.EncData[SensorHub::LHipS] = senHub.LHipS_Enc.ReadPos();   //TODO: add robustness to ReadPos() when encoder is offline
+    senHub.EncData[SensorHub::LKneS] = senHub.LKneS_Enc.ReadPos();   //TODO: read the correct encoder when encoders connected
+    senHub.EncData[SensorHub::LAnkS] = senHub.LAnkS_Enc.ReadPos();
     // senHub.EncData[SensorHub::LHipF] = senHub.LAnkS_Enc.ReadPos();
     // senHub.EncData[SensorHub::LAnkF] = senHub.LAnkS_Enc.ReadPos();    
 }
 void SensorHub::UpdateREnc()
 {
     SensorHub &senHub = SensorHub::GetInstance();
-    senHub.EncData[SensorHub::RHipS]=senHub.RKneS_Enc.ReadPos();   ////TODO: read the correct encoder when encoders connected
+    senHub.EncData[SensorHub::RHipS]=senHub.RHipS_Enc.ReadPos();   ////TODO: read the correct encoder when encoders connected
     // senHub.EncData[SensorHub::RHipF]=senHub.RKneS_Enc.ReadPos();
     senHub.EncData[SensorHub::RKneS]=senHub.RKneS_Enc.ReadPos();
-    senHub.EncData[SensorHub::RAnkS]=senHub.RKneS_Enc.ReadPos();
+    senHub.EncData[SensorHub::RAnkS]=senHub.RAnkS_Enc.ReadPos();
     // senHub.EncData[SensorHub::RAnkF]=senHub.RKneS_Enc.ReadPos();
     
 }

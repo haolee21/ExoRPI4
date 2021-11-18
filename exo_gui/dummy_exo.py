@@ -28,7 +28,7 @@ while True:
                     # while True:
                     conn.settimeout(0.01)
                     data = conn.recv(1024)
-                    recv_cmd = data[:-1]
+                    recv_cmd = data[:-1] #removed '\n' in the end
                         # idx = data.find(b'\n')
                         # if idx<0:
                         #     old_cmd = old_cmd+data
@@ -42,17 +42,17 @@ while True:
                         receive = b''
                         for c in receiveNum:
                             receive = receive+c.to_bytes(2,'little')
-                        receive = receive+b'\n'
-                        print('send ',len(receive))
+                        receive = receive
+                        # print('send ',len(receive))
                         conn.send(receive)
                         # time.sleep(0.02)
                     elif recv_cmd == b'CON:STOP':
-                        conn.send(b'OK\n')
+                        conn.send(b'OK')
                         break
                     else:
                         print('client sent different msg')
                         print(recv_cmd.decode())
-                        ret='OK\n'
+                        ret='1'
                         conn.send(ret.encode('utf-8'))
         except:
             print('no client')

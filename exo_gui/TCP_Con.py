@@ -10,7 +10,7 @@ JOINT_DATA_LEN=12
 PRE_DATA_LEN=10
 class TCP:
     port =1234
-    ip_address='192.168.0.100'
+    ip_address='192.168.0.104'
     def __init__(self):
         self.flag = False
         
@@ -74,7 +74,7 @@ class TCP:
             print('error: tcp port not connected')
             self.disConCcallback()
             
-    def SendCmd(self,cmd,byte_to_read):
+    def SendCmd(self,cmd,byte_to_read,print_response=False):
         cmd = cmd+'\n'
         response = b''
         try:
@@ -86,6 +86,9 @@ class TCP:
 
                 # s.settimeout(0.1)
                 response = s.recv(byte_to_read)
+                
+                
+                
                 # response = response[:-1]
                 
 
@@ -105,7 +108,8 @@ class TCP:
         # response = self.s.recv(byte_to_read+1)#include \n
     
         # response = response[:-1]
-      
+        if print_response:
+            print('Send: '+cmd[:-1].ljust(25)+'Response: '+response.decode())
         return response
 
     def Update_test(self):

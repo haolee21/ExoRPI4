@@ -19,35 +19,44 @@ void Valves_hub::On(Valves_hub::SW_ID valve){
     {
     case Valves_hub::SW_ID::LANKBAL:
         this->SW_ValCond[(unsigned)Valves_hub::SW_ID::LANKBAL]=true;
+        this->valChanged_flag=true;
         break;
     case Valves_hub::SW_ID::LKNEBAL:
         this->SW_ValCond[(unsigned)Valves_hub::SW_ID::LKNEBAL]=true;
+        this->valChanged_flag=true;
         break;
     case Valves_hub::SW_ID::RANKBAL:
         this->SW_ValCond[(unsigned)Valves_hub::SW_ID::RANKBAL]=true;
+        this->valChanged_flag=true;
         break;
     case Valves_hub::SW_ID::RKNEBAL:
         this->SW_ValCond[(unsigned)Valves_hub::SW_ID::RKNEBAL]=true;
+        this->valChanged_flag=true;
         break;
     default:
         throw std::invalid_argument( "cannot find this sw valve to turn on" );
         
     }
+    
 }
 void Valves_hub::Off(Valves_hub::SW_ID valve){
     switch (valve)
     {
     case Valves_hub::SW_ID::LANKBAL:
         this->SW_ValCond[(unsigned)Valves_hub::SW_ID::LANKBAL]=false;
+        this->valChanged_flag=true;
         break;
     case Valves_hub::SW_ID::LKNEBAL:
         this->SW_ValCond[(unsigned)Valves_hub::SW_ID::LKNEBAL]=false;
+        this->valChanged_flag=true;
         break;
     case Valves_hub::SW_ID::RANKBAL:
         this->SW_ValCond[(unsigned)Valves_hub::SW_ID::RANKBAL]=false;
+        this->valChanged_flag=true;
         break;
     case Valves_hub::SW_ID::RKNEBAL:
         this->SW_ValCond[(unsigned)Valves_hub::SW_ID::RKNEBAL]=false;
+        this->valChanged_flag=true;
         break;
     default:
         throw std::invalid_argument( "cannot find this sw valve to turn off" );
@@ -56,18 +65,21 @@ void Valves_hub::Off(Valves_hub::SW_ID valve){
 }
 void Valves_hub::UpdateValve(){
     Valves_hub& hub = Valves_hub::GetInstance();
-    std::array<char,TeensyI2C::CMDLEN> cmd;
+    if(hub.valChanged_flag){
+        std::array<char,TeensyI2C::CMDLEN> cmd;
 
-    std::memcpy(cmd.begin(),hub.PWM_Duty.begin(),sizeof(uint8_t)*PWM_VAL_NUM);
-    std::memcpy(cmd.begin()+PWM_VAL_NUM*sizeof(uint8_t),hub.SW_ValCond.begin(),sizeof(bool)*SW_VAL_NUM);
+        std::memcpy(cmd.begin(),hub.PWM_Duty.begin(),sizeof(uint8_t)*PWM_VAL_NUM);
+        std::memcpy(cmd.begin()+PWM_VAL_NUM*sizeof(uint8_t),hub.SW_ValCond.begin(),sizeof(bool)*SW_VAL_NUM);
     
-    hub.teensyValveCon.WriteCmd(cmd);
-    
+        hub.teensyValveCon.WriteCmd(cmd);
+        hub.valChanged_flag=false;
+    }
 }
 
 void Valves_hub::SetDuty(u_int8_t duty, Valves_hub::PWM_ID id){
     Valves_hub& hub = Valves_hub::GetInstance();
     hub.PWM_Duty[id]=duty;
+    hub.valChanged_flag=true;
 
 }
 void Valves_hub::SetDuty(const std::array<u_int8_t,PWM_VAL_NUM> duty){
@@ -86,3 +98,4 @@ const std::array<uint8_t,PWM_VAL_NUM>& Valves_hub::GetDuty(){
 const std::array<bool,SW_VAL_NUM>& Valves_hub::GetSWValCond(){
     return std::ref(Valves_hub::GetInstance().SW_ValCond);
 }
+

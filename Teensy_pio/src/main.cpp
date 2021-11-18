@@ -50,7 +50,8 @@ Valve valve_list[num_val] = {
 const size_t slave_rx_buffer_size = num_pwm+num_val;
 uint8_t slave_rx_buffer[slave_rx_buffer_size] = {};
 uint8_t slave_rx_buffer_2[slave_rx_buffer_size] = {};
-volatile size_t slave_bytes_received = 0;
+volatile size_t slave_bytes_received = 0; //when a variable is not used in the main thread, we need to declared it as volatile to avoid it got deleted when optimized
+                                          // it only get modified in IRS
 
 void log_message_received();
 
