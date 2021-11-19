@@ -227,7 +227,7 @@
      <string>Main Reservior</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="but_resetLHip">
+   <widget class="QPushButton" name="btn_resetLHip">
     <property name="geometry">
      <rect>
       <x>370</x>
@@ -358,19 +358,6 @@
      <string>Discharge</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>700</x>
-      <y>482</y>
-      <width>75</width>
-      <height>91</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PushButton</string>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -378,7 +365,7 @@
      <x>0</x>
      <y>0</y>
      <width>795</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuConnection">

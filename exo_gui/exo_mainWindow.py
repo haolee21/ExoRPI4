@@ -15,6 +15,7 @@ from PlotPressureWindow import *
 from PWM_TestWindow import *
 import math
 DATALEN=120
+SAMPT = 40
 class SystemData:
     def __init__(self):
         self.ip_address='127.0.0.1'
@@ -91,8 +92,21 @@ class MW(QMainWindow):
         self.init_exo_model(exo_x,exo_y)
 
 
-        self.btn_exo_resetHip = self.findChild(QPushButton,'but_resetLHip')
-        self.btn_exo_resetHip.clicked.connect(self.btn_resetHip_clicked)
+        # reset encoder pos
+        self.btn_exo_resetLHipS = self.findChild(QPushButton,'btn_resetLHip')
+        self.btn_exo_resetLHipS.clicked.connect(self.btn_resetLHipS_clicked)
+        self.btn_exo_resetLKneS = self.findChild(QPushButton,'btn_resetLKne')
+        self.btn_exo_resetLKneS.clicked.connect(self.btn_resetLKneS_clicked)
+        self.btn_exo_resetLAnkS = self.findChild(QPushButton,'btn_resetLAnk')
+        self.btn_exo_resetLAnkS.clicked.connect(self.btn_resetLAnkS_clicked)
+
+        self.btn_exo_resetRHipS = self.findChild(QPushButton,'btn_resetRHip')
+        self.btn_exo_resetRHipS.clicked.connect(self.btn_resetRHipS_clicked)
+        self.btn_exo_resetRKneS = self.findChild(QPushButton,'btn_resetRKne')
+        self.btn_exo_resetRKneS.clicked.connect(self.btn_resetRKneS_clicked)
+        self.btn_exo_resetRAnkS = self.findChild(QPushButton,'btn_resetRAnk')
+        self.btn_exo_resetRAnkS.clicked.connect(self.btn_resetRAnkS_clicked)
+        
 
 
         #function checkbox
@@ -158,7 +172,7 @@ class MW(QMainWindow):
                 self.btn_connect.setText('Disconnect')
                 self.timer = QtCore.QTimer()
                 self.timer.timeout.connect(self.tcp_port.DataUpdate)
-                self.timer.start(20)
+                self.timer.start(SAMPT)
                 
         else:
             self.timer.stop()
@@ -183,10 +197,21 @@ class MW(QMainWindow):
     def open_pwm_test(self):
         self.pwm_test_window.show()
         
-    def btn_resetHip_clicked(self):
-        # self.tcp_port.Update_test(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData)
-        ret = self.tcp_port.SendCmd('RESET:HIP',2)
-        print('return is ',ret.decode())
+    def btn_resetLHipS_clicked(self):
+        self.tcp_port.SendCmd('CAL:ENC:LHIP_S',1,True)
+    def btn_resetLKneS_clicked(self):
+        self.tcp_port.SendCmd('CAL:ENC:LKNE_S',1,True)
+    def btn_resetLAnkS_clicked(self):
+        self.tcp_port.SendCmd('CAL:ENC:LANK_S',1,True)
+    def btn_resetRHipS_clicked(self):
+        self.tcp_port.SendCmd('CAL:ENC:RHIP_S',1,True)
+    def btn_resetRKneS_clicked(self):
+        self.tcp_port.SendCmd('CAL:ENC:RKNE_S',1,True)
+    def btn_resetRAnkS_clicked(self):
+        self.tcp_port.SendCmd('CAL:ENC:RANK_S',1,True)
+
+
+
     def btn_dischargeAll_clicked(self):
         ret = self.tcp_port.SendCmd('STR:REL:ALL',2)
         print('Discharge all air  ',ret.decode())
