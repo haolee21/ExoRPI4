@@ -103,6 +103,7 @@ public:
             }
         }
         else{
+            
             this->Reset();
         }
     }

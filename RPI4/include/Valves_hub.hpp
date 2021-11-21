@@ -6,6 +6,7 @@
 #include "Timer.hpp"
 #include "SensorHub.hpp"
 #include <stdexcept>
+#include "Recorder.hpp"
 
 class Valves_hub
 {
@@ -47,15 +48,16 @@ private:
     
     bool valChanged_flag;
 
-
+    Recorder<uint8_t,PWM_VAL_NUM> pwmRecorder;
+    Recorder<bool,SW_VAL_NUM> swRecorder;
 
 
     
-
-
-    
-
     TeensyI2C teensyValveCon;
+
+    
+
+    
     
     
 

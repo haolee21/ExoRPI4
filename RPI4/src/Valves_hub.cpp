@@ -1,7 +1,11 @@
 #include "Valves_hub.hpp"
 Valves_hub::Valves_hub()
-:teensyValveCon(TeensyI2C(1))
+:
+pwmRecorder(Recorder<uint8_t,PWM_VAL_NUM>("test","test"))
+,swRecorder(Recorder<bool,SW_VAL_NUM>("test","test"))
+,teensyValveCon(TeensyI2C(1))
 {
+   
 
 }
 
@@ -80,6 +84,7 @@ void Valves_hub::SetDuty(u_int8_t duty, Valves_hub::PWM_ID id){
     Valves_hub& hub = Valves_hub::GetInstance();
     hub.PWM_Duty[id]=duty;
     hub.valChanged_flag=true;
+    
 
 }
 void Valves_hub::SetDuty(const std::array<u_int8_t,PWM_VAL_NUM> duty){

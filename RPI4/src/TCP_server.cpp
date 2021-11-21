@@ -88,10 +88,54 @@ void TCP_server::RecvCmd(){
                 else if(cmd_device.compare("RTANK")==0){Valves_hub::SetDuty(input,Valves_hub::RTANKPRE);}
                 TCP_server::Send_cmd(std::string("1"),socket);
             }
+            else if(cmd_subClass.compare("REC")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
+                if(cmd_device.compare("DATA")==0){
+                    std::string input = Sub_cmd(ret_str,cmd_idx,'\n');
+                    if(input.compare("1")==0){
+                        Timer::StartRec();
+                    }
+                    else{
+                        Timer::EndRec();
+                    }
+                }
+            }
+            
             
 
             else{
                 TCP_server::Send_cmd(std::string("0"),socket);
+            }
+        }
+
+        else if(cmd_class.compare("CAL")==0){
+            if(cmd_subClass.compare("ENC")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
+                if(cmd_device.compare("LHIP_S")==0){
+                    // SensorHub::ResetEnc(SensorHub::EncName::LHipS);
+                    std::cout<<"DEV::LHip_S encoder reset\n";
+                }
+                else if(cmd_device.compare("LKNE_S")==0){
+                    // SensorHub::ResetEnc(SensorHub::EncName::LKneS);
+                    std::cout<<"DEV::LKne_S encoder reset\n";
+                }
+                else if(cmd_device.compare("LANK_S")==0){
+                    // SensorHub::ResetEnc(SensorHub::EncName::LAnkS);
+                    std::cout<<"DEV::LAnk_S encoder reset\n";
+                }
+                else if(cmd_device.compare("RHIP_S")==0){
+                    // SensorHub::ResetEnc(SensorHub::EncName::RHipS);
+                    std::cout<<"DEV::RHip_S encoder reset\n";
+                }
+                else if(cmd_device.compare("RKNE_S")==0){
+                    // SensorHub::ResetEnc(SensorHub::EncName::RKneS);
+                    std::cout<<"DEV::RKne_S encoder reset\n";
+                }
+                else if(cmd_device.compare("RANK_S")==0){
+                    // SensorHub::ResetEnc(SensorHub::EncName::RAnkS);
+                    std::cout<<"DEV::RAnk_S encoder reset\n";
+                }
+                
             }
         }
 
