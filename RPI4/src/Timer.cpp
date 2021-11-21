@@ -1,7 +1,10 @@
 #include "Timer.hpp"
-
+bool Timer::dataRec_flag=false; //it has to be false defautly, will be a const ref to all class that use
+std::string Timer::filePath="";
+namespace fs = boost::filesystem;
 Timer::Timer()
 {
+    
     
 }
 Timer::~Timer()
@@ -61,6 +64,10 @@ void* Timer::TimerTick(void*){
     Timer &timer = Timer::GetInstance();
     clock_gettime(CLOCK_MONOTONIC,&t);
     while(timer.updateFlag){
+
+
+
+
         //update sensor 
         for(unsigned i=0;i<timer.senCallbacks.size();i++){
             timer.senFutures[i]=std::async(std::launch::async,timer.senCallbacks[i]);
@@ -84,7 +91,7 @@ void* Timer::TimerTick(void*){
         }
         
         //update valve
-        Valves_hub::UpdateValve();
+        // Valves_hub::UpdateValve();
 
 
         timer.timeStamp++;
@@ -113,4 +120,36 @@ void Timer::Add_conCallback(std::function<void()> fun){
     timer.conFutures.push_back(std::async(std::launch::async,fun));
     timer.conFutures.back().wait();
     timer.conFutures.back().get();
+}
+const bool& Timer::GetDataRec_flag(){
+    return std::ref(Timer::dataRec_flag);
+}
+void Timer::StartRec(){
+    if(!Timer::dataRec_flag){
+        fs::path data_dir(fs::current_path());
+        std::string homeFolder = data_dir.string();
+        std::string filePath;
+        {
+            using namespace std;
+		    time_t result = time(nullptr);
+    	    tm* timePtr = localtime(&result);
+    	    std::stringstream curDate;
+    	    curDate<<timePtr->tm_year+1900<<'-'<<std::setw(2)<<std::setfill('0')<<timePtr->tm_mon+1<<setw(2)<<setfill('0')<<timePtr->tm_mday<<'-'<<setw(2)<<setfill('0')<<timePtr->tm_hour<<setw(2)<<setfill('0')<<timePtr->tm_min<<'-'<<setw(2)<<setfill('0')<<timePtr->tm_sec;
+    	    filePath = homeFolder +'/'+ curDate.str();
+	    }
+        std::cout<<"folder name: "<<filePath<<std::endl;
+        if (fs::is_directory(filePath))
+            throw std::invalid_argument("Data folder already exists\n");
+    
+        fs::create_directory(filePath);
+        Timer::filePath = filePath;
+        Timer::dataRec_flag = true;
+
+    }
+}
+void Timer::EndRec(){
+    Timer::dataRec_flag=false;
+}
+const std::string& Timer::GetFilePath(){
+    return std::ref(Timer::filePath);
 }

@@ -14,7 +14,12 @@
 #include <future>
 #include <vector>
 #include <iostream>
-#include "Valves_hub.hpp"
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
+#include <cstring>
+#include <sstream>
+#include <iomanip>
+// #include "Valves_hub.hpp"
 class Timer
 {
     //this class has mix usage. Static functions are for real-time clocks nano sleep or number rounding
@@ -36,6 +41,14 @@ class Timer
     
     static std::function<void()> senUpdateFun;
     static std::function<void()> controlUpdateFun;
+
+
+    // Data recording functions, it is binded to the timer because the "directory name" is based on the current time
+    const static bool& GetDataRec_flag(); 
+    const static std::string& GetFilePath();
+    static void StartRec();//create a new directory and sync time when start recording
+    static void EndRec();
+    
 private:
     Timer();
     // sensor/controller update functions, will ran in timer tick function
@@ -54,6 +67,9 @@ private:
     //below static functions are for real-time nano clocks     
     static void tsnorm(struct timespec *ts);
     
+    //Data recording private members
+    static bool dataRec_flag;
+    static std::string filePath;
 
     
 };
