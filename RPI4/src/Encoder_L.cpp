@@ -1,4 +1,5 @@
 #include "Encoder_L.hpp"
+std::mutex Encoder_L::lock = std::mutex();
 Encoder_L::Encoder_L(uint8_t pinId)
 :Encoder(pinId,Encoder_L::SPI_IDX)
 {
@@ -24,4 +25,10 @@ void Encoder_L::_setCE()
         Encoder_L::CEC_pin.On();
     else
         Encoder_L::CEC_pin.Off();
+}
+void Encoder_L::Lock(){
+    Encoder_L::lock.lock();
+}
+void Encoder_L::Unlock(){
+    Encoder_L::lock.unlock();
 }

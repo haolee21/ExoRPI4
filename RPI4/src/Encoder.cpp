@@ -105,6 +105,7 @@ void Encoder::_initCE(uint8_t pinId)
 
 void Encoder::SetZero()
 {
+    this->Lock();
     this->_setCE();
 
     this->txBuf[0] = 0x70;
@@ -117,6 +118,7 @@ void Encoder::SetZero()
         this->_spiTxRx(1);
     }
     cout<<"done set zero\n";
+    this->Unlock();
 }
 char Encoder::_spiTxRx(unsigned int len)
 {
@@ -133,6 +135,7 @@ char Encoder::_spiTxRx(unsigned int len)
 
 int Encoder::ReadPos()
 {
+    this->Lock();
     //preset the CE pins
     // auto start = chrono::high_resolution_clock::now();
     this->_setCE();
@@ -160,6 +163,7 @@ int Encoder::ReadPos()
     // auto elapsed = chrono::high_resolution_clock::now() - start;
     // long long dur_time = chrono::duration_cast<chrono::microseconds>(elapsed).count();
     // cout << "time: " << dur_time << endl;
+    this->Unlock();
     return (int)(this->MSB << 8) + (int)this->LSB;
    
 }
