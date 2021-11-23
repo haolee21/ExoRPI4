@@ -47,7 +47,7 @@ private:
         writeCsv.close();
 
 
-        std::cout<<"save temp: \n";
+        // std::cout<<"save temp: \n";
         for(unsigned i=0;i<endIdx;i++){
             std::array<T,N> curRow = data[i];
             for(unsigned i2=0;i2<N;i2++){
@@ -126,7 +126,7 @@ public:
             }
         }
         else{
-            std::cout<<"push but no data saved\n";
+            // std::cout<<"push but no data saved\n";
 
         }
     }

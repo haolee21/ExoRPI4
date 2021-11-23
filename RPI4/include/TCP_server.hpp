@@ -9,6 +9,7 @@
 #include <Valves_hub.hpp>
 #include <functional>
 #include "Timer.hpp"
+#include <sys/time.h>
 #define TCP_PORT 1234
 class TCP_server
 {

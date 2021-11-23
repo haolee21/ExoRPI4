@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>795</width>
-    <height>620</height>
+    <height>714</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QProgressBar" name="air_volumn">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>470</y>
+      <x>90</x>
+      <y>550</y>
       <width>191</width>
       <height>51</height>
      </rect>
@@ -90,7 +90,7 @@
       <x>20</x>
       <y>130</y>
       <width>321</width>
-      <height>271</height>
+      <height>251</height>
      </rect>
     </property>
     <property name="font">
@@ -101,7 +101,7 @@
     <property name="title">
      <string>Functions</string>
     </property>
-    <widget class="QPushButton" name="but_sendCmd">
+    <widget class="QPushButton" name="btn_sendCmd">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -212,8 +212,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>440</y>
+      <x>120</x>
+      <y>520</y>
       <width>141</width>
       <height>16</height>
      </rect>
@@ -230,9 +230,9 @@
    <widget class="QPushButton" name="btn_resetLHip">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>480</y>
-      <width>101</width>
+      <x>380</x>
+      <y>500</y>
+      <width>111</width>
       <height>41</height>
      </rect>
     </property>
@@ -258,9 +258,9 @@
    <widget class="QPushButton" name="btn_resetLKne">
     <property name="geometry">
      <rect>
-      <x>480</x>
-      <y>480</y>
-      <width>101</width>
+      <x>500</x>
+      <y>500</y>
+      <width>111</width>
       <height>41</height>
      </rect>
     </property>
@@ -276,9 +276,9 @@
    <widget class="QPushButton" name="btn_resetLAnk">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>480</y>
-      <width>101</width>
+      <x>620</x>
+      <y>500</y>
+      <width>111</width>
       <height>41</height>
      </rect>
     </property>
@@ -294,9 +294,9 @@
    <widget class="QPushButton" name="btn_resetRHip">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>530</y>
-      <width>101</width>
+      <x>380</x>
+      <y>550</y>
+      <width>111</width>
       <height>41</height>
      </rect>
     </property>
@@ -312,9 +312,9 @@
    <widget class="QPushButton" name="btn_resetRKne">
     <property name="geometry">
      <rect>
-      <x>480</x>
-      <y>530</y>
-      <width>101</width>
+      <x>500</x>
+      <y>550</y>
+      <width>111</width>
       <height>41</height>
      </rect>
     </property>
@@ -330,9 +330,9 @@
    <widget class="QPushButton" name="btn_resetRAnk">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>530</y>
-      <width>101</width>
+      <x>620</x>
+      <y>550</y>
+      <width>111</width>
       <height>41</height>
      </rect>
     </property>
@@ -348,8 +348,8 @@
    <widget class="QPushButton" name="btn_dischargeAllAir">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>530</y>
+      <x>110</x>
+      <y>610</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -357,6 +357,58 @@
     <property name="text">
      <string>Discharge</string>
     </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_3">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>390</y>
+      <width>321</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Data Recording</string>
+    </property>
+    <widget class="QPushButton" name="btn_rec_start">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>60</y>
+       <width>101</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>REC Start</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_syncTime">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>30</y>
+       <width>101</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>SYNC TIME</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>50</y>
+       <width>59</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

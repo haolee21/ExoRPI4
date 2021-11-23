@@ -15,7 +15,7 @@ void TCP_server::Off(){
 TCP_server::~TCP_server()
 {
     this->Off(); //turn itself off when finished
-    std::cout<<"SYS:TCP_server:Thread join starts\n";
+    std::cout<<"SYS:TCP_server:Thread join starts, remember it has to be connected to a client when it ends, otherwise it will stuck in loops\n";
     this->recv_th->join();
     std::cout<<"SYS:TCP_server:Thread join\n";
 }
@@ -112,30 +112,52 @@ void TCP_server::RecvCmd(){
             if(cmd_subClass.compare("ENC")==0){
                 std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
                 if(cmd_device.compare("LHIP_S")==0){
-                    // SensorHub::ResetEnc(SensorHub::EncName::LHipS);
+                    SensorHub::ResetEnc(SensorHub::EncName::LHipS);
                     std::cout<<"DEV::LHip_S encoder reset\n";
+                    TCP_server::Send_cmd(std::string("1"),socket);
                 }
                 else if(cmd_device.compare("LKNE_S")==0){
-                    // SensorHub::ResetEnc(SensorHub::EncName::LKneS);
+                    SensorHub::ResetEnc(SensorHub::EncName::LKneS);
+                    TCP_server::Send_cmd(std::string("1"),socket);
                     std::cout<<"DEV::LKne_S encoder reset\n";
                 }
                 else if(cmd_device.compare("LANK_S")==0){
-                    // SensorHub::ResetEnc(SensorHub::EncName::LAnkS);
+                    SensorHub::ResetEnc(SensorHub::EncName::LAnkS);
+                    TCP_server::Send_cmd(std::string("1"),socket);
                     std::cout<<"DEV::LAnk_S encoder reset\n";
                 }
                 else if(cmd_device.compare("RHIP_S")==0){
-                    // SensorHub::ResetEnc(SensorHub::EncName::RHipS);
+                    SensorHub::ResetEnc(SensorHub::EncName::RHipS);
+                    TCP_server::Send_cmd(std::string("1"),socket);
                     std::cout<<"DEV::RHip_S encoder reset\n";
                 }
                 else if(cmd_device.compare("RKNE_S")==0){
-                    // SensorHub::ResetEnc(SensorHub::EncName::RKneS);
+                    SensorHub::ResetEnc(SensorHub::EncName::RKneS);
+                    TCP_server::Send_cmd(std::string("1"),socket);
                     std::cout<<"DEV::RKne_S encoder reset\n";
                 }
                 else if(cmd_device.compare("RANK_S")==0){
-                    // SensorHub::ResetEnc(SensorHub::EncName::RAnkS);
+                    SensorHub::ResetEnc(SensorHub::EncName::RAnkS);
+                    TCP_server::Send_cmd(std::string("1"),socket);
                     std::cout<<"DEV::RAnk_S encoder reset\n";
                 }
+                else{
+                    TCP_server::Send_cmd(std::string("0"),socket);
+                }
                 
+            }
+            if(cmd_subClass.compare("TIME")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
+                double inputs = std::stod(Sub_cmd(ret_str,cmd_idx,'\n'));
+                if(cmd_device.compare("EPOCH")==0){
+                    timeval time;
+                    int input_usec = (inputs - floor(inputs))*1000000;
+                    time.tv_sec = inputs;
+                    time.tv_usec = input_usec;
+                    settimeofday(&time,NULL);
+                    std::cout<<"Set DateTime\n";
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                }
             }
         }
 

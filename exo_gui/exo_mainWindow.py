@@ -14,6 +14,7 @@ from PlotJointWindow import *
 from PlotPressureWindow import *
 from PWM_TestWindow import *
 import math
+import time
 DATALEN=120
 SAMPT = 40
 class SystemData:
@@ -80,7 +81,7 @@ class MW(QMainWindow):
         self.model_plot = self.model_plot_widget.addPlot(colspan=1)
         self.model_plot.hideAxis('bottom')
         self.model_plot.hideAxis('left')
-        self.model_plot.setYRange(-50,50)
+        self.model_plot.setYRange(-65,50)
         self.model_plot.setXRange(-50,50)
         self.rtplot_data=[10.0,-10.0,0,10.0,-10.0,0]
         
@@ -110,8 +111,8 @@ class MW(QMainWindow):
 
 
         #function checkbox
-        self.but_sendCmd = self.findChild(QPushButton,'but_sendCmd')
-        self.but_sendCmd.clicked.connect(self.btn_sendCmd_clicked)
+        self.btn_sendCmd = self.findChild(QPushButton,'btn_sendCmd')
+        self.btn_sendCmd.clicked.connect(self.btn_sendCmd_clicked)
         self.relLKne_task = self.findChild(QCheckBox,'checkBox_rel_LKne')
         self.relRKne_task = self.findChild(QCheckBox,'checkBox_rel_RKne')
         self.relLAnk_task = self.findChild(QCheckBox,'checkBox_rel_LAnk')
@@ -125,6 +126,11 @@ class MW(QMainWindow):
         self.walkRec_task = self.findChild(QRadioButton,'radioButton_walkRec')
         self.walkRec_task.toggled.connect(self.radio_walkRec_checked)
 
+        # Data REC
+        self.btn_rec_start = self.findChild(QPushButton,'btn_rec_start')
+        self.btn_rec_start.clicked.connect(self.btn_rec_start_clicked)
+        self.btn_syncTime = self.findChild(QPushButton,'btn_syncTime')
+        self.btn_syncTime.clicked.connect(self.btn_updateTime_clicked)
         
 
 
@@ -179,6 +185,13 @@ class MW(QMainWindow):
             print('Disconnect   ',self.tcp_port.SendCmd('CON:STOP',2).decode())
             self.tcp_port.Disconnect()
             self.btn_connect.setText('Connect')
+    def btn_updateTime_clicked(self):
+        self.tcp_port.SendCmd('CAL:TIME:EPOCH:'+str(time.time()),1,True)
+    def btn_rec_start_clicked(self):
+        # self.tcp_port.SendCmd('SET:REC:DATA:1')
+        print('still develop')
+
+
     def found_disconnect(self):
         self.timer.stop()
         self.tcp_port.Disconnect()
@@ -242,6 +255,7 @@ class MW(QMainWindow):
         xpos,ypos=self.get_exo_model()
         self.left_leg_line.setData([0.0]+xpos[0:3],[0.0]+ypos[0:3])
         self.right_leg_line.setData([0.0]+xpos[4:],[0.0]+ypos[4:])
+
     
 
 sysData = SystemData()
