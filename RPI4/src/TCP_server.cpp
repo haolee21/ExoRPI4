@@ -53,8 +53,7 @@ void TCP_server::RecvCmd(){
         if(cmd_class.compare("REQ")==0){
             if(cmd_subClass.compare("MEAS")==0){
                 std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
-                if(cmd_device.compare("DATA")==0){
-                    
+                if(cmd_device.compare("DATA")==0){  
                     //TODO: add callback to reply measurements
                     std::array<char,(SensorHub::NUMENC+SensorHub::NUMPRE)*sizeof(uint16_t)> meaData;
                     const std::array<u_int16_t,SensorHub::NUMENC> &encData=SensorHub::GetEncData();
@@ -62,9 +61,21 @@ void TCP_server::RecvCmd(){
                     const std::array<u_int16_t,SensorHub::NUMPRE> &preData=SensorHub::GetPreData();
                     std::memcpy(meaData.begin()+encData.size()*sizeof(u_int16_t),preData.begin(),sizeof(u_int16_t)*preData.size());
                     TCP_server::Send_cmd(std::string(meaData.begin(),meaData.end()),socket);
-                    
                 }
             }
+            else if(cmd_subClass.compare("REC")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
+                if(cmd_device.compare("DATA")==0){
+                    const bool &recFlag=Timer::GetDataRec_flag();
+                    if(recFlag){
+                        TCP_server::Send_cmd(std::string("1"),socket);
+                    }
+                    else{
+                        TCP_server::Send_cmd(std::string("0"),socket);
+                    }
+                }
+            }
+            
         }
         else if(cmd_class.compare("ACT")==0){
             if(cmd_subClass.compare("STOP")==0){
@@ -80,13 +91,35 @@ void TCP_server::RecvCmd(){
             if(cmd_subClass.compare("PWM")==0){
                 std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
                 uint8_t input = std::stoi(Sub_cmd(ret_str,cmd_idx,'\n'));
-                if(cmd_device.compare("LKNE")==0) {Valves_hub::SetDuty(input,Valves_hub::LKNEPRE);}
-                else if(cmd_device.compare("LANK")==0) {Valves_hub::SetDuty(input,Valves_hub::LANKPRE);}
-                else if(cmd_device.compare("LTANK")==0){Valves_hub::SetDuty(input,Valves_hub::LTANKPRE);}
-                else if(cmd_device.compare("RKNE")==0){Valves_hub::SetDuty(input,Valves_hub::RKNEPRE);}
-                else if(cmd_device.compare("RANK")==0){Valves_hub::SetDuty(input,Valves_hub::RANKPRE);}
-                else if(cmd_device.compare("RTANK")==0){Valves_hub::SetDuty(input,Valves_hub::RTANKPRE);}
-                TCP_server::Send_cmd(std::string("1"),socket);
+                std::cout<<"set pwm duty directly\n";
+                if(cmd_device.compare("LKNE")==0) {
+                    Valves_hub::SetDuty(input,Valves_hub::LKNEPRE);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    }
+                else if(cmd_device.compare("LANK")==0){
+                    Valves_hub::SetDuty(input,Valves_hub::LANKPRE);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    }
+                else if(cmd_device.compare("LTANK")==0){
+                    Valves_hub::SetDuty(input,Valves_hub::LTANKPRE);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    }
+                else if(cmd_device.compare("RKNE")==0){
+                    Valves_hub::SetDuty(input,Valves_hub::RKNEPRE);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    }
+                else if(cmd_device.compare("RANK")==0){
+                    Valves_hub::SetDuty(input,Valves_hub::RANKPRE);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    }
+                else if(cmd_device.compare("RTANK")==0){
+                    Valves_hub::SetDuty(input,Valves_hub::RTANKPRE);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    }
+                else{
+                    TCP_server::Send_cmd(std::string("0"),socket);
+                }
+                
             }
             else if(cmd_subClass.compare("REC")==0){
                 std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
@@ -94,9 +127,11 @@ void TCP_server::RecvCmd(){
                     std::string input = Sub_cmd(ret_str,cmd_idx,'\n');
                     if(input.compare("1")==0){
                         Timer::StartRec();
+                        std::cout<<"Start to record\n";
                     }
                     else{
                         Timer::EndRec();
+                        std::cout<<"End recording\n";
                     }
                 }
             }

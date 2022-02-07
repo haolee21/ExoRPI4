@@ -70,6 +70,16 @@ class TCP:
             self.updateJoint(receive[:JOINT_DATA_LEN]) 
             self.updatePre(receive[JOINT_DATA_LEN:-2])
             self.updateTank(int.from_bytes(receive[-2:],'little'))
+
+            rec_flag = int.from_bytes(self.SendCmd('REQ:REC:DATA',1),'little')
+
+            if rec_flag==1 and self.parent.rec_flag==False:
+                self.parent.rec_flag=True
+                self.parent.btn_rec_start.setText('REC End')
+            elif rec_flag==0 and self.parent.rec_flag==True:
+                self.parent.rec_flag=False
+                self.parent.btn_rec_start.setText('REC Start')
+            
         else:
             print('error: tcp port not connected')
             self.disConCcallback()

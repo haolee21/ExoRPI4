@@ -6,7 +6,7 @@
 #define USEC (1000 * NSEC)
 #define MSEC (1000 * USEC)
 #define SEC (1000 * MSEC)
-#define SAMPT 4000  //sampling period in uS
+#define SAMPT 2000  //sampling period in uS
 
 #include <functional>
 #include <pthread.h>
@@ -48,6 +48,7 @@ class Timer
     const static std::string& GetFilePath();
     static void StartRec();//create a new directory and sync time when start recording
     static void EndRec();
+    
     
 private:
     Timer();

@@ -373,7 +373,7 @@
     <widget class="QPushButton" name="btn_rec_start">
      <property name="geometry">
       <rect>
-       <x>190</x>
+       <x>210</x>
        <y>60</y>
        <width>101</width>
        <height>23</height>
@@ -386,7 +386,7 @@
     <widget class="QPushButton" name="btn_syncTime">
      <property name="geometry">
       <rect>
-       <x>190</x>
+       <x>210</x>
        <y>30</y>
        <width>101</width>
        <height>23</height>
@@ -396,17 +396,52 @@
       <string>SYNC TIME</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_2">
+    <widget class="QLabel" name="label_3">
      <property name="geometry">
       <rect>
-       <x>50</x>
-       <y>50</y>
-       <width>59</width>
-       <height>15</height>
+       <x>60</x>
+       <y>30</y>
+       <width>111</width>
+       <height>20</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string>REC Start Time</string>
+     </property>
+    </widget>
+    <widget class="QLCDNumber" name="lcdNumber">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>60</y>
+       <width>64</width>
+       <height>23</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLCDNumber" name="lcdNumber_2">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>60</y>
+       <width>64</width>
+       <height>23</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLCDNumber" name="lcdNumber_3">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>60</y>
+       <width>64</width>
+       <height>23</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -417,7 +452,7 @@
      <x>0</x>
      <y>0</y>
      <width>795</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuConnection">

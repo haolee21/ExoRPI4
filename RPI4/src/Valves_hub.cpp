@@ -77,7 +77,9 @@ void Valves_hub::UpdateValve(){
     
         hub.teensyValveCon.WriteCmd(cmd);
         hub.valChanged_flag=false;
+        
     }
+    
 }
 
 void Valves_hub::SetDuty(u_int8_t duty, Valves_hub::PWM_ID id){
@@ -90,12 +92,17 @@ void Valves_hub::SetDuty(u_int8_t duty, Valves_hub::PWM_ID id){
 void Valves_hub::SetDuty(const std::array<u_int8_t,PWM_VAL_NUM> duty){
     Valves_hub& hub = Valves_hub::GetInstance();
     std::memcpy(hub.PWM_Duty.begin(),duty.begin(),sizeof(u_int8_t)*PWM_VAL_NUM);
+    hub.valChanged_flag=true;
 }
 void Valves_hub::SetSW(bool cond,Valves_hub::SW_ID id){
-    Valves_hub::GetInstance().SW_ValCond[id]=cond;
+    Valves_hub& hub = Valves_hub::GetInstance();
+    hub.SW_ValCond[id]=cond;
+    hub.valChanged_flag=true;
 }
 void Valves_hub::SetSW(const std::array<bool,SW_VAL_NUM> cond){
-    std::memcpy(Valves_hub::GetInstance().SW_ValCond.begin(),cond.begin(),sizeof(bool)*SW_VAL_NUM);
+    Valves_hub& hub = Valves_hub::GetInstance();
+    std::memcpy(hub.SW_ValCond.begin(),cond.begin(),sizeof(bool)*SW_VAL_NUM);
+    hub.valChanged_flag=true;
 }
 const std::array<uint8_t,PWM_VAL_NUM>& Valves_hub::GetDuty(){
     return std::ref(Valves_hub::GetInstance().PWM_Duty);

@@ -90,7 +90,18 @@ void* Timer::TimerTick(void*){
             timer.senFutures[i].get();
         }
         
-        //update valve
+
+
+        //update actuation
+        for(unsigned i=0;i<timer.conCallbacks.size();i++){
+            timer.conFutures[i]=std::async(std::launch::async,timer.conCallbacks[i]);
+        }
+        for(unsigned i=0;i<timer.conCallbacks.size();i++){
+            timer.conFutures[i].wait();
+        }
+        for(unsigned i=0;i<timer.conCallbacks.size();i++){
+            timer.conFutures[i].get();
+        }
         // Valves_hub::UpdateValve();
 
 

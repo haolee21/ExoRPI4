@@ -131,7 +131,7 @@ class MW(QMainWindow):
         self.btn_rec_start.clicked.connect(self.btn_rec_start_clicked)
         self.btn_syncTime = self.findChild(QPushButton,'btn_syncTime')
         self.btn_syncTime.clicked.connect(self.btn_updateTime_clicked)
-        
+        self.rec_flag = False
 
 
         self.show()
@@ -188,8 +188,16 @@ class MW(QMainWindow):
     def btn_updateTime_clicked(self):
         self.tcp_port.SendCmd('CAL:TIME:EPOCH:'+str(time.time()),1,True)
     def btn_rec_start_clicked(self):
-        # self.tcp_port.SendCmd('SET:REC:DATA:1')
-        print('still develop')
+        if(not self.rec_flag):
+            self.btn_updateTime_clicked()
+            self.tcp_port.SendCmd('SET:REC:DATA:1',1)
+            self.rec_flag=True
+            self.btn_rec_start.setText('REC End')
+        else:
+            self.rec_flag=False
+            self.btn_rec_start.setText('REC Start')
+
+        
 
 
     def found_disconnect(self):

@@ -13,7 +13,7 @@
 #include<iterator>
 #include"Timer.hpp"
 
-#define REC_MAX_LEN 15
+#define REC_MAX_LEN 10000
 template<class T,unsigned N>
 class Recorder
 {
@@ -47,15 +47,7 @@ private:
         writeCsv.close();
 
 
-        // std::cout<<"save temp: \n";
-        for(unsigned i=0;i<endIdx;i++){
-            std::array<T,N> curRow = data[i];
-            for(unsigned i2=0;i2<N;i2++){
-                std::cout<<curRow[i2]<<',';
-            }
-            std::cout<<std::endl;
-        }
-        std::cout<<std::endl;
+        
     }
 public:
     Recorder(std::string _fileName,std::string _header)
@@ -125,10 +117,7 @@ public:
                 this->curData=&(this->tempData1);
             }
         }
-        else{
-            // std::cout<<"push but no data saved\n";
-
-        }
+        
     }
 
 
