@@ -8,15 +8,15 @@
 int F_in = A1;     // Force                   
 int P1_in = A2;    // Pressure 1
 int P2_in = A3;    // Pressure 2
-int Pos_in = A4;   // Position
+int Pos_in = A0;   // Position
 
 // digital input pins
 int Val1_in=13;
 int Val2_in=14;
 
 // output pins
-int Val1_out=52;
-int Val2_out=53;
+int Val1_out=51;
+int Val2_out=52;
 // PWM control
 unsigned val1_on_duty;
 unsigned val2_on_duty;
@@ -24,12 +24,14 @@ const unsigned TIME_UNIT=100;
 
 // record arrays
 const unsigned DATALEN = 1000*10;
-int force_mem[DATALEN];
-int p1_mem[DATALEN];
-int p2_mem[DATALEN];
-int pos_mem[DATALEN];
-int val1_mem[DATALEN];
-int val2_mem[DATALEN];
+
+int *force_mem = new int(DATALEN);
+
+int *p1_mem = new int(DATALEN);
+int *p2_mem= new int(DATALEN);
+int *pos_mem = new int(DATALEN);
+int *val1_mem= new int(DATALEN);
+int *val2_mem=new int(DATALEN);
 
 unsigned int recIdx; //index of the array
 
@@ -41,6 +43,7 @@ bool sendDataFlag; //when true, send all the data back
 
 void setup()
 {
+
     recIdx=0;
     fullTestFlag=true;
     sendDataFlag=false;
@@ -69,34 +72,53 @@ void setup()
 
     Serial.begin(115200);          //  setup serial
 
+
+    //Timer setup
+    // TIMER 1 for interrupt frequency 1000 Hz
+    cli(); // stop interrupts
+    TCCR1A = 0; // set entire TCCR1A register to 0
+    TCCR1B = 0; // same for TCCR1B
+    TCNT1  = 0; // initialize counter value to 0
+    // set compare match register for 1000 Hz increments
+    OCR1A = 15999; // = 16000000 / (1 * 1000) - 1 (must be <65536)
+    // turn on CTC mode
+    TCCR1B |= (1 << WGM12);
+    // Set CS12, CS11 and CS10 bits for 1 prescaler
+    TCCR1B |= (0 << CS12) | (0 << CS11) | (1 << CS10);
+    // enable timer compare interrupt
+    TIMSK1 |= (1 << OCIE1A);
+    sei(); // allow interrupts
+
+    // TIMER 0 for interrupt frequency 100.16025641025641 Hz:
+    cli(); // stop interrupts
+    TCCR0A = 0; // set entire TCCR0A register to 0
+    TCCR0B = 0; // same for TCCR0B
+    TCNT0  = 0; // initialize counter value to 0
+    // set compare match register for 100.16025641025641 Hz increments
+    OCR0A = 155; // = 16000000 / (1024 * 100.16025641025641) - 1 (must be <256)
+    // turn on CTC mode
+    TCCR0B |= (1 << WGM01);
+    // Set CS02, CS01 and CS00 bits for 1024 prescaler
+    TCCR0B |= (1 << CS02) | (0 << CS01) | (1 << CS00);
+    // enable timer compare interrupt
+    TIMSK0 |= (1 << OCIE0A);
+    sei(); // allow interrupts//
+
 }
 
 
-// TIMER 1 for interrupt frequency 1000 Hz:
-cli(); // stop interrupts
-TCCR1A = 0; // set entire TCCR1A register to 0
-TCCR1B = 0; // same for TCCR1B
-TCNT1  = 0; // initialize counter value to 0
-// set compare match register for 1000 Hz increments
-OCR1A = 15999; // = 16000000 / (1 * 1000) - 1 (must be <65536)
-// turn on CTC mode
-TCCR1B |= (1 << WGM12);
-// Set CS12, CS11 and CS10 bits for 1 prescaler
-TCCR1B |= (0 << CS12) | (0 << CS11) | (1 << CS10);
-// enable timer compare interrupt
-TIMSK1 |= (1 << OCIE1A);
-sei(); // allow interrupts
+
 
 // the loop function runs over and over again until power down or reset
 ISR(TIMER1_COMPA_vect)
 {
-    if(idx<DATALEN){
-      force_mem[idx]=analogRead(F_in);
-      p1_mem[idx]=analogRead(P1_in);
-      p2_mem[idx]=analogRead(P2_in);
-      pos_mem[idx]=analogRead(Pos_in);
-      val1_mem[idx]=digitalRead(val1_in);
-      val2_mem[idx++]=digitalRead(val2_in);
+    if(recIdx<DATALEN){
+      force_mem[recIdx]=analogRead(F_in);
+      p1_mem[recIdx]=analogRead(P1_in);
+      p2_mem[recIdx]=analogRead(P2_in);
+      pos_mem[recIdx]=analogRead(Pos_in);
+      val1_mem[recIdx]=digitalRead(Val1_in);
+      val2_mem[recIdx++]=digitalRead(Val2_in);
         
     }
     else{
@@ -107,20 +129,7 @@ ISR(TIMER1_COMPA_vect)
 }
 
 
-// TIMER 0 for interrupt frequency 100.16025641025641 Hz:
-cli(); // stop interrupts
-TCCR0A = 0; // set entire TCCR0A register to 0
-TCCR0B = 0; // same for TCCR0B
-TCNT0  = 0; // initialize counter value to 0
-// set compare match register for 100.16025641025641 Hz increments
-OCR0A = 155; // = 16000000 / (1024 * 100.16025641025641) - 1 (must be <256)
-// turn on CTC mode
-TCCR0B |= (1 << WGM01);
-// Set CS02, CS01 and CS00 bits for 1024 prescaler
-TCCR0B |= (1 << CS02) | (0 << CS01) | (1 << CS00);
-// enable timer compare interrupt
-TIMSK0 |= (1 << OCIE0A);
-sei(); // allow interrupts
+
 
 ISR(TIMER0_COMPA_vect){
    if(fullTestFlag){
@@ -141,7 +150,7 @@ ISR(TIMER0_COMPA_vect){
       
     }
     digitalWrite(long_pin,HIGH);
-    delayMicroseconds(high_duty-short_duty);
+    delayMicroseconds(high_duty-low_duty);
     digitalWrite(short_pin,HIGH);
     delayMicroseconds(val2_on_duty);
 
@@ -151,18 +160,30 @@ ISR(TIMER0_COMPA_vect){
     
    }
 }
-
+void Send16BitIntArray(int* array,unsigned len){
+  for(unsigned i=0;i<len;i++){
+    Serial.write((array[i]>>8)&0xFF); //write the higher byte
+    Serial.write((array[i]&0xFF)); //write the lower byte
+    
+  }
+  Serial.write('\t');
+  
+}
 
 void SendData(){
   //TODO: finish the serial sending 
   fullTestFlag=false; //prevent the main loop from sending any data back
-  Serial.write(force_mem,DATALEN);
-  Serial.write(p1_mem,DATALEN);
-  Serial.write(p2_mem,DATALEN);
-  Serial.write(pos_mem,DATALEN);
-  Serial.write(val1_mem,DATALEN);
-  Serial.write(val2_mem,DATALEN);
+  Send16BitIntArray(force_mem,DATALEN);
+  
+  Send16BitIntArray(force_mem,DATALEN);
+  Send16BitIntArray(p1_mem,DATALEN);
+  Send16BitIntArray(p2_mem,DATALEN);
+  Send16BitIntArray(pos_mem,DATALEN);
+  Send16BitIntArray(val1_mem,DATALEN);
+  Send16BitIntArray(val2_mem,DATALEN);
+  Serial.println("Done\n");
   Serial.write('\n');
+  
   
   
 }
