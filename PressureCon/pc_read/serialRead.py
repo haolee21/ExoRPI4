@@ -64,7 +64,7 @@ while True:
             result_data[name]=value
 
         data_frame = pd.DataFrame(result_data)
-        data_frame.to_csv(datetime.now().strftime("%H%M%S_%b%d%Y.csv"))
+        data_frame.to_csv(datetime.now().strftime("%H%M%S_%b%d%Y.csv"),index_label='time')
         print('Done sampling')
 
         ser.close()
