@@ -3,7 +3,8 @@ import serial
 from datetime import date,datetime
 import time
 import pandas as pd
-baud = 115200
+import pdb
+baud = 100000
 dev_port = '/dev/ttyACM0'
 
 
@@ -12,42 +13,61 @@ dev_port = '/dev/ttyACM0'
 while True:
     data=input('Start next sampling cycle? (y/n)')
     if data=='y':
-        print('Buffer cleared')
-
-        ser=serial.Serial(port=dev_port,baudrate=baud,timeout=None,parity=serial.PARITY_ODD,bytesize=serial.EIGHTBITS,stopbits=serial.STOPBITS_ONE)
+        
+        input('Please press the reset button on arduino, hit enter after the red light went off')
+        ser=serial.Serial(port=dev_port,baudrate=baud,timeout=None,parity=serial.PARITY_NONE,bytesize=serial.EIGHTBITS,stopbits=serial.STOPBITS_ONE,xonxoff=True)
         ser.flushInput()
         ser.flushOutput()
-        time.sleep(0.1)
-        print(dev_port, 'cleared, please press the reset button on arduino')
+        
         
         # pc will receive data until '\n' is received
-        msg=''
+        msg=[]
         data_list=[]
+        power=0
+        val=0
+        data_count=0
         while True:
-            cur_byte=ser.read()
-            if cur_byte == '\t':
+            cur_byte=ser.read().decode('utf-8')
+            if cur_byte==',':
+                # print(val)
+                msg.append(val)
+                val=0
+                pow=0
+                data_count=data_count+1
+            elif cur_byte == '\t':
+                print('next data set')
+                print('msg length ',len(msg))
                 data_list.append(msg)
-                msg=''
+                data_count=0
+                msg=[]
             elif cur_byte=='\n':
-                data_list.append(msg)
+                
+                print('end data sending')
                 break
             else:
-                msg +=cur_byte
+                val*=10
+                val += int(cur_byte)
+                # power +=1
+
         print('we received data from ', len(data_list), ' different sources')
 
 
         
         ## save the data
         
-    
+        # pdb.set_trace()
+        data_label=['tank_pre','cyln_pre','force','pos','val1','val2']
         result_data=dict()
         for idx,value in enumerate(data_list):
-            name = 'data'+str(idx)
-            result_data['data'+str(idx)]=value
+            name = data_label[idx]
+            
+            result_data[name]=value
 
         data_frame = pd.DataFrame(result_data)
-        data_frame.to_csv(datetime.now().strftime("%H%M%S_%b%d%Y"))
+        data_frame.to_csv(datetime.now().strftime("%H%M%S_%b%d%Y.csv"))
         print('Done sampling')
+
+        ser.close()
 
     else:
         print('Invalid command')
