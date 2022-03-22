@@ -67,22 +67,24 @@ void setup()
     volatileArrayInit(val1_mem,false,sizeof(bool)*DATALEN);
     volatileArrayInit(val2_mem,false,sizeof(bool)*DATALEN);
 
-
+  
 
     //config output pins (analog read pins does not need to be configured)
+    analogReadRes(12); 
+    
     pinMode(Val1_out,OUTPUT);
     pinMode(Val2_out,OUTPUT);  
     pinMode(LED,OUTPUT);
     digitalWrite(Val1_out,LOW);
     digitalWrite(Val2_out,LOW);
     digitalWrite(LED,HIGH);
-
+    
 
     Serial.begin(1000000);          //  setup serial
 
 
     senTimer.begin(SenUpdate,1000);
-    actTimer.begin(ActUpdate,50000);
+    actTimer.begin(ActUpdate,TIME_UNIT*100);
 
 }
 void volatileArrayInit(volatile void* dataArray,char value, size_t len){

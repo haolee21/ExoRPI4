@@ -1,1 +1,6 @@
 *.csv
+*.ipynb
+pc_read/
+pc_read/__pycache__/
+pc_read/.ipynb_checkpoints/
+pc_read/*.ipynb
