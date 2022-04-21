@@ -137,28 +137,31 @@ const bool& Timer::GetDataRec_flag(){
 }
 void Timer::StartRec(){
     //TODO: did not consider if the recording thread already started
-    if(!Timer::dataRec_flag){
-        fs::path data_dir(fs::current_path());
-        std::string homeFolder = data_dir.string();
-        std::string filePath;
-        {
-            //create the directory to save the data with datetime as folder name
-            using namespace std;
-		    time_t result = time(nullptr);
-    	    tm* timePtr = localtime(&result);
-    	    std::stringstream curDate;
-    	    curDate<<timePtr->tm_year+1900<<'-'<<std::setw(2)<<std::setfill('0')<<timePtr->tm_mon+1<<setw(2)<<setfill('0')<<timePtr->tm_mday<<'-'<<setw(2)<<setfill('0')<<timePtr->tm_hour<<setw(2)<<setfill('0')<<timePtr->tm_min<<'-'<<setw(2)<<setfill('0')<<timePtr->tm_sec;
-    	    filePath = homeFolder +'/'+ curDate.str();
-	    }
-        std::cout<<"folder name: "<<filePath<<std::endl;
-        if (fs::is_directory(filePath))
-            throw std::invalid_argument("Data folder already exists\n");
-        else{
-            std::cout<<"SYS:TIMER:create new directory to save rec\n";
-            fs::create_directory(filePath);
-            Timer::filePath = filePath;
-            Timer::dataRec_flag = true;
-        }
+    if(Timer::dataRec_flag){
+        Timer::EndRec();
+        Timer::dataRec_flag = !Timer::dataRec_flag;
+
+    }
+    fs::path data_dir(fs::current_path());
+    std::string homeFolder = data_dir.string();
+    std::string filePath;
+    {
+        //create the directory to save the data with datetime as folder name
+        using namespace std;
+        time_t result = time(nullptr);
+        tm* timePtr = localtime(&result);
+        std::stringstream curDate;
+        curDate<<timePtr->tm_year+1900<<'-'<<std::setw(2)<<std::setfill('0')<<timePtr->tm_mon+1<<setw(2)<<setfill('0')<<timePtr->tm_mday<<'-'<<setw(2)<<setfill('0')<<timePtr->tm_hour<<setw(2)<<setfill('0')<<timePtr->tm_min<<'-'<<setw(2)<<setfill('0')<<timePtr->tm_sec;
+        filePath = homeFolder +'/'+ curDate.str();
+    }
+    std::cout<<"folder name: "<<filePath<<std::endl;
+    if (fs::is_directory(filePath))
+        throw std::invalid_argument("Data folder already exists\n");
+    else{
+        std::cout<<"SYS:TIMER:create new directory to save rec\n";
+        fs::create_directory(filePath);
+        Timer::filePath = filePath;
+        Timer::dataRec_flag = true;
     }
 }
 void Timer::EndRec(){
