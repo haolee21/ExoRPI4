@@ -46,7 +46,7 @@ class Timer
     // Data recording functions, it is binded to the timer because the "directory name" is based on the current time
     const static bool& GetDataRec_flag(); 
     const static std::string& GetFilePath();
-    static void StartRec();//create a new directory and sync time when start recording
+    static bool StartRec();//create a new directory and sync time when start recording
     static void EndRec();
     
     

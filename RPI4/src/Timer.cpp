@@ -135,11 +135,11 @@ void Timer::Add_conCallback(std::function<void()> fun){
 const bool& Timer::GetDataRec_flag(){
     return std::ref(Timer::dataRec_flag);
 }
-void Timer::StartRec(){
-    //TODO: did not consider if the recording thread already started
+bool Timer::StartRec(){
+    
     if(Timer::dataRec_flag){
         Timer::EndRec();
-        Timer::dataRec_flag = !Timer::dataRec_flag;
+       
 
     }
     fs::path data_dir(fs::current_path());
@@ -155,13 +155,16 @@ void Timer::StartRec(){
         filePath = homeFolder +'/'+ curDate.str();
     }
     std::cout<<"folder name: "<<filePath<<std::endl;
-    if (fs::is_directory(filePath))
+    if (fs::is_directory(filePath)){
         throw std::invalid_argument("Data folder already exists\n");
+        return false;
+    }
     else{
         std::cout<<"SYS:TIMER:create new directory to save rec\n";
         fs::create_directory(filePath);
         Timer::filePath = filePath;
         Timer::dataRec_flag = true;
+        return true;
     }
 }
 void Timer::EndRec(){
