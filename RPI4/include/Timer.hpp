@@ -6,7 +6,7 @@
 #define USEC (1000 * NSEC)
 #define MSEC (1000 * USEC)
 #define SEC (1000 * MSEC)
-#define SAMPT 2000  //sampling period in uS
+#define SAMPT 1000  //sampling period in uS, make sure 
 
 #include <functional>
 #include <pthread.h>

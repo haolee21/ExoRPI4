@@ -7,6 +7,9 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 set(Boost_INCLUDE_DIR /home/lowlimb/tools/ARM/boost_1_75_0)
 set(Boost_LIBRARY_DIR /home/lowlimb/tools/ARM/boost_1_75_0/stage/lib)
 
+# #setup osqp library
+# set(OSQP_)
+
 set(CMAKE_C_COMPILER arm-linux-gnueabihf-gcc)
 set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
 
@@ -70,7 +73,7 @@ add_library(
 
 message(STATUS ${BASE_DIR})
 set_target_properties(lib PROPERTIES LINKER_LANGUAGE CXX)
-link_directories(${Boost_LIBRARY_DIR}) 
+# link_directories(${Boost_LIBRARY_DIR}) 
 enable_testing()
 file(GLOB SRC_FILES 
     ${Include_DIR}/*.cpp

@@ -93,7 +93,7 @@ void SensorHub::UpdateREnc()
     SensorHub &senHub = SensorHub::GetInstance();
     // senHub.EncData[SensorHub::RHipS]=senHub.RHipS_Enc.ReadPos();   ////TODO: read the correct encoder when encoders connected
     // senHub.EncData[SensorHub::RHipF]=senHub.RKneS_Enc.ReadPos();
-    // senHub.EncData[SensorHub::RKneS]=senHub.RKneS_Enc.ReadPos();
+    senHub.EncData[SensorHub::RKneS]=senHub.RKneS_Enc.ReadPos();
     // senHub.EncData[SensorHub::RAnkS]=senHub.RAnkS_Enc.ReadPos();
     // senHub.EncData[SensorHub::RAnkF]=senHub.RKneS_Enc.ReadPos();
     std::array<uint16_t,NUMENC/2> curMea{senHub.EncData[SensorHub::RHipS],senHub.EncData[SensorHub::RKneS],senHub.EncData[SensorHub::RAnkS]};

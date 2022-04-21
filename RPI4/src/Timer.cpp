@@ -56,7 +56,7 @@ void* Timer::TimerTick(void*){
 
     //////////////////////////////////////////////////////////
     unsigned timeDiff_idx=0; //TODO: testing loop period only, should be commented in final version
-    std::array<float,60*1000> timeDiff; //can only run around 60 sec
+    std::array<float,120*1000> timeDiff; //can only run around 120 sec
     auto t_start=std::chrono::high_resolution_clock::now();
     auto t_end = std::chrono::high_resolution_clock::now();
     ///////////////////////////////////////////////////////////
@@ -136,11 +136,13 @@ const bool& Timer::GetDataRec_flag(){
     return std::ref(Timer::dataRec_flag);
 }
 void Timer::StartRec(){
+    //TODO: did not consider if the recording thread already started
     if(!Timer::dataRec_flag){
         fs::path data_dir(fs::current_path());
         std::string homeFolder = data_dir.string();
         std::string filePath;
         {
+            //create the directory to save the data with datetime as folder name
             using namespace std;
 		    time_t result = time(nullptr);
     	    tm* timePtr = localtime(&result);
@@ -151,11 +153,12 @@ void Timer::StartRec(){
         std::cout<<"folder name: "<<filePath<<std::endl;
         if (fs::is_directory(filePath))
             throw std::invalid_argument("Data folder already exists\n");
-    
-        fs::create_directory(filePath);
-        Timer::filePath = filePath;
-        Timer::dataRec_flag = true;
-
+        else{
+            std::cout<<"SYS:TIMER:create new directory to save rec\n";
+            fs::create_directory(filePath);
+            Timer::filePath = filePath;
+            Timer::dataRec_flag = true;
+        }
     }
 }
 void Timer::EndRec(){

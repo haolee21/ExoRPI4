@@ -8,6 +8,7 @@ Encoder_L::Encoder_L(uint8_t pinId)
 Encoder_L::~Encoder_L()
 {
 }
+
 const Pin Encoder_L::CEA_pin = Pin(Encoder_L::CEA,Pin::IO_TYPE::Output);
 const Pin Encoder_L::CEB_pin = Pin(Encoder_L::CEB,Pin::IO_TYPE::Output);
 const Pin Encoder_L::CEC_pin = Pin(Encoder_L::CEC,Pin::IO_TYPE::Output);
