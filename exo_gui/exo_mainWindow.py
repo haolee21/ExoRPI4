@@ -47,7 +47,7 @@ class MW(QMainWindow):
         # jointUpdateCB = lambda data:self.joint_plot_window.UpdateData(self,data)
         # preUpdateCB = lambda data:self.pressure_plot_window.UpdateData(self,data)
         # self.tcp_port.SetCallBack(jointUpdateCB,preUpdateCB)
-        self.tcp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect)
+        self.tcp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn)
         # TCP/IP connection
         
         self.cur_ip = self.findChild(QLabel,'cur_ip_label')
@@ -179,6 +179,10 @@ class MW(QMainWindow):
                 self.timer = QtCore.QTimer()
                 self.timer.timeout.connect(self.tcp_port.DataUpdate)
                 self.timer.start(SAMPT)
+
+               
+                    
+
                 
         else:
             self.timer.stop()
@@ -189,14 +193,27 @@ class MW(QMainWindow):
         self.tcp_port.SendCmd('CAL:TIME:EPOCH:'+str(time.time()),1,True)
     def btn_rec_start_clicked(self):
         if(not self.rec_flag):
+            # when clicked, start the recording
             self.btn_updateTime_clicked()
             self.tcp_port.SendCmd('SET:REC:DATA:1',1)
             self.rec_flag=True
             self.btn_rec_start.setText('REC End')
         else:
+            # when clicked, end the recording
+            self.tcp_port.SendCmd('SET:REC:DATA:0',0)
             self.rec_flag=False
             self.btn_rec_start.setText('REC Start')
-
+    def update_rec_btn(self,flag_read):
+        
+        ## callback function for tcp_con to check rec condition
+        if self.rec_flag == False and flag_read==True:
+            self.rec_flag = True
+            self.btn_rec_start.setText('REC Stop')
+            
+        elif self.rec_flag == True and flag_read == False:
+            self.rec_flag=False
+            self.btn_rec_start.setText('Rec Start')
+        
         
 
 
