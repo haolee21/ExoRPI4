@@ -152,12 +152,13 @@ int Encoder::ReadPos()
     }
     
     // usleep(20);
-    
+    // The encoder has issues reading two bytes consecutively, you will have to send one byte per time.    
     this->txBuf[0] = 0x00;
     this->_spiTxRx(1);
     this->MSB = this->rxBuf[0];
     this->_spiTxRx(1);
     this->LSB = this->rxBuf[0];
+
 
 
     // auto elapsed = chrono::high_resolution_clock::now() - start;

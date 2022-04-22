@@ -9,6 +9,10 @@
 // Blink the LED to make sure the Teensy hasn't hung
 IntervalTimer blink_timer;
 IntervalTimer pwm_timer;
+unsigned long previousMicro;//micros only last for less than 2 hrs
+
+
+
 
 volatile bool led_high = false;
 void blink_isr();
@@ -17,12 +21,16 @@ const uint16_t slave_address = 0x002D;
 I2CSlave& slave = Slave;
 void after_receive(int size);
 
-const int duty_unit = 200; //in micro second, suppose total period is 50Hz
+const int duty_unit = 50; //in micro second, the valve PWM period is 200 Hz
+const unsigned long period_time =duty_unit*100;
+
 const int num_pwm = PWM_VAL_NUM;
 const int num_val = SW_VAL_NUM;
 
 int pwm_idx=0;//this is for record the valve id, not the pin id (e.g., pwm1 is pin 8)
 int val_idx=0;
+
+
 
 // create two lists for pwm_valves, pwm_list is the original list, pwm_sort_list is after sorting
 PWM_valve pwm_list[num_pwm] = {
@@ -142,8 +150,7 @@ void decode_msg()
 //  Serial.print("set duty:");
   for (int i = 0; i < num_pwm; i++) {
     pwm_list[i].setDuty((int)slave_rx_buffer_2[i]);
-//    Serial.print((int)slave_rx_buffer_2[i]);
-//    Serial.print(',');
+
   }
   for (int i = num_pwm; i < num_pwm + num_val;i++){
     if((bool)slave_rx_buffer_2[i]){
@@ -156,32 +163,46 @@ void decode_msg()
   }
 
 
-  memcpy(pwm_sort_list, pwm_list, sizeof(PWM_valve) * num_pwm);
-  heapSort(pwm_sort_list, num_pwm);
+  // memcpy(pwm_sort_list, pwm_list, sizeof(PWM_valve) * num_pwm);
+  // heapSort(pwm_sort_list, num_pwm);
 }
 // reference from https://www.geeksforgeeks.org/heap-sort/
 
 
 void PWM_valve_on_off()
 {
+
+  int time_diff = (int)(micros()-previousMicro);
+
+  for(int i =0;i<num_pwm;i++){
+    if(pwm_list[i].GetDuty()*duty_unit>=time_diff){
+      // Serial.println("on");
+      pwm_list[i].on();
+    }
+    else if(pwm_list[i].GetDuty()*duty_unit<time_diff){
+      pwm_list[i].off();
+      // Serial.println("off");
+    }
+  }
+
+
+  // for (int i = 0; i < num_pwm; i++)
+  // {
+  //   pwm_sort_list[i].on();
+  // }
+  // int pre_duty = 0;
+  // for (int i = 0; i < num_pwm; i++)
+  // {
+  //   int cur_sleep_t = pwm_sort_list[i].cal_off_t(pre_duty);
+  //   delayMicroseconds(duty_unit*cur_sleep_t);
+  //   pwm_sort_list[i].off();
+
+  // }
+
+  if(time_diff >= period_time){
+    previousMicro = micros();
   
-  for (int i = 0; i < num_pwm; i++)
-  {
-    pwm_sort_list[i].on();
   }
-  int pre_duty = 0;
-  for (int i = 0; i < num_pwm; i++)
-  {
-    int cur_sleep_t = pwm_sort_list[i].cal_off_t(pre_duty);
-    delayMicroseconds(duty_unit*cur_sleep_t);
-    pwm_sort_list[i].off();
-//    Serial.print("val");
-//    Serial.print(pwm_sort_list[i].idx);
-//    Serial.print(':');
-//    Serial.print(cur_sleep_t*duty_unit);
-//    Serial.print('\t');
-  }
-//  Serial.print('\n');
   
 }
 void setup() {
@@ -194,7 +215,9 @@ void setup() {
 
   //create pwm_valve list
   memcpy(pwm_sort_list, pwm_list, sizeof(PWM_valve) * num_pwm);
-  pwm_timer.begin(PWM_valve_on_off, duty_unit * 100); //it is in micro second
+
+  previousMicro = micros();
+  pwm_timer.begin(PWM_valve_on_off, duty_unit  ); //will check the valve on/off every 1 unit of duty time
 
   // Configure I2C Slave
   slave.after_receive(after_receive);
@@ -227,5 +250,5 @@ void loop() {
   // We could receive multiple message while we're asleep.
   // This example is modelling an application where it's Ok
   // to drop messages.
-  delayMicroseconds(50);
+  // delayMicroseconds(50);
 }
