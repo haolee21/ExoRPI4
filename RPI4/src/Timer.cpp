@@ -60,6 +60,9 @@ void* Timer::TimerTick(void*){
     auto t_start=std::chrono::high_resolution_clock::now();
     auto t_end = std::chrono::high_resolution_clock::now();
     ///////////////////////////////////////////////////////////
+    //TODO: Need to add init sequence here
+    //we cannot add 
+
 
     Timer &timer = Timer::GetInstance();
     clock_gettime(CLOCK_MONOTONIC,&t);

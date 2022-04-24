@@ -41,8 +41,8 @@ private:
     
     
 
-    std::array<uint8_t,PWM_VAL_NUM> PWM_Duty{};
-    std::array<bool,SW_VAL_NUM> SW_ValCond{}; //using value initializer to set all values to zero
+    std::array<uint8_t,PWM_VAL_NUM> PWM_Duty{0};
+    std::array<bool,SW_VAL_NUM> SW_ValCond{0}; //using value initializer to set all values to zero
     void On(Valves_hub::SW_ID sw_valve);//turn on or off the valve
     void Off(Valves_hub::SW_ID sw_valve);
     

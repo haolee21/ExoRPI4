@@ -54,7 +54,7 @@ void TCP_server::RecvCmd(){
             if(cmd_subClass.compare("MEAS")==0){
                 std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
                 if(cmd_device.compare("DATA")==0){  
-                    //TODO: add callback to reply measurements
+                    
                     std::array<char,(SensorHub::NUMENC+SensorHub::NUMPRE)*sizeof(uint16_t)> meaData;
                     const std::array<u_int16_t,SensorHub::NUMENC> &encData=SensorHub::GetEncData();
                     std::memcpy(meaData.begin(),encData.begin(),sizeof(u_int16_t)*encData.size());
@@ -74,6 +74,14 @@ void TCP_server::RecvCmd(){
                         TCP_server::Send_cmd(std::string("0"),socket);
                     }
                 }
+            }
+            else if(cmd_subClass.compare("PWM")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
+                if(cmd_device.compare("DUTY")==0){
+                    const std::array<uint8_t,PWM_VAL_NUM> pwm_data = Valves_hub::GetDuty();
+                    TCP_server::Send_cmd(std::string(pwm_data.begin(),pwm_data.end()),socket);
+                }
+
             }
             
         }

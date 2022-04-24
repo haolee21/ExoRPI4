@@ -14,23 +14,8 @@ set(CMAKE_C_COMPILER arm-linux-gnueabihf-gcc)
 set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
 
 set(Boost_USE_STATIC_LIBS ON)
-# set(XENO_CONFIG "/home/lowlimb/rpi-kernel/xenomai-3.0.7/target/usr/xenomai/bin/xeno-config")
-# set(XENO_CFLAG_PARAM  "--alchemy --cflags")
-# set(XENO_LDFLAG_PARAM  "--alchemy --ldflags")
-# execute_process(COMMAND bash -c "${XENO_CONFIG} ${XENO_CFLAG_PARAM}" 
-#                 OUTPUT_VARIABLE XENO_CFFLAGS
-#                 OUTPUT_STRIP_TRAILING_WHITESPACE)
-# execute_process(COMMAND bash -c "${XENO_CONFIG} ${XENO_LDFLAG_PARAM}"
-#                 OUTPUT_VARIABLE XENO_LDFLAG
-#                 OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-# we can only set flags after we called xeno-config since xeno requires many flags when using make
 
 
-# we can only set flags after we called xeno-config since xeno requires many flags when using make
-
-# set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -o3 -pthread ${XENO_CFFLAGS} ${XENO_LDFLAG}" ) #you can set with add_definitions("-Wall -std=c+11, etc")
-# set(CMAKE_C_FLAGS   "-std=c++17 -Wall -o3 -pthread ${XENO_CFFLAGS} ${XENO_LDFLAG}")
 set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -o3 -pthread -lrt -o3") #you can set with add_definitions("-Wall -std=c+11, etc")
 set(CMAKE_C_FLAGS   "-std=c++17 -Wall -o3 -pthread -lrt -o3")
 
@@ -58,7 +43,7 @@ include_directories(
     ${Boost_INCLUDE_DIR}
     ${BASE_DIR}
     #${Eigen_INCLUDE_DIR}
-    #${Xenomai_INCLUDE_DIR}
+
     
 )
 file(GLOB HEAD_FILES 
@@ -73,7 +58,7 @@ add_library(
 
 message(STATUS ${BASE_DIR})
 set_target_properties(lib PROPERTIES LINKER_LANGUAGE CXX)
-# link_directories(${Boost_LIBRARY_DIR}) 
+# link_directories(${Boost_LIBRARY_DIR}) #unnecessary 
 enable_testing()
 file(GLOB SRC_FILES 
     ${Include_DIR}/*.cpp

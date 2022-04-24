@@ -1,16 +1,30 @@
 #include "Valves_hub.hpp"
 Valves_hub::Valves_hub()
 :
-pwmRecorder(Recorder<uint8_t,PWM_VAL_NUM>("test","test"))
-,swRecorder(Recorder<bool,SW_VAL_NUM>("test","test"))
+pwmRecorder(Recorder<uint8_t,PWM_VAL_NUM>("PWM",PWM_HEADER))//TODO: use correct valve names, perhaps adding it in shared file with Teensy
+,swRecorder(Recorder<bool,SW_VAL_NUM>("SW",SW_HEADER))
 ,teensyValveCon(TeensyI2C(1))
 {
-   
+    //Do not set any valve condition here, it will crash
+    //I believe the reason is because TeensyI2C is not created yet
+    //I guess the behavior of initialization list is different from I thought
 
 }
 
 Valves_hub::~Valves_hub()
 {
+    
+    //TODO: add air release sequence
+    //right now I will just turn off all valves
+    std::cout<<"Turn off all valves\n";
+    Valves_hub::SetSW(std::array<bool,SW_VAL_NUM>{0});
+    Valves_hub::SetDuty(std::array<uint8_t,PWM_VAL_NUM>{0});
+    Valves_hub::UpdateValve(); //SetSW or SetDuty only change the flags in Valves_hub
+                               //It is UpdateValve that sends them to Teensy
+                               //However, when destructor is called, the original callback (RT Timer) has already stopped
+                               //Thus, we will have to call it ourself. 
+
+
 }
 Valves_hub& Valves_hub::GetInstance(){
     static Valves_hub instance;
@@ -68,7 +82,9 @@ void Valves_hub::Off(Valves_hub::SW_ID valve){
     }
 }
 void Valves_hub::UpdateValve(){
+    
     Valves_hub& hub = Valves_hub::GetInstance();
+    
     if(hub.valChanged_flag){
         std::array<char,TeensyI2C::CMDLEN> cmd;
 
@@ -78,7 +94,11 @@ void Valves_hub::UpdateValve(){
         hub.teensyValveCon.WriteCmd(cmd);
         hub.valChanged_flag=false;
         
+        
     }
+    hub.pwmRecorder.PushData(hub.GetDuty());
+    hub.swRecorder.PushData(hub.GetSWValCond());
+
     
 }
 

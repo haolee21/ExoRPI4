@@ -38,10 +38,11 @@ private:
         vts<<header<<'\n';
         for(unsigned i=0;i<endIdx;i++){
             std::array<T,N> curRow = data[i];
-            std::copy(curRow.begin(),curRow.end()-1,std::ostream_iterator<T>(vts,",")); //only -1 because this will not include the -1 member (1:3, only select 1,2)
+            //Note that I converted all save data into int, it is to avoid error when using uint8_t, it is equivalent to byte, thus, default will only output ascii 
+            std::copy(curRow.begin(),curRow.end()-1,std::ostream_iterator<int>(vts,",")); //only -1 because this will not include the -1 member (1:3, only select 1,2)
 
 
-            vts<<*(curRow.end()-1)<<'\n';
+            vts<<(int)*(curRow.end()-1)<<'\n';//last element does not need ',' but '\n'
         }
         writeCsv<<vts.str();
         writeCsv.close();
@@ -55,7 +56,8 @@ public:
     {
         
         
-        this->saveCSV_future = std::async(std::launch::async,[](){});
+        this->saveCSV_future = std::async(std::launch::async,[](){}); //This is for init the save file thread, so we don't need to generate a new thread
+        
 
         this->dataIdx=0;
         this->tempFileIdx=0;

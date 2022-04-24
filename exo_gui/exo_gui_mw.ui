@@ -399,9 +399,9 @@
     <widget class="QLabel" name="label_3">
      <property name="geometry">
       <rect>
-       <x>60</x>
+       <x>50</x>
        <y>30</y>
-       <width>111</width>
+       <width>121</width>
        <height>20</height>
       </rect>
      </property>
@@ -452,7 +452,7 @@
      <x>0</x>
      <y>0</y>
      <width>795</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuConnection">
@@ -467,6 +467,7 @@
     </property>
     <addaction name="actionGraphJoint"/>
     <addaction name="action_plotPressure"/>
+    <addaction name="actionPWM_Duty"/>
    </widget>
    <widget class="QMenu" name="menuTask_Settings">
     <property name="title">
@@ -509,6 +510,11 @@
   <action name="act_testPWM_valves">
    <property name="text">
     <string>Test PWM Valves</string>
+   </property>
+  </action>
+  <action name="actionPWM_Duty">
+   <property name="text">
+    <string>PWM Duty</string>
    </property>
   </action>
  </widget>
