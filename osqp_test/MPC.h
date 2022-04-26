@@ -51,8 +51,8 @@ MPC::MPC(/* args */)
     c_int A_p[3] = {0, 2, 4, };
     c_float l[3] = {1.0, 0.0, 0.0, };
     c_float u[3] = {1.0, 0.7, 0.7, };
-    c_int n = 2;
-    c_int m = 3;
+    c_int n = X_LEN;
+    c_int m = NUM_OF_CONS;
 
     if(this->data){
         this->data->n = n;

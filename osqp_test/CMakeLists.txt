@@ -6,12 +6,9 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 # set(CMAKE_C_COMPILER arm-linux-gnueabihf-gcc) //setting these are useless, you should do it when init cmake 
 # set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
 
-set(osqp_INCLUDE_DIRS ~/tools/ARM/osqp/include)
-set(osqp_LIBRARIES ~/tools/ARM/osqp/lib)
+set(osqp_INCLUDE_DIRS /home/lowlimb/tools/ARM/osqp/include)
+set(osqp_LIBRARIES /home/lowlimb/tools/ARM/osqp/lib)
 # set(osqp_DIR home/lowlimb/tools/ARM/osqp/lib/cmake/osqp)
-
-# set(CMAKE_C_COMPILER arm-linux-gnueabihf-gcc)
-# set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
 
 set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -o3")
 set(CMAKE_C_FLAGS "-Wall -o3")
