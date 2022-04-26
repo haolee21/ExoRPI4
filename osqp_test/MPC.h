@@ -7,6 +7,7 @@
 #define CONS_A_LEN 4
 #define X_LEN 2
 #define NUM_OF_CONS 3
+#define A_MAT_LEN 50
 #include "osqp/osqp.h"
 #include <memory>
 #include <array>
@@ -24,6 +25,7 @@ private:
     
     c_int exitflag = 0;
 
+
 public:
     MPC(/* args */);
     ~MPC();
@@ -33,6 +35,12 @@ public:
     void UpdateQuadCost(std::array<float,QUAD_COST_LEN>);
     void UpdateConsBound(std::array<float,CONS_BOUND_LEN> up, std::array<float,CONS_BOUND_LEN> low);
     void UpdateConsMat(std::array<float,CONS_A_LEN>);
+
+    //MPC Controller function
+    void UpdateAMatVal(std::array<float,A_MAT_LEN>);
+    void SetDutyLimit(float up,float low);
+    
+
 
 };
 
