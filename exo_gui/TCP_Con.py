@@ -10,7 +10,7 @@ JOINT_DATA_LEN=12
 PRE_DATA_LEN=10
 class TCP:
     port =1234
-    ip_address='192.168.0.100'
+    ip_address='192.168.0.110'
     def __init__(self):
         self.flag = False
         
@@ -39,11 +39,12 @@ class TCP:
         # except:
         #     print('sock connecting failed')
         return self.flag
-    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback):
+    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback,recBtnUpdate):
         self.updateJoint = updateJointFun
         self.updatePre = updatePreFun
         self.updateTank = updateTankFun
         self.disConCcallback = disConCallback
+        self.recBtnUpdate = recBtnUpdate
         
     def Disconnect(self):
         if self.flag:
@@ -53,7 +54,7 @@ class TCP:
         print('this is the test function for testing multiprocess')
     def DataUpdate(self):
         if self.flag:
-            receive = self.SendCmd('REQ:MEAS:DATA',JOINT_DATA_LEN+PRE_DATA_LEN)
+            receive = self.SendCmd('REQ:MEAS:DATA',JOINT_DATA_LEN+PRE_DATA_LEN,print_response=False)
             # receive =b''
             # # while True:
             # #     cur_data = self.s.recv(1)
@@ -69,12 +70,21 @@ class TCP:
             # else:
             self.updateJoint(receive[:JOINT_DATA_LEN]) 
             self.updatePre(receive[JOINT_DATA_LEN:-2])
-            self.updateTank(int.from_bytes(receive[-2:],'big'))
+            self.updateTank(int.from_bytes(receive[-2:],'little'))
+
+            # rec_flag = int.from_bytes(self.SendCmd('REQ:REC:DATA',1,print_response=False),'little')
+            rec_flag = int(self.SendCmd('REQ:REC:DATA',1,print_response=False).decode())
+            # continuous checking if rec has already started
+            
+
+            self.recBtnUpdate(rec_flag)
+
+            
         else:
             print('error: tcp port not connected')
             self.disConCcallback()
             
-    def SendCmd(self,cmd,byte_to_read):
+    def SendCmd(self,cmd,byte_to_read,print_response=True):
         cmd = cmd+'\n'
         response = b''
         try:
@@ -86,6 +96,9 @@ class TCP:
 
                 # s.settimeout(0.1)
                 response = s.recv(byte_to_read)
+                
+                
+                
                 # response = response[:-1]
                 
 
@@ -105,7 +118,8 @@ class TCP:
         # response = self.s.recv(byte_to_read+1)#include \n
     
         # response = response[:-1]
-      
+        if print_response:
+            print('Send: '+cmd[:-1].ljust(25)+'Response: '+response.decode())
         return response
 
     def Update_test(self):

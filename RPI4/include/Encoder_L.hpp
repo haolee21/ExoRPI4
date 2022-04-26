@@ -1,6 +1,7 @@
 #ifndef ENCODER_L_HPP
 #define ENCODER_L_HPP
 #include "Encoder.hpp"
+#include <mutex>
 class Encoder_L:public Encoder
 {
 private:
@@ -13,6 +14,10 @@ private:
     static const Pin CEB_pin;
     static const Pin CEC_pin;
     virtual void _setCE();
+    virtual void Lock();
+    virtual void Unlock();
+    static std::mutex lock;
+
 public:
     Encoder_L(uint8_t pinId);
     ~Encoder_L();

@@ -18,11 +18,11 @@ void SensorHub::ResetEnc(SensorHub::EncName encName)
 }
 const std::array<u_int16_t, SensorHub::NUMENC> &SensorHub::GetEncData()
 {
-    return std::cref(SensorHub::GetInstance().EncData);
+    return std::ref(SensorHub::GetInstance().EncData);
 }
 const std::array<u_int16_t, SensorHub::NUMPRE> &SensorHub::GetPreData()
 {
-    return std::cref(SensorHub::GetInstance().PreData);
+    return std::ref(SensorHub::GetInstance().PreData);
     // return std::cref(SensorHub::GetInstance().adc0.ReadData());
 }
 
@@ -32,7 +32,10 @@ SensorHub::~SensorHub()
     munlockall();
 }
 SensorHub::SensorHub() //initialize member in list since Encoder has no default constructor
-    : LHipS_Enc(Encoder_L(Encoder_L::HIP1)), LKneS_Enc(Encoder_L(Encoder_L::KNEE)), LAnkS_Enc(Encoder_L(Encoder_L::ANK1)), RHipS_Enc(Encoder_R(Encoder_R::HIP1)), RKneS_Enc(Encoder_R(Encoder_R::KNEE)), RAnkS_Enc(Encoder_R(Encoder_R::ANK1)),adc0(ADC(0))//,adc1(ADC(1)) //, LHipF_Enc(Encoder_L(1)), LAnkF_Enc(Encoder_L(4)), RHipF_Enc(Encoder_R(1)), RAnkF_Enc(Encoder_R(4))
+    : LEncRecorder(Recorder<uint16_t,NUMENC/2>("EncodersL","LHipS,LKneS,LAnkS"))
+    , REncRecorder(Recorder<uint16_t,NUMENC/2>("EncodersR","RHipS,RKneS,RAnkS"))
+    ,PreRecorder(Recorder<uint16_t,NUMPRE>("Pressure","test"))
+    , LHipS_Enc(Encoder_L(Encoder_L::HIP1)), LKneS_Enc(Encoder_L(Encoder_L::KNEE)), LAnkS_Enc(Encoder_L(Encoder_L::ANK1)), RHipS_Enc(Encoder_R(Encoder_R::HIP1)), RKneS_Enc(Encoder_R(Encoder_R::KNEE)), RAnkS_Enc(Encoder_R(Encoder_R::ANK1)),adc0(ADC(0))//,adc1(ADC(1)) //, LHipF_Enc(Encoder_L(1)), LAnkF_Enc(Encoder_L(4)), RHipF_Enc(Encoder_R(1)), RAnkF_Enc(Encoder_R(4))
 {
     
 }
@@ -76,9 +79,12 @@ void SensorHub::ResetEncImpl(SensorHub::EncName EncName)
 void SensorHub::UpdateLEnc()
 {
     SensorHub &senHub = SensorHub::GetInstance();
-    senHub.EncData[SensorHub::LHipS] = senHub.LKneS_Enc.ReadPos();   //TODO: add robustness to ReadPos() when encoder is offline
-    senHub.EncData[SensorHub::LKneS] = senHub.LKneS_Enc.ReadPos();   //TODO: read the correct encoder when encoders connected
-    senHub.EncData[SensorHub::LAnkS] = senHub.LKneS_Enc.ReadPos();
+    // senHub.EncData[SensorHub::LHipS] = senHub.LHipS_Enc.ReadPos();   //TODO: add robustness to ReadPos() when encoder is offline
+    // senHub.EncData[SensorHub::LKneS] = senHub.LKneS_Enc.ReadPos();   //TODO: read the correct encoder when encoders connected
+    // senHub.EncData[SensorHub::LAnkS] = senHub.LAnkS_Enc.ReadPos();
+    std::array<uint16_t,NUMENC/2> curMea{senHub.EncData[SensorHub::LHipS],senHub.EncData[SensorHub::LKneS],senHub.EncData[SensorHub::LAnkS]};
+    
+    senHub.LEncRecorder.PushData(curMea);
     // senHub.EncData[SensorHub::LHipF] = senHub.LAnkS_Enc.ReadPos();
     // senHub.EncData[SensorHub::LAnkF] = senHub.LAnkS_Enc.ReadPos();    
 }
@@ -90,7 +96,8 @@ void SensorHub::UpdateREnc()
     senHub.EncData[SensorHub::RKneS]=senHub.RKneS_Enc.ReadPos();
     senHub.EncData[SensorHub::RAnkS]=senHub.RKneS_Enc.ReadPos();
     // senHub.EncData[SensorHub::RAnkF]=senHub.RKneS_Enc.ReadPos();
-    
+    std::array<uint16_t,NUMENC/2> curMea{senHub.EncData[SensorHub::RHipS],senHub.EncData[SensorHub::RKneS],senHub.EncData[SensorHub::RAnkS]};
+    senHub.REncRecorder.PushData(curMea);
 }
 void SensorHub::UpdatePre()
 {

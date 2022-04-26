@@ -15,7 +15,7 @@ void TCP_server::Off(){
 TCP_server::~TCP_server()
 {
     this->Off(); //turn itself off when finished
-    std::cout<<"SYS:TCP_server:Thread join starts\n";
+    std::cout<<"SYS:TCP_server:Thread join starts, remember it has to be connected to a client when it ends, otherwise it will stuck in loops\n";
     this->recv_th->join();
     std::cout<<"SYS:TCP_server:Thread join\n";
 }
@@ -53,23 +53,153 @@ void TCP_server::RecvCmd(){
         if(cmd_class.compare("REQ")==0){
             if(cmd_subClass.compare("MEAS")==0){
                 std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
-                if(cmd_device.compare("DATA")==0){
-                    //TODO: add callback to reply measurements
+                if(cmd_device.compare("DATA")==0){  
+                    
                     std::array<char,(SensorHub::NUMENC+SensorHub::NUMPRE)*sizeof(uint16_t)> meaData;
                     const std::array<u_int16_t,SensorHub::NUMENC> &encData=SensorHub::GetEncData();
                     std::memcpy(meaData.begin(),encData.begin(),sizeof(u_int16_t)*encData.size());
                     const std::array<u_int16_t,SensorHub::NUMPRE> &preData=SensorHub::GetPreData();
                     std::memcpy(meaData.begin()+encData.size()*sizeof(u_int16_t),preData.begin(),sizeof(u_int16_t)*preData.size());
                     TCP_server::Send_cmd(std::string(meaData.begin(),meaData.end()),socket);
-                    
                 }
             }
+            else if(cmd_subClass.compare("REC")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
+                if(cmd_device.compare("DATA")==0){
+                    const bool &recFlag=Timer::GetDataRec_flag();
+                    if(recFlag){
+                        TCP_server::Send_cmd(std::string("1"),socket);
+                    }
+                    else{
+                        TCP_server::Send_cmd(std::string("0"),socket);
+                    }
+                }
+            }
+            else if(cmd_subClass.compare("PWM")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
+                if(cmd_device.compare("DUTY")==0){
+                    const std::array<uint8_t,PWM_VAL_NUM> pwm_data = Valves_hub::GetDuty();
+                    TCP_server::Send_cmd(std::string(pwm_data.begin(),pwm_data.end()),socket);
+                }
+
+            }
+            
         }
         else if(cmd_class.compare("ACT")==0){
             if(cmd_subClass.compare("STOP")==0){
                 std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
                 if(cmd_device.compare("CONN")==0){
                     this->flag=false;
+                }
+            }
+        }
+        else if(cmd_class.compare("SET")==0){
+            
+            
+            if(cmd_subClass.compare("PWM")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
+                uint8_t input = std::stoi(Sub_cmd(ret_str,cmd_idx,'\n'));
+                std::cout<<"set pwm duty directly\n";
+                if(cmd_device.compare("LKNE")==0) {
+                    Valves_hub::SetDuty(input,Valves_hub::LKNEPRE);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    }
+                else if(cmd_device.compare("LANK")==0){
+                    Valves_hub::SetDuty(input,Valves_hub::LANKPRE);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    }
+                else if(cmd_device.compare("LTANK")==0){
+                    Valves_hub::SetDuty(input,Valves_hub::LTANKPRE);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    }
+                else if(cmd_device.compare("RKNE")==0){
+                    Valves_hub::SetDuty(input,Valves_hub::RKNEPRE);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    }
+                else if(cmd_device.compare("RANK")==0){
+                    Valves_hub::SetDuty(input,Valves_hub::RANKPRE);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    }
+                else if(cmd_device.compare("RTANK")==0){
+                    Valves_hub::SetDuty(input,Valves_hub::RTANKPRE);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    }
+                else{
+                    TCP_server::Send_cmd(std::string("0"),socket);
+                }
+                
+            }
+            else if(cmd_subClass.compare("REC")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
+                if(cmd_device.compare("DATA")==0){
+                    std::string input = Sub_cmd(ret_str,cmd_idx,'\n');
+                    if(input.compare("1")==0){
+                        Timer::StartRec();
+                        std::cout<<"Start to record\n";
+                    }
+                    else{
+                        Timer::EndRec();
+                        std::cout<<"End recording\n";
+                    }
+                }
+            }
+            
+            
+
+            else{
+                TCP_server::Send_cmd(std::string("0"),socket);
+            }
+        }
+
+        else if(cmd_class.compare("CAL")==0){
+            if(cmd_subClass.compare("ENC")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
+                if(cmd_device.compare("LHIP_S")==0){
+                    SensorHub::ResetEnc(SensorHub::EncName::LHipS);
+                    std::cout<<"DEV::LHip_S encoder reset\n";
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                }
+                else if(cmd_device.compare("LKNE_S")==0){
+                    SensorHub::ResetEnc(SensorHub::EncName::LKneS);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    std::cout<<"DEV::LKne_S encoder reset\n";
+                }
+                else if(cmd_device.compare("LANK_S")==0){
+                    SensorHub::ResetEnc(SensorHub::EncName::LAnkS);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    std::cout<<"DEV::LAnk_S encoder reset\n";
+                }
+                else if(cmd_device.compare("RHIP_S")==0){
+                    SensorHub::ResetEnc(SensorHub::EncName::RHipS);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    std::cout<<"DEV::RHip_S encoder reset\n";
+                }
+                else if(cmd_device.compare("RKNE_S")==0){
+                    SensorHub::ResetEnc(SensorHub::EncName::RKneS);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    std::cout<<"DEV::RKne_S encoder reset\n";
+                }
+                else if(cmd_device.compare("RANK_S")==0){
+                    SensorHub::ResetEnc(SensorHub::EncName::RAnkS);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    std::cout<<"DEV::RAnk_S encoder reset\n";
+                }
+                else{
+                    TCP_server::Send_cmd(std::string("0"),socket);
+                }
+                
+            }
+            if(cmd_subClass.compare("TIME")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
+                double inputs = std::stod(Sub_cmd(ret_str,cmd_idx,'\n'));
+                if(cmd_device.compare("EPOCH")==0){
+                    timeval time;
+                    int input_usec = (inputs - floor(inputs))*1000000;
+                    time.tv_sec = inputs;
+                    time.tv_usec = input_usec;
+                    settimeofday(&time,NULL);
+                    std::cout<<"Set DateTime\n";
+                    TCP_server::Send_cmd(std::string("1"),socket);
                 }
             }
         }

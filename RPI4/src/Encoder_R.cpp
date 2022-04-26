@@ -1,6 +1,6 @@
 
 #include "Encoder_R.hpp"
-
+std::mutex Encoder_R::lock = std::mutex();
 
 Encoder_R::Encoder_R(uint8_t pinId)
 : Encoder(pinId,Encoder_R::SPI_IDX)
@@ -30,6 +30,13 @@ void Encoder_R::_setCE()
 }
 
 
-
+void Encoder_R::Lock(){
+    Encoder_R::lock.lock();
+    // mtx_R.lock();
+}
+void Encoder_R::Unlock(){
+    Encoder_R::lock.unlock();
+    // mtx_R.unlock();
+}   
 
 

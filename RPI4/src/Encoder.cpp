@@ -13,6 +13,7 @@ Encoder::Encoder(uint8_t pinId,int spi_num)
     string spi_port = "/dev/spidev"+ss.str()+".0";
     this->fd = open(spi_port.c_str(), O_RDWR);
     unsigned int speed = 1000000;
+    // unsigned speed = 500000;
 
 
     auto mode = SPI_MODE_0;
@@ -104,6 +105,7 @@ void Encoder::_initCE(uint8_t pinId)
 
 void Encoder::SetZero()
 {
+    this->Lock();
     this->_setCE();
 
     this->txBuf[0] = 0x70;
@@ -116,6 +118,7 @@ void Encoder::SetZero()
         this->_spiTxRx(1);
     }
     cout<<"done set zero\n";
+    this->Unlock();
 }
 char Encoder::_spiTxRx(unsigned int len)
 {
@@ -132,6 +135,7 @@ char Encoder::_spiTxRx(unsigned int len)
 
 int Encoder::ReadPos()
 {
+    this->Lock();
     //preset the CE pins
     // auto start = chrono::high_resolution_clock::now();
     this->_setCE();
@@ -148,7 +152,7 @@ int Encoder::ReadPos()
     }
     
     // usleep(20);
-    
+    // The encoder has issues reading two bytes consecutively, you will have to send one byte per time.    
     this->txBuf[0] = 0x00;
     this->_spiTxRx(1);
     this->MSB = this->rxBuf[0];
@@ -156,9 +160,11 @@ int Encoder::ReadPos()
     this->LSB = this->rxBuf[0];
 
 
+
     // auto elapsed = chrono::high_resolution_clock::now() - start;
     // long long dur_time = chrono::duration_cast<chrono::microseconds>(elapsed).count();
     // cout << "time: " << dur_time << endl;
+    this->Unlock();
     return (int)(this->MSB << 8) + (int)this->LSB;
    
 }

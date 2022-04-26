@@ -11,6 +11,7 @@
 #include <chrono>
 #include <memory>
 #include <Timer.hpp>
+#include "Recorder.hpp"
 
 #define DEG (360.0f/4096.0f)
 
@@ -55,6 +56,9 @@ private:
     
     std::array<u_int16_t,NUMENC> EncData;
     std::array<u_int16_t,NUMPRE> PreData;
+    Recorder<uint16_t,NUMENC/2> LEncRecorder;
+    Recorder<uint16_t,NUMENC/2> REncRecorder;
+    Recorder<uint16_t,NUMPRE> PreRecorder;
 
     // Encoders, S is for sagittal plane, F is for frontal plane
     Encoder_L LHipS_Enc,LKneS_Enc,LAnkS_Enc; //LHipF_Enc,LAnkF_Enc

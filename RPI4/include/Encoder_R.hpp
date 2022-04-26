@@ -1,6 +1,7 @@
 #ifndef ENCODER_R_HPP
 #define ENCODER_R_HPP
 #include "Encoder.hpp"
+
 class Encoder_R:public Encoder
 {
 private:
@@ -14,6 +15,9 @@ private:
     static const Pin CEC_pin;
 
     virtual void _setCE();
+    virtual void Lock();
+    virtual void Unlock();
+    static std::mutex lock;
 public:
     Encoder_R(uint8_t pinId);
     ~Encoder_R();
@@ -23,6 +27,8 @@ public:
     static const uint8_t KNEE = 2;
     static const uint8_t ANK1 = 3;
     static const uint8_t ANK2 = 4;
+
+    
 };
 
 
