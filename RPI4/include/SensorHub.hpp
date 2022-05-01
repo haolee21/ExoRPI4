@@ -23,7 +23,7 @@ public:
     
     ~SensorHub();
     const static int NUMENC = 6;    
-    const static int NUMPRE = 5; //always 8 since ADC has 8 channels
+    const static int NUMPRE = 8; //always 8 since ADC has 8 channels
     
     const float ENC_DEN = 4096.0;
     const float PRE_DEN = 65536;

@@ -143,9 +143,6 @@ void TCP_server::RecvCmd(){
                     }
                 }
             }
-            
-            
-
             else{
                 TCP_server::Send_cmd(std::string("0"),socket);
             }

@@ -9,6 +9,7 @@
 #include <boost/filesystem/path.hpp>
 #include <iomanip>
 
+
 int main()
 {   
     
@@ -36,7 +37,7 @@ int main()
 
     clock_gettime(CLOCK_MONOTONIC, &t);
     
-    for(int i=0;i<50;i++){
+    for(int i=0;i<TOT_RUN_TIME;i++){
         // std::array<u_int16_t,SensorHub::NUMENC> curEnc=SensorHub::GetEncData();
         // std::cout<<i<<"cur enc mea: ";
         // for(int i2=0;i2<SensorHub::NUMENC;i2++){

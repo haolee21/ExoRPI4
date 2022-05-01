@@ -77,7 +77,7 @@ public:
 
     }
     
-    void PushData(std::array<T,N> data){
+    void PushData(const std::array<T,N> data){
 
         if(this->data_rec_flag){
             (*(this->curData))[this->dataIdx++]=data;

@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QAction, QApplication, QCheckBox, QLabel, QLineEdit, QMainWindow,QPushButton, QRadioButton,QWidget,QProgressBar
+from PyQt5.QtWidgets import QLCDNumber
 from PyQt5 import uic,QtCore
 
 
@@ -15,6 +16,7 @@ from PlotPressureWindow import *
 from PWM_TestWindow import *
 import math
 import time
+import datetime
 DATALEN=120
 SAMPT = 40
 class SystemData:
@@ -133,6 +135,8 @@ class MW(QMainWindow):
         self.btn_syncTime.clicked.connect(self.btn_updateTime_clicked)
         self.rec_flag = False
 
+        self.label_startTime = self.findChild(QLabel,'label_startTime')
+
 
         self.show()
     def radio_walkRec_checked(self):
@@ -198,6 +202,8 @@ class MW(QMainWindow):
             self.tcp_port.SendCmd('SET:REC:DATA:1',1)
             self.rec_flag=True
             self.btn_rec_start.setText('REC End')
+            curTime = datetime.datetime.fromtimestamp(time.time())
+            self.label_startTime.setText("%04d-" %(curTime.year) + "%02d-" %(curTime.month) + "%02d%02d-" %(curTime.hour,curTime.minute)+"%02d" %(curTime.second))
         else:
             # when clicked, end the recording
             self.tcp_port.SendCmd('SET:REC:DATA:0',0)
