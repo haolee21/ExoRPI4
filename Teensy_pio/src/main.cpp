@@ -21,7 +21,7 @@ const uint16_t slave_address = 0x002D;
 I2CSlave& slave = Slave;
 void after_receive(int size);
 
-const int duty_unit = 500; //in micro second, the valve PWM period is 200 Hz
+const int duty_unit = 100; //in micro second, the valve PWM period is 200 Hz
 const unsigned long period_time =duty_unit*100;
 
 const int num_pwm = PWM_VAL_NUM;

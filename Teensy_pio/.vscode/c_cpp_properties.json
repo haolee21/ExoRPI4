@@ -5,7 +5,8 @@
             "includePath": [
                 "${default}",
                 "include",
-                ".pio"
+                ".pio",
+                "/home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI_Teensy"
             ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "gnu11",

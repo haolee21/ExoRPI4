@@ -27,7 +27,7 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 set(Include_DIR include)
-set(BASE_DIR /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4)
+set(COMMON_DIR /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI_Teensy)
 find_package(Boost 1.74.0 COMPONENTS serialization date_time filesystem REQUIRED)
 #set(Eigen_INCLUDE_DIR /home/pi/Lib/eigen-eigen-323c052e1731)
 
@@ -41,7 +41,7 @@ include_directories(
     ${Include_DIR}
     src
     ${Boost_INCLUDE_DIR}
-    ${BASE_DIR}
+    ${COMMON_DIR}
     #${Eigen_INCLUDE_DIR}
 
     
@@ -49,14 +49,14 @@ include_directories(
 file(GLOB HEAD_FILES 
     ${Include_DIR}/*.h 
     ${Include_DIR}/*.hpp
-    ${BASE_DIR}/*.h)
+    ${COMMON_DIR}/*.h)
 add_library(
     lib STATIC
     ${HEAD_FILES}
     
 )
 
-message(STATUS ${BASE_DIR})
+# message(STATUS ${BASE_DIR})
 set_target_properties(lib PROPERTIES LINKER_LANGUAGE CXX)
 # link_directories(${Boost_LIBRARY_DIR}) #unnecessary 
 enable_testing()

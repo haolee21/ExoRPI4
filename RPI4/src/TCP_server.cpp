@@ -99,7 +99,7 @@ void TCP_server::RecvCmd(){
             if(cmd_subClass.compare("PWM")==0){
                 std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
                 uint8_t input = std::stoi(Sub_cmd(ret_str,cmd_idx,'\n'));
-                std::cout<<"set pwm duty directly\n";
+                
                 if(cmd_device.compare("LKNE")==0) {
                     Valves_hub::SetDuty(input,Valves_hub::LKNEPRE);
                     TCP_server::Send_cmd(std::string("1"),socket);
@@ -135,10 +135,12 @@ void TCP_server::RecvCmd(){
                     std::string input = Sub_cmd(ret_str,cmd_idx,'\n');
                     if(input.compare("1")==0){
                         Timer::StartRec();
+                        TCP_server::Send_cmd("1",socket);
                         std::cout<<"Start to record\n";
                     }
                     else{
                         Timer::EndRec();
+                        TCP_server::Send_cmd("1",socket);
                         std::cout<<"End recording\n";
                     }
                 }

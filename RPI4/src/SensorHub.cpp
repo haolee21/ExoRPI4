@@ -108,7 +108,7 @@ void SensorHub::UpdatePre()
     senHub.PreData[2]=data[ADC::SEN3];
     senHub.PreData[3]=data[ADC::SEN4];
     senHub.PreData[4]=data[ADC::SEN5];
-    senHub.PreRecorder.PushData(data);
+    senHub.PreRecorder.PushData(senHub.PreData);
 
    
 
