@@ -94,10 +94,8 @@ void TCP_server::RecvCmd(){
             }
         }
         else if(cmd_class.compare("SET")==0){
-            
-            
+            std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
             if(cmd_subClass.compare("PWM")==0){
-                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
                 uint8_t input = std::stoi(Sub_cmd(ret_str,cmd_idx,'\n'));
                 
                 if(cmd_device.compare("LKNE")==0) {
@@ -129,8 +127,27 @@ void TCP_server::RecvCmd(){
                 }
                 
             }
+            else if(cmd_subClass.compare("PRE")==0){
+                float input = std::stof(Sub_cmd(ret_str,cmd_idx,'\n'));
+                u_int16_t pre_val = (u_int16_t)((input/50.0+0.5)*13107.2);
+                if(cmd_device.compare("LTANK")==0){
+                    Valves_hub::SetDesiredPre(Valves_hub::PWM_ID::LTANKPRE,pre_val);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    std::cout<<"set ltank pre "<<pre_val<<std::endl;
+                }
+                else if(cmd_device.compare("RTANK")==0){
+                    Valves_hub::SetDesiredPre(Valves_hub::PWM_ID::RTANKPRE,pre_val);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                    std::cout<<"set rtank pre "<<pre_val<<std::endl;
+
+                }
+                else{
+                    TCP_server::Send_cmd(std::string("0"),socket);
+                }
+
+            }
             else if(cmd_subClass.compare("REC")==0){
-                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
+                
                 if(cmd_device.compare("DATA")==0){
                     std::string input = Sub_cmd(ret_str,cmd_idx,'\n');
                     if(input.compare("1")==0){
@@ -148,6 +165,33 @@ void TCP_server::RecvCmd(){
             else{
                 TCP_server::Send_cmd(std::string("0"),socket);
             }
+        }
+        else if(cmd_class.compare("ACT")==0){
+            if(cmd_subClass.compare("MPC")==0){
+                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
+                std::string input = Sub_cmd(ret_str,cmd_idx,'\n');
+                if(cmd_device.compare("LTANK")==0){
+                    if(input.compare("1")==0){
+                        Valves_hub::StartMPC(Valves_hub::PWM_ID::LTANKPRE,true);
+                    }
+                    else{
+                        Valves_hub::StartMPC(Valves_hub::PWM_ID::LTANKPRE,false);
+                    }
+                }
+                else if(cmd_device.compare("LKNE")==0){
+                    if(input.compare("1")==0){
+                        Valves_hub::StartMPC(Valves_hub::PWM_ID::LKNEPRE,true);
+                    }
+                    else{
+                        Valves_hub::StartMPC(Valves_hub::PWM_ID::LKNEPRE,false);
+                    }
+                }
+
+
+
+            }
+
+
         }
 
         else if(cmd_class.compare("CAL")==0){

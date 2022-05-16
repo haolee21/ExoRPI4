@@ -41,8 +41,11 @@ public:
         LHipS,LKneS,LAnkS,//,LHipF,LAnkF
         RHipS,RKneS,RAnkS//RHipF,RAnkF
     };
+    enum PreName{ //The order of this enum must follow the order on the pcb board
+        LTank,LKne,Force,Pos,Tank, //TODO: check it whenever you reconnect the pressure sensors
+    };
     // Pressure sensor index need to be assigned since it is determine by ADC channels
-    static const u_int8_t LKneP=0,RKneP=1,LAnkP=2,RAnkP=3,TankP=4;//TODO: check the order before use
+    
 
 
     static void ResetEnc(SensorHub::EncName);

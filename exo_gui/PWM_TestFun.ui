@@ -613,44 +613,44 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_9">
       <item>
-       <widget class="QPushButton" name="btn_LKneCharge_rel">
+       <widget class="QPushButton" name="btn_LKneCharge_stop">
         <property name="text">
-         <string>Release</string>
+         <string>Stop</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_LAnkCharge_rel">
+       <widget class="QPushButton" name="btn_LAnkCharge_stop">
         <property name="text">
-         <string>Release</string>
+         <string>Stop</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_LTankCharge_rel">
+       <widget class="QPushButton" name="btn_LTankCharge_stop">
         <property name="text">
-         <string>Release</string>
+         <string>Stop</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_RKneCharge_rel">
+       <widget class="QPushButton" name="btn_RKneCharge_stop">
         <property name="text">
-         <string>Release</string>
+         <string>Stop</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_RAnkCharge_rel">
+       <widget class="QPushButton" name="btn_RAnkCharge_stop">
         <property name="text">
-         <string>Release</string>
+         <string>Stop</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_RTankCharge_rel">
+       <widget class="QPushButton" name="btn_RTankCharge_stop">
         <property name="text">
-         <string>Release</string>
+         <string>Stop</string>
         </property>
        </widget>
       </item>

@@ -32,6 +32,7 @@ protected:
     char MSB;
     char LSB;
     
+
     
     
 public:
@@ -39,6 +40,12 @@ public:
     ~Encoder();
     void SetZero();
     int ReadPos();
+    
+    static const uint8_t HIP1 = 0; //these are the pin ID we use to init encoder objects
+    static const uint8_t HIP2 = 1;
+    static const uint8_t KNEE = 2;
+    static const uint8_t ANK1 = 3;
+    static const uint8_t ANK2 = 4;
     
 };
 
