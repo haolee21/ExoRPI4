@@ -503,6 +503,11 @@
     <string>PWM Duty</string>
    </property>
   </action>
+  <action name="actionTest_MPC">
+   <property name="text">
+    <string>Test MPC</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

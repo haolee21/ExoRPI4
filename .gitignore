@@ -10,4 +10,5 @@ Teensy_pio/.pio
 RPI4/CmakeLists.txt
 osqp_test/build/*
 osqp_test/.vscode
+osqp_test/build2/*
 PressureCon/*

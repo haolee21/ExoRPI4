@@ -9,6 +9,9 @@ pwmRecorder(Recorder<uint8_t,PWM_VAL_NUM>("PWM",PWM_HEADER))//TODO: use correct 
     //I believe the reason is because TeensyI2C is not created yet
     //I guess the behavior of initialization list is different from I thought
 
+    this->l_tank_enable=false;
+    this->r_tank_enable=false;
+
 }
 
 Valves_hub::~Valves_hub()
@@ -84,6 +87,13 @@ void Valves_hub::Off(Valves_hub::SW_ID valve){
 void Valves_hub::UpdateValve(){
     
     Valves_hub& hub = Valves_hub::GetInstance();
+
+
+    //MPC check
+    const std::array<u_int16_t,SensorHub::NUMPRE>& pre_data = SensorHub::GetPreData(); //use ref to avoid copy
+    if(hub.l_tank_enable){
+        hub.PWM_Duty[PWM_ID::LTANKPRE] = hub.LTankCon.GetControl(hub.desired_pre[PWM_ID::LTANKPRE],pre_data[SensorHub::PreName::Tank],pre_data[SensorHub::PreName::LTank],hub.PWM_Duty[PWM_ID::LTANKPRE]);
+    }
     
     if(hub.valChanged_flag){
         std::array<char,TeensyI2C::CMDLEN> cmd;
@@ -129,5 +139,26 @@ const std::array<uint8_t,PWM_VAL_NUM>& Valves_hub::GetDuty(){
 }
 const std::array<bool,SW_VAL_NUM>& Valves_hub::GetSWValCond(){
     return std::ref(Valves_hub::GetInstance().SW_ValCond);
+}
+
+void Valves_hub::StartMPC(Valves_hub::PWM_ID pwm_valve,bool enable){
+    Valves_hub& hub = Valves_hub::GetInstance();
+    
+    switch (pwm_valve)
+    {
+    case Valves_hub::PWM_ID::LTANKPRE:
+        hub.l_tank_enable = enable;
+        break;
+    case Valves_hub::PWM_ID::RTANKPRE:
+        hub.r_tank_enable = enable;
+    default:
+        break;
+    }
+}
+
+void Valves_hub::SetDesiredPre(Valves_hub::PWM_ID pwm_valve,u_int16_t des_pre){
+    Valves_hub& hub = Valves_hub::GetInstance();
+    hub.desired_pre[pwm_valve] = des_pre;
+
 }
 

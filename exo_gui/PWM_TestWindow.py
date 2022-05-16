@@ -31,22 +31,26 @@ class PWM_TestWindow(QWidget):
 
         self.LKne_pre=self.findChild(QLineEdit,'lineEdit_LKnePre')
         self.LAnk_pre=self.findChild(QLineEdit,'lineEdit_LAnkPre')
+        self.LTank_pre = self.findChild(QLineEdit,'lineEdit_LTankPre')
         self.RKne_pre=self.findChild(QLineEdit,'lineEdit_RKnePre')
         self.RAnk_pre=self.findChild(QLineEdit,'lineEdit_RAnkPre')
+        self.RTank_pre=self.findChild(QLineEdit,'lineEdit_RTankPre')
+        
+
 
         self.btn_LKnePreStr=self.findChild(QPushButton,'btn_LKneCharge_str')
         self.btn_LAnkPreStr=self.findChild(QPushButton,'btn_LAnkCharge_str')
-        self.btn_LTankPreStr=self.findChild(QPushButton,'btn_RAnkCharge_str')
+        self.btn_LTankPreStr=self.findChild(QPushButton,'btn_LTankCharge_str')
         self.btn_RKnePreStr=self.findChild(QPushButton,'btn_RKneCharge_str')
         self.btn_RAnkPreStr=self.findChild(QPushButton,'btn_RAnkCharge_str')
         self.btn_RTankPreStr=self.findChild(QPushButton,'btn_RTankCharge_str')
 
-        self.btn_LKnePreRel=self.findChild(QPushButton,'btn_LKneCharge_rel')
-        self.btn_LAnkPreRel=self.findChild(QPushButton,'btn_LAnkCharge_rel')
-        self.btn_LTankPreRel=self.findChild(QPushButton,'btn_LTankCharge_rel')
-        self.btn_RKnePreRel=self.findChild(QPushButton,'btn_RKneCharge_rel')
-        self.btn_RAnkPreRel=self.findChild(QPushButton,'btn_RAnkCharge_rel')
-        self.btn_RTankPreRel=self.findChild(QPushButton,'btn_RTankCharge_rel')
+        self.btn_LKnePreStop=self.findChild(QPushButton,'btn_LKneCharge_stop')
+        self.btn_LAnkPreStop=self.findChild(QPushButton,'btn_LAnkCharge_stop')
+        self.btn_LTankPreStop=self.findChild(QPushButton,'btn_LTankCharge_stop')
+        self.btn_RKnePreStop=self.findChild(QPushButton,'btn_RKneCharge_stop')
+        self.btn_RAnkPreStop=self.findChild(QPushButton,'btn_RAnkCharge_stop')
+        self.btn_RTankPreStop=self.findChild(QPushButton,'btn_RTankCharge_stop')
 
         #bind clicked and functions
         self.btn_LKnePWM_start.clicked.connect(self.btn_LKnePWM_start_clicked)
@@ -63,7 +67,20 @@ class PWM_TestWindow(QWidget):
         self.btn_RAnkPWM_stop.clicked.connect(self.btn_RAnkPWM_stop_clicked)
         self.btn_RTankPWM_stop.clicked.connect(self.btn_RTankPWM_stop_clicked)
 
+        #pressure control
+        self.btn_LTankPreStr.clicked.connect(self.btn_LTankPre_start_clicked)
+        self.btn_RTankPreStr.clicked.connect(self.btn_RTankPre_start_clicked)
+        self.btn_LTankPreStop.clicked.connect(self.btn_LTankPre_stop_clicked)
+        self.btn_RTankPreStop.clicked.connect(self.btn_RTankPre_stop_clicked)
     # btn clicked 
+    def text_to_float(self,text):
+       
+        try:
+            res=float(text)
+        except:
+            res=0
+        return res
+    ## PWM Duty cycle control test
     def btn_LKnePWM_start_clicked(self):
         self.parent.tcp_port.SendCmd('SET:PWM:LKNE:'+str(int(float(self.LKne_duty.text()))),1,True)
     def btn_LAnkPWM_start_clicked(self):
@@ -89,5 +106,20 @@ class PWM_TestWindow(QWidget):
         self.parent.tcp_port.SendCmd('SET:PWM:RANK:0',1,True)
     def btn_RTankPWM_stop_clicked(self):
         self.parent.tcp_port.SendCmd('SET:PWM:RTANK:0',1,True)
+
+    ## MPC pressure control test
+    ## all pressure are set in psi, will be convert to voltage reading and send to the exoskeleton
+    
+    def btn_LTankPre_start_clicked(self):
+        self.parent.tcp_port.SendCmd('SET:PRE:LTANK:'+str(self.text_to_float(self.LTank_pre.text())),1,True)#this is to avoid sending invalid commands
+        # self.parent.tcp_port.SendCmd('ACT:MPC:LTANK:1',1,True)
+    def btn_RTankPre_start_clicked(self):
+        self.parent.tcp_port.SendCmd('SET:PRE:RTANK:'+str(self.text_to_float(self.RTank_pre.text())),1,True)
+        # self.parent.tcp_port.SendCmd('ACT:MPC:RTANK:1',1,True)
+
+    def btn_LTankPre_stop_clicked(self):
+        self.parent.tcp_port.SendCmd('ACT:MPC:LTANK:0')
+    def btn_RTankPre_stop_clicked(self):
+        self.parent.tcp_port.SendCmd('ACT:MPC:RTANK:0')
     
         

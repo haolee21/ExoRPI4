@@ -103,11 +103,15 @@ void SensorHub::UpdatePre()
 {
     SensorHub & senHub = SensorHub::GetInstance();
     const std::array<u_int16_t,8> &data = senHub.adc0.ReadData();
-    senHub.PreData[0]=data[ADC::SEN1];
-    senHub.PreData[1]=data[ADC::SEN2];
-    senHub.PreData[2]=data[ADC::SEN3];
-    senHub.PreData[3]=data[ADC::SEN4];
-    senHub.PreData[4]=data[ADC::SEN5];
+    senHub.PreData[0]=data[ADC::SEN0];
+    senHub.PreData[1]=data[ADC::SEN1];
+    senHub.PreData[2]=data[ADC::SEN2];
+    senHub.PreData[3]=data[ADC::SEN3];
+    senHub.PreData[4]=data[ADC::SEN4];
+    senHub.PreData[5]=data[ADC::SEN5];
+    senHub.PreData[6]=data[ADC::SEN6];
+    senHub.PreData[7]=data[ADC::SEN7];
+
     senHub.PreRecorder.PushData(senHub.PreData);
 
    
