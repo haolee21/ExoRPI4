@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>550</y>
+      <y>540</y>
       <width>191</width>
       <height>51</height>
      </rect>
@@ -348,8 +348,8 @@
    <widget class="QPushButton" name="btn_dischargeAllAir">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>610</y>
+      <x>190</x>
+      <y>600</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -430,6 +430,16 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
+   </widget>
+   <widget class="QLCDNumber" name="lcd_TankPre">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>600</y>
+      <width>151</width>
+      <height>41</height>
+     </rect>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

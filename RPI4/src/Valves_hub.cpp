@@ -92,8 +92,15 @@ void Valves_hub::UpdateValve(){
     //MPC check
     const std::array<u_int16_t,SensorHub::NUMPRE>& pre_data = SensorHub::GetPreData(); //use ref to avoid copy
     if(hub.l_tank_enable){
-        hub.PWM_Duty[PWM_ID::LTANKPRE] = hub.LTankCon.GetControl(hub.desired_pre[PWM_ID::LTANKPRE],pre_data[SensorHub::PreName::Tank],pre_data[SensorHub::PreName::LTank],hub.PWM_Duty[PWM_ID::LTANKPRE]);
+        
+        int res_duty = hub.LTankCon.GetControl((int)hub.desired_pre[PWM_ID::LTANKPRE],(int)pre_data[SensorHub::PreName::Tank],pre_data[SensorHub::PreName::LTank],hub.PWM_Duty[PWM_ID::LTANKPRE]);
+        hub.SetDuty(res_duty,Valves_hub::PWM_ID::LTANKPRE);
+        // if(res_duty==0){
+        //     hub.l_tank_enable=false;
+        // }
+        
     }
+    
     
     if(hub.valChanged_flag){
         std::array<char,TeensyI2C::CMDLEN> cmd;

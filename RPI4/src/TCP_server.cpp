@@ -36,6 +36,7 @@ void TCP_server::RecvCmd(){
     
     
     while(this->flag){
+        
         std::shared_ptr<boost::asio::ip::tcp::socket> socket(new boost::asio::ip::tcp::socket(this->ioc));
         this->acceptor->accept(*socket);
         
@@ -85,14 +86,14 @@ void TCP_server::RecvCmd(){
             }
             
         }
-        else if(cmd_class.compare("ACT")==0){
-            if(cmd_subClass.compare("STOP")==0){
-                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
-                if(cmd_device.compare("CONN")==0){
-                    this->flag=false;
-                }
-            }
-        }
+        // else if(cmd_class.compare("CON")==0){
+        //     if(cmd_subClass.compare("STOP")==0){
+        //         std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
+        //         if(cmd_device.compare("CONN")==0){
+        //             this->flag=false;
+        //         }
+        //     }
+        // }
         else if(cmd_class.compare("SET")==0){
             std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
             if(cmd_subClass.compare("PWM")==0){
@@ -162,32 +163,47 @@ void TCP_server::RecvCmd(){
                     }
                 }
             }
+            
             else{
                 TCP_server::Send_cmd(std::string("0"),socket);
             }
         }
         else if(cmd_class.compare("ACT")==0){
+            
             if(cmd_subClass.compare("MPC")==0){
                 std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
                 std::string input = Sub_cmd(ret_str,cmd_idx,'\n');
                 if(cmd_device.compare("LTANK")==0){
                     if(input.compare("1")==0){
                         Valves_hub::StartMPC(Valves_hub::PWM_ID::LTANKPRE,true);
+                        
+                        TCP_server::Send_cmd(std::string("1"),socket);
                     }
                     else{
                         Valves_hub::StartMPC(Valves_hub::PWM_ID::LTANKPRE,false);
+                        
+                        TCP_server::Send_cmd(std::string("1"),socket);
                     }
                 }
-                else if(cmd_device.compare("LKNE")==0){
+                else if(cmd_device.compare("RTANK")==0){
                     if(input.compare("1")==0){
-                        Valves_hub::StartMPC(Valves_hub::PWM_ID::LKNEPRE,true);
+                        Valves_hub::StartMPC(Valves_hub::PWM_ID::RTANKPRE,true);
+                        TCP_server::Send_cmd(std::string("1"),socket);
                     }
                     else{
-                        Valves_hub::StartMPC(Valves_hub::PWM_ID::LKNEPRE,false);
+                        Valves_hub::StartMPC(Valves_hub::PWM_ID::RTANKPRE,false);
+                        TCP_server::Send_cmd(std::string("1"),socket);
                     }
+                }
+                else{
+                    TCP_server::Send_cmd(std::string("0"),socket);
                 }
 
 
+
+            }
+            else{
+                TCP_server::Send_cmd(std::string("0"),socket);
 
             }
 
@@ -282,6 +298,7 @@ void TCP_server::SendCallback(const boost::system::error_code& error,
 }
 
 void TCP_server::Send_cmd(std::string reply,std::shared_ptr<boost::asio::ip::tcp::socket> socket){
+    
     socket->async_send(boost::asio::buffer(reply),
                        std::bind(&TCP_server::SendCallback,std::placeholders::_1,std::placeholders::_2,socket,reply));
 

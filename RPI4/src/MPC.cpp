@@ -1,5 +1,6 @@
 #include <cmath>
 #include "MPC.hpp"
+#include <iostream>
 MPC::MPC(/* args */)
 {
 
@@ -22,7 +23,9 @@ MPC::MPC(/* args */)
     //setup osqp solver
     this->osqp_data.reset(new OSQPData);
     this->osqp_settings.reset(new OSQPSettings);
-
+    osqp_set_default_settings(this->osqp_settings.get());
+    this->osqp_settings->alpha = 1.0;
+    this->osqp_settings->verbose = false;
    
     
 }
@@ -100,17 +103,23 @@ void MPC::UpdateA(int _p_tank,int _p_lt, int _duty){
                   +this->c19*(1-p_tank/p_lt)*(1-p_tank/p_lt);
 
     this->matB<<b0,b1;
+   
+
     
 }
 
 int MPC::GetControl(int p_des,int p_tank,int p_lt,int duty){
+    
+    if(std::abs(p_des-p_lt)>1000){ //if desired pressure has 2 psi difference
+        if(duty==0){
+            duty=35;//if duty=0, there will be no output
+        }
 
-    if(std::abs(p_des-p_lt)>35390){ //if desired pressure has 2 psi difference
         this->UpdateA(p_tank,p_lt,duty);
-
         // format question to osqp format
         float q_val = 2*(p_tank*this->matA.coeff(0,1)*this->matB.coeff(1,0)+p_lt*this->matA.coeff(1,1)*this->matB(1,0));
         float p_val = this->matB.coeff(0,1)*this->matB.coeff(0,1);
+ 
 
         c_int P_nnz = 1;
         c_float P_x[1]={p_val};
@@ -118,10 +127,10 @@ int MPC::GetControl(int p_des,int p_tank,int p_lt,int duty){
         c_int P_p[2]={0,1};
         this->osqp_data->n =1;
         this->osqp_data->P = csc_matrix(this->osqp_data->n,this->osqp_data->n,P_nnz,P_x,P_i,P_p);
-
+        
         c_float q[1]={q_val};
         this->osqp_data->q = q;
-
+        // std::cout<<"pval: "<<p_val<<std::endl;
 
         c_int A_nnz = 1;
         this->osqp_data->m = 1;
@@ -130,14 +139,13 @@ int MPC::GetControl(int p_des,int p_tank,int p_lt,int duty){
         c_int A_p[2]={0,1};
         this->osqp_data->A = csc_matrix(this->osqp_data->m,this->osqp_data->n,A_nnz,A_x,A_i,A_p);
 
-        c_float l[1]={0};
+        c_float l[1]={35};
         c_float u[1]={95};
 
         this->osqp_data->l = l;
         this->osqp_data->u = u;
 
-        osqp_set_default_settings(this->osqp_settings.get());
-        this->osqp_settings->alpha = 1.0;
+        
     
         int set_up_flag = osqp_setup(&this->work,this->osqp_data.get(),this->osqp_settings.get());
 
@@ -147,8 +155,11 @@ int MPC::GetControl(int p_des,int p_tank,int p_lt,int duty){
             solve_err = osqp_solve(this->work);
         if(!solve_err){
             duty = *this->work->solution->x;
-            if(duty<30)
-                duty =0;
+            // if(duty<30)
+            //     duty =0;
+        }
+        else{
+            std::cout<<"osqp failed\n";
         }
         return duty;
     }

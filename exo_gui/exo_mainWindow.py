@@ -38,7 +38,7 @@ class MW(QMainWindow):
 
         self.tcp_port = TCP()
         self.dataLen=DATALEN
-        self.max_pressure=80.0 #max pressure is 80 psi
+        self.max_pressure=70.0 #max pressure is 80 psi
         #init all windows, otherwise all data will be lost when we close it
         self.con_window = ConnectionWindow(self)
         self.joint_plot_window = PlotJointWindow(self)
@@ -71,7 +71,8 @@ class MW(QMainWindow):
         # air reserivor 
         
         self.air_volume = self.findChild(QProgressBar,'air_volumn')
-        
+        self.tank_pre = self.findChild(QLCDNumber,'lcd_TankPre')
+        self.tank_pre.setDigitCount(5)
         # connection setting
         self.value = 0
         
@@ -190,7 +191,7 @@ class MW(QMainWindow):
                 
         else:
             self.timer.stop()
-            print('Disconnect   ',self.tcp_port.SendCmd('CON:STOP',2).decode())
+            # self.tcp_port.SendCmd('SET:STOP:TCP:1',2,True)
             self.tcp_port.Disconnect()
             self.btn_connect.setText('Connect')
     def btn_updateTime_clicked(self):
@@ -203,7 +204,7 @@ class MW(QMainWindow):
             self.rec_flag=True
             self.btn_rec_start.setText('REC End')
             curTime = datetime.datetime.fromtimestamp(time.time())
-            self.label_startTime.setText("%04d-" %(curTime.year) + "%02d-" %(curTime.month) + "%02d%02d-" %(curTime.hour,curTime.minute)+"%02d" %(curTime.second))
+            self.label_startTime.setText("%04d-" %(curTime.year) + "%02d%02d-" %(curTime.month,curTime.day) + "%02d%02d-" %(curTime.hour,curTime.minute)+"%02d" %(curTime.second))
         else:
             # when clicked, end the recording
             self.tcp_port.SendCmd('SET:REC:DATA:0',0)
@@ -229,6 +230,7 @@ class MW(QMainWindow):
         self.btn_connect.setText('Connect')
     def update_air_volume(self,volume):
         cur_pre = volume*0.0037147-25
+        self.tank_pre.display(cur_pre)
         if cur_pre>self.max_pressure:
             cur_pre=self.max_pressure
         self.air_volume.setValue(int(cur_pre/self.max_pressure*100))
