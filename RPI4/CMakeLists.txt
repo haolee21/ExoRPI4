@@ -43,7 +43,7 @@ find_library(osqp_LIB osqp ${osqp_LIBRARIES})
 
 include_directories(
     ${Include_DIR}
-    src
+    # src
     ${Boost_INCLUDE_DIR}
     ${COMMON_DIR}
     ${EIGEN_INCLUDE_DIR}
@@ -65,7 +65,7 @@ include_directories(
 # link_directories(${Boost_LIBRARY_DIR}) #unnecessary 
 
 file(GLOB SRC_FILES 
-    ${Include_DIR}/*.cpp
+    # ${Include_DIR}/*.cpp
     src/*.cpp)
 add_executable(exo_o ${SRC_FILES})
 
