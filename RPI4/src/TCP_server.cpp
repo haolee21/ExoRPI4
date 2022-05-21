@@ -51,9 +51,11 @@ void TCP_server::RecvCmd(){
         std::size_t cmd_idx=0;
         std::string cmd_class = this->Sub_cmd(ret_str,cmd_idx,':');
         std::string cmd_subClass = this->Sub_cmd(ret_str,cmd_idx,':');
+        
         if(cmd_class.compare("REQ")==0){
+            std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
             if(cmd_subClass.compare("MEAS")==0){
-                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
+                // std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
                 if(cmd_device.compare("DATA")==0){  
                     
                     std::array<char,(SensorHub::NUMENC+SensorHub::NUMPRE)*sizeof(uint16_t)> meaData;
@@ -65,7 +67,7 @@ void TCP_server::RecvCmd(){
                 }
             }
             else if(cmd_subClass.compare("REC")==0){
-                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
+                // std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
                 if(cmd_device.compare("DATA")==0){
                     const bool &recFlag=Timer::GetDataRec_flag();
                     if(recFlag){
@@ -77,13 +79,22 @@ void TCP_server::RecvCmd(){
                 }
             }
             else if(cmd_subClass.compare("PWM")==0){
-                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
+                // std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
                 if(cmd_device.compare("DUTY")==0){
                     const std::array<uint8_t,PWM_VAL_NUM> pwm_data = Valves_hub::GetDuty();
                     TCP_server::Send_cmd(std::string(pwm_data.begin(),pwm_data.end()),socket);
                 }
 
             }
+            else if(cmd_subClass.compare("CONT")==0){
+                if(cmd_device.compare("MPC")==0){
+                    const std::array<bool,NUM_OF_MPC> mpc_enable = Valves_hub::GetMpcCond();
+                    TCP_server::Send_cmd(std::string(mpc_enable.begin(),mpc_enable.end()),socket);
+                }
+
+            }
+        
+            
             
         }
         // else if(cmd_class.compare("CON")==0){

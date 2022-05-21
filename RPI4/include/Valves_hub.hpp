@@ -8,6 +8,7 @@
 #include "Recorder.hpp"
 #include "MPC.hpp"
 
+#define NUM_OF_MPC 6
 
 class Valves_hub
 {
@@ -42,6 +43,7 @@ public:
     //MPC control
     static void StartMPC(Valves_hub::PWM_ID pwm_valve,bool enable);
     static void SetDesiredPre(Valves_hub::PWM_ID pwm_valve,u_int16_t des_pre);
+    const static std::array<bool,NUM_OF_MPC>& GetMpcCond();
 private:
     
     Valves_hub();
@@ -62,9 +64,13 @@ private:
     
     TeensyI2C teensyValveCon;
 
-    //MPC Pressure control
+    //MPC Pressure control 
     MPC LTankCon,RTankCon;
-    bool l_tank_enable,r_tank_enable; //when these flags are true, we will calculate the duty of the pwm during update valve conditions
+    std::array<bool,NUM_OF_MPC> mpc_enable;
+    enum MPC_Enable{
+        kLTank,kLKne,kLAnk,kRTank,kRKne,kRAnk
+    };
+    // bool l_tank_enable,r_tank_enable; //when these flags are true, we will calculate the duty of the pwm during update valve conditions
     std::array<u_int16_t,PWM_VAL_NUM> desired_pre{0};
 
 

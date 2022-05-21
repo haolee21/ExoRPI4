@@ -8,6 +8,7 @@ import pdb
 CMD_LEN = 2
 JOINT_DATA_LEN=12
 PRE_DATA_LEN=10
+MPC_LEN=6
 class TCP:
     port =1234
     ip_address='192.168.0.110'
@@ -39,12 +40,13 @@ class TCP:
         # except:
         #     print('sock connecting failed')
         return self.flag
-    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback,recBtnUpdate):
+    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback,recBtnUpdate,mpcCondUpdate):
         self.updateJoint = updateJointFun
         self.updatePre = updatePreFun
         self.updateTank = updateTankFun
         self.disConCcallback = disConCallback
         self.recBtnUpdate = recBtnUpdate
+        self.mpcCondUpdate = mpcCondUpdate
         
     def Disconnect(self):
         if self.flag:
@@ -75,9 +77,13 @@ class TCP:
             # rec_flag = int.from_bytes(self.SendCmd('REQ:REC:DATA',1,print_response=False),'little')
             rec_flag = int(self.SendCmd('REQ:REC:DATA',1,print_response=False).decode())
             # continuous checking if rec has already started
-            
 
             self.recBtnUpdate(rec_flag)
+
+            mpc_flag = self.SendCmd('REQ:CONT:MPC',MPC_LEN,print_response=False)
+            # # print('mpc recv flag: ',(mpc_flag[0:2] and [False,True]))
+            self.mpcCondUpdate(mpc_flag)
+            
 
             
         else:

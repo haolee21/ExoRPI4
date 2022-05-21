@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QAction, QApplication, QCheckBox, QLabel, QLineEdit, QMainWindow,QPushButton, QRadioButton,QWidget,QProgressBar
 from PyQt5.QtWidgets import QLCDNumber
 from PyQt5 import uic,QtCore
+from PyQt5.QtGui import QPixmap
 
 
 import pyqtgraph as pg
@@ -49,7 +50,7 @@ class MW(QMainWindow):
         # jointUpdateCB = lambda data:self.joint_plot_window.UpdateData(self,data)
         # preUpdateCB = lambda data:self.pressure_plot_window.UpdateData(self,data)
         # self.tcp_port.SetCallBack(jointUpdateCB,preUpdateCB)
-        self.tcp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn)
+        self.tcp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn,self.UpdateMPC_LED)
         # TCP/IP connection
         
         self.cur_ip = self.findChild(QLabel,'cur_ip_label')
@@ -139,6 +140,29 @@ class MW(QMainWindow):
         self.label_startTime = self.findChild(QLabel,'label_startTime')
 
 
+        # set MPC condition display
+        self.off_led = QPixmap('off_led.png')
+        self.on_led = QPixmap('on_led.png')
+        self.led_mpc_ltank = self.findChild(QLabel,'LED_LTank')
+        self.led_mpc_lknee = self.findChild(QLabel,'LED_LKnee')
+        self.led_mpc_rtank = self.findChild(QLabel,'LED_RTank')
+        self.led_mpc_rknee = self.findChild(QLabel,'LED_RKnee')
+        self.led_mpc_lank = self.findChild(QLabel,'LED_LAnk')
+        self.led_mpc_rank = self.findChild(QLabel,'LED_RAnk')
+        
+
+
+        self.led_mpc_ltank.setPixmap(self.off_led)
+        self.led_mpc_lknee.setPixmap(self.off_led)
+        self.led_mpc_rtank.setPixmap(self.off_led)
+        self.led_mpc_rknee.setPixmap(self.off_led)
+        self.led_mpc_lank.setPixmap(self.off_led)
+        self.led_mpc_rank.setPixmap(self.off_led)
+
+        self.old_mpc_cond = [False]*6
+        
+
+
         self.show()
     def radio_walkRec_checked(self):
         self.relLKne_task.setChecked(False)
@@ -220,7 +244,7 @@ class MW(QMainWindow):
         elif self.rec_flag == True and flag_read == False:
             self.rec_flag=False
             self.btn_rec_start.setText('Rec Start')
-        
+     
         
 
 
@@ -289,6 +313,39 @@ class MW(QMainWindow):
         self.left_leg_line.setData([0.0]+xpos[0:3],[0.0]+ypos[0:3])
         self.right_leg_line.setData([0.0]+xpos[4:],[0.0]+ypos[4:])
 
+
+    def UpdateMPC_LED(self,led_cond):
+        if(self.old_mpc_cond[0]^led_cond[0]):
+            if(led_cond[0]):
+                self.led_mpc_ltank.setPixmap(self.on_led)
+            else:
+                self.led_mpc_ltank.setPixmap(self.off_led) 
+        if(self.old_mpc_cond[1]^led_cond[1]):
+            if(led_cond[1]):
+                self.led_mpc_lknee.setPixmap(self.on_led)
+            else:
+                self.led_mpc_lknee.setPixmap(self.off_led)
+        if(self.old_mpc_cond[2]^led_cond[2]):
+            if(led_cond[2]):
+                self.led_mpc_lank.setPixmap(self.on_led)
+            else:
+                self.led_mpc_lank.setPixmap(self.off_led)    
+        if(self.old_mpc_cond[3]^led_cond[3]):
+            if(led_cond[3]):
+                self.led_mpc_rtank.setPixmap(self.on_led)
+            else:
+                self.led_mpc_rtank.setPixmap(self.off_led)
+        if(self.old_mpc_cond[4]^led_cond[4]):
+            if(led_cond[4]):
+                self.led_mpc_rknee.setPixmap(self.on_led)
+            else:
+                self.led_mpc_rknee.setPixmap(self.off_led)
+        if(self.old_mpc_cond[5]^led_cond[5]):
+            if(led_cond[5]):
+                self.led_mpc_rank.setPixmap(self.on_led)
+            else:
+                self.led_mpc_rank.setPixmap(self.off_led)
+        self.old_mpc_cond = led_cond
     
 
 sysData = SystemData()

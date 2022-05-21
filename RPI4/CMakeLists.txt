@@ -20,8 +20,8 @@ set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
 set(Boost_USE_STATIC_LIBS ON)
 
 
-set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -o3 -pthread -lrt -o3") #you can set with add_definitions("-Wall -std=c+11, etc")
-set(CMAKE_C_FLAGS   "-std=c++17 -Wall -o3 -pthread -lrt -o3")
+set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -pthread -lrt -O3") #you can set with add_definitions("-Wall -std=c+11, etc")
+set(CMAKE_C_FLAGS   "-std=c++17 -Wall -pthread -lrt -O3")
 
 # Search for programs only in the build host directories
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
