@@ -192,7 +192,7 @@ void TCP_server::RecvCmd(){
                     }
                     else{
                         Valves_hub::StartMPC(Valves_hub::PWM_ID::LTANKPRE,false);
-                        
+                        Valves_hub::SetDuty(0,Valves_hub::PWM_ID::LTANKPRE);
                         TCP_server::Send_cmd(std::string("1"),socket);
                     }
                 }
@@ -203,6 +203,7 @@ void TCP_server::RecvCmd(){
                     }
                     else{
                         Valves_hub::StartMPC(Valves_hub::PWM_ID::RTANKPRE,false);
+                        Valves_hub::SetDuty(0,Valves_hub::PWM_ID::RTANKPRE);
                         TCP_server::Send_cmd(std::string("1"),socket);
                     }
                 }

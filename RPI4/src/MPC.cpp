@@ -1,24 +1,73 @@
 #include <cmath>
 #include "MPC.hpp"
 #include <iostream>
+using namespace std;
 MPC::MPC(/* args */)
 {
 
     //load default values for the model parameters, it is data from one of the experiment
-    this->c00 = 8.79462549e-01;
-    this->c02 = 6.14512679;
-    this->c03 =  2.15175439e+03;
-    this->c06 = -1.52124169;
-    this->c07 = 1.0181582;
-    this->c08 = 2.24744155;
-    this->c09 = -1.96773051;
 
-    this->c12 = 1.59100979;
-    this->c13 = -2.31679389e+03;
-    this->c16 = 1.38348116;
-    this->c17 = 4.84105880e-01;
-    this->c18 = -1.68793486e+01;
-    this->c19 = 2.66752892;
+    this->cl[0][0]=0;
+    this->cl[0][1]=0;
+    this->cl[0][2]=-2.554145389437805;
+    this->cl[0][3]=0;
+    this->cl[0][4]=828.3041147394617;
+    this->cl[0][5]=0;
+    this->cl[0][6]=64.4955220089105;
+    this->cl[0][7]=0;
+    this->cl[0][8]=1.4215445297754645;
+    this->cl[0][9]=0;
+    this->cl[0][10]=91.03587057293441;
+    this->cl[0][11]=36.73168344070655;
+    this->cl[0][12]=0;
+
+    this->cl[1][0]=0;
+    this->cl[1][1]=0;
+    this->cl[1][2]=21.964275810299558;
+    this->cl[1][3]=0;
+    this->cl[1][4]=-678.695092863387;
+    this->cl[1][5]=0;
+    this->cl[1][6]=-210.04224452757012;
+    this->cl[1][7]=0;
+    this->cl[1][8]=-12.87055314421623;
+    this->cl[1][9]=0;
+    this->cl[1][10]=0;
+    this->cl[1][11]=0;
+    this->cl[1][12]=-127.3061999422339;
+
+
+    this->ch[0][0]=0;
+    this->ch[0][1]=0;
+    this->ch[0][2]=17.6077691015832;
+    this->ch[0][3]=0;
+    this->ch[0][4]=0;
+    this->ch[0][5]=0;
+    this->ch[0][6]=0;
+    this->ch[0][7]=0;
+    this->ch[0][8]=-64.48492498724528;
+    this->ch[0][9]=0;
+    this->ch[0][10]=0;
+    this->ch[0][11]=0;
+    this->ch[0][12]=-334.30043189545825;
+
+    this->ch[1][0]=0;
+    this->ch[1][1]=0;
+    this->ch[1][2]=-46.07090089741948;
+    this->ch[1][3]=0;
+    this->ch[1][4]=0;
+    this->ch[1][5]=0;
+    this->ch[1][6]=0;
+    this->ch[1][7]=0;
+    this->ch[1][8]=128.80706856928742;
+    this->ch[1][9]=0;
+    this->ch[1][10]=0;
+    this->ch[1][11]=0;
+    this->ch[1][12]=346.2909905997821;
+
+
+
+
+   
 
     //setup osqp solver
     this->osqp_data.reset(new OSQPData);
@@ -33,92 +82,141 @@ MPC::MPC(/* args */)
 MPC::~MPC()
 {
 }
-void MPC::UpdateParam(float _c00,float _c02,float _c03,float _c06,float _c07,float _c08,
-                      float _c09,float _c12,float _c13,float _c16,float _c17,float _c18,float _c19){
-    this->c00 = _c00;
-    this->c02 = _c02;
-    this->c03 = _c03;
-    this->c06 = _c06;
-    this->c07 = _c07;
-    this->c08 = _c08;
-    this->c09 = _c09;
-    this->c12 = _c12;
-    this->c13 = _c13;
-    this->c16 = _c16;
-    this->c17 = _c17;
-    this->c18 = _c18;
-    this->c19 = _c19;
+void MPC::UpdateParamH(array<float,13> new_0,array<float,13> new_1){
+    
+    this->ch[0] = new_0;
+    this->ch[1] = new_1;
 }
-void MPC::UpdateA(int _p_tank,int _p_lt, int _duty){
-    float p_tank = ((float)_p_tank - 6553.6)/65536; //The zero pressure measurement is 0.5V
-    float p_lt = ((float)_p_lt - 6553.6)/65536;
+void MPC::UpdateParamL(array<float,13> new_0,array<float,13> new_1){
+    this->cl[0] = new_0;
+    this->cl[1] = new_1;
+}
+void MPC::UpdateL(int _pt,int _ps, int _duty){
+    float pt = ((float)_pt - 6553.6)/65536; //The zero pressure measurement is 0.5V
+    float ps = ((float)_ps - 6553.6)/65536;
     float duty = (float)_duty/100;
    
     float a00,a01,a10,a11,b0,b1;
-    a00 =  duty*this->c00
-          -duty*this->c02*p_lt/p_tank/p_tank
-          +duty*this->c03*p_lt*p_lt/p_tank/p_tank
-          +duty*this->c06
-          +duty*this->c07*p_lt
-          +duty*this->c08/p_lt
-          -3*duty*this->c09*(1-p_tank/p_lt)*(1-p_tank/p_lt)/p_lt;
-
-    a01 = duty*this->c02/p_tank
-         -duty*this->c03*p_lt/p_tank
-         +duty*this->c03*(1-p_lt/p_tank)
-         +duty*this->c07*p_tank
-         -duty*this->c08*p_tank/p_lt/p_lt
-         +3*duty*this->c09*p_tank*(1-p_tank/p_lt)*(1-p_tank/p_lt)/p_lt;
+    a00 = (-this->cl[0][2]*ps/pt/pt
+          -2*this->cl[0][4]*pt/ps
+          -2*this->cl[0][6]*pt/ps
+          -2*this->cl[0][8]*pt/ps
+          -this->cl[0][10]/ps
+          -2*this->cl[0][11]*pt/ps/ps)*duty;
+    
+    a01 = (this->cl[0][2]/pt
+         +this->cl[0][4]*(1-pt*pt/ps/ps)
+         +2*this->cl[0][4]*pt*pt/ps/ps
+         +this->cl[0][6]*(2-pt*pt/ps/ps)
+         +2*this->cl[0][6]*pt*pt/ps/ps
+         +this->cl[0][8]*(3-pt*pt/ps/ps)
+         +2*this->cl[0][8]*pt*pt/ps/ps
+         +this->cl[0][10]*pt/ps/ps
+         +2*this->cl[0][11]*pt*pt/ps/ps/ps)*duty;
     
     
-    a10 = -duty*this->c12*p_lt/p_tank/p_tank
-          +duty*this->c13*p_lt*p_lt/p_tank/p_tank
-          +duty*this->c16
-          +duty*this->c17*p_lt
-          +duty*this->c18/p_lt
-          -3*duty*this->c19*(1-p_tank/p_lt)*(1-p_tank/p_lt)/p_lt;
+    a10 = (-this->cl[1][2]*ps/pt/pt
+          -2*this->cl[1][4]*pt/ps
+          -2*this->cl[1][6]*pt/ps
+          -2*this->cl[1][8]*pt/ps
+          -3*this->cl[1][12]*pt*pt/ps/ps/ps)*duty;
 
-    a11 = duty*this->c12/p_tank
-         -duty*this->c13*p_lt/p_tank
-         +duty*this->c13*(1-p_lt/p_tank)
-         +duty*this->c17*p_tank
-         -duty*this->c18*p_tank/p_lt/p_lt
-         +3*duty*this->c19*p_tank*(1-p_tank/p_lt)*(1-p_tank/p_lt)/p_lt/p_lt;
+    a11 = (this->cl[1][2]/pt
+         +this->cl[1][4]*(1-pt*pt/ps/ps)
+         +2*this->cl[1][4]*pt*pt/ps/ps
+         +this->cl[1][6]*(2-pt*pt/ps/ps)
+         +2*this->cl[1][6]*pt*pt/ps/ps
+         +this->cl[1][8]*(3-pt*pt/ps/ps)
+         +2*this->cl[1][8]*pt*pt/ps/ps
+         +3*this->cl[1][12]*pt*pt*pt/ps/ps/ps/ps)*duty;
 
     this->matA<<a00,a01,a10,a11;
     
-    b0 = this->c00*p_tank
-                  +this->c02*p_lt/p_tank
-                  +this->c03*p_lt*(1-p_lt/p_tank)
-                  +this->c06*p_tank
-                  +this->c07*p_lt*p_tank
-                  +this->c08*p_tank/p_lt
-                  +this->c09*(1-p_tank/p_lt)*(1-p_tank/p_lt);
+    b0 = this->cl[0][2]*ps/pt
+        +this->cl[0][4]*ps*(1-pt*pt/ps/ps)
+        +this->cl[0][6]*ps*(2-pt*pt/ps/ps)
+        +this->cl[0][8]*ps*(3-pt*pt/ps/ps)
+        +this->cl[0][10]*(1-pt/ps)
+        +this->cl[0][11]*(1-pt*pt/ps/ps);
 
-    b1 = this->c12*p_lt/p_tank
-                  +this->c13*p_lt*(1-p_lt/p_tank)
-                  +this->c16*p_tank
-                  +this->c17*p_lt*p_tank
-                  +this->c18*p_tank/p_lt
-                  +this->c19*(1-p_tank/p_lt)*(1-p_tank/p_lt);
+    b1 = this->cl[1][2]*ps/pt
+        +this->cl[1][4]*ps*(1-pt*pt/ps/ps)
+        +this->cl[1][6]*ps*(2-pt*pt/ps/ps)
+        +this->cl[1][8]*ps*(3-pt*pt/ps/ps)
+        +this->cl[1][12]*(1-pt*pt*pt/ps/ps/ps);
 
     this->matB<<b0,b1;
-   
-
-    
 }
 
-int MPC::GetControl(int p_des,int p_tank,int p_lt,int duty){
+void MPC::UpdateH(int _pt,int _ps, int _duty){
+    float pt = ((float)_pt - 6553.6)/65536; //The zero pressure measurement is 0.5V
+    float ps = ((float)_ps - 6553.6)/65536;
+    float duty = (float)_duty/100;
+   
+    float a00,a01,a10,a11,b0,b1;
+    a00 =(this->ch[0][2]/ps
+          +2*this->ch[0][8]*ps*ps/pt/pt
+          +this->ch[0][8]*(3-ps*ps/pt/pt)
+          +3*this->ch[0][12]*ps*ps*ps/pt/pt/pt/pt)*duty;
+         
+
+    a01 = -(this->ch[0][2]*pt/ps/ps
+          +2*this->ch[0][8]*ps/pt
+          +3*this->ch[0][12]*ps*ps/pt/pt/pt)*duty;
     
-    if(std::abs(p_des-p_lt)>1000){ //if desired pressure has 2 psi difference
+    
+    a10 = (this->ch[1][2]/ps
+          +2*this->ch[1][8]*ps*ps/pt/pt
+          +this->ch[1][8]*(3-ps*ps/pt/pt)
+          +3*this->ch[1][12]*ps*ps*ps/pt/pt/pt/pt)*duty;
+
+    a11 = -(this->ch[1][2]*pt/ps/ps
+            +2*this->ch[1][8]*ps/pt
+            +3*this->ch[1][12]*ps*ps/pt/pt/pt)*duty;
+
+    this->matA<<a00,a01,a10,a11;
+    
+    b0 = this->ch[0][2]*pt/ps
+        +this->ch[0][8]*pt*(3-ps*ps/pt/pt)
+        +this->ch[0][12]*(1-ps*ps*ps/pt/pt/pt);
+
+    b1 = this->ch[1][2]*pt/ps
+        +this->ch[1][8]*pt*(3-ps*ps/pt/pt)
+        +this->ch[1][12]*(1-ps*ps*ps/pt/pt/pt);
+
+    this->matB<<b0,b1;
+
+}
+
+int MPC::GetControl(int p_des,int pt,int ps,int duty){
+    int p_diff = p_des - ps;
+    
+    if(std::abs(p_diff)>525){ //if desired pressure has 2 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
+        
+        double lb = 50.0;
+        // if(std::abs(pt-ps)<7865){ //if the difference is less than 5 psi, we can operate the valve with lower duty
+        //     lb = 50.0;
+        // }
+
         if(duty==0){
-            duty=35;//if duty=0, there will be no output
+            duty=50;//if duty=0, there will be no output
         }
 
-        this->UpdateA(p_tank,p_lt,duty);
+        if((p_des>ps) & (pt>ps)){
+            this->UpdateH(pt,ps,duty);
+        
+        }
+        else if((p_des<ps)&(ps>pt)){
+            this->UpdateL(pt,ps,duty);
+        }
+        else{
+            return 0;
+        }
+
+        
         // format question to osqp format
-        float q_val = 2*(p_tank*this->matA.coeff(0,1)*this->matB.coeff(1,0)+p_lt*this->matA.coeff(1,1)*this->matB(1,0));
-        float p_val = this->matB.coeff(0,1)*this->matB.coeff(0,1);
+        float q_val = 2*(pt*this->matA.coeff(1,0)*this->matB.coeff(1,0)+ps*this->matA.coeff(1,1)*this->matB(1,0)-this->matB(1,0)*p_diff);
+        float p_val = this->matB.coeff(1,0)*this->matB.coeff(1,0);
  
 
         c_int P_nnz = 1;
@@ -139,8 +237,8 @@ int MPC::GetControl(int p_des,int p_tank,int p_lt,int duty){
         c_int A_p[2]={0,1};
         this->osqp_data->A = csc_matrix(this->osqp_data->m,this->osqp_data->n,A_nnz,A_x,A_i,A_p);
 
-        c_float l[1]={35};
-        c_float u[1]={95};
+        c_float l[1]={lb};
+        c_float u[1]={100};
 
         this->osqp_data->l = l;
         this->osqp_data->u = u;
@@ -161,6 +259,14 @@ int MPC::GetControl(int p_des,int p_tank,int p_lt,int duty){
         else{
             std::cout<<"osqp failed\n";
         }
+
+
+        // std::cout<<"pval: "<<p_val<<std::endl;
+        // std::cout<<"qval: "<<q_val<<std::endl;
+        // std::cout<<"ps: "<<ps<<std::endl;
+        // std::cout<<"pt: "<<pt<<std::endl;
+        // std::cout<<"p_des: "<<p_des<<std::endl;
+        
         return duty;
     }
     else{
