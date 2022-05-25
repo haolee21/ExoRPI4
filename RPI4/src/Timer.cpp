@@ -167,6 +167,9 @@ bool Timer::StartRec(){
         fs::create_directory(filePath);
         Timer::filePath = filePath;
         Timer::dataRec_flag = true;
+
+        //reset the timeStamp
+        Timer::GetInstance().timeStamp=0;
         return true;
     }
 }

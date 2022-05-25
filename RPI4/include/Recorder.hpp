@@ -25,12 +25,15 @@ private:
     std::array<std::array<T,N>,REC_MAX_LEN> tempData2;
     std::array<std::array<T,N>,REC_MAX_LEN> *curData;
 
-    
+    std::array<unsigned,REC_MAX_LEN> rec_time1;
+    std::array<unsigned,REC_MAX_LEN> rec_time2;
+    std::array<unsigned,REC_MAX_LEN> *cur_rec_time;
+
     unsigned dataIdx;
     unsigned tempFileIdx;
     bool tempData_flag; //tempData_flag=true for tempData1, =false for tempData2
     std::future<void> saveCSV_future;
-    static void SaveCSV(std::array<std::array<T,N>,REC_MAX_LEN> data,std::string filePath,std::string fileName,unsigned fileIdx,std::string header,unsigned endIdx=REC_MAX_LEN){
+    static void SaveCSV(std::array<std::array<T,N>,REC_MAX_LEN> data,std::array<unsigned,REC_MAX_LEN> rec_time ,std::string filePath,std::string fileName,unsigned fileIdx,std::string header,unsigned endIdx=REC_MAX_LEN){
 
         std::string fullFileName = filePath+"/"+fileName + '_'+std::to_string(fileIdx)+".csv";
 
@@ -39,6 +42,9 @@ private:
         writeCsv.open(fullFileName);
         vts<<header<<'\n';
         for(unsigned i=0;i<endIdx;i++){
+            vts<<rec_time[i];
+            vts<<',';
+
             std::array<T,N> curRow = data[i];
             //Note that I converted all save data into int, it is to avoid error when using uint8_t, it is equivalent to byte, thus, default will only output ascii 
             std::copy(curRow.begin(),curRow.end()-1,std::ostream_iterator<int>(vts,",")); //only -1 because this will not include the -1 member (1:3, only select 1,2)
@@ -65,6 +71,7 @@ public:
         this->tempFileIdx=0;
         this->tempData_flag=true;
         this->curData = &(this->tempData1);
+        this->cur_rec_time = &(this->rec_time1);
         
 
     }
@@ -72,7 +79,7 @@ public:
         this->saveCSV_future.wait();
         this->saveCSV_future.get();
         if(this->dataIdx!=0)
-        Recorder::SaveCSV(*(this->curData),this->filePath,this->fileName,this->tempFileIdx,this->header,this->dataIdx);
+        Recorder::SaveCSV(*(this->curData),*(this->cur_rec_time),this->filePath,this->fileName,this->tempFileIdx,this->header,this->dataIdx);
         
 
         
@@ -87,12 +94,15 @@ public:
                 this->saveCSV_future.wait();
                 this->saveCSV_future.get();
                 std::array<std::array<T,N>,REC_MAX_LEN> oldData = *(this->curData);
-                this->saveCSV_future = std::async(std::launch::async,[this,oldData](){Recorder::SaveCSV(oldData,this->filePath,this->fileName,this->tempFileIdx++,this->header);});//the reason I did not copy filePath etc is because these values will not change in single batch, but when reset, the filePath and all counters will change, so I use copy in reset
+                std::array<unsigned,REC_MAX_LEN> old_rec_time = *(this->cur_rec_time);
+                this->saveCSV_future = std::async(std::launch::async,[this,oldData,old_rec_time](){Recorder::SaveCSV(oldData,old_rec_time, this->filePath,this->fileName,this->tempFileIdx++,this->header);});//the reason I did not copy filePath etc is because these values will not change in single batch, but when reset, the filePath and all counters will change, so I use copy in reset
                 if(this->tempData_flag){
                     this->curData=&(this->tempData2);
+                    this->cur_rec_time = &(this->rec_time2);
                 }
                 else{
                     this->curData=&(this->tempData1);
+                    this->cur_rec_time = &(this->rec_time1);
                 }
                 this->dataIdx=0;
                 this->tempData_flag=!this->tempData_flag;
@@ -108,17 +118,20 @@ public:
             this->saveCSV_future.wait();
             this->saveCSV_future.get();
             std::array<std::array<T,N>,REC_MAX_LEN> oldData = *(this->curData);
+            std::array<unsigned,REC_MAX_LEN> old_rec_time = *(this->cur_rec_time);
             unsigned oldDataIdx=this->dataIdx;
             unsigned oldFileIdx = this->tempFileIdx++;
             std::string oldFilePath = this->filePath;
-            this->saveCSV_future = std::async(std::launch::async,[this,oldData,oldDataIdx,oldFilePath,oldFileIdx](){Recorder::SaveCSV(oldData,oldFilePath,this->fileName,oldFileIdx,this->header,oldDataIdx);});   
+            this->saveCSV_future = std::async(std::launch::async,[this,oldData,old_rec_time,oldDataIdx,oldFilePath,oldFileIdx](){Recorder::SaveCSV(oldData,old_rec_time, oldFilePath,this->fileName,oldFileIdx,this->header,oldDataIdx);});   
             this->dataIdx=0;
             this->tempFileIdx=0;
             if(this->data_rec_flag){
                 this->curData=&(this->tempData2);
+                this->cur_rec_time = &(this->rec_time2);
             }
             else{
                 this->curData=&(this->tempData1);
+                this->cur_rec_time = &(this->rec_time1);
             }
         }
         
