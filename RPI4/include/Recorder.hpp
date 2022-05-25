@@ -24,6 +24,8 @@ private:
     std::array<std::array<T,N>,REC_MAX_LEN> tempData1;
     std::array<std::array<T,N>,REC_MAX_LEN> tempData2;
     std::array<std::array<T,N>,REC_MAX_LEN> *curData;
+
+    
     unsigned dataIdx;
     unsigned tempFileIdx;
     bool tempData_flag; //tempData_flag=true for tempData1, =false for tempData2

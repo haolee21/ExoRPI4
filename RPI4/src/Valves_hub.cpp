@@ -1,9 +1,11 @@
 #include "Valves_hub.hpp"
+#include "MPC_param.hpp"
 Valves_hub::Valves_hub()
 :
 pwmRecorder(Recorder<uint8_t,PWM_VAL_NUM>("PWM",PWM_HEADER))//TODO: use correct valve names, perhaps adding it in shared file with Teensy
 ,swRecorder(Recorder<bool,SW_VAL_NUM>("SW",SW_HEADER))
-,teensyValveCon(TeensyI2C(1))
+,teensyValveCon(TeensyI2C(1)),
+LTankCon(MpcInitParam::kLTankCl,MpcInitParam::kLTankCh)
 {
     //Do not set any valve condition here, it will crash
     //I believe the reason is because TeensyI2C is not created yet

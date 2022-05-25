@@ -54,7 +54,7 @@ private:
     bool mpc_enable;
     
 public:
-    MPC(/* args */);
+    MPC(std::array<std::array<float,13>,2> init_cl,std::array<std::array<float,13>,2> init_ch);
     ~MPC();
     void UpdateParamH(std::array<float,13> new_param0,std::array<float,13> new_param1);
     void UpdateParamL(std::array<float,13> new_param0,std::array<float,13> new_param1);

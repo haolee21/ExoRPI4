@@ -1,74 +1,17 @@
 #include <cmath>
-#include "MPC.hpp"
 #include <iostream>
+#include "MPC.hpp"
+#include "MPC_param.hpp"
+
 using namespace std;
-MPC::MPC(/* args */)
+MPC::MPC(array<array<float,13>,2> init_cl,array<array<float,13>,2> init_ch)
 {
 
     //load default values for the model parameters, it is data from one of the experiment
+    this->cl = init_cl;
+    this->ch = init_ch;
 
-    this->cl[0][0]=0;
-    this->cl[0][1]=0;
-    this->cl[0][2]=-2.554145389437805;
-    this->cl[0][3]=0;
-    this->cl[0][4]=828.3041147394617;
-    this->cl[0][5]=0;
-    this->cl[0][6]=64.4955220089105;
-    this->cl[0][7]=0;
-    this->cl[0][8]=1.4215445297754645;
-    this->cl[0][9]=0;
-    this->cl[0][10]=91.03587057293441;
-    this->cl[0][11]=36.73168344070655;
-    this->cl[0][12]=0;
-
-    this->cl[1][0]=0;
-    this->cl[1][1]=0;
-    this->cl[1][2]=21.964275810299558;
-    this->cl[1][3]=0;
-    this->cl[1][4]=-678.695092863387;
-    this->cl[1][5]=0;
-    this->cl[1][6]=-210.04224452757012;
-    this->cl[1][7]=0;
-    this->cl[1][8]=-12.87055314421623;
-    this->cl[1][9]=0;
-    this->cl[1][10]=0;
-    this->cl[1][11]=0;
-    this->cl[1][12]=-127.3061999422339;
-
-
-    this->ch[0][0]=0;
-    this->ch[0][1]=0;
-    this->ch[0][2]=17.6077691015832;
-    this->ch[0][3]=0;
-    this->ch[0][4]=0;
-    this->ch[0][5]=0;
-    this->ch[0][6]=0;
-    this->ch[0][7]=0;
-    this->ch[0][8]=-64.48492498724528;
-    this->ch[0][9]=0;
-    this->ch[0][10]=0;
-    this->ch[0][11]=0;
-    this->ch[0][12]=-334.30043189545825;
-
-    this->ch[1][0]=0;
-    this->ch[1][1]=0;
-    this->ch[1][2]=-46.07090089741948;
-    this->ch[1][3]=0;
-    this->ch[1][4]=0;
-    this->ch[1][5]=0;
-    this->ch[1][6]=0;
-    this->ch[1][7]=0;
-    this->ch[1][8]=128.80706856928742;
-    this->ch[1][9]=0;
-    this->ch[1][10]=0;
-    this->ch[1][11]=0;
-    this->ch[1][12]=346.2909905997821;
-
-
-
-
-   
-
+    
     //setup osqp solver
     this->osqp_data.reset(new OSQPData);
     this->osqp_settings.reset(new OSQPSettings);
