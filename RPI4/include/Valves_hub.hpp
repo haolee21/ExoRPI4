@@ -65,7 +65,7 @@ private:
     TeensyI2C teensyValveCon;
 
     //MPC Pressure control 
-    MPC LTankCon;
+    MPC LTankCon,LKneCon;
     std::array<bool,NUM_OF_MPC> mpc_enable;
     enum MPC_Enable{
         kLTank,kLKne,kLAnk,kRTank,kRKne,kRAnk

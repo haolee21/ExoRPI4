@@ -68,10 +68,16 @@ class PWM_TestWindow(QWidget):
         self.btn_RTankPWM_stop.clicked.connect(self.btn_RTankPWM_stop_clicked)
 
         #pressure control
+
+        ## start
         self.btn_LTankPreStr.clicked.connect(self.btn_LTankPre_start_clicked)
         self.btn_RTankPreStr.clicked.connect(self.btn_RTankPre_start_clicked)
+        self.btn_LKnePreStr.clicked.connect(self.btn_LKnePre_start_clicked)
+        ## stop
         self.btn_LTankPreStop.clicked.connect(self.btn_LTankPre_stop_clicked)
         self.btn_RTankPreStop.clicked.connect(self.btn_RTankPre_stop_clicked)
+        self.btn_LKnePreStop.clicked.connect(self.btn_LKnePre_stop_clicked)
+        
     # btn clicked 
     def text_to_float(self,text):
        
@@ -117,9 +123,14 @@ class PWM_TestWindow(QWidget):
         self.parent.tcp_port.SendCmd('SET:PRE:RTANK:'+str(self.text_to_float(self.RTank_pre.text())),1,True)
         self.parent.tcp_port.SendCmd('ACT:MPC:RTANK:1',1,True)
 
+    def btn_LKnePre_start_clicked(self):
+        self.parent.tcp_port.SendCmd('SET:PRE:LKNE:'+str(self.text_to_float(self.LKne_pre.text())),1,True)
+        self.parent.tcp_port.SendCmd('ACT:MPC:LKNE:1',1,True)
+
     def btn_LTankPre_stop_clicked(self):
         self.parent.tcp_port.SendCmd('ACT:MPC:LTANK:0',1,True)
     def btn_RTankPre_stop_clicked(self):
         self.parent.tcp_port.SendCmd('ACT:MPC:RTANK:0',1,True)
-    
+    def btn_LKnePre_stop_clicked(self):
+        self.parent.tcp_port.SendCmd('ACT:MPC:LKNE:0',1,True)
         
