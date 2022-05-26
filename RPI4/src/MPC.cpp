@@ -4,7 +4,7 @@
 #include "MPC_param.hpp"
 
 using namespace std;
-MPC::MPC(array<array<float,13>,2> init_cl,array<array<float,13>,2> init_ch)
+MPC::MPC(array<array<float,MPC_STATE_NUM>,2> init_cl,array<array<float,MPC_STATE_NUM>,2> init_ch)
 {
 
     //load default values for the model parameters, it is data from one of the experiment
@@ -25,111 +25,112 @@ MPC::MPC(array<array<float,13>,2> init_cl,array<array<float,13>,2> init_ch)
 MPC::~MPC()
 {
 }
-void MPC::UpdateParamH(array<float,13> new_0,array<float,13> new_1){
+void MPC::UpdateParamH(array<float,MPC_STATE_NUM> new_0,array<float,MPC_STATE_NUM> new_1){
     
     this->ch[0] = new_0;
     this->ch[1] = new_1;
 }
-void MPC::UpdateParamL(array<float,13> new_0,array<float,13> new_1){
+void MPC::UpdateParamL(array<float,MPC_STATE_NUM> new_0,array<float,MPC_STATE_NUM> new_1){
     this->cl[0] = new_0;
     this->cl[1] = new_1;
 }
-void MPC::UpdateL(int _pt,int _ps, int _duty){
-    float pt = ((float)_pt - 6553.6)/65536; //The zero pressure measurement is 0.5V
-    float ps = ((float)_ps - 6553.6)/65536;
+void MPC::Update(int _ph,int _pl, int _duty,std::array<std::array<float,MPC_STATE_NUM>,2> &c){
+    float ph = ((float)_ph - 6553.6)/65536; //The zero pressure measurement is 0.5V
+    float pl = ((float)_pl - 6553.6)/65536;
     float duty = (float)_duty/100;
    
     float a00,a01,a10,a11,b0,b1;
-    a00 = (-this->cl[0][2]*ps/pt/pt
-          -2*this->cl[0][4]*pt/ps
-          -2*this->cl[0][6]*pt/ps
-          -2*this->cl[0][8]*pt/ps
-          -this->cl[0][10]/ps
-          -2*this->cl[0][11]*pt/ps/ps)*duty;
-    
-    a01 = (this->cl[0][2]/pt
-         +this->cl[0][4]*(1-pt*pt/ps/ps)
-         +2*this->cl[0][4]*pt*pt/ps/ps
-         +this->cl[0][6]*(2-pt*pt/ps/ps)
-         +2*this->cl[0][6]*pt*pt/ps/ps
-         +this->cl[0][8]*(3-pt*pt/ps/ps)
-         +2*this->cl[0][8]*pt*pt/ps/ps
-         +this->cl[0][10]*pt/ps/ps
-         +2*this->cl[0][11]*pt*pt/ps/ps/ps)*duty;
+    a00 = (-c[0][0]*ph
+          -c[0][1]
+          -2*c[0][2]*pl/ph
+          -c[0][3]
+          -2*c[0][4]*pl/ph
+          -c[0][5]
+          -2*c[0][6]*pl/ph
+          -c[0][7]
+          -c[0][8]/ph
+          -2*c[0][9]*pl/ph/ph
+          -3*c[0][10]*pl*pl/ph/ph/ph
+    )*duty;
     
     
-    a10 = (-this->cl[1][2]*ps/pt/pt
-          -2*this->cl[1][4]*pt/ps
-          -2*this->cl[1][6]*pt/ps
-          -2*this->cl[1][8]*pt/ps
-          -3*this->cl[1][12]*pt*pt/ps/ps/ps)*duty;
+    a01 = (c[0][0]/pl
+          +c[0][1]*(1-pl/ph)
+          +c[0][1]*pl/ph
+          +c[0][2]*(1-pl*pl/ph/ph)
+          +c[0][3]*(2-pl/ph)
+          +c[0][3]*pl/ph
+          +c[0][4]*(2-pl*pl/ph/ph)
+          +2*c[0][4]*pl*pl/ph/ph
+          +c[0][5]*(3-pl/ph)
+          +c[0][5]*pl/ph
+          +c[0][6]*(3-pl*pl/ph/ph)
+          +2*c[0][6]*pl*pl/ph/ph
+          +c[0][7]
+          +c[0][8]*pl/ph/ph
+          +2*c[0][9]*pl*pl/ph/ph/ph
+          +3*c[0][10]*pl*pl*pl/ph/ph/ph/ph)*duty;
+    
+    
+    a10 = -(c[1][0]*ph/pl/pl
+          +c[1][1]
+          +2*c[1][2]*pl/ph
+          +c[1][3]
+          +2*c[1][4]*pl/ph
+          +c[1][5]
+          +2*c[1][6]*pl/ph
+          +c[1][7]
+          +c[1][8]/ph
+          +2*c[1][9]*pl/ph/ph
+          +3*c[1][10]*pl*pl/ph/ph/ph)*duty;
 
-    a11 = (this->cl[1][2]/pt
-         +this->cl[1][4]*(1-pt*pt/ps/ps)
-         +2*this->cl[1][4]*pt*pt/ps/ps
-         +this->cl[1][6]*(2-pt*pt/ps/ps)
-         +2*this->cl[1][6]*pt*pt/ps/ps
-         +this->cl[1][8]*(3-pt*pt/ps/ps)
-         +2*this->cl[1][8]*pt*pt/ps/ps
-         +3*this->cl[1][12]*pt*pt*pt/ps/ps/ps/ps)*duty;
+    a11 = (c[1][0]/pl
+          +c[1][1]*(1-pl/ph)
+          +c[1][1]*pl/ph
+          +c[1][2]*(1-pl*pl/ph/ph)
+          +2*c[1][2]*pl*pl/ph/ph
+          +c[1][3]*(2-pl/ph)
+          +c[1][3]*pl/ph
+          +c[1][4]*(2-pl*pl/ph/ph)
+          +2*c[1][4]*pl*pl/ph/ph
+          +c[1][5]*(3-pl/ph)
+          +c[1][5]*pl/ph
+          +c[1][6]*(3-pl*pl/ph/ph)
+          +2*c[1][6]*pl*pl/ph/ph
+          +c[1][7]
+          +c[1][8]*pl/ph/ph
+          +2*c[1][9]*pl*pl/ph/ph/ph
+          +3*c[1][10]*pl*pl*pl/ph/ph/ph/ph)*duty;
 
     this->matA<<a00,a01,a10,a11;
     
-    b0 = this->cl[0][2]*ps/pt
-        +this->cl[0][4]*ps*(1-pt*pt/ps/ps)
-        +this->cl[0][6]*ps*(2-pt*pt/ps/ps)
-        +this->cl[0][8]*ps*(3-pt*pt/ps/ps)
-        +this->cl[0][10]*(1-pt/ps)
-        +this->cl[0][11]*(1-pt*pt/ps/ps);
+    b0 = c[0][0]*ph/pl
+        +c[0][1]*ph*(1-pl/ph)
+        +c[0][2]*ph*(1-pl*pl/ph/ph)
+        +c[0][3]*ph*(2-pl/ph)
+        +c[0][4]*ph*(2-pl*pl/ph/ph)
+        +c[0][5]*ph*(3-pl/ph)
+        +c[0][6]*ph*(3-pl*pl/ph/ph)
+        +c[0][7]*(ph-pl)
+        +c[0][8]*(1-pl/ph)
+        +c[0][9]*(1-pl*pl/ph/ph)
+        +c[0][10]*(1-pl*pl*pl/ph/ph/ph);
 
-    b1 = this->cl[1][2]*ps/pt
-        +this->cl[1][4]*ps*(1-pt*pt/ps/ps)
-        +this->cl[1][6]*ps*(2-pt*pt/ps/ps)
-        +this->cl[1][8]*ps*(3-pt*pt/ps/ps)
-        +this->cl[1][12]*(1-pt*pt*pt/ps/ps/ps);
+    b1 = c[1][0]*ph/pl
+        +c[1][1]*ph*(1-pl/ph)
+        +c[1][2]*ph*(1-pl*pl/ph/ph)
+        +c[1][3]*ph*(2-pl/ph)
+        +c[1][4]*ph*(2-pl*pl/ph/ph)
+        +c[1][5]*ph*(3-pl/ph)
+        +c[1][6]*ph*(3-pl*pl/ph/ph)
+        +c[1][7]*(ph-pl)
+        +c[1][8]*(1-pl/ph)
+        +c[1][9]*(1-pl*pl/ph/ph)
+        +c[1][10]*(1-pl*pl*pl/ph/ph/ph);
 
     this->matB<<b0,b1;
 }
 
-void MPC::UpdateH(int _pt,int _ps, int _duty){
-    float pt = ((float)_pt - 6553.6)/65536; //The zero pressure measurement is 0.5V
-    float ps = ((float)_ps - 6553.6)/65536;
-    float duty = (float)_duty/100;
-   
-    float a00,a01,a10,a11,b0,b1;
-    a00 =(this->ch[0][2]/ps
-          +2*this->ch[0][8]*ps*ps/pt/pt
-          +this->ch[0][8]*(3-ps*ps/pt/pt)
-          +3*this->ch[0][12]*ps*ps*ps/pt/pt/pt/pt)*duty;
-         
-
-    a01 = -(this->ch[0][2]*pt/ps/ps
-          +2*this->ch[0][8]*ps/pt
-          +3*this->ch[0][12]*ps*ps/pt/pt/pt)*duty;
-    
-    
-    a10 = (this->ch[1][2]/ps
-          +2*this->ch[1][8]*ps*ps/pt/pt
-          +this->ch[1][8]*(3-ps*ps/pt/pt)
-          +3*this->ch[1][12]*ps*ps*ps/pt/pt/pt/pt)*duty;
-
-    a11 = -(this->ch[1][2]*pt/ps/ps
-            +2*this->ch[1][8]*ps/pt
-            +3*this->ch[1][12]*ps*ps/pt/pt/pt)*duty;
-
-    this->matA<<a00,a01,a10,a11;
-    
-    b0 = this->ch[0][2]*pt/ps
-        +this->ch[0][8]*pt*(3-ps*ps/pt/pt)
-        +this->ch[0][12]*(1-ps*ps*ps/pt/pt/pt);
-
-    b1 = this->ch[1][2]*pt/ps
-        +this->ch[1][8]*pt*(3-ps*ps/pt/pt)
-        +this->ch[1][12]*(1-ps*ps*ps/pt/pt/pt);
-
-    this->matB<<b0,b1;
-
-}
 
 int MPC::GetControl(int p_des,int pt,int ps,int duty){
     int p_diff = p_des - ps;
@@ -137,20 +138,20 @@ int MPC::GetControl(int p_des,int pt,int ps,int duty){
     if(std::abs(p_diff)>525){ //if desired pressure has 2 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
         
         double lb = 50.0;
-        // if(std::abs(pt-ps)<7865){ //if the difference is less than 5 psi, we can operate the valve with lower duty
-        //     lb = 50.0;
-        // }
+        if(std::abs(pt-ps)<2621){ //if the difference is less than 10 psi, we can operate the valve with lower duty
+            lb = 40.0;
+        }
 
         if(duty==0){
             duty=50;//if duty=0, there will be no output
         }
 
         if((p_des>ps) & (pt>ps)){
-            this->UpdateH(pt,ps,duty);
+            this->Update(pt,ps,duty,this->ch);
         
         }
         else if((p_des<ps)&(ps>pt)){
-            this->UpdateL(pt,ps,duty);
+            this->Update(ps,pt,duty,this->cl);
         }
         else{
             return 0;

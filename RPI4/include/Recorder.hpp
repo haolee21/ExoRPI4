@@ -89,6 +89,7 @@ public:
     void PushData(const std::array<T,N> data){
 
         if(this->data_rec_flag){
+            (*(this->cur_rec_time))[this->dataIdx]=Timer::GetCurTime();
             (*(this->curData))[this->dataIdx++]=data;
             if(this->dataIdx==REC_MAX_LEN){
                 this->saveCSV_future.wait();

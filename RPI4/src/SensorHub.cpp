@@ -32,11 +32,14 @@ SensorHub::~SensorHub()
     munlockall();
 }
 SensorHub::SensorHub() //initialize member in list since Encoder has no default constructor
-    : LEncRecorder(Recorder<uint16_t,NUMENC/2>("EncodersL","LHipS,LKneS,LAnkS"))
-    , REncRecorder(Recorder<uint16_t,NUMENC/2>("EncodersR","RHipS,RKneS,RAnkS"))
+    : LEncRecorder(Recorder<uint16_t,NUMENC/2>("EncodersL","Time,LHipS,LKneS,LAnkS"))
+    , REncRecorder(Recorder<uint16_t,NUMENC/2>("EncodersR","Time,RHipS,RKneS,RAnkS"))
     ,PreRecorder(Recorder<uint16_t,NUMPRE>("Pressure","LTankPre,KnePre,Force,Pos,TankPre,na,na,na"))
     , LHipS_Enc(Encoder_L(Encoder_L::HIP1)), LKneS_Enc(Encoder_L(Encoder_L::KNEE)), LAnkS_Enc(Encoder_L(Encoder_L::ANK1)), RHipS_Enc(Encoder_R(Encoder_R::HIP1)), RKneS_Enc(Encoder_R(Encoder_R::KNEE)), RAnkS_Enc(Encoder_R(Encoder_R::ANK1)),adc0(ADC(0))//,adc1(ADC(1)) //, LHipF_Enc(Encoder_L(1)), LAnkF_Enc(Encoder_L(4)), RHipF_Enc(Encoder_R(1)), RAnkF_Enc(Encoder_R(4))
+    ,filter_3_hz(FilterParam::Filter3Hz::a,FilterParam::Filter3Hz::b)
+    ,filter_5_hz(FilterParam::Filter5Hz::a,FilterParam::Filter5Hz::b)
 {
+
     
 }
 
@@ -103,20 +106,27 @@ void SensorHub::UpdatePre()
 {
     SensorHub & senHub = SensorHub::GetInstance();
     const std::array<u_int16_t,8> &data = senHub.adc0.ReadData();
-    senHub.PreData[0]=data[ADC::SEN0];
-    senHub.PreData[1]=data[ADC::SEN1];
-    senHub.PreData[2]=data[ADC::SEN2];
-    senHub.PreData[3]=data[ADC::SEN3];
-    senHub.PreData[4]=data[ADC::SEN4];
-    senHub.PreData[5]=data[ADC::SEN5];
-    senHub.PreData[6]=data[ADC::SEN6];
-    senHub.PreData[7]=data[ADC::SEN7];
+
+    std::array<u_int16_t,NUMPRE> cur_mea;
+    cur_mea[0]=data[ADC::SEN0];
+    cur_mea[1]=data[ADC::SEN1];
+    cur_mea[2]=data[ADC::SEN2];
+    cur_mea[3]=data[ADC::SEN3];
+    cur_mea[4]=data[ADC::SEN4];
+    cur_mea[5]=data[ADC::SEN5];
+    cur_mea[6]=data[ADC::SEN6];
+    cur_mea[7]=data[ADC::SEN7];
+
+    // senHub.PreData = senHub.filter_3_hz.GetFilteredMea(cur_mea);
+    senHub.PreData = senHub.filter_5_hz.GetFilteredMea(cur_mea);
+
+    // std::cout<<cur_mea[0]<<std::endl;
 
     senHub.PreRecorder.PushData(senHub.PreData);
 
+
+    
    
-
-
   
 }
 

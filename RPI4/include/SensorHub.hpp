@@ -12,6 +12,8 @@
 #include <memory>
 #include <Timer.hpp>
 #include "Recorder.hpp"
+#include "FilterParam.hpp"
+#include "Butter.hpp"
 
 #define DEG (360.0f/4096.0f)
 
@@ -31,7 +33,8 @@ public:
     static SensorHub& GetInstance();
     static const std::array<u_int16_t,NUMENC>& GetEncData(); //I did not use lock here since they will be read-only arrays
     static const std::array<u_int16_t,NUMPRE>& GetPreData(); //While data may not be sync, but it will be the most recent one
-    
+    static const std::array<u_int16_t,NUMPRE>& GetPreFiltered(); //get the filtered pressure reading
+
     SensorHub(const SensorHub&) = delete; // prevent copy singleton
 
 
@@ -59,9 +62,9 @@ private:
     
     std::array<u_int16_t,NUMENC> EncData;
     std::array<u_int16_t,NUMPRE> PreData;
-    Recorder<uint16_t,NUMENC/2> LEncRecorder;
-    Recorder<uint16_t,NUMENC/2> REncRecorder;
-    Recorder<uint16_t,NUMPRE> PreRecorder;
+    Recorder<u_int16_t,NUMENC/2> LEncRecorder;
+    Recorder<u_int16_t,NUMENC/2> REncRecorder;
+    Recorder<u_int16_t,NUMPRE> PreRecorder;
 
     // Encoders, S is for sagittal plane, F is for frontal plane
     Encoder_L LHipS_Enc,LKneS_Enc,LAnkS_Enc; //LHipF_Enc,LAnkF_Enc
@@ -72,7 +75,12 @@ private:
     // ADC 
     ADC adc0;
 
-
+    //Butterworth filter for ADC
+    Butter<u_int16_t,FilterParam::Filter3Hz::Order,NUMPRE> filter_3_hz;
+    Butter<u_int16_t,FilterParam::Filter5Hz::Order,NUMPRE> filter_5_hz;
+   
+    
+   
 
     
     

@@ -19,12 +19,15 @@
 #define MPC_H
 
 #define LIN_CONST_LEN 2
+
 #include<math.h>
 #include<memory>
 #include<array>
 #include <unsupported/Eigen/MatrixFunctions>
 #include <osqp/osqp.h>
 #include <Eigen/Dense>
+
+#include "MPC_param.hpp"
 
 
 class MPC
@@ -40,12 +43,12 @@ private:
     
     // the cylinders are divided into master and slave
     // we control the 
-    std::array<std::array<float,13>,2> ch;  
-    std::array<std::array<float,13>,2> cl;
+    std::array<std::array<float,MPC_STATE_NUM>,2> ch;  
+    std::array<std::array<float,MPC_STATE_NUM>,2> cl;
 
 
-    void UpdateH(int p_t,int p_s,int duty); //generate the OSQP constants
-    void UpdateL(int p_t,int p_s,int duty);
+    //generate the OSQP constants
+    void Update(int p_t,int p_s,int duty,std::array<std::array<float,MPC_STATE_NUM>,2> &c);
 
     std::unique_ptr<OSQPSettings> osqp_settings;
     std::unique_ptr<OSQPData> osqp_data;
@@ -54,10 +57,10 @@ private:
     bool mpc_enable;
     
 public:
-    MPC(std::array<std::array<float,13>,2> init_cl,std::array<std::array<float,13>,2> init_ch);
+    MPC(std::array<std::array<float,MPC_STATE_NUM>,2> init_cl,std::array<std::array<float,MPC_STATE_NUM>,2> init_ch);
     ~MPC();
-    void UpdateParamH(std::array<float,13> new_param0,std::array<float,13> new_param1);
-    void UpdateParamL(std::array<float,13> new_param0,std::array<float,13> new_param1);
+    void UpdateParamH(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
+    void UpdateParamL(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     
     int GetControl(int p_des,int p_tank,int p_set,int duty);
 
