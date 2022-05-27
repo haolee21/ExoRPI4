@@ -1,12 +1,12 @@
-#ifndef BUTTER_HPP
-#define BUTTER_HPP
+#ifndef DIGITAL_FILTER_HPP
+#define DIGITAL_FILTER_HPP
 #include <array>
 #include <cstring>
 template<class T,int M,int N>
 // T: data type
 // M: order of the filter
 // N: number of each measurement
-class Butter
+class DigitalFilter
 {
 private:
     std::array<std::array<T,N>,M> in_buf;
@@ -19,7 +19,7 @@ private:
 
 
 public:
-    Butter(std::array<float,M+1>_a,std::array<float,M+1>_b)
+    DigitalFilter(std::array<float,M+1>_a,std::array<float,M+1>_b)
     :a(_a),b(_b)
     {
         this->buf_idx=0;
@@ -31,7 +31,7 @@ public:
  
 
     };
-    ~Butter(){
+    ~DigitalFilter(){
 
     }
     std::array<T,N> GetFilteredMea(std::array<T,N> cur_mea){

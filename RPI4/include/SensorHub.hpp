@@ -13,7 +13,7 @@
 #include <Timer.hpp>
 #include "Recorder.hpp"
 #include "FilterParam.hpp"
-#include "Butter.hpp"
+#include "DigitalFilter.hpp"
 
 #define DEG (360.0f/4096.0f)
 
@@ -76,8 +76,8 @@ private:
     ADC adc0;
 
     //Butterworth filter for ADC
-    Butter<u_int16_t,FilterParam::Filter3Hz::Order,NUMPRE> filter_3_hz;
-    Butter<u_int16_t,FilterParam::Filter5Hz::Order,NUMPRE> filter_5_hz;
+    DigitalFilter<u_int16_t,FilterParam::Filter3Hz::Order,NUMPRE> filter_3_hz;
+    DigitalFilter<u_int16_t,FilterParam::Filter5Hz::Order,NUMPRE> filter_5_hz;
    
     
    
