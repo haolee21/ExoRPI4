@@ -15,7 +15,7 @@ int main()
     
 
     struct timespec t;
-    long int interval = 1*SEC;
+    // long int interval = 1*SEC;
 
 
     TCP_server tcp_server;//it needs to connect to a client in order to sync the time when boot
@@ -37,22 +37,26 @@ int main()
 
     clock_gettime(CLOCK_MONOTONIC, &t);
     
-    for(int i=0;i<TOT_RUN_TIME;i++){
-        // std::array<u_int16_t,SensorHub::NUMENC> curEnc=SensorHub::GetEncData();
-        // std::cout<<i<<"cur enc mea: ";
-        // for(int i2=0;i2<SensorHub::NUMENC;i2++){
-        //     std::cout<<curEnc[i2]<<',';
-        // }
-        // std::cout<<"\n";
-        // std::array<u_int16_t,SensorHub::NUMPRE> curPre=SensorHub::GetPreData();
-        // std::cout<<i<<"cur pre mea: ";
-        // for(int i3=0;i3<SensorHub::NUMPRE;i3++){
-        //     std::cout<<curPre[i3]<<',';
-        // }
-        // std::cout<<std::endl;
+    // for(int i=0;i<TOT_RUN_TIME;i++){
+    //     // std::array<u_int16_t,SensorHub::NUMENC> curEnc=SensorHub::GetEncData();
+    //     // std::cout<<i<<"cur enc mea: ";
+    //     // for(int i2=0;i2<SensorHub::NUMENC;i2++){
+    //     //     std::cout<<curEnc[i2]<<',';
+    //     // }
+    //     // std::cout<<"\n";
+    //     // std::array<u_int16_t,SensorHub::NUMPRE> curPre=SensorHub::GetPreData();
+    //     // std::cout<<i<<"cur pre mea: ";
+    //     // for(int i3=0;i3<SensorHub::NUMPRE;i3++){
+    //     //     std::cout<<curPre[i3]<<',';
+    //     // }
+    //     // std::cout<<std::endl;
         
-        t.tv_nsec+=interval;
-        Timer::Sleep(&t);
+    //     t.tv_nsec+=interval;
+    //     Timer::Sleep(&t);
+    // }
+    while(true)
+    {
+
     }
 
     Timer::StopRT();
