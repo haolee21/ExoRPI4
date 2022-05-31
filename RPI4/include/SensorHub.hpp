@@ -65,6 +65,7 @@ private:
     Recorder<u_int16_t,NUMENC/2> LEncRecorder;
     Recorder<u_int16_t,NUMENC/2> REncRecorder;
     Recorder<u_int16_t,NUMPRE> PreRecorder;
+    Recorder<u_int16_t,NUMPRE> PreRecOri;
 
     // Encoders, S is for sagittal plane, F is for frontal plane
     Encoder_L LHipS_Enc,LKneS_Enc,LAnkS_Enc; //LHipF_Enc,LAnkF_Enc

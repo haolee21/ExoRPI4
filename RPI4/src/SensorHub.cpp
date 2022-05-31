@@ -32,9 +32,10 @@ SensorHub::~SensorHub()
     munlockall();
 }
 SensorHub::SensorHub() //initialize member in list since Encoder has no default constructor
-    : LEncRecorder(Recorder<uint16_t,NUMENC/2>("EncodersL","Time,LHipS,LKneS,LAnkS"))
-    , REncRecorder(Recorder<uint16_t,NUMENC/2>("EncodersR","Time,RHipS,RKneS,RAnkS"))
+    : LEncRecorder(Recorder<uint16_t,NUMENC/2>("EncodersL","LHipS,LKneS,LAnkS"))
+    , REncRecorder(Recorder<uint16_t,NUMENC/2>("EncodersR","RHipS,RKneS,RAnkS"))
     ,PreRecorder(Recorder<uint16_t,NUMPRE>("Pressure","LTankPre,KnePre,Force,Pos,TankPre,na,na,na"))
+    ,PreRecOri(Recorder<u_int16_t,NUMPRE>("Pressure_ori","LTankPre,KnePre,Force,Pos,TankPre,na,na,na") )
     , LHipS_Enc(Encoder_L(Encoder_L::HIP1)), LKneS_Enc(Encoder_L(Encoder_L::KNEE)), LAnkS_Enc(Encoder_L(Encoder_L::ANK1)), RHipS_Enc(Encoder_R(Encoder_R::HIP1)), RKneS_Enc(Encoder_R(Encoder_R::KNEE)), RAnkS_Enc(Encoder_R(Encoder_R::ANK1)),adc0(ADC(0))//,adc1(ADC(1)) //, LHipF_Enc(Encoder_L(1)), LAnkF_Enc(Encoder_L(4)), RHipF_Enc(Encoder_R(1)), RAnkF_Enc(Encoder_R(4))
     ,filter_3_hz(FilterParam::Filter3Hz::a,FilterParam::Filter3Hz::b)
     ,filter_5_hz(FilterParam::Filter5Hz::a,FilterParam::Filter5Hz::b)
@@ -116,13 +117,17 @@ void SensorHub::UpdatePre()
     cur_mea[5]=data[ADC::SEN5];
     cur_mea[6]=data[ADC::SEN6];
     cur_mea[7]=data[ADC::SEN7];
-
+    
+    
     // senHub.PreData = senHub.filter_3_hz.GetFilteredMea(cur_mea);
     senHub.PreData = senHub.filter_5_hz.GetFilteredMea(cur_mea);
 
     // std::cout<<cur_mea[0]<<std::endl;
 
     senHub.PreRecorder.PushData(senHub.PreData);
+
+    //rec data before filtering
+    senHub.PreRecOri.PushData(cur_mea);
 
 
     

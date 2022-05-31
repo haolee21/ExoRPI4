@@ -2,7 +2,7 @@
 #define PWM_VAL_NUM 6
 #define SW_VAL_NUM 8
 
-#define PWM_HEADER "Time,LTANK,LKNE_PRE,LANK_PRE,RKNE_PRE,RANK_PRE,R_TANK" //TODO: need 7 pwm I think
+#define PWM_HEADER "LTANK,LKNE_PRE,LANK_PRE,RKNE_PRE,RANK_PRE,R_TANK" //TODO: need 7 pwm I think
 #define TEENSY_PWM0 8   //VAL 9
 #define RPI_PWM0 0
 #define TEENSY_PWM1 9 //VAL 10
@@ -16,7 +16,7 @@
 #define TEENSY_PWM5 14 //VAL 14
 #define RPI_PWM5 5
 
-#define SW_HEADER "Timer,LBAL,LREL,RBAL,RREL,TANK_REL,NA,NA,NA" //may change
+#define SW_HEADER "LBAL,LREL,RBAL,RREL,TANK_REL,NA,NA,NA" //may change
 #define TEENSY_SW0 0 //VAL 1
 #define RPI_SW0 0 
 #define TEENSY_SW1 1 //VAL 2

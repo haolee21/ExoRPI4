@@ -104,7 +104,7 @@ void MPC::Update(int _ph,int _pl, int _duty,std::array<std::array<float,MPC_STAT
 
     this->matA<<a00,a01,a10,a11;
     
-    b0 = c[0][0]*ph/pl
+    b0 =(c[0][0]*ph/pl
         +c[0][1]*ph*(1-pl/ph)
         +c[0][2]*ph*(1-pl*pl/ph/ph)
         +c[0][3]*ph*(2-pl/ph)
@@ -114,9 +114,9 @@ void MPC::Update(int _ph,int _pl, int _duty,std::array<std::array<float,MPC_STAT
         +c[0][7]*(ph-pl)
         +c[0][8]*(1-pl/ph)
         +c[0][9]*(1-pl*pl/ph/ph)
-        +c[0][10]*(1-pl*pl*pl/ph/ph/ph);
+        +c[0][10]*(1-pl*pl*pl/ph/ph/ph))/100; //it has to be divided by 100 since we calculate f'(D/100) originally
 
-    b1 = c[1][0]*ph/pl
+    b1 =(c[1][0]*ph/pl
         +c[1][1]*ph*(1-pl/ph)
         +c[1][2]*ph*(1-pl*pl/ph/ph)
         +c[1][3]*ph*(2-pl/ph)
@@ -126,7 +126,7 @@ void MPC::Update(int _ph,int _pl, int _duty,std::array<std::array<float,MPC_STAT
         +c[1][7]*(ph-pl)
         +c[1][8]*(1-pl/ph)
         +c[1][9]*(1-pl*pl/ph/ph)
-        +c[1][10]*(1-pl*pl*pl/ph/ph/ph);
+        +c[1][10]*(1-pl*pl*pl/ph/ph/ph))/100; 
 
     this->matB<<b0,b1;
 }
@@ -135,7 +135,7 @@ void MPC::Update(int _ph,int _pl, int _duty,std::array<std::array<float,MPC_STAT
 int MPC::GetControl(int p_des,int pt,int ps,int duty){
     int p_diff = p_des - ps;
     
-    if(std::abs(p_diff)>525){ //if desired pressure has 2 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
+    if(std::abs(p_diff)>132){ //if desired pressure has 0.5 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
         
         double lb = 50.0;
         if(std::abs(pt-ps)<2621){ //if the difference is less than 10 psi, we can operate the valve with lower duty
@@ -156,11 +156,14 @@ int MPC::GetControl(int p_des,int pt,int ps,int duty){
         else{
             return 0;
         }
-
+        float pt_scaled = ((float)pt - 6553.6)/65536;
+        float ps_scaled = ((float)ps - 6553.6)/65536;
         
         // format question to osqp format
-        float q_val = 2*(pt*this->matA.coeff(1,0)*this->matB.coeff(1,0)+ps*this->matA.coeff(1,1)*this->matB(1,0)-this->matB(1,0)*p_diff);
-        float p_val = this->matB.coeff(1,0)*this->matB.coeff(1,0);
+        float q_val = 2*(pt_scaled*this->matA.coeff(1,0)*this->matB.coeff(1,0)
+                        +ps_scaled*this->matA.coeff(1,1)*this->matB.coeff(1,0)
+                        -this->matB.coeff(1,0)*p_diff);
+        float p_val = 2*this->matB.coeff(1,0)*this->matB.coeff(1,0);
  
 
         c_int P_nnz = 1;
@@ -196,7 +199,7 @@ int MPC::GetControl(int p_des,int pt,int ps,int duty){
         if(!set_up_flag)
             solve_err = osqp_solve(this->work);
         if(!solve_err){
-            duty = *this->work->solution->x;
+            duty = *this->work->solution->x+0.5;
             // if(duty<30)
             //     duty =0;
         }
@@ -212,6 +215,7 @@ int MPC::GetControl(int p_des,int pt,int ps,int duty){
         // std::cout<<"p_des: "<<p_des<<std::endl;
         
         return duty;
+        
     }
     else{
         return 0;
