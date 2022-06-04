@@ -98,7 +98,7 @@ void Valves_hub::UpdateValve(){
         
         int res_duty = hub.LTankCon.GetControl((int)hub.desired_pre[PWM_ID::LTANKPRE],(int)pre_data[SensorHub::PreName::Tank],pre_data[SensorHub::PreName::LTank],hub.PWM_Duty[PWM_ID::LTANKPRE]);
         
-        hub.SetDuty(res_duty,Valves_hub::PWM_ID::LTANKPRE);
+        hub.SetDuty(res_duty,Valves_hub::PWM_ID::LTANKPRE); 
     }
     if(hub.mpc_enable[Valves_hub::MPC_Enable::kLKne]){
     

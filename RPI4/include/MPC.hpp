@@ -33,22 +33,44 @@
 class MPC
 {
 private:
+    // Please reference to the equation note
+    
+    
+    Eigen::Matrix<float,2,1> B;
+    Eigen::Matrix<float,2,1> alpha;
+    void UpdateDyn(float p_h,float p_l,float d,bool increase_pre);
+    //parameter of OSQP
+    float P_val,q_val;
+    const Eigen::Matrix<float,1,2> H_h; // when I define state, I define it as 
+    const Eigen::Matrix<float,1,2> H_l;
+    Eigen::Matrix<float,2,1> Phi; //this will be useful if we want to estimate the flow rate
+    Eigen::Matrix2f dPhi_dx;
+    Eigen::Matrix<float,2,1> dPhi_du;
+    void UpdatePhi(float ph,float pl,float d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
+    void Update_dPhi_dxL(float ph,float pl,float d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
+    void Update_dPhi_duL(float ph,float pl,float d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
 
-    Eigen::Matrix2f matA;
+    void Update_dPhi_dxH(float ph,float pl,float d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
+    void Update_dPhi_duH(float ph,float pl,float d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
+
+    // Eigen::Matrix2f matA;
     // Eigen::Matrix2f matA2;
     // Eigen::Matrix2f matA3;
-    Eigen::Matrix<float,2,1> matB;
-    const Eigen::Matrix<float,1,2> phi{1,0};
+    // Eigen::Matrix<float,2,1> matB;
+    // const Eigen::Matrix<float,1,2> phi{1,0};
 
     
     // the cylinders are divided into master and slave
     // we control the 
-    std::array<std::array<float,MPC_STATE_NUM>,2> ch;  
-    std::array<std::array<float,MPC_STATE_NUM>,2> cl;
+    std::array<float,MPC_STATE_NUM> ah;
+    std::array<float,MPC_STATE_NUM> bh;
+    std::array<float,MPC_STATE_NUM> al;
+    std::array<float,MPC_STATE_NUM> bl;
+
 
 
     //generate the OSQP constants
-    void Update(int p_t,int p_s,int duty,std::array<std::array<float,MPC_STATE_NUM>,2> &c);
+
 
     std::unique_ptr<OSQPSettings> osqp_settings;
     std::unique_ptr<OSQPData> osqp_data;
