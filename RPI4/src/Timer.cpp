@@ -55,10 +55,10 @@ void* Timer::TimerTick(void*){
     long int interval = SAMPT*USEC;
 
     //////////////////////////////////////////////////////////
-    unsigned timeDiff_idx=0; //TODO: testing loop period only, should be commented in final version
-    std::array<float,TOT_RUN_TIME*1000+1000> timeDiff; //can only run around 100 sec
-    auto t_start=std::chrono::high_resolution_clock::now();
-    auto t_end = std::chrono::high_resolution_clock::now();
+    // unsigned timeDiff_idx=0; //TODO: testing loop period only, should be commented in final version
+    // std::array<float,TOT_RUN_TIME*1000+1000> timeDiff; //can only run around 100 sec
+    // auto t_start=std::chrono::high_resolution_clock::now();
+    // auto t_end = std::chrono::high_resolution_clock::now();
     ///////////////////////////////////////////////////////////
     //TODO: Need to add init sequence here
     //we cannot add 
@@ -79,9 +79,9 @@ void* Timer::TimerTick(void*){
         Timer::Sleep(&t);
 
         ///////////////////////////////////////////////// TODO: testing loop period only
-        t_end = std::chrono::high_resolution_clock::now();
-        timeDiff[timeDiff_idx++]=std::chrono::duration<float,std::micro>(t_end-t_start).count();
-        t_start = t_end;
+        // t_end = std::chrono::high_resolution_clock::now();
+        // timeDiff[timeDiff_idx++]=std::chrono::duration<float,std::micro>(t_end-t_start).count();
+        // t_start = t_end;
         /////////////////////////////////////////////////
 
 
@@ -111,10 +111,10 @@ void* Timer::TimerTick(void*){
         timer.timeStamp++;
     }
     /////////////////////////////////////////// TODO: testing loop period only
-    std::cout<<"Time diff: \n";
-    for(unsigned i=0;i<timeDiff_idx;i++){
-        std::cout<<timeDiff[i]<<',';
-    }
+    // std::cout<<"Time diff: \n";
+    // for(unsigned i=0;i<timeDiff_idx;i++){
+        // std::cout<<timeDiff[i]<<',';
+    // }
     ////////////////////////////////////////////
 
     

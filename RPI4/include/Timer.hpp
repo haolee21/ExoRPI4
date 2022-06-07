@@ -7,7 +7,7 @@
 #define MSEC (1000 * USEC)
 #define SEC (1000 * MSEC)
 #define SAMPT 10000  //sampling period in uS, make sure 
-#define TOT_RUN_TIME 1800
+#define TOT_RUN_TIME 60
 #include <functional>
 #include <pthread.h>
 #include "RT.hpp"

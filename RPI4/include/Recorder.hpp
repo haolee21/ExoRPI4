@@ -138,6 +138,10 @@ public:
         
     }
 
+    int ReturnRecIdx(){
+        return this->dataIdx;
+    }
+
 
 };
 

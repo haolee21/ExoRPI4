@@ -26,9 +26,10 @@
 #include <unsupported/Eigen/MatrixFunctions>
 #include <osqp/osqp.h>
 #include <Eigen/Dense>
+#include <string>
 
 #include "MPC_param.hpp"
-
+#include "Recorder.hpp"
 
 class MPC
 {
@@ -77,6 +78,8 @@ private:
     OSQPWorkspace *work;
 
     bool mpc_enable;
+
+    
     
 public:
     MPC(std::array<std::array<float,MPC_STATE_NUM>,2> init_cl,std::array<std::array<float,MPC_STATE_NUM>,2> init_ch);
@@ -86,6 +89,7 @@ public:
     
     int GetControl(int p_des,int p_tank,int p_set,int duty);
 
+    std::array<float,2> GetPhi();
  
 };
 

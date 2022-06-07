@@ -231,7 +231,7 @@ class MW(QMainWindow):
             self.label_startTime.setText("%04d-" %(curTime.year) + "%02d%02d-" %(curTime.month,curTime.day) + "%02d%02d-" %(curTime.hour,curTime.minute)+"%02d" %(curTime.second))
         else:
             # when clicked, end the recording
-            self.tcp_port.SendCmd('SET:REC:DATA:0',0)
+            self.tcp_port.SendCmd('SET:REC:DATA:0',1)
             self.rec_flag=False
             self.btn_rec_start.setText('REC Start')
     def update_rec_btn(self,flag_read):

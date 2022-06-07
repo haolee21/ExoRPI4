@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+
 #include "MPC.hpp"
 #include "MPC_param.hpp"
 
@@ -70,6 +71,8 @@ void MPC::UpdatePhi(float p_h,float p_l,float d,const std::array<float,MPC_STATE
 
     this->Phi<< a[0]*x2 + a[1]*x17 + a[2]*x18 + a[3]*x10 + a[4]*x20 + a[5]*x8 + a[6]*x13 + a[7]*x15 + a[8]*x5 + a[9]*x21 + a[10]*x24 + a[11]*x16 + a[12]*x22 + a[13]*x23
               , b[0]*x2 + b[1]*x17 + b[2]*x18 + b[3]*x10 + b[4]*x20 + b[5]*x8 + b[6]*x13 + b[7]*x15 + b[8]*x5 + b[9]*x21 + b[10]*x24 + b[11]*x16 + b[12]*x22 + b[13]*x23;
+    
+ 
 
 }
 void MPC::Update_dPhi_dxL(float p_h,float p_l,float d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b){
@@ -296,6 +299,7 @@ int MPC::GetControl(int p_des,int pt,int ps,int duty){
             this->UpdateDyn(ps_scaled,pt_scaled,duty_scaled,false);
         }
         else{
+            this->Phi<<0,0;
             return 0;
         }
         
@@ -306,7 +310,7 @@ int MPC::GetControl(int p_des,int pt,int ps,int duty){
         // std::cout<<"p_val: "<<p_val<<std::endl;
         // std::cout<<"B: "<<this->B<<std::endl;
         // std::cout<<"P_diff: "<<p_diff<<std::endl;
-        std::cout<<"Phi: "<<this->Phi<<std::endl;
+        // std::cout<<"Phi: "<<this->Phi<<std::endl;
         // std::cout<<"duty: "<<duty<<std::endl;
 
         c_int P_nnz = 1;
@@ -364,6 +368,10 @@ int MPC::GetControl(int p_des,int pt,int ps,int duty){
         return 0;
     }
 
+}
+
+std::array<float,2> MPC::GetPhi(){
+    return std::array<float,2>({this->Phi.coeff(0,0),this->Phi.coeff(1,0)});
 }
 
 

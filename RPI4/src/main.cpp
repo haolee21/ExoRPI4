@@ -15,7 +15,7 @@ int main()
     
 
     struct timespec t;
-    // long int interval = 1*SEC;
+    long int interval = 1*SEC;
 
 
     TCP_server tcp_server;//it needs to connect to a client in order to sync the time when boot
@@ -56,6 +56,8 @@ int main()
     // }
     while(true)
     {
+        t.tv_nsec+=interval;
+        Timer::Sleep(&t);
 
     }
 
