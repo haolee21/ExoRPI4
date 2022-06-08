@@ -96,16 +96,21 @@ void Valves_hub::UpdateValve(){
 
     //MPC check
     const std::array<u_int16_t,SensorHub::NUMPRE>& pre_data = SensorHub::GetPreData(); //use ref to avoid copy
+
+    //put measurements in mpc controller, we must do this even the mpc controller are not enabled since it relies on the history of the measurements
+    hub.LTankCon.PushPreMeas(pre_data[SensorHub::PreName::Tank],pre_data[SensorHub::PreName::LTank],hub.PWM_Duty[PWM_ID::LTANKPRE]);
+    hub.LKneCon.PushPreMeas(pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::LKne],hub.PWM_Duty[PWM_ID::LKNEPRE]);
+
     if(hub.mpc_enable[Valves_hub::MPC_Enable::kLTank]){
         
-        int res_duty = hub.LTankCon.GetControl((int)hub.desired_pre[PWM_ID::LTANKPRE],(int)pre_data[SensorHub::PreName::Tank],pre_data[SensorHub::PreName::LTank],hub.PWM_Duty[PWM_ID::LTANKPRE]);
+        int res_duty = hub.LTankCon.GetControl(hub.desired_pre[Valves_hub::PWM_ID::LTANKPRE],pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::Tank]);
         
         hub.SetDuty(res_duty,Valves_hub::PWM_ID::LTANKPRE); 
         hub.mpc_ltank_rec.PushData(hub.LTankCon.GetPhi());
     }
     if(hub.mpc_enable[Valves_hub::MPC_Enable::kLKne]){
     
-        int res_duty = hub.LKneCon.GetControl((int)hub.desired_pre[PWM_ID::LKNEPRE],(int)pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::LKne],hub.PWM_Duty[PWM_ID::LKNEPRE]);
+        int res_duty = hub.LKneCon.GetControl(hub.desired_pre[Valves_hub::PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::LTank]);
         hub.SetDuty(res_duty,Valves_hub::PWM_ID::LKNEPRE);
         hub.mpc_lkne_rec.PushData(hub.LKneCon.GetPhi());
     }

@@ -10,11 +10,11 @@ namespace FilterParam
         const std::array<float,Order+1> a = {1.        , -3.50778621,  4.64090241, -2.74265282,  0.61053481};
 
     }
-    namespace Filter5Hz
+    namespace Filter10Hz //It is actually 10 Hz, TODO: change it later
     {
         const int Order=2;
-        const std::array<float,Order+1> b = {0.02008337, 0.04016673, 0.02008337};
-        const std::array<float,Order+1> a = {1.        , -1.56101808,  0.64135154};
+        const std::array<float,Order+1> b = {0.06745527, 0.13491055, 0.06745527};
+        const std::array<float,Order+1> a = { 1.       , -1.1429805,  0.4128016};
     }
     
 }

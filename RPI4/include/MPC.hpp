@@ -28,6 +28,7 @@
 #include <Eigen/Dense>
 #include <string>
 
+
 #include "MPC_param.hpp"
 #include "Recorder.hpp"
 
@@ -39,7 +40,7 @@ private:
     
     Eigen::Matrix<float,2,1> B;
     Eigen::Matrix<float,2,1> alpha;
-    void UpdateDyn(float p_h,float p_l,float d,bool increase_pre);
+    void UpdateDyn(const std::array<float,MPC_DELAY>& p_h,const std::array<float,MPC_DELAY>& p_l, const std::array<float,MPC_DELAY> &u,bool increase_pre);
     //parameter of OSQP
     float P_val,q_val;
     const Eigen::Matrix<float,1,2> H_h; // when I define state, I define it as 
@@ -47,18 +48,18 @@ private:
     Eigen::Matrix<float,2,1> Phi; //this will be useful if we want to estimate the flow rate
     Eigen::Matrix2f dPhi_dx;
     Eigen::Matrix<float,2,1> dPhi_du;
-    void UpdatePhi(float ph,float pl,float d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
-    void Update_dPhi_dxL(float ph,float pl,float d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
-    void Update_dPhi_duL(float ph,float pl,float d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
+    void UpdatePhi(const std::array<float,MPC_DELAY> ph,const std::array<float,MPC_DELAY> pl,const std::array<float,MPC_DELAY> u,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
+    void Update_dPhi_dxL(const std::array<float,MPC_DELAY>& ph, const std::array<float,MPC_DELAY> &pl,const std::array<float,MPC_DELAY> &d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
+    void Update_dPhi_dxH(const std::array<float,MPC_DELAY>& ph,const std::array<float,MPC_DELAY> &pl,const std::array<float,MPC_DELAY>& d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
+    void Update_dPhi_du(const std::array<float,MPC_DELAY>& ph,const std::array<float,MPC_DELAY> &pl,const std::array<float,MPC_DELAY>& d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
 
-    void Update_dPhi_dxH(float ph,float pl,float d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
-    void Update_dPhi_duH(float ph,float pl,float d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
-
-    // Eigen::Matrix2f matA;
-    // Eigen::Matrix2f matA2;
-    // Eigen::Matrix2f matA3;
-    // Eigen::Matrix<float,2,1> matB;
-    // const Eigen::Matrix<float,1,2> phi{1,0};
+    //Mem for previous measurements
+    std::array<float,MPC_DELAY> p_tank_mem; //mem is just for storage, pop the oldest ones and put the newest one there, the order may be 34512
+    std::array<float,MPC_DELAY> p_set_mem;
+    std::array<float,MPC_DELAY> u_mem;
+    void SortHistory();
+    std::array<float,MPC_DELAY> GetHistory(const std::array<float,MPC_DELAY>& mem);
+    unsigned meas_idx;
 
     
     // the cylinders are divided into master and slave
@@ -87,9 +88,10 @@ public:
     void UpdateParamH(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     void UpdateParamL(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     
-    int GetControl(int p_des,int p_tank,int p_set,int duty);
+    int GetControl(const u_int16_t& p_des,const u_int16_t& p_cur,const u_int16_t& p_tank);//It requires current pressure value because all the values storaged in the meme are scaled
 
     std::array<float,2> GetPhi();
+    void PushPreMeas(const u_int16_t p_tank,const u_int16_t p_set,const u_int16_t duty);
  
 };
 

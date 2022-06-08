@@ -38,7 +38,7 @@ SensorHub::SensorHub() //initialize member in list since Encoder has no default 
     ,PreRecOri(Recorder<u_int16_t,NUMPRE>("Pressure_ori","LTankPre,KnePre,Force,Pos,TankPre,na,na,na") )
     , LHipS_Enc(Encoder_L(Encoder_L::HIP1)), LKneS_Enc(Encoder_L(Encoder_L::KNEE)), LAnkS_Enc(Encoder_L(Encoder_L::ANK1)), RHipS_Enc(Encoder_R(Encoder_R::HIP1)), RKneS_Enc(Encoder_R(Encoder_R::KNEE)), RAnkS_Enc(Encoder_R(Encoder_R::ANK1)),adc0(ADC(0))//,adc1(ADC(1)) //, LHipF_Enc(Encoder_L(1)), LAnkF_Enc(Encoder_L(4)), RHipF_Enc(Encoder_R(1)), RAnkF_Enc(Encoder_R(4))
     ,filter_3_hz(FilterParam::Filter3Hz::a,FilterParam::Filter3Hz::b)
-    ,filter_5_hz(FilterParam::Filter5Hz::a,FilterParam::Filter5Hz::b)
+    ,filter_10_hz(FilterParam::Filter10Hz::a,FilterParam::Filter10Hz::b)
 {
 
     
@@ -120,7 +120,7 @@ void SensorHub::UpdatePre()
     
     
     // senHub.PreData = senHub.filter_3_hz.GetFilteredMea(cur_mea);
-    senHub.PreData = senHub.filter_5_hz.GetFilteredMea(cur_mea);
+    senHub.PreData = senHub.filter_10_hz.GetFilteredMea(cur_mea);
 
     // std::cout<<cur_mea[0]<<std::endl;
 
