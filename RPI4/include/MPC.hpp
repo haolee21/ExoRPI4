@@ -40,14 +40,14 @@ private:
     
     Eigen::Matrix<float,2,1> B;
     Eigen::Matrix<float,2,1> alpha;
-    void UpdateDyn(const std::array<float,MPC_DELAY>& p_h,const std::array<float,MPC_DELAY>& p_l, const std::array<float,MPC_DELAY> &u,bool increase_pre);
+    void UpdateDyn(bool increase_pre);
     //parameter of OSQP
     float P_val,q_val;
     const Eigen::Matrix<float,1,2> H_h; // when I define state, I define it as 
     const Eigen::Matrix<float,1,2> H_l;
     Eigen::Matrix<float,2,1> Phi; //this will be useful if we want to estimate the flow rate
-    Eigen::Matrix2f dPhi_dx;
-    Eigen::Matrix<float,2,1> dPhi_du;
+    Eigen::Matrix<float,2,2> dPhi_dx_T;
+    Eigen::Matrix<float,2,1> dPhi_du_T;
     void UpdatePhi(const std::array<float,MPC_DELAY> ph,const std::array<float,MPC_DELAY> pl,const std::array<float,MPC_DELAY> u,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
     void Update_dPhi_dxL(const std::array<float,MPC_DELAY>& ph, const std::array<float,MPC_DELAY> &pl,const std::array<float,MPC_DELAY> &d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
     void Update_dPhi_dxH(const std::array<float,MPC_DELAY>& ph,const std::array<float,MPC_DELAY> &pl,const std::array<float,MPC_DELAY>& d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
@@ -57,8 +57,17 @@ private:
     std::array<float,MPC_DELAY> p_tank_mem; //mem is just for storage, pop the oldest ones and put the newest one there, the order may be 34512
     std::array<float,MPC_DELAY> p_set_mem;
     std::array<float,MPC_DELAY> u_mem;
-    void SortHistory();
-    std::array<float,MPC_DELAY> GetHistory(const std::array<float,MPC_DELAY>& mem);
+
+    std::array<float,MPC_DELAY> p_tank_his;
+    std::array<float,MPC_DELAY> p_set_his;
+    std::array<float,MPC_DELAY> u_his;
+
+    std::array<float,MPC_DELAY> p_tank_hat;
+    std::array<float,MPC_DELAY> p_set_hat;
+    std::array<float,MPC_DELAY> u_hat;
+    // void SortHistory();
+    void UpdateHistory();
+
     unsigned meas_idx;
 
     
@@ -90,7 +99,9 @@ public:
     
     int GetControl(const u_int16_t& p_des,const u_int16_t& p_cur,const u_int16_t& p_tank);//It requires current pressure value because all the values storaged in the meme are scaled
 
-    std::array<float,2> GetPhi();
+    //Get values for recorder
+    std::array<float,4> GetMpcRec();
+
     void PushPreMeas(const u_int16_t p_tank,const u_int16_t p_set,const u_int16_t duty);
  
 };

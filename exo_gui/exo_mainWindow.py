@@ -39,7 +39,7 @@ class MW(QMainWindow):
 
         self.tcp_port = TCP()
         self.dataLen=DATALEN
-        self.max_pressure=70.0 #max pressure is 80 psi
+        self.max_pressure=100.0 #max pressure is 80 psi
         #init all windows, otherwise all data will be lost when we close it
         self.con_window = ConnectionWindow(self)
         self.joint_plot_window = PlotJointWindow(self)

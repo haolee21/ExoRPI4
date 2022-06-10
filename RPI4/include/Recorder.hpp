@@ -47,10 +47,20 @@ private:
 
             std::array<T,N> curRow = data[i];
             //Note that I converted all save data into int, it is to avoid error when using uint8_t, it is equivalent to byte, thus, default will only output ascii 
-            std::copy(curRow.begin(),curRow.end()-1,std::ostream_iterator<int>(vts,",")); //only -1 because this will not include the -1 member (1:3, only select 1,2)
+            // if(sizeof(T)==sizeof(char))
+            if((typeid(T)==typeid(u_int8_t)) || (typeid(T)==typeid(char)) )
+            {
+                 std::copy(curRow.begin(),curRow.end()-1,std::ostream_iterator<int>(vts,",")); //only -1 because this will not include the -1 member (1:3, only select 1,2)
+            }
+            else{
+                 std::copy(curRow.begin(),curRow.end()-1,std::ostream_iterator<T>(vts,",")); //only -1 because this will not include the -1 member (1:3, only select 1,2)
 
+            }
 
-            vts<<(int)*(curRow.end()-1)<<'\n';//last element does not need ',' but '\n'
+            if((typeid(T)==typeid(u_int8_t)) || (typeid(T)==typeid(char)) )
+                vts<<(int)*(curRow.end()-1)<<'\n';//last element does not need ',' but '\n'
+            else
+                vts<<*(curRow.end()-1)<<'\n';//last element does not need ',' but '\n'
         }
         writeCsv<<vts.str();
         writeCsv.close();

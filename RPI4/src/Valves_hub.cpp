@@ -7,8 +7,8 @@ pwmRecorder(Recorder<uint8_t,PWM_VAL_NUM>("PWM",PWM_HEADER))//TODO: use correct 
 ,teensyValveCon(TeensyI2C(1))
 ,LTankCon(MpcInitParam::kLTankCl,MpcInitParam::kLTankCh)
 ,LKneCon(MpcInitParam::kLKneCl,MpcInitParam::kLKneCh)
-,mpc_ltank_rec(Recorder<float,2>("LTank_mpc","Tank,LTank"))
-,mpc_lkne_rec(Recorder<float,2>("LKne_mpc","LTank,LKne"))
+,mpc_ltank_rec(Recorder<float,4>("LTank_mpc","Tank,LTank,LTank_pval,LTank_qval"))
+,mpc_lkne_rec(Recorder<float,4>("LKne_mpc","LTank,LKne,LKne_pval,LKne_qval"))
 {
     //Do not set any valve condition here, it will crash
     //I believe the reason is because TeensyI2C is not created yet
@@ -106,13 +106,13 @@ void Valves_hub::UpdateValve(){
         int res_duty = hub.LTankCon.GetControl(hub.desired_pre[Valves_hub::PWM_ID::LTANKPRE],pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::Tank]);
         
         hub.SetDuty(res_duty,Valves_hub::PWM_ID::LTANKPRE); 
-        hub.mpc_ltank_rec.PushData(hub.LTankCon.GetPhi());
+        hub.mpc_ltank_rec.PushData(hub.LTankCon.GetMpcRec());
     }
     if(hub.mpc_enable[Valves_hub::MPC_Enable::kLKne]){
     
         int res_duty = hub.LKneCon.GetControl(hub.desired_pre[Valves_hub::PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::LTank]);
         hub.SetDuty(res_duty,Valves_hub::PWM_ID::LKNEPRE);
-        hub.mpc_lkne_rec.PushData(hub.LKneCon.GetPhi());
+        hub.mpc_lkne_rec.PushData(hub.LKneCon.GetMpcRec());
     }
     
     

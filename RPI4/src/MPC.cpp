@@ -43,6 +43,9 @@ void MPC::UpdateParamL(array<float,MPC_STATE_NUM> new_a,array<float,MPC_STATE_NU
 }
 void MPC::UpdatePhi(const std::array<float,MPC_DELAY> p_h,const std::array<float,MPC_DELAY> p_l,
         const std::array<float,MPC_DELAY> u,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b){
+    //Record the old Phi
+
+
     float x0 = 1.0/p_l[0];
     float x1 = p_h[0]*u[0];
     float x2 = x0*x1;
@@ -174,6 +177,7 @@ void MPC::UpdatePhi(const std::array<float,MPC_DELAY> p_h,const std::array<float
 }
 void MPC::Update_dPhi_dxL(const std::array<float,MPC_DELAY>& p_h, const std::array<float,MPC_DELAY> &p_l,const std::array<float,MPC_DELAY> &u
                         ,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b){
+    
     float x0 = a[59]*u[4];
     float x1 = (u[4]*u[4]);
     float x2 = a[65]*x1;
@@ -223,7 +227,45 @@ void MPC::Update_dPhi_dxL(const std::array<float,MPC_DELAY>& p_h, const std::arr
     float x46 = 2*b[68];
     float x47 = 3*b[69];
 
-    this->dPhi_dx<<-a[56]*x7 - a[57]*x11 - a[58]*x11 - a[60]*x11 - a[61]*x4 - a[64]*x16 - a[67]*x8 - x0 - x10*x20 - x14*x15 - x17*x19 - x2 - x21*x22 - x23*x24, a[56]*x26 + a[57]*x30 + a[57]*x36 + a[58]*x30 + a[58]*x37 + a[60]*x30 + a[60]*x39 + a[61]*x14 + a[64]*x27 + a[66]*x40 + a[67]*x21 + x0*x33 + x0*x9 + x15*x31 + x19*x32 + x2*x33 + x2*x9 + x20*x29 + x22*x23 + x24*x34, -b[56]*x7 - b[57]*x11 - b[58]*x11 - b[60]*x11 - b[61]*x4 - b[64]*x16 - b[67]*x8 - x10*x45 - x14*x43 - x17*x44 - x21*x46 - x23*x47 - x41 - x42, b[56]*x26 + b[57]*x30 + b[57]*x36 + b[58]*x30 + b[58]*x37 + b[60]*x30 + b[60]*x39 + b[61]*x14 + b[64]*x27 + b[66]*x40 + b[67]*x21 + x23*x46 + x29*x45 + x31*x43 + x32*x44 + x33*x41 + x33*x42 + x34*x47 + x41*x9 + x42*x9;
+
+    this->dPhi_dx_T<<-a[56]*x7 - a[57]*x11 - a[58]*x11 - a[60]*x11 - a[61]*x4 - a[64]*x16 - a[67]*x8 - x0 - x10*x20 - x14*x15 - x17*x19 - x2 - x21*x22 - x23*x24, a[56]*x26 + a[57]*x30 + a[57]*x36 + a[58]*x30 + a[58]*x37 + a[60]*x30 + a[60]*x39 + a[61]*x14 + a[64]*x27 + a[66]*x40 + a[67]*x21 + x0*x33 + x0*x9 + x15*x31 + x19*x32 + x2*x33 + x2*x9 + x20*x29 + x22*x23 + x24*x34, -b[56]*x7 - b[57]*x11 - b[58]*x11 - b[60]*x11 - b[61]*x4 - b[64]*x16 - b[67]*x8 - x10*x45 - x14*x43 - x17*x44 - x21*x46 - x23*x47 - x41 - x42, b[56]*x26 + b[57]*x30 + b[57]*x36 + b[58]*x30 + b[58]*x37 + b[60]*x30 + b[60]*x39 + b[61]*x14 + b[64]*x27 + b[66]*x40 + b[67]*x21 + x23*x46 + x29*x45 + x31*x43 + x32*x44 + x33*x41 + x33*x42 + x34*x47 + x41*x9 + x42*x9;
+    
+}
+
+void MPC::Update_dPhi_dxH(const std::array<float,MPC_DELAY>& p_h,const std::array<float,MPC_DELAY> &p_l,const std::array<float,MPC_DELAY>& u
+                          ,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b) {
+    float x0 = 1.0/p_l[4];
+    float x1 = 1.0/p_h[4];
+    float x2 = p_l[4]*x1;
+    float x3 = a[59]*u[4];
+    float x4 = (p_h[4]);
+    float x5 = p_l[4]*x4;
+    float x6 = u[4]*x5;
+    float x7 = (u[4]*u[4]);
+    float x8 = a[65]*x7;
+    float x9 = x5*x7;
+    float x10 = a[57]*u[4];
+    float x11 = (p_l[4]*p_l[4]);
+    float x12 = x11*x4;
+    float x13 = 2*x12;
+    float x14 = a[58]*u[4];
+    float x15 = a[60]*u[4];
+    float x16 = x11/(p_h[4]*p_h[4]*p_h[4]);
+    float x17 = 2*u[4];
+    float x18 = 3*u[4];
+    float x19 = (p_l[4]*p_l[4]*p_l[4])/(p_h[4]*p_h[4]*p_h[4]*p_h[4]);
+    float x20 = 3 - x2;
+    float x21 = a[66]*x7;
+    float x22 = x16*x7;
+    float x23 = -x12;
+    float x24 = x23 + 3;
+    float x25 = a[56]*u[4]*x0 + a[61]*x6 + a[62]*x16*x17 + a[63]*x18*x19 + a[64]*x0*x7 + a[67]*x9 + 2*a[68]*x22 + 3*a[69]*x19*x7 + x10*x13 + x10*(x23 + 1) + x13*x14 + x13*x15 + x13*x21 + x14*(x23 + 2) + x15*x24 + x2*x3 + x2*x8 + x20*x3 + x20*x8 + x21*x24;
+    float x26 = p_h[4]/x11;
+    float x27 = x17*x2;
+    float x28 = -b[56]*u[4]*x26 - b[57]*x27 - b[58]*x27 - b[59]*u[4] - b[60]*x27 - b[61]*u[4]*x1 - 2*b[62]*x6 - b[63]*x16*x18 - b[64]*x26*x7 - b[65]*x7 - 2*b[66]*x2*x7 - b[67]*x1*x7 - 2*b[68]*x9 - 3*b[69]*x22;
+
+    this->dPhi_dx_T<<x25, x25, x28, x28;
+
 }
 void MPC::Update_dPhi_du(const std::array<float,MPC_DELAY>& p_h,const std::array<float,MPC_DELAY> &p_l,const std::array<float,MPC_DELAY>& u
                         ,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b){
@@ -245,86 +287,42 @@ void MPC::Update_dPhi_du(const std::array<float,MPC_DELAY>& p_h,const std::array
     float x15 = x1*x8;
     float x16 = x1*x12;
 
-    this->dPhi_du<<a[56]*x0 + a[57]*x10 + a[58]*x11 + a[59]*x5 + a[60]*x12 + a[61]*x4 + a[62]*x7 + a[63]*x8 + a[64]*x2 + a[65]*x13 + a[66]*x16 + a[67]*x9 + a[68]*x14 + a[69]*x15, b[56]*x0 + b[57]*x10 + b[58]*x11 + b[59]*x5 + b[60]*x12 + b[61]*x4 + b[62]*x7 + b[63]*x8 + b[64]*x2 + b[65]*x13 + b[66]*x16 + b[67]*x9 + b[68]*x14 + b[69]*x15;
-
-
+    this->dPhi_du_T<<a[56]*x0 + a[57]*x10 + a[58]*x11 + a[59]*x5 + a[60]*x12 + a[61]*x4 + a[62]*x7 + a[63]*x8 + a[64]*x2 + a[65]*x13 + a[66]*x16 + a[67]*x9 + a[68]*x14 + a[69]*x15, b[56]*x0 + b[57]*x10 + b[58]*x11 + b[59]*x5 + b[60]*x12 + b[61]*x4 + b[62]*x7 + b[63]*x8 + b[64]*x2 + b[65]*x13 + b[66]*x16 + b[67]*x9 + b[68]*x14 + b[69]*x15;
     
 }
-void MPC::Update_dPhi_dxH(const std::array<float,MPC_DELAY>& p_h,const std::array<float,MPC_DELAY> &p_l,const std::array<float,MPC_DELAY>& u
-                          ,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b) {
-    float x0 = 1.0/p_l[4];
-    float x1 = u[4]*x0;
-    float x2 = 1.0/p_h[4];
-    float x3 = p_l[4]*x2;
-    float x4 = a[59]*u[4];
-    float x5 = (p_h[4]);
-    float x6 = p_l[4]*x5;
-    float x7 = u[4]*x6;
-    float x8 = (u[4]*u[4]);
-    float x9 = x0*x8;
-    float x10 = a[65]*x8;
-    float x11 = x6*x8;
-    float x12 = (p_l[4]*p_l[4]);
-    float x13 = x12*x5;
-    float x14 = 2*u[4];
-    float x15 = x13*x14;
-    float x16 = x12/(p_h[4]*p_h[4]*p_h[4]);
-    float x17 = x14*x16;
-    float x18 = (p_l[4]*p_l[4]*p_l[4])/(p_h[4]*p_h[4]*p_h[4]*p_h[4]);
-    float x19 = 3*u[4];
-    float x20 = a[63]*x19;
-    float x21 = 3 - x3;
-    float x22 = 2*x8;
-    float x23 = a[66]*x22;
-    float x24 = x16*x22;
-    float x25 = 3*x8;
-    float x26 = a[69]*x25;
-    float x27 = -x13;
-    float x28 = u[4]*(x27 + 1);
-    float x29 = u[4]*(x27 + 2);
-    float x30 = x27 + 3;
-    float x31 = u[4]*x30;
-    float x32 = x30*x8;
-    float x33 = u[4]*x2;
-    float x34 = p_h[4]/x12;
-    float x35 = u[4]*x34;
-    float x36 = x2*x8;
-    float x37 = x14*x3;
-    float x38 = 2*x7;
-    float x39 = x34*x8;
-    float x40 = 2*x11;
-    float x41 = b[59]*u[4];
-    float x42 = b[65]*x8;
-    float x43 = b[63]*x19;
-    float x44 = b[66]*x22;
-    float x45 = b[69]*x25;
-    this->dPhi_dx<<a[56]*x1 + a[57]*x15 + a[57]*x28 + a[58]*x15 + a[58]*x29 + a[60]*x15 + a[60]*x31 + a[61]*x7 + a[62]*x17 + a[64]*x9 + a[66]*x32 + a[67]*x11 + a[68]*x24 + x10*x21 + x10*x3 + x13*x23 + x18*x20 + x18*x26 + x21*x4 + x3*x4, -a[56]*x35 - a[57]*x37 - a[58]*x37 - a[60]*x37 - a[61]*x33 - a[62]*x38 - a[64]*x39 - a[67]*x36 - a[68]*x40 - x10 - x16*x20 - x16*x26 - x23*x3 - x4, b[56]*x1 + b[57]*x15 + b[57]*x28 + b[58]*x15 + b[58]*x29 + b[60]*x15 + b[60]*x31 + b[61]*x7 + b[62]*x17 + b[64]*x9 + b[66]*x32 + b[67]*x11 + b[68]*x24 + x13*x44 + x18*x43 + x18*x45 + x21*x41 + x21*x42 + x3*x41 + x3*x42, -b[56]*x35 - b[57]*x37 - b[58]*x37 - b[60]*x37 - b[61]*x33 - b[62]*x38 - b[64]*x39 - b[67]*x36 - b[68]*x40 - x16*x43 - x16*x45 - x3*x44 - x41 - x42; 
-}
 
 
-
-void MPC::UpdateDyn(const std::array<float,MPC_DELAY> &p_h,const std::array<float,MPC_DELAY>& p_l, const std::array<float,MPC_DELAY>& u,bool increase_pre)
+void MPC::UpdateDyn(bool increase_pre)
 {
-    
+    this->UpdateHistory();
     if(increase_pre){
         //if we are increasing the pressure
         
-        this->UpdatePhi(p_h,p_l,u,this->ah,this->bh);
-        this->Update_dPhi_dxH(p_h,p_l,u,this->ah,this->bh);
-        this->Update_dPhi_du(p_h,p_l,u,this->ah,this->bh);
+        this->UpdatePhi(this->p_tank_his,this->p_set_his,this->u_his,this->ah,this->bh);
+        this->Update_dPhi_dxH(this->p_tank_hat,this->p_set_hat,this->u_hat,this->ah,this->bh);
+        this->Update_dPhi_du(this->p_tank_hat,this->p_set_hat,this->u_hat,this->ah,this->bh);
         
         
 
     }
     else{
-        this->UpdatePhi(p_h,p_l,u,this->al,this->bl);
-        this->Update_dPhi_dxL(p_h,p_l,u,this->al,this->bl);
-        this->Update_dPhi_du(p_h,p_l,u,this->al,this->bl);
+        this->UpdatePhi(this->p_set_his,this->p_tank_his,this->u_his,this->al,this->bl);
+        this->Update_dPhi_dxL(this->p_set_hat,this->p_tank_hat,this->u_hat,this->al,this->bl);
+        this->Update_dPhi_du(this->p_set_hat,this->p_tank_hat,this->u_hat, this->al,this->bl);
     }
-    Eigen::Matrix2f K_mat = 2*Eigen::Matrix2f::Identity()-this->dPhi_dx;
 
-    this->B = K_mat.inverse()*this->dPhi_du;
-    this->alpha = K_mat.inverse()*(this->Phi-this->dPhi_du* *u.end());
+
+    Eigen::Matrix2f K_mat = 2*Eigen::Matrix2f::Identity()-this->dPhi_dx_T;
+    
+    // std::cout<<"dPhi_dx: "<<this->dPhi_dx_T<<std::endl;
+    // std::cout<<"dPhi_du: "<<this->dPhi_du_T<<std::endl;
+    // std::cout<<"K_mat: "<<K_mat<<std::endl;
+    // std::cout<<"Phi: "<<this->Phi<<std::endl;
+
+    this->B = K_mat.inverse()*this->dPhi_du_T;
+    this->alpha = K_mat.inverse()*(this->Phi-this->dPhi_du_T*this->u_his[MPC_DELAY-1]);
+
+    
 
 }
 
@@ -339,7 +337,7 @@ int MPC::GetControl(const u_int16_t& p_des,const u_int16_t& ps, const u_int16_t&
 
 
 
-    int p_diff = p_des - ps;
+    int p_diff = (p_des - ps);
     
     
     if(std::abs(p_diff)>262){ //if desired pressure has 1 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
@@ -358,42 +356,57 @@ int MPC::GetControl(const u_int16_t& p_des,const u_int16_t& ps, const u_int16_t&
 
         double lb = 20; //set the lower bound 20 duty
 
-        std::array<float,MPC_DELAY> pt_scaled= this->GetHistory(this->p_tank_mem);
-        std::array<float,MPC_DELAY> ps_scaled = this->GetHistory(this->p_set_mem);
-        std::array<float,MPC_DELAY> duty_scaled=this->GetHistory(this->u_mem);
         
         if((p_des>ps) & (pt>ps)){
             //increasing pressure
             // std::cout<<"increase\n";
-            this->UpdateDyn(pt_scaled,ps_scaled,duty_scaled,true);
+            this->UpdateDyn(true);
         
         }
         else if((p_des<ps)&(ps>pt)){
             //decreasing pressure
             // std::cout<<"decrease\n";
-            this->UpdateDyn(ps_scaled,pt_scaled,duty_scaled,false);
+            this->UpdateDyn(false);
         }
         else{
             this->Phi<<0,0;
+            this->P_val=0;
+            this->q_val=0;
             return 0;
         }
         
         // format question to osqp format
-        float q_val = 2*(this->B.coeff(1,0)*this->alpha.coeff(1,0)-p_diff*this->B.coeff(1,0))/100;
-        float p_val = 2*this->B.coeff(1,0)*this->B.coeff(1,0)/10000;//scale up the u to duty instead of duty/100
-        // std::cout<<"q_val: "<<q_val<<std::endl;
-        // std::cout<<"p_val: "<<p_val<<std::endl;
-        // std::cout<<"B: "<<this->B<<std::endl;
-        // std::cout<<"P_diff: "<<p_diff<<std::endl;
-        // std::cout<<"Phi: "<<this->Phi<<std::endl;
-        // std::cout<<"duty: "<<duty<<std::endl;
+        this->q_val = 2*(this->B.coeff(1,0)*this->alpha.coeff(1,0)-p_diff/65536*this->B.coeff(1,0))*100;
+        this->P_val = 2*this->B.coeff(1,0)*this->B.coeff(1,0);//scale up the u to duty instead of duty/100
+        
 
+       
         c_int P_nnz = 1;
-        c_float P_x[1]={p_val};
+        c_float P_x[1]={P_val};
         c_int P_i[1]={0};
         c_int P_p[2]={0,1};
         this->osqp_data->n =1;
         this->osqp_data->P = csc_matrix(this->osqp_data->n,this->osqp_data->n,P_nnz,P_x,P_i,P_p);
+
+
+        // std::cout<<"pval: "<<this->P_val<<std::endl;
+        // std::cout<<"qval: "<<this->q_val<<std::endl;
+        float ideal_duty = -this->q_val/this->P_val+0.5;
+
+        // std::cout<<"ideal duty: "<<ideal_duty<<std::endl;
+        if(ideal_duty<20){
+            return 20;
+        }
+        else if(ideal_duty>100)
+            return 100;
+        else{
+            return ideal_duty;
+        }
+
+
+        
+        /* osqp is not working......
+
         
         c_float q[1]={q_val};
         this->osqp_data->q = q;
@@ -437,17 +450,21 @@ int MPC::GetControl(const u_int16_t& p_des,const u_int16_t& ps, const u_int16_t&
         // std::cout<<"p_des: "<<p_des<<std::endl;
         
         return duty;
-        
+        */
     }
     else{
+        this->Phi<<0,0;
+        this->P_val=0;
+        this->q_val=0;
         return 0;
     }
 
 }
 
-std::array<float,2> MPC::GetPhi(){
-    return std::array<float,2>({this->Phi.coeff(0,0),this->Phi.coeff(1,0)});
+std::array<float,4> MPC::GetMpcRec(){
+    return std::array<float,4>({this->Phi.coeff(0,0),this->Phi.coeff(1,0),this->P_val,this->q_val});
 }
+
 
 
 void MPC::PushPreMeas(const u_int16_t p_tank,const u_int16_t p_set,const u_int16_t duty)
@@ -461,14 +478,33 @@ void MPC::PushPreMeas(const u_int16_t p_tank,const u_int16_t p_set,const u_int16
     }
 }
 
-std::array<float,MPC_DELAY> MPC::GetHistory(const std::array<float,MPC_DELAY>& mem){
-    std::array<float,MPC_DELAY> result;
+void MPC::UpdateHistory(){
     
-    for(int i=0;i<MPC_DELAY;i++){
-        result[i]=mem[(this->meas_idx+i)%MPC_DELAY];
+    for(int i=0;i<MPC_DELAY-1;i++){
+        this->p_tank_his[i]=this->p_tank_mem[(this->meas_idx+i)%MPC_DELAY];
+        this->p_set_his[i]=this->p_set_mem[(this->meas_idx+i)%MPC_DELAY];
+        this->u_his[i]=this->u_mem[(this->meas_idx+i)%MPC_DELAY];
+
+        this->p_tank_hat[i]=this->p_tank_mem[(this->meas_idx+i+1)%MPC_DELAY];
+        this->p_set_hat[i]=this->p_set_mem[(this->meas_idx+i+1)%MPC_DELAY];
+        this->u_hat[i]=this->u_mem[(this->meas_idx+i+1)%MPC_DELAY];
     }
-    return result;
+
+    this->p_tank_his[MPC_DELAY-1] = this->p_tank_mem[(this->meas_idx+MPC_DELAY-1)%MPC_DELAY];
+    this->p_set_his[MPC_DELAY-1] = this->p_set_mem[(this->meas_idx+MPC_DELAY-1)%MPC_DELAY];
+    this->u_his[MPC_DELAY-1] = this->u_mem[(this->meas_idx+MPC_DELAY-1)%MPC_DELAY];
+
+    this->p_tank_hat[MPC_DELAY-1] = this->p_tank_mem[(this->meas_idx+MPC_DELAY-1)%MPC_DELAY];
+    this->p_set_hat[MPC_DELAY-1] = this->p_set_mem[(this->meas_idx+MPC_DELAY-1)%MPC_DELAY];
+    this->u_hat[MPC_DELAY-1] = this->u_mem[(this->meas_idx+MPC_DELAY-1)%MPC_DELAY];
+
+    // std::cout<<"mem values: "<<this->p_tank_his[0]<<std::endl;
+
+
 }
+
+
+
 
 
 
