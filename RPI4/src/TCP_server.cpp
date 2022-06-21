@@ -58,11 +58,19 @@ void TCP_server::RecvCmd(){
                 // std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
                 if(cmd_device.compare("DATA")==0){  
                     
-                    std::array<char,(SensorHub::NUMENC+SensorHub::NUMPRE)*sizeof(uint16_t)> meaData;
+                    std::array<char,(SensorHub::NUMENC+SensorHub::NUMPRE)*sizeof(u_int16_t)> meaData;
                     const std::array<u_int16_t,SensorHub::NUMENC> &encData=SensorHub::GetEncData();
                     std::memcpy(meaData.begin(),encData.begin(),sizeof(u_int16_t)*encData.size());
                     const std::array<u_int16_t,SensorHub::NUMPRE> &preData=SensorHub::GetPreData();
                     std::memcpy(meaData.begin()+encData.size()*sizeof(u_int16_t),preData.begin(),sizeof(u_int16_t)*preData.size());
+
+                    // std::array<char,16> test_char;
+                    // std::memcpy(test_char.begin(),preData.begin(),sizeof(u_int16_t)*8);
+                    // std::cout<<"test\n";
+                    // std::cout<<(unsigned)meaData[18]<<','<<(unsigned)meaData[19]<<std::endl;
+                    // std::cout<<(unsigned)test_char[6]<<','<<(unsigned)test_char[7]<<std::endl;
+                    // std::cout<<preData[3]<<std::endl;
+                
                     TCP_server::Send_cmd(std::string(meaData.begin(),meaData.end()),socket);
                 }
             }

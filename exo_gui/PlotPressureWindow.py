@@ -63,5 +63,7 @@ class PlotPressureWindow(QWidget):
         self.r_ankPreData.popleft()
         self.r_ankPreData.append(int.from_bytes(data[6:8],'little')) #*0.0038147-25)
         self.right_anklePre_line.setData(self.r_ankPreData)
+        
+        # print(int.from_bytes(data[6],'little'))
 
         self.parent.app.processEvents()

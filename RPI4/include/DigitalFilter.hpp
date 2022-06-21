@@ -37,7 +37,7 @@ public:
     std::array<T,N> GetFilteredMea(std::array<T,N> cur_mea){
         
         for(int idx=0;idx<N;idx++){
-            T res_val = 0;
+            double res_val = 0;//define in double to avoid overflow
             for(int im=1;im<M+1;im++){
                 int pre_idx = (this->buf_idx+M-im)%M;
                 res_val += this->b[im]*this->in_buf[pre_idx][idx]-this->a[im]*this->out_buf[pre_idx][idx];

@@ -73,8 +73,8 @@ private:
     // bool l_tank_enable,r_tank_enable; //when these flags are true, we will calculate the duty of the pwm during update valve conditions
     std::array<u_int16_t,PWM_VAL_NUM> desired_pre{0};
 
-    Recorder<float,4> mpc_ltank_rec; //record p_tank, p_set(target), p_val, q_val
-    Recorder<float,4> mpc_lkne_rec;
+    Recorder<float,10> mpc_ltank_rec; //record p_tank, p_set(target), p_val, q_val
+    Recorder<float,10> mpc_lkne_rec;
 
 
 };

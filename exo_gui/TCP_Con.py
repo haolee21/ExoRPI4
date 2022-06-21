@@ -7,7 +7,7 @@ from PyQt5 import QtCore
 import pdb
 CMD_LEN = 2
 JOINT_DATA_LEN=12
-PRE_DATA_LEN=10
+PRE_DATA_LEN=16
 MPC_LEN=6
 class TCP:
     port =1234
@@ -71,8 +71,8 @@ class TCP:
             #     print(len(receive))
             # else:
             self.updateJoint(receive[:JOINT_DATA_LEN]) 
-            self.updatePre(receive[JOINT_DATA_LEN:-2])
-            self.updateTank(int.from_bytes(receive[-2:],'little'))
+            self.updatePre(receive[JOINT_DATA_LEN:JOINT_DATA_LEN+PRE_DATA_LEN])
+            self.updateTank(int.from_bytes(receive[JOINT_DATA_LEN+8:JOINT_DATA_LEN+10],'little'))
 
             # rec_flag = int.from_bytes(self.SendCmd('REQ:REC:DATA',1,print_response=False),'little')
             rec_flag = int(self.SendCmd('REQ:REC:DATA',1,print_response=False).decode())

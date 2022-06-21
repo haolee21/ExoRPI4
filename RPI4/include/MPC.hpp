@@ -100,7 +100,7 @@ public:
     int GetControl(const u_int16_t& p_des,const u_int16_t& p_cur,const u_int16_t& p_tank);//It requires current pressure value because all the values storaged in the meme are scaled
 
     //Get values for recorder
-    std::array<float,4> GetMpcRec();
+    std::array<float,10> GetMpcRec();
 
     void PushPreMeas(const u_int16_t p_tank,const u_int16_t p_set,const u_int16_t duty);
  

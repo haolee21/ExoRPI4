@@ -45,249 +45,184 @@ void MPC::UpdatePhi(const std::array<float,MPC_DELAY> p_h,const std::array<float
         const std::array<float,MPC_DELAY> u,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b){
     //Record the old Phi
 
+    float x0 = p_h[0]*u[0];
+    float x1 = x0/p_l[0];
+    float x2 = p_h[2]*u[2];
+    float x3 = x2/p_l[2];
+    float x4 = p_h[3]*u[3];
+    float x5 = x4/p_l[3];
+    float x6 = p_h[4]*u[4];
+    float x7 = x6/p_l[4];
+    float x8 = p_h[5]*u[5];
+    float x9 = x8/p_l[5];
+    float x10 = p_h[6]*u[6];
+    float x11 = x10/p_l[6];
+    float x12 = p_h[7]*u[7];
+    float x13 = x12/p_l[7];
+    float x14 = p_h[8]*u[8];
+    float x15 = x14/p_l[8];
+    float x16 = p_h[9]*u[9];
+    float x17 = x16/p_l[9];
+    float x18 = p_h[1]*u[1];
+    float x19 = x18/p_l[1];
+    float x20 = -(p_l[2]*p_l[2])/(p_h[2]*p_h[2]);
+    float x21 = x20 + 1;
+    float x22 = u[2]*x21;
+    float x23 = -(p_l[3]*p_l[3])/(p_h[3]*p_h[3]);
+    float x24 = x23 + 1;
+    float x25 = u[3]*x24;
+    float x26 = -(p_l[4]*p_l[4])/(p_h[4]*p_h[4]);
+    float x27 = x26 + 1;
+    float x28 = u[4]*x27;
+    float x29 = -(p_l[5]*p_l[5])/(p_h[5]*p_h[5]);
+    float x30 = x29 + 1;
+    float x31 = u[5]*x30;
+    float x32 = -(p_l[6]*p_l[6])/(p_h[6]*p_h[6]);
+    float x33 = x32 + 1;
+    float x34 = u[6]*x33;
+    float x35 = -(p_l[0]*p_l[0])/(p_h[0]*p_h[0]);
+    float x36 = x35 + 1;
+    float x37 = u[0]*x36;
+    float x38 = -(p_l[7]*p_l[7])/(p_h[7]*p_h[7]);
+    float x39 = x38 + 1;
+    float x40 = u[7]*x39;
+    float x41 = -(p_l[8]*p_l[8])/(p_h[8]*p_h[8]);
+    float x42 = x41 + 1;
+    float x43 = u[8]*x42;
+    float x44 = -(p_l[9]*p_l[9])/(p_h[9]*p_h[9]);
+    float x45 = x44 + 1;
+    float x46 = u[9]*x45;
+    float x47 = -(p_l[1]*p_l[1])/(p_h[1]*p_h[1]);
+    float x48 = x47 + 1;
+    float x49 = u[1]*x48;
+    float x50 = p_h[2]*x22;
+    float x51 = x2*(x20 + 3);
+    float x52 = p_h[3]*x25;
+    float x53 = p_h[0]*x37;
+    float x54 = x4*(x23 + 3);
+    float x55 = p_h[4]*x28;
+    float x56 = x6*(x26 + 3);
+    float x57 = x0*(x35 + 3);
+    float x58 = p_h[5]*x31;
+    float x59 = x8*(x29 + 3);
+    float x60 = p_h[6]*x34;
+    float x61 = x10*(x32 + 3);
+    float x62 = p_h[7]*x40;
+    float x63 = x12*(x38 + 3);
+    float x64 = p_h[8]*x43;
+    float x65 = x14*(x41 + 3);
+    float x66 = p_h[9]*x46;
+    float x67 = x16*(x44 + 3);
+    float x68 = p_h[1]*x49;
+    float x69 = x18*(x47 + 3);
+    float x70 = (u[1]*u[1]);
+    float x71 = x48*x70;
+    float x72 = x70*(1 - (p_l[1]*p_l[1]*p_l[1])/(p_h[1]*p_h[1]*p_h[1]));
+    float x73 = (u[2]*u[2]);
+    float x74 = x21*x73;
+    float x75 = x73*(1 - (p_l[2]*p_l[2]*p_l[2])/(p_h[2]*p_h[2]*p_h[2]));
+    float x76 = (u[3]*u[3]);
+    float x77 = x24*x76;
+    float x78 = x76*(1 - (p_l[3]*p_l[3]*p_l[3])/(p_h[3]*p_h[3]*p_h[3]));
+    float x79 = (u[4]*u[4]);
+    float x80 = x27*x79;
+    float x81 = x79*(1 - (p_l[4]*p_l[4]*p_l[4])/(p_h[4]*p_h[4]*p_h[4]));
+    float x82 = (u[5]*u[5]);
+    float x83 = x30*x82;
+    float x84 = x82*(1 - (p_l[5]*p_l[5]*p_l[5])/(p_h[5]*p_h[5]*p_h[5]));
+    float x85 = (u[6]*u[6]);
+    float x86 = x33*x85;
+    float x87 = x85*(1 - (p_l[6]*p_l[6]*p_l[6])/(p_h[6]*p_h[6]*p_h[6]));
+    float x88 = (u[7]*u[7]);
+    float x89 = x39*x88;
+    float x90 = x88*(1 - (p_l[7]*p_l[7]*p_l[7])/(p_h[7]*p_h[7]*p_h[7]));
+    float x91 = (u[0]*u[0]);
+    float x92 = x36*x91;
+    float x93 = (u[8]*u[8]);
+    float x94 = x42*x93;
+    float x95 = x93*(1 - (p_l[8]*p_l[8]*p_l[8])/(p_h[8]*p_h[8]*p_h[8]));
+    float x96 = (u[9]*u[9]);
+    float x97 = x45*x96;
+    float x98 = x96*(1 - (p_l[9]*p_l[9]*p_l[9])/(p_h[9]*p_h[9]*p_h[9]));
+    float x99 = x91*(1 - (p_l[0]*p_l[0]*p_l[0])/(p_h[0]*p_h[0]*p_h[0]));
 
-    float x0 = 1.0/p_l[0];
-    float x1 = p_h[0]*u[0];
-    float x2 = x0*x1;
-    float x3 = 1.0/p_l[1];
-    float x4 = p_h[1]*u[1];
-    float x5 = x3*x4;
-    float x6 = 1.0/p_l[2];
-    float x7 = p_h[2]*u[2];
-    float x8 = x6*x7;
-    float x9 = 1.0/p_l[3];
-    float x10 = p_h[3]*u[3];
-    float x11 = x10*x9;
-    float x12 = 1.0/p_l[4];
-    float x13 = p_h[4]*u[4];
-    float x14 = x12*x13;
-    float x15 = (u[1]*u[1]);
-    float x16 = p_h[1]*x15;
-    float x17 = x16*x3;
-    float x18 = (u[2]*u[2]);
-    float x19 = p_h[2]*x18;
-    float x20 = x19*x6;
-    float x21 = (u[3]*u[3]);
-    float x22 = p_h[3]*x21;
-    float x23 = x22*x9;
-    float x24 = (u[4]*u[4]);
-    float x25 = p_h[4]*x24;
-    float x26 = x12*x25;
-    float x27 = (u[0]*u[0]);
-    float x28 = p_h[0]*x27;
-    float x29 = x0*x28;
-    float x30 = -p_l[1]/p_h[1];
-    float x31 = x30 + 1;
-    float x32 = u[1]*x31;
-    float x33 = -p_l[2]/p_h[2];
-    float x34 = x33 + 1;
-    float x35 = u[2]*x34;
-    float x36 = -p_l[3]/p_h[3];
-    float x37 = x36 + 1;
-    float x38 = u[3]*x37;
-    float x39 = -p_l[0]/p_h[0];
-    float x40 = x39 + 1;
-    float x41 = u[0]*x40;
-    float x42 = -p_l[4]/p_h[4];
-    float x43 = x42 + 1;
-    float x44 = u[4]*x43;
-    float x45 = x30 + 3;
-    float x46 = x4*x45;
-    float x47 = x33 + 3;
-    float x48 = x47*x7;
-    float x49 = x39 + 3;
-    float x50 = x1*x49;
-    float x51 = x36 + 3;
-    float x52 = x10*x51;
-    float x53 = x42 + 3;
-    float x54 = x13*x53;
-    float x55 = x27*x40;
-    float x56 = -(p_l[1]*p_l[1])/(p_h[1]*p_h[1]);
-    float x57 = x56 + 1;
-    float x58 = u[1]*x57;
-    float x59 = 1 - (p_l[1]*p_l[1]*p_l[1])/(p_h[1]*p_h[1]*p_h[1]);
-    float x60 = u[1]*x59;
-    float x61 = x15*x31;
-    float x62 = -(p_l[2]*p_l[2])/(p_h[2]*p_h[2]);
-    float x63 = x62 + 1;
-    float x64 = u[2]*x63;
-    float x65 = 1 - (p_l[2]*p_l[2]*p_l[2])/(p_h[2]*p_h[2]*p_h[2]);
-    float x66 = u[2]*x65;
-    float x67 = x18*x34;
-    float x68 = -(p_l[3]*p_l[3])/(p_h[3]*p_h[3]);
-    float x69 = x68 + 1;
-    float x70 = u[3]*x69;
-    float x71 = 1 - (p_l[3]*p_l[3]*p_l[3])/(p_h[3]*p_h[3]*p_h[3]);
-    float x72 = u[3]*x71;
-    float x73 = x21*x37;
-    float x74 = -(p_l[4]*p_l[4])/(p_h[4]*p_h[4]);
-    float x75 = x74 + 1;
-    float x76 = u[4]*x75;
-    float x77 = 1 - (p_l[4]*p_l[4]*p_l[4])/(p_h[4]*p_h[4]*p_h[4]);
-    float x78 = u[4]*x77;
-    float x79 = x24*x43;
-    float x80 = -(p_l[0]*p_l[0])/(p_h[0]*p_h[0]);
-    float x81 = x80 + 1;
-    float x82 = u[0]*x81;
-    float x83 = 1 - (p_l[0]*p_l[0]*p_l[0])/(p_h[0]*p_h[0]*p_h[0]);
-    float x84 = u[0]*x83;
-    float x85 = p_h[1]*x58;
-    float x86 = x4*(x56 + 2);
-    float x87 = x56 + 3;
-    float x88 = x4*x87;
-    float x89 = p_h[0]*x82;
-    float x90 = x16*x45;
-    float x91 = p_h[2]*x64;
-    float x92 = x1*(x80 + 2);
-    float x93 = x7*(x62 + 2);
-    float x94 = x62 + 3;
-    float x95 = x7*x94;
-    float x96 = x19*x47;
-    float x97 = p_h[3]*x70;
-    float x98 = x10*(x68 + 2);
-    float x99 = x68 + 3;
-    float x100 = x10*x99;
-    float x101 = x80 + 3;
-    float x102 = x1*x101;
-    float x103 = x22*x51;
-    float x104 = p_h[4]*x76;
-    float x105 = x13*(x74 + 2);
-    float x106 = x74 + 3;
-    float x107 = x106*x13;
-    float x108 = x25*x53;
-    float x109 = x28*x49;
-    float x110 = x27*x81;
-    float x111 = x27*x83;
-    float x112 = x15*x57;
-    float x113 = x15*x59;
-    float x114 = x18*x63;
-    float x115 = x18*x65;
-    float x116 = x21*x69;
-    float x117 = x21*x71;
-    float x118 = x24*x75;
-    float x119 = x24*x77;
-    float x120 = x101*x28;
-    float x121 = x16*x87;
-    float x122 = x19*x94;
-    float x123 = x22*x99;
-    float x124 = x106*x25;
-
-    this->Phi<<a[0]*x2 + a[10]*x120 + a[11]*x55 + a[12]*x110 + a[13]*x111 + a[14]*x5 + a[15]*x85 + a[16]*x86 + a[17]*x46 + a[18]*x88 + a[19]*x32 + a[1]*x89 + a[20]*x58 + a[21]*x60 + a[22]*x17 + a[23]*x90 + a[24]*x121 + a[25]*x61 + a[26]*x112 + a[27]*x113 + a[28]*x8 + a[29]*x91 + a[2]*x92 + a[30]*x93 + a[31]*x48 + a[32]*x95 + a[33]*x35 + a[34]*x64 + a[35]*x66 + a[36]*x20 + a[37]*x96 + a[38]*x122 + a[39]*x67 + a[3]*x50 + a[40]*x114 + a[41]*x115 + a[42]*x11 + a[43]*x97 + a[44]*x98 + a[45]*x52 + a[46]*x100 + a[47]*x38 + a[48]*x70 + a[49]*x72 + a[4]*x102 + a[50]*x23 + a[51]*x103 + a[52]*x123 + a[53]*x73 + a[54]*x116 + a[55]*x117 + a[56]*x14 + a[57]*x104 + a[58]*x105 + a[59]*x54 + a[5]*x41 + a[60]*x107 + a[61]*x44 + a[62]*x76 + a[63]*x78 + a[64]*x26 + a[65]*x108 + a[66]*x124 + a[67]*x79 + a[68]*x118 + a[69]*x119 + a[6]*x82 + a[7]*x84 + a[8]*x29 + a[9]*x109, b[0]*x2 + b[10]*x120 + b[11]*x55 + b[12]*x110 + b[13]*x111 + b[14]*x5 + b[15]*x85 + b[16]*x86 + b[17]*x46 + b[18]*x88 + b[19]*x32 + b[1]*x89 + b[20]*x58 + b[21]*x60 + b[22]*x17 + b[23]*x90 + b[24]*x121 + b[25]*x61 + b[26]*x112 + b[27]*x113 + b[28]*x8 + b[29]*x91 + b[2]*x92 + b[30]*x93 + b[31]*x48 + b[32]*x95 + b[33]*x35 + b[34]*x64 + b[35]*x66 + b[36]*x20 + b[37]*x96 + b[38]*x122 + b[39]*x67 + b[3]*x50 + b[40]*x114 + b[41]*x115 + b[42]*x11 + b[43]*x97 + b[44]*x98 + b[45]*x52 + b[46]*x100 + b[47]*x38 + b[48]*x70 + b[49]*x72 + b[4]*x102 + b[50]*x23 + b[51]*x103 + b[52]*x123 + b[53]*x73 + b[54]*x116 + b[55]*x117 + b[56]*x14 + b[57]*x104 + b[58]*x105 + b[59]*x54 + b[5]*x41 + b[60]*x107 + b[61]*x44 + b[62]*x76 + b[63]*x78 + b[64]*x26 + b[65]*x108 + b[66]*x124 + b[67]*x79 + b[68]*x118 + b[69]*x119 + b[6]*x82 + b[7]*x84 + b[8]*x29 + b[9]*x109;
+    this->Phi<<a[0]*x1 + a[10]*x71 + a[11]*x72 + a[12]*x3 + a[13]*x50 + a[14]*x51 + a[15]*x22 + a[16]*x74 + a[17]*x75 + a[18]*x5 + a[19]*x52 + a[1]*x53 + a[20]*x54 + a[21]*x25 + a[22]*x77 + a[23]*x78 + a[24]*x7 + a[25]*x55 + a[26]*x56 + a[27]*x28 + a[28]*x80 + a[29]*x81 + a[2]*x57 + a[30]*x9 + a[31]*x58 + a[32]*x59 + a[33]*x31 + a[34]*x83 + a[35]*x84 + a[36]*x11 + a[37]*x60 + a[38]*x61 + a[39]*x34 + a[3]*x37 + a[40]*x86 + a[41]*x87 + a[42]*x13 + a[43]*x62 + a[44]*x63 + a[45]*x40 + a[46]*x89 + a[47]*x90 + a[48]*x15 + a[49]*x64 + a[4]*x92 + a[50]*x65 + a[51]*x43 + a[52]*x94 + a[53]*x95 + a[54]*x17 + a[55]*x66 + a[56]*x67 + a[57]*x46 + a[58]*x97 + a[59]*x98 + a[5]*x99 + a[6]*x19 + a[7]*x68 + a[8]*x69 + a[9]*x49, b[0]*x1 + b[10]*x71 + b[11]*x72 + b[12]*x3 + b[13]*x50 + b[14]*x51 + b[15]*x22 + b[16]*x74 + b[17]*x75 + b[18]*x5 + b[19]*x52 + b[1]*x53 + b[20]*x54 + b[21]*x25 + b[22]*x77 + b[23]*x78 + b[24]*x7 + b[25]*x55 + b[26]*x56 + b[27]*x28 + b[28]*x80 + b[29]*x81 + b[2]*x57 + b[30]*x9 + b[31]*x58 + b[32]*x59 + b[33]*x31 + b[34]*x83 + b[35]*x84 + b[36]*x11 + b[37]*x60 + b[38]*x61 + b[39]*x34 + b[3]*x37 + b[40]*x86 + b[41]*x87 + b[42]*x13 + b[43]*x62 + b[44]*x63 + b[45]*x40 + b[46]*x89 + b[47]*x90 + b[48]*x15 + b[49]*x64 + b[4]*x92 + b[50]*x65 + b[51]*x43 + b[52]*x94 + b[53]*x95 + b[54]*x17 + b[55]*x66 + b[56]*x67 + b[57]*x46 + b[58]*x97 + b[59]*x98 + b[5]*x99 + b[6]*x19 + b[7]*x68 + b[8]*x69 + b[9]*x49;
 
 }
 void MPC::Update_dPhi_dxL(const std::array<float,MPC_DELAY>& p_h, const std::array<float,MPC_DELAY> &p_l,const std::array<float,MPC_DELAY> &u
                         ,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b){
     
-    float x0 = a[59]*u[4];
-    float x1 = (u[4]*u[4]);
-    float x2 = a[65]*x1;
-    float x3 = 1.0/p_h[4];
-    float x4 = u[4]*x3;
-    float x5 = (p_l[4]*p_l[4]);
-    float x6 = p_h[4]/x5;
-    float x7 = u[4]*x6;
-    float x8 = x1*x3;
-    float x9 = p_l[4]*x3;
-    float x10 = 2*x9;
-    float x11 = u[4]*x10;
-    float x12 = (p_h[4]);
-    float x13 = p_l[4]*x12;
-    float x14 = u[4]*x13;
-    float x15 = 2*a[62];
-    float x16 = x1*x6;
-    float x17 = x5/(p_h[4]*p_h[4]*p_h[4]);
-    float x18 = 3*u[4];
-    float x19 = a[63]*x18;
-    float x20 = a[66]*x1;
-    float x21 = x1*x13;
-    float x22 = 2*a[68];
-    float x23 = x1*x17;
-    float x24 = 3*a[69];
-    float x25 = 1.0/p_l[4];
-    float x26 = u[4]*x25;
-    float x27 = x1*x25;
-    float x28 = x12*x5;
-    float x29 = 2*x28;
-    float x30 = u[4]*x29;
-    float x31 = u[4]*x17;
-    float x32 = (p_l[4]*p_l[4]*p_l[4])/(p_h[4]*p_h[4]*p_h[4]*p_h[4]);
-    float x33 = 3 - x9;
-    float x34 = x1*x32;
-    float x35 = -x28;
-    float x36 = u[4]*(x35 + 1);
-    float x37 = u[4]*(x35 + 2);
-    float x38 = x35 + 3;
-    float x39 = u[4]*x38;
-    float x40 = x1*x38;
-    float x41 = b[59]*u[4];
-    float x42 = b[65]*x1;
-    float x43 = 2*b[62];
-    float x44 = b[63]*x18;
-    float x45 = b[66]*x1;
-    float x46 = 2*b[68];
-    float x47 = 3*b[69];
+    float x0 = (p_l[9]*p_l[9]);
+    float x1 = p_h[9]*u[9]/x0;
+    float x2 = 2*p_l[9];
+    float x3 = u[9]*x2;
+    float x4 = x3/p_h[9];
+    float x5 = (p_h[9]);
+    float x6 = x3*x5;
+    float x7 = (u[9]*u[9]);
+    float x8 = a[58]*x7;
+    float x9 = x2*x5;
+    float x10 = x0/(p_h[9]*p_h[9]*p_h[9]);
+    float x11 = 3*x7;
+    float x12 = a[59]*x11;
+    float x13 = u[9]/p_l[9];
+    float x14 = x0*x5;
+    float x15 = 2*u[9];
+    float x16 = x14*x15;
+    float x17 = x10*x15;
+    float x18 = 2*x10;
+    float x19 = (p_l[9]*p_l[9]*p_l[9])/(p_h[9]*p_h[9]*p_h[9]*p_h[9]);
+    float x20 = -x14;
+    float x21 = u[9]*(x20 + 1);
+    float x22 = u[9]*(x20 + 3);
+    float x23 = b[58]*x7;
+    float x24 = b[59]*x11;
 
 
-    this->dPhi_dx_T<<-a[56]*x7 - a[57]*x11 - a[58]*x11 - a[60]*x11 - a[61]*x4 - a[64]*x16 - a[67]*x8 - x0 - x10*x20 - x14*x15 - x17*x19 - x2 - x21*x22 - x23*x24, a[56]*x26 + a[57]*x30 + a[57]*x36 + a[58]*x30 + a[58]*x37 + a[60]*x30 + a[60]*x39 + a[61]*x14 + a[64]*x27 + a[66]*x40 + a[67]*x21 + x0*x33 + x0*x9 + x15*x31 + x19*x32 + x2*x33 + x2*x9 + x20*x29 + x22*x23 + x24*x34, -b[56]*x7 - b[57]*x11 - b[58]*x11 - b[60]*x11 - b[61]*x4 - b[64]*x16 - b[67]*x8 - x10*x45 - x14*x43 - x17*x44 - x21*x46 - x23*x47 - x41 - x42, b[56]*x26 + b[57]*x30 + b[57]*x36 + b[58]*x30 + b[58]*x37 + b[60]*x30 + b[60]*x39 + b[61]*x14 + b[64]*x27 + b[66]*x40 + b[67]*x21 + x23*x46 + x29*x45 + x31*x43 + x32*x44 + x33*x41 + x33*x42 + x34*x47 + x41*x9 + x42*x9;
+    this->dPhi_dx_T<<-a[54]*x1 - a[55]*x4 - a[56]*x4 - a[57]*x6 - x10*x12 - x8*x9, a[54]*x13 + a[55]*x16 + a[55]*x21 + a[56]*x16 + a[56]*x22 + a[57]*x17 + x12*x19 + x18*x8, -b[54]*x1 - b[55]*x4 - b[56]*x4 - b[57]*x6 - x10*x24 - x23*x9, b[54]*x13 + b[55]*x16 + b[55]*x21 + b[56]*x16 + b[56]*x22 + b[57]*x17 + x18*x23 + x19*x24;
     
 }
 
 void MPC::Update_dPhi_dxH(const std::array<float,MPC_DELAY>& p_h,const std::array<float,MPC_DELAY> &p_l,const std::array<float,MPC_DELAY>& u
                           ,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b) {
-    float x0 = 1.0/p_l[4];
-    float x1 = 1.0/p_h[4];
-    float x2 = p_l[4]*x1;
-    float x3 = a[59]*u[4];
-    float x4 = (p_h[4]);
-    float x5 = p_l[4]*x4;
-    float x6 = u[4]*x5;
-    float x7 = (u[4]*u[4]);
-    float x8 = a[65]*x7;
-    float x9 = x5*x7;
-    float x10 = a[57]*u[4];
-    float x11 = (p_l[4]*p_l[4]);
-    float x12 = x11*x4;
-    float x13 = 2*x12;
-    float x14 = a[58]*u[4];
-    float x15 = a[60]*u[4];
-    float x16 = x11/(p_h[4]*p_h[4]*p_h[4]);
-    float x17 = 2*u[4];
-    float x18 = 3*u[4];
-    float x19 = (p_l[4]*p_l[4]*p_l[4])/(p_h[4]*p_h[4]*p_h[4]*p_h[4]);
-    float x20 = 3 - x2;
-    float x21 = a[66]*x7;
-    float x22 = x16*x7;
-    float x23 = -x12;
-    float x24 = x23 + 3;
-    float x25 = a[56]*u[4]*x0 + a[61]*x6 + a[62]*x16*x17 + a[63]*x18*x19 + a[64]*x0*x7 + a[67]*x9 + 2*a[68]*x22 + 3*a[69]*x19*x7 + x10*x13 + x10*(x23 + 1) + x13*x14 + x13*x15 + x13*x21 + x14*(x23 + 2) + x15*x24 + x2*x3 + x2*x8 + x20*x3 + x20*x8 + x21*x24;
-    float x26 = p_h[4]/x11;
-    float x27 = x17*x2;
-    float x28 = -b[56]*u[4]*x26 - b[57]*x27 - b[58]*x27 - b[59]*u[4] - b[60]*x27 - b[61]*u[4]*x1 - 2*b[62]*x6 - b[63]*x16*x18 - b[64]*x26*x7 - b[65]*x7 - 2*b[66]*x2*x7 - b[67]*x1*x7 - 2*b[68]*x9 - 3*b[69]*x22;
-
-    this->dPhi_dx_T<<x25, x25, x28, x28;
+    float x0 = u[9]/p_l[9];
+    float x1 = (p_h[9]);
+    float x2 = (p_l[9]*p_l[9]);
+    float x3 = x1*x2;
+    float x4 = 2*u[9];
+    float x5 = x3*x4;
+    float x6 = x2/(p_h[9]*p_h[9]*p_h[9]);
+    float x7 = a[57]*x4;
+    float x8 = (u[9]*u[9]);
+    float x9 = x6*x8;
+    float x10 = 2*a[58];
+    float x11 = 3*a[59];
+    float x12 = (p_l[9]*p_l[9]*p_l[9])*x8/(p_h[9]*p_h[9]*p_h[9]*p_h[9]);
+    float x13 = -x3;
+    float x14 = u[9]*(x13 + 1);
+    float x15 = u[9]*(x13 + 3);
+    float x16 = p_h[9]*u[9]/x2;
+    float x17 = p_l[9]*x4;
+    float x18 = x17/p_h[9];
+    float x19 = p_l[9]*x1;
+    float x20 = x19*x8;
+    float x21 = 2*b[58];
+    float x22 = 3*b[59];
+    this->dPhi_dx_T<<a[54]*x0 + a[55]*x14 + a[55]*x5 + a[56]*x15 + a[56]*x5 + x10*x9 + x11*x12 + x6*x7, -a[54]*x16 - a[55]*x18 - a[56]*x18 - x10*x20 - x11*x9 - x19*x7, b[54]*x0 + b[55]*x14 + b[55]*x5 + b[56]*x15 + b[56]*x5 + b[57]*x4*x6 + x12*x22 + x21*x9, -b[54]*x16 - b[55]*x18 - b[56]*x18 - b[57]*x1*x17 - x20*x21 - x22*x9;
 
 }
 void MPC::Update_dPhi_du(const std::array<float,MPC_DELAY>& p_h,const std::array<float,MPC_DELAY> &p_l,const std::array<float,MPC_DELAY>& u
                         ,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b){
-    float x0 = p_h[4]/p_l[4];
-    float x1 = 2*u[4];
-    float x2 = x0*x1;
-    float x3 = -p_l[4]/p_h[4];
-    float x4 = x3 + 1;
-    float x5 = p_h[4]*(x3 + 3);
-    float x6 = -(p_l[4]*p_l[4])/(p_h[4]*p_h[4]);
-    float x7 = x6 + 1;
-    float x8 = 1 - (p_l[4]*p_l[4]*p_l[4])/(p_h[4]*p_h[4]*p_h[4]);
-    float x9 = x1*x4;
-    float x10 = p_h[4]*x7;
-    float x11 = p_h[4]*(x6 + 2);
-    float x12 = p_h[4]*(x6 + 3);
-    float x13 = x1*x5;
-    float x14 = x1*x7;
-    float x15 = x1*x8;
-    float x16 = x1*x12;
+    float x0 = p_h[9]/p_l[9];
+    float x1 = -(p_l[9]*p_l[9])/(p_h[9]*p_h[9]);
+    float x2 = x1 + 1;
+    float x3 = p_h[9]*x2;
+    float x4 = p_h[9]*(x1 + 3);
+    float x5 = 2*u[9];
+    float x6 = x2*x5;
+    float x7 = x5*(1 - (p_l[9]*p_l[9]*p_l[9])/(p_h[9]*p_h[9]*p_h[9]));
 
-    this->dPhi_du_T<<a[56]*x0 + a[57]*x10 + a[58]*x11 + a[59]*x5 + a[60]*x12 + a[61]*x4 + a[62]*x7 + a[63]*x8 + a[64]*x2 + a[65]*x13 + a[66]*x16 + a[67]*x9 + a[68]*x14 + a[69]*x15, b[56]*x0 + b[57]*x10 + b[58]*x11 + b[59]*x5 + b[60]*x12 + b[61]*x4 + b[62]*x7 + b[63]*x8 + b[64]*x2 + b[65]*x13 + b[66]*x16 + b[67]*x9 + b[68]*x14 + b[69]*x15;
+    this->dPhi_du_T<<a[54]*x0 + a[55]*x3 + a[56]*x4 + a[57]*x2 + a[58]*x6 + a[59]*x7, b[54]*x0 + b[55]*x3 + b[56]*x4 + b[57]*x2 + b[58]*x6 + b[59]*x7;
     
 }
 
@@ -354,7 +289,7 @@ int MPC::GetControl(const u_int16_t& p_des,const u_int16_t& ps, const u_int16_t&
         //     lb=60.0;
         // }
 
-        double lb = 20; //set the lower bound 20 duty
+        // double lb = 20; //set the lower bound 20 duty
 
         
         if((p_des>ps) & (pt>ps)){
@@ -376,10 +311,11 @@ int MPC::GetControl(const u_int16_t& p_des,const u_int16_t& ps, const u_int16_t&
         }
         
         // format question to osqp format
-        this->q_val = 2*(this->B.coeff(1,0)*this->alpha.coeff(1,0)-p_diff/65536*this->B.coeff(1,0))*100;
-        this->P_val = 2*this->B.coeff(1,0)*this->B.coeff(1,0);//scale up the u to duty instead of duty/100
+        // std::cout<<"diff: "<<p_diff<<std::endl;
+        this->q_val = 2*(this->B.coeff(1,0)*this->alpha.coeff(1,0)-p_diff/65536*this->B.coeff(1,0));
+        this->P_val = 2*this->B.coeff(1,0)*this->B.coeff(1,0)/100;//scale up the u to duty instead of duty/100, since q_val/100 and p_val/10000, I just scale p_val/100
         
-
+        
        
         c_int P_nnz = 1;
         c_float P_x[1]={P_val};
@@ -391,7 +327,7 @@ int MPC::GetControl(const u_int16_t& p_des,const u_int16_t& ps, const u_int16_t&
 
         // std::cout<<"pval: "<<this->P_val<<std::endl;
         // std::cout<<"qval: "<<this->q_val<<std::endl;
-        float ideal_duty = -this->q_val/this->P_val+0.5;
+        float ideal_duty = this->q_val/this->P_val+0.5; //for some reason the q_val's sign is opposite TODO: figure out why!
 
         // std::cout<<"ideal duty: "<<ideal_duty<<std::endl;
         if(ideal_duty<20){
@@ -461,8 +397,10 @@ int MPC::GetControl(const u_int16_t& p_des,const u_int16_t& ps, const u_int16_t&
 
 }
 
-std::array<float,4> MPC::GetMpcRec(){
-    return std::array<float,4>({this->Phi.coeff(0,0),this->Phi.coeff(1,0),this->P_val,this->q_val});
+std::array<float,10> MPC::GetMpcRec(){ //record dPhi_du, dPhi_dx
+    return std::array<float,10>({this->Phi.coeff(0,0),this->Phi.coeff(1,0),this->P_val,this->q_val
+                                ,this->dPhi_du_T.coeff(0,0),this->dPhi_du_T.coeff(1,0)
+                                ,this->dPhi_dx_T.coeff(0,0),this->dPhi_dx_T.coeff(0,1),this->dPhi_dx_T.coeff(1,0),this->dPhi_dx_T.coeff(1,1)});
 }
 
 

@@ -108,6 +108,8 @@ void SensorHub::UpdatePre()
     SensorHub & senHub = SensorHub::GetInstance();
     const std::array<u_int16_t,8> &data = senHub.adc0.ReadData();
 
+    
+
     std::array<u_int16_t,NUMPRE> cur_mea;
     cur_mea[0]=data[ADC::SEN0];
     cur_mea[1]=data[ADC::SEN1];
@@ -122,12 +124,13 @@ void SensorHub::UpdatePre()
     // senHub.PreData = senHub.filter_3_hz.GetFilteredMea(cur_mea);
     senHub.PreData = senHub.filter_10_hz.GetFilteredMea(cur_mea);
 
-    // std::cout<<cur_mea[0]<<std::endl;
 
     senHub.PreRecorder.PushData(senHub.PreData);
 
     //rec data before filtering
     senHub.PreRecOri.PushData(cur_mea);
+
+   
 
 
     

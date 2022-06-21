@@ -7,8 +7,8 @@ pwmRecorder(Recorder<uint8_t,PWM_VAL_NUM>("PWM",PWM_HEADER))//TODO: use correct 
 ,teensyValveCon(TeensyI2C(1))
 ,LTankCon(MpcInitParam::kLTankCl,MpcInitParam::kLTankCh)
 ,LKneCon(MpcInitParam::kLKneCl,MpcInitParam::kLKneCh)
-,mpc_ltank_rec(Recorder<float,4>("LTank_mpc","Tank,LTank,LTank_pval,LTank_qval"))
-,mpc_lkne_rec(Recorder<float,4>("LKne_mpc","LTank,LKne,LKne_pval,LKne_qval"))
+,mpc_ltank_rec(Recorder<float,10>("LTank_mpc","dTank,dLTank,LTank_pval,LTank_qval,dPhi_du0,dPhi_du1,dPhi_dx00,dPhi_dx01,dPhi_dx10,dPhi_dx11"))
+,mpc_lkne_rec(Recorder<float,10>("LKne_mpc","dLTank,dLKne,LKne_pval,LKne_qval,dPhi_du0,dPhi_du1,dPhi_dx00,dPhi_dx01,dPhi_dx10,dPhi_dx11"))
 {
     //Do not set any valve condition here, it will crash
     //I believe the reason is because TeensyI2C is not created yet
