@@ -1,8 +1,14 @@
+from ctypes.wintypes import DOUBLE
 from PyQt5.QtWidgets import QWidget
 from PyQt5 import uic
 from pyqtgraph import GraphicsLayoutWidget
 import pyqtgraph as pg
 from collections import deque
+import struct
+
+from TCP_Con import DOUBLE_SIZE
+
+
 class PlotPressureWindow(QWidget):
     def __init__(self,parent=None):
         super().__init__()
@@ -44,24 +50,30 @@ class PlotPressureWindow(QWidget):
 
 
         # init data
-        self.l_knePreData = deque([0]*parent.dataLen)
-        self.l_ankPreData = deque([0]*parent.dataLen)
-        self.r_knePreData = deque([0]*parent.dataLen)
-        self.r_ankPreData = deque([0]*parent.dataLen)
+        self.l_knePreData = deque([0.0]*parent.dataLen)
+        self.l_ankPreData = deque([0.0]*parent.dataLen)
+        self.r_knePreData = deque([0.0]*parent.dataLen)
+        self.r_ankPreData = deque([0.0]*parent.dataLen)
     def UpdateData(self,data):
         # the results are from 16 bits ADC, MSB, LSB
         # print('pressure got update')
         self.l_knePreData.popleft()
-        self.l_knePreData.append(int.from_bytes(data[0:2],'little')*0.0038147-25)
+        # self.l_knePreData.append(int.from_bytes(data[0:2],'little')*0.0038147-25)
+        val1 = struct.unpack("d",data[0:DOUBLE_SIZE])[0]*0.0038147-25
+
+        self.l_knePreData.append(val1)
         self.left_kneePre_line.setData(self.l_knePreData)
         self.l_ankPreData.popleft()
-        self.l_ankPreData.append(int.from_bytes(data[2:4],'little')*0.0038147-25)
+        # self.l_ankPreData.append(int.from_bytes(data[2:4],'little')*0.0038147-25)
+        self.l_ankPreData.append(struct.unpack("d",data[DOUBLE_SIZE:DOUBLE_SIZE*2])[0]*0.0038147-25)
         self.left_anklePre_line.setData(self.l_ankPreData)
         self.r_knePreData.popleft()
-        self.r_knePreData.append(int.from_bytes(data[4:6],'little')) #*0.0038147-25) #TODO: change them back to pressure when force sensor test is done
+        # self.r_knePreData.append(int.from_bytes(data[4:6],'little')) #*0.0038147-25) #TODO: change them back to pressure when force sensor test is done
+        self.r_knePreData.append(struct.unpack("d",data[DOUBLE_SIZE*2:DOUBLE_SIZE*3])[0])
         self.right_kneePre_line.setData(self.r_knePreData)
         self.r_ankPreData.popleft()
-        self.r_ankPreData.append(int.from_bytes(data[6:8],'little')) #*0.0038147-25)
+        # self.r_ankPreData.append(int.from_bytes(data[6:8],'little')) #*0.0038147-25)
+        self.r_ankPreData.append(struct.unpack("d",data[DOUBLE_SIZE*3:DOUBLE_SIZE*4])[0]) #*0.0038147-25)
         self.right_anklePre_line.setData(self.r_ankPreData)
         
         # print(int.from_bytes(data[6],'little'))

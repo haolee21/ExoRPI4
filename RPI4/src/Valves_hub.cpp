@@ -95,7 +95,7 @@ void Valves_hub::UpdateValve(){
 
 
     //MPC check
-    const std::array<u_int16_t,SensorHub::NUMPRE>& pre_data = SensorHub::GetPreData(); //use ref to avoid copy
+    const std::array<double,SensorHub::NUMPRE>& pre_data = SensorHub::GetPreData(); //use ref to avoid copy
 
     //put measurements in mpc controller, we must do this even the mpc controller are not enabled since it relies on the history of the measurements
     hub.LTankCon.PushPreMeas(pre_data[SensorHub::PreName::Tank],pre_data[SensorHub::PreName::LTank],hub.PWM_Duty[PWM_ID::LTANKPRE]);
@@ -186,7 +186,7 @@ void Valves_hub::StartMPC(Valves_hub::PWM_ID pwm_valve,bool enable){
     }
 }
 
-void Valves_hub::SetDesiredPre(Valves_hub::PWM_ID pwm_valve,u_int16_t des_pre){
+void Valves_hub::SetDesiredPre(Valves_hub::PWM_ID pwm_valve,double des_pre){
     Valves_hub& hub = Valves_hub::GetInstance();
     hub.desired_pre[pwm_valve] = des_pre;
 

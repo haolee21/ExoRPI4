@@ -1,17 +1,21 @@
 import socket 
 import multiprocessing as mp
+import struct
 import threading as th
 import time
 import numpy as np
 from PyQt5 import QtCore
 import pdb
 CMD_LEN = 2
-JOINT_DATA_LEN=12
-PRE_DATA_LEN=16
+ENC_NUM = 6
+PRE_NUM = 8
+DOUBLE_SIZE = 8
+JOINT_DATA_LEN=ENC_NUM*DOUBLE_SIZE
+PRE_DATA_LEN= PRE_NUM*DOUBLE_SIZE
 MPC_LEN=6
 class TCP:
     port =1234
-    ip_address='192.168.0.110'
+    ip_address='192.168.0.100'
     def __init__(self):
         self.flag = False
         
@@ -70,9 +74,11 @@ class TCP:
             #     print('package incomplete')
             #     print(len(receive))
             # else:
+
             self.updateJoint(receive[:JOINT_DATA_LEN]) 
             self.updatePre(receive[JOINT_DATA_LEN:JOINT_DATA_LEN+PRE_DATA_LEN])
-            self.updateTank(int.from_bytes(receive[JOINT_DATA_LEN+8:JOINT_DATA_LEN+10],'little'))
+            self.updateTank(struct.unpack("d",receive[JOINT_DATA_LEN+4*DOUBLE_SIZE:JOINT_DATA_LEN+5*DOUBLE_SIZE])[0])
+            # self.updateTank(int.from_bytes(receive[JOINT_DATA_LEN+4*DOUBLE_SIZE:JOINT_DATA_LEN+5*DOUBLE_SIZE],'little'))
 
             # rec_flag = int.from_bytes(self.SendCmd('REQ:REC:DATA',1,print_response=False),'little')
             rec_flag = int(self.SendCmd('REQ:REC:DATA',1,print_response=False).decode())

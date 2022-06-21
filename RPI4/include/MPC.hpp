@@ -97,12 +97,12 @@ public:
     void UpdateParamH(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     void UpdateParamL(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     
-    int GetControl(const u_int16_t& p_des,const u_int16_t& p_cur,const u_int16_t& p_tank);//It requires current pressure value because all the values storaged in the meme are scaled
+    int GetControl(const double& p_des,const double& p_cur,const double& p_tank);//It requires current pressure value because all the values storaged in the meme are scaled
 
     //Get values for recorder
     std::array<float,10> GetMpcRec();
 
-    void PushPreMeas(const u_int16_t p_tank,const u_int16_t p_set,const u_int16_t duty);
+    void PushPreMeas(const double p_tank,const double p_set,const double duty);
  
 };
 

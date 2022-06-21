@@ -31,9 +31,9 @@ public:
     const float PRE_DEN = 65536;
 
     static SensorHub& GetInstance();
-    static const std::array<u_int16_t,NUMENC>& GetEncData(); //I did not use lock here since they will be read-only arrays
-    static const std::array<u_int16_t,NUMPRE>& GetPreData(); //While data may not be sync, but it will be the most recent one
-    static const std::array<u_int16_t,NUMPRE>& GetPreFiltered(); //get the filtered pressure reading
+    static const std::array<double,NUMENC>& GetEncData(); //I did not use lock here since they will be read-only arrays
+    static const std::array<double,NUMPRE>& GetPreData(); //While data may not be sync, but it will be the most recent one
+    static const std::array<double,NUMPRE>& GetPreFiltered(); //get the filtered pressure reading
 
     SensorHub(const SensorHub&) = delete; // prevent copy singleton
 
@@ -60,12 +60,12 @@ public:
     
 private:
     
-    std::array<u_int16_t,NUMENC> EncData;
-    std::array<u_int16_t,NUMPRE> PreData;
-    Recorder<u_int16_t,NUMENC/2> LEncRecorder;
-    Recorder<u_int16_t,NUMENC/2> REncRecorder;
-    Recorder<u_int16_t,NUMPRE> PreRecorder;
-    Recorder<u_int16_t,NUMPRE> PreRecOri;
+    std::array<double,NUMENC> EncData;
+    std::array<double,NUMPRE> PreData;
+    Recorder<double,NUMENC/2> LEncRecorder;
+    Recorder<double,NUMENC/2> REncRecorder;
+    Recorder<double,NUMPRE> PreRecorder;
+    Recorder<double,NUMPRE> PreRecOri;
 
     // Encoders, S is for sagittal plane, F is for frontal plane
     Encoder_L LHipS_Enc,LKneS_Enc,LAnkS_Enc; //LHipF_Enc,LAnkF_Enc
@@ -77,8 +77,8 @@ private:
     ADC adc0;
 
     //Butterworth filter for ADC
-    DigitalFilter<u_int16_t,FilterParam::Filter3Hz::Order,NUMPRE> filter_3_hz;
-    DigitalFilter<u_int16_t,FilterParam::Filter10Hz::Order,NUMPRE> filter_10_hz;
+    DigitalFilter<double,FilterParam::Filter3Hz::Order,NUMPRE> filter_3_hz;
+    DigitalFilter<double,FilterParam::Filter10Hz::Order,NUMPRE> filter_10_hz;
    
     
    

@@ -35,10 +35,10 @@ public:
     static const uint8_t SEN6= 7;
     static const uint8_t SEN7= 0;
     static const uint8_t DATALEN=8;
-    const std::array<u_int16_t,DATALEN>& ReadData();
+    const std::array<double,DATALEN>& ReadData();
 private:
     // int *data;
-    std::array<u_int16_t,8> data;
+    std::array<double,8> data;
     void startConv();
 
 

@@ -267,7 +267,7 @@ void MPC::UpdateDyn(bool increase_pre)
 
 
 
-int MPC::GetControl(const u_int16_t& p_des,const u_int16_t& ps, const u_int16_t& pt){
+int MPC::GetControl(const double& p_des,const double& ps, const double& pt){
     
 
 
@@ -405,7 +405,7 @@ std::array<float,10> MPC::GetMpcRec(){ //record dPhi_du, dPhi_dx
 
 
 
-void MPC::PushPreMeas(const u_int16_t p_tank,const u_int16_t p_set,const u_int16_t duty)
+void MPC::PushPreMeas(const double p_tank,const double p_set,const double duty)
 {
     this->p_tank_mem[this->meas_idx] = ((float)p_tank - 6553.6)/65536;
     this->p_set_mem[this->meas_idx]=((float)p_set - 6553.6)/65536;

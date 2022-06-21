@@ -58,14 +58,14 @@ void TCP_server::RecvCmd(){
                 // std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
                 if(cmd_device.compare("DATA")==0){  
                     
-                    std::array<char,(SensorHub::NUMENC+SensorHub::NUMPRE)*sizeof(u_int16_t)> meaData;
-                    const std::array<u_int16_t,SensorHub::NUMENC> &encData=SensorHub::GetEncData();
-                    std::memcpy(meaData.begin(),encData.begin(),sizeof(u_int16_t)*encData.size());
-                    const std::array<u_int16_t,SensorHub::NUMPRE> &preData=SensorHub::GetPreData();
-                    std::memcpy(meaData.begin()+encData.size()*sizeof(u_int16_t),preData.begin(),sizeof(u_int16_t)*preData.size());
+                    std::array<char,(SensorHub::NUMENC+SensorHub::NUMPRE)*sizeof(double)> meaData;
+                    const std::array<double,SensorHub::NUMENC> &encData=SensorHub::GetEncData();
+                    std::memcpy(meaData.begin(),encData.begin(),sizeof(double)*encData.size());
+                    const std::array<double,SensorHub::NUMPRE> &preData=SensorHub::GetPreData();
+                    std::memcpy(meaData.begin()+encData.size()*sizeof(double),preData.begin(),sizeof(double)*preData.size());
 
                     // std::array<char,16> test_char;
-                    // std::memcpy(test_char.begin(),preData.begin(),sizeof(u_int16_t)*8);
+                    // std::memcpy(test_char.begin(),preData.begin(),sizeof(double)*8);
                     // std::cout<<"test\n";
                     // std::cout<<(unsigned)meaData[18]<<','<<(unsigned)meaData[19]<<std::endl;
                     // std::cout<<(unsigned)test_char[6]<<','<<(unsigned)test_char[7]<<std::endl;
@@ -149,7 +149,7 @@ void TCP_server::RecvCmd(){
             }
             else if(cmd_subClass.compare("PRE")==0){
                 float input = std::stof(Sub_cmd(ret_str,cmd_idx,'\n'));
-                u_int16_t pre_val = (u_int16_t)((input/50.0+0.5)*13107.2);
+                double pre_val = (double)((input/50.0+0.5)*13107.2);
                 if(cmd_device.compare("LTANK")==0){
                     Valves_hub::SetDesiredPre(Valves_hub::PWM_ID::LTANKPRE,pre_val);
                     TCP_server::Send_cmd(std::string("1"),socket);

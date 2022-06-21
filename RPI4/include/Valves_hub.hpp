@@ -14,7 +14,7 @@ class Valves_hub
 {
 public:
     static Valves_hub& GetInstance();
-    // static Valves_hub& GetInstance(std::array<u_int16_t,SensorHub::NUMENC>&,std::array<u_int16_t,SensorHub::NUMPRE>&); // ideally this initializer should be called first
+    // static Valves_hub& GetInstance(std::array<double,SensorHub::NUMENC>&,std::array<double,SensorHub::NUMPRE>&); // ideally this initializer should be called first
 
     Valves_hub(const Valves_hub&)=delete; //no copy
     
@@ -42,7 +42,7 @@ public:
 
     //MPC control
     static void StartMPC(Valves_hub::PWM_ID pwm_valve,bool enable);
-    static void SetDesiredPre(Valves_hub::PWM_ID pwm_valve,u_int16_t des_pre);
+    static void SetDesiredPre(Valves_hub::PWM_ID pwm_valve,double des_pre);
     const static std::array<bool,NUM_OF_MPC>& GetMpcCond();
 private:
     
@@ -71,7 +71,7 @@ private:
         kLTank,kLKne,kLAnk,kRTank,kRKne,kRAnk
     };
     // bool l_tank_enable,r_tank_enable; //when these flags are true, we will calculate the duty of the pwm during update valve conditions
-    std::array<u_int16_t,PWM_VAL_NUM> desired_pre{0};
+    std::array<double,PWM_VAL_NUM> desired_pre{0};
 
     Recorder<float,10> mpc_ltank_rec; //record p_tank, p_set(target), p_val, q_val
     Recorder<float,10> mpc_lkne_rec;
