@@ -149,7 +149,7 @@ void TCP_server::RecvCmd(){
             }
             else if(cmd_subClass.compare("PRE")==0){
                 float input = std::stof(Sub_cmd(ret_str,cmd_idx,'\n'));
-                double pre_val = (double)((input/50.0+0.5)*13107.2);
+                double pre_val = (double)(input*320+8000);
                 if(cmd_device.compare("LTANK")==0){
                     Valves_hub::SetDesiredPre(Valves_hub::PWM_ID::LTANKPRE,pre_val);
                     TCP_server::Send_cmd(std::string("1"),socket);

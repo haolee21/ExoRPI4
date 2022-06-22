@@ -59,13 +59,13 @@ class PlotPressureWindow(QWidget):
         # print('pressure got update')
         self.l_knePreData.popleft()
         # self.l_knePreData.append(int.from_bytes(data[0:2],'little')*0.0038147-25)
-        val1 = struct.unpack("d",data[0:DOUBLE_SIZE])[0]*0.0038147-25
+        
 
-        self.l_knePreData.append(val1)
+        self.l_knePreData.append(struct.unpack("d",data[0:DOUBLE_SIZE])[0]*0.003125-25)
         self.left_kneePre_line.setData(self.l_knePreData)
         self.l_ankPreData.popleft()
         # self.l_ankPreData.append(int.from_bytes(data[2:4],'little')*0.0038147-25)
-        self.l_ankPreData.append(struct.unpack("d",data[DOUBLE_SIZE:DOUBLE_SIZE*2])[0]*0.0038147-25)
+        self.l_ankPreData.append(struct.unpack("d",data[DOUBLE_SIZE:DOUBLE_SIZE*2])[0]*0.003125-25)
         self.left_anklePre_line.setData(self.l_ankPreData)
         self.r_knePreData.popleft()
         # self.r_knePreData.append(int.from_bytes(data[4:6],'little')) #*0.0038147-25) #TODO: change them back to pressure when force sensor test is done

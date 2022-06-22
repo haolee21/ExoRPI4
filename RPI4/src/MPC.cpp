@@ -275,7 +275,7 @@ int MPC::GetControl(const double& p_des,const double& ps, const double& pt){
     int p_diff = (p_des - ps);
     
     
-    if(std::abs(p_diff)>262){ //if desired pressure has 1 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
+    if(std::abs(p_diff)>320){ //if desired pressure has 1 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
         
         // double lb;
         // if(std::abs(pt-ps)<1310){ //if the difference is less than 10 psi, we can operate the valve with lower duty
@@ -327,7 +327,7 @@ int MPC::GetControl(const double& p_des,const double& ps, const double& pt){
 
         // std::cout<<"pval: "<<this->P_val<<std::endl;
         // std::cout<<"qval: "<<this->q_val<<std::endl;
-        float ideal_duty = this->q_val/this->P_val+0.5; //for some reason the q_val's sign is opposite TODO: figure out why!
+        float ideal_duty = -this->q_val/this->P_val+0.5; //for some reason the q_val's sign is opposite TODO: figure out why!
 
         // std::cout<<"ideal duty: "<<ideal_duty<<std::endl;
         if(ideal_duty<20){
@@ -407,8 +407,8 @@ std::array<float,10> MPC::GetMpcRec(){ //record dPhi_du, dPhi_dx
 
 void MPC::PushPreMeas(const double p_tank,const double p_set,const double duty)
 {
-    this->p_tank_mem[this->meas_idx] = ((float)p_tank - 6553.6)/65536;
-    this->p_set_mem[this->meas_idx]=((float)p_set - 6553.6)/65536;
+    this->p_tank_mem[this->meas_idx] = ((float)p_tank - 8000)/65536;
+    this->p_set_mem[this->meas_idx]=((float)p_set - 8000)/65536;
     this->u_mem[this->meas_idx]=(float)duty/100;
     this->meas_idx++;
     if(this->meas_idx>=MPC_DELAY){

@@ -253,7 +253,7 @@ class MW(QMainWindow):
         self.tcp_port.Disconnect()
         self.btn_connect.setText('Connect')
     def update_air_volume(self,volume):
-        cur_pre = volume*0.0037147-25
+        cur_pre = volume*0.003125-25
         self.tank_pre.display(cur_pre)
         if cur_pre>self.max_pressure:
             cur_pre=self.max_pressure

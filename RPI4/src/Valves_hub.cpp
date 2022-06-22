@@ -2,13 +2,13 @@
 #include "MPC_param.hpp"
 Valves_hub::Valves_hub()
 :
-pwmRecorder(Recorder<uint8_t,PWM_VAL_NUM>("PWM",PWM_HEADER))//TODO: use correct valve names, perhaps adding it in shared file with Teensy
-,swRecorder(Recorder<bool,SW_VAL_NUM>("SW",SW_HEADER))
-,teensyValveCon(TeensyI2C(1))
+pwmRecorder("PWM",PWM_HEADER)//TODO: use correct valve names, perhaps adding it in shared file with Teensy
+,swRecorder("SW",SW_HEADER)
+,teensyValveCon(1)
 ,LTankCon(MpcInitParam::kLTankCl,MpcInitParam::kLTankCh)
 ,LKneCon(MpcInitParam::kLKneCl,MpcInitParam::kLKneCh)
-,mpc_ltank_rec(Recorder<float,10>("LTank_mpc","dTank,dLTank,LTank_pval,LTank_qval,dPhi_du0,dPhi_du1,dPhi_dx00,dPhi_dx01,dPhi_dx10,dPhi_dx11"))
-,mpc_lkne_rec(Recorder<float,10>("LKne_mpc","dLTank,dLKne,LKne_pval,LKne_qval,dPhi_du0,dPhi_du1,dPhi_dx00,dPhi_dx01,dPhi_dx10,dPhi_dx11"))
+,mpc_ltank_rec("LTank_mpc","dTank,dLTank,LTank_pval,LTank_qval,dPhi_du0,dPhi_du1,dPhi_dx00,dPhi_dx01,dPhi_dx10,dPhi_dx11")
+,mpc_lkne_rec("LKne_mpc","dLTank,dLKne,LKne_pval,LKne_qval,dPhi_du0,dPhi_du1,dPhi_dx00,dPhi_dx01,dPhi_dx10,dPhi_dx11")
 {
     //Do not set any valve condition here, it will crash
     //I believe the reason is because TeensyI2C is not created yet
