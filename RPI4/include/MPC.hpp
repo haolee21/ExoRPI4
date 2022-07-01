@@ -46,9 +46,10 @@ private:
     const Eigen::Matrix<float,1,2> H_h; // when I define state, I define it as 
     const Eigen::Matrix<float,1,2> H_l;
     Eigen::Matrix<float,2,1> Phi; //this will be useful if we want to estimate the flow rate
+    Eigen::Matrix<float,2,1> Phi_hat;
     Eigen::Matrix<float,2,2> dPhi_dx_T;
     Eigen::Matrix<float,2,1> dPhi_du_T;
-    void UpdatePhi(const std::array<float,MPC_DELAY> ph,const std::array<float,MPC_DELAY> pl,const std::array<float,MPC_DELAY> u,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
+    void UpdatePhi(const std::array<float,MPC_DELAY> ph,const std::array<float,MPC_DELAY> pl,const std::array<float,MPC_DELAY> u,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b,Eigen::Matrix<float,2,1>& _phi);
     void Update_dPhi_dxL(const std::array<float,MPC_DELAY>& ph, const std::array<float,MPC_DELAY> &pl,const std::array<float,MPC_DELAY> &d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
     void Update_dPhi_dxH(const std::array<float,MPC_DELAY>& ph,const std::array<float,MPC_DELAY> &pl,const std::array<float,MPC_DELAY>& d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
     void Update_dPhi_du(const std::array<float,MPC_DELAY>& ph,const std::array<float,MPC_DELAY> &pl,const std::array<float,MPC_DELAY>& d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
@@ -80,15 +81,22 @@ private:
 
 
 
-    //generate the OSQP constants
-
+    
+    //generate MPC constants
 
     std::unique_ptr<OSQPSettings> osqp_settings;
     std::unique_ptr<OSQPData> osqp_data;
     OSQPWorkspace *work;
-
     bool mpc_enable;
 
+    //cylinder volume
+    float GetVolumeLinear_mm3(float pos);
+    static const float kArea;//= 0.31*645.16; //mm^2
+    
+    const float volume_slope_6in = 0.0006218871831205513; //TODO: these are only used for linear calibrations
+    const float volume_intercept_6in = 114.13020872532238;
+
+    float GetExternalForce(float P,float V,  float dP,float dV, float Phi);
     
     
 public:

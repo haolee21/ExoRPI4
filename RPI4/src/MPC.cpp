@@ -5,6 +5,10 @@
 #include "MPC_param.hpp"
 
 using namespace std;
+
+
+const float MPC::kArea =  0.31*645.16f;  //unit: mm^2
+
 MPC::MPC(array<array<float,MPC_STATE_NUM>,2> init_cl,array<array<float,MPC_STATE_NUM>,2> init_ch)
 {
 
@@ -42,7 +46,8 @@ void MPC::UpdateParamL(array<float,MPC_STATE_NUM> new_a,array<float,MPC_STATE_NU
     this->bl = new_b;
 }
 void MPC::UpdatePhi(const std::array<float,MPC_DELAY> p_h,const std::array<float,MPC_DELAY> p_l,
-        const std::array<float,MPC_DELAY> u,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b){
+        const std::array<float,MPC_DELAY> u,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b,
+        Eigen::Matrix<float,2,1>& _phi){
     //Record the old Phi
 
     float x0 = p_h[0]*u[0];
@@ -146,7 +151,7 @@ void MPC::UpdatePhi(const std::array<float,MPC_DELAY> p_h,const std::array<float
     float x98 = x96*(1 - (p_l[9]*p_l[9]*p_l[9])/(p_h[9]*p_h[9]*p_h[9]));
     float x99 = x91*(1 - (p_l[0]*p_l[0]*p_l[0])/(p_h[0]*p_h[0]*p_h[0]));
 
-    this->Phi<<a[0]*x1 + a[10]*x71 + a[11]*x72 + a[12]*x3 + a[13]*x50 + a[14]*x51 + a[15]*x22 + a[16]*x74 + a[17]*x75 + a[18]*x5 + a[19]*x52 + a[1]*x53 + a[20]*x54 + a[21]*x25 + a[22]*x77 + a[23]*x78 + a[24]*x7 + a[25]*x55 + a[26]*x56 + a[27]*x28 + a[28]*x80 + a[29]*x81 + a[2]*x57 + a[30]*x9 + a[31]*x58 + a[32]*x59 + a[33]*x31 + a[34]*x83 + a[35]*x84 + a[36]*x11 + a[37]*x60 + a[38]*x61 + a[39]*x34 + a[3]*x37 + a[40]*x86 + a[41]*x87 + a[42]*x13 + a[43]*x62 + a[44]*x63 + a[45]*x40 + a[46]*x89 + a[47]*x90 + a[48]*x15 + a[49]*x64 + a[4]*x92 + a[50]*x65 + a[51]*x43 + a[52]*x94 + a[53]*x95 + a[54]*x17 + a[55]*x66 + a[56]*x67 + a[57]*x46 + a[58]*x97 + a[59]*x98 + a[5]*x99 + a[6]*x19 + a[7]*x68 + a[8]*x69 + a[9]*x49, b[0]*x1 + b[10]*x71 + b[11]*x72 + b[12]*x3 + b[13]*x50 + b[14]*x51 + b[15]*x22 + b[16]*x74 + b[17]*x75 + b[18]*x5 + b[19]*x52 + b[1]*x53 + b[20]*x54 + b[21]*x25 + b[22]*x77 + b[23]*x78 + b[24]*x7 + b[25]*x55 + b[26]*x56 + b[27]*x28 + b[28]*x80 + b[29]*x81 + b[2]*x57 + b[30]*x9 + b[31]*x58 + b[32]*x59 + b[33]*x31 + b[34]*x83 + b[35]*x84 + b[36]*x11 + b[37]*x60 + b[38]*x61 + b[39]*x34 + b[3]*x37 + b[40]*x86 + b[41]*x87 + b[42]*x13 + b[43]*x62 + b[44]*x63 + b[45]*x40 + b[46]*x89 + b[47]*x90 + b[48]*x15 + b[49]*x64 + b[4]*x92 + b[50]*x65 + b[51]*x43 + b[52]*x94 + b[53]*x95 + b[54]*x17 + b[55]*x66 + b[56]*x67 + b[57]*x46 + b[58]*x97 + b[59]*x98 + b[5]*x99 + b[6]*x19 + b[7]*x68 + b[8]*x69 + b[9]*x49;
+    _phi<<a[0]*x1 + a[10]*x71 + a[11]*x72 + a[12]*x3 + a[13]*x50 + a[14]*x51 + a[15]*x22 + a[16]*x74 + a[17]*x75 + a[18]*x5 + a[19]*x52 + a[1]*x53 + a[20]*x54 + a[21]*x25 + a[22]*x77 + a[23]*x78 + a[24]*x7 + a[25]*x55 + a[26]*x56 + a[27]*x28 + a[28]*x80 + a[29]*x81 + a[2]*x57 + a[30]*x9 + a[31]*x58 + a[32]*x59 + a[33]*x31 + a[34]*x83 + a[35]*x84 + a[36]*x11 + a[37]*x60 + a[38]*x61 + a[39]*x34 + a[3]*x37 + a[40]*x86 + a[41]*x87 + a[42]*x13 + a[43]*x62 + a[44]*x63 + a[45]*x40 + a[46]*x89 + a[47]*x90 + a[48]*x15 + a[49]*x64 + a[4]*x92 + a[50]*x65 + a[51]*x43 + a[52]*x94 + a[53]*x95 + a[54]*x17 + a[55]*x66 + a[56]*x67 + a[57]*x46 + a[58]*x97 + a[59]*x98 + a[5]*x99 + a[6]*x19 + a[7]*x68 + a[8]*x69 + a[9]*x49, b[0]*x1 + b[10]*x71 + b[11]*x72 + b[12]*x3 + b[13]*x50 + b[14]*x51 + b[15]*x22 + b[16]*x74 + b[17]*x75 + b[18]*x5 + b[19]*x52 + b[1]*x53 + b[20]*x54 + b[21]*x25 + b[22]*x77 + b[23]*x78 + b[24]*x7 + b[25]*x55 + b[26]*x56 + b[27]*x28 + b[28]*x80 + b[29]*x81 + b[2]*x57 + b[30]*x9 + b[31]*x58 + b[32]*x59 + b[33]*x31 + b[34]*x83 + b[35]*x84 + b[36]*x11 + b[37]*x60 + b[38]*x61 + b[39]*x34 + b[3]*x37 + b[40]*x86 + b[41]*x87 + b[42]*x13 + b[43]*x62 + b[44]*x63 + b[45]*x40 + b[46]*x89 + b[47]*x90 + b[48]*x15 + b[49]*x64 + b[4]*x92 + b[50]*x65 + b[51]*x43 + b[52]*x94 + b[53]*x95 + b[54]*x17 + b[55]*x66 + b[56]*x67 + b[57]*x46 + b[58]*x97 + b[59]*x98 + b[5]*x99 + b[6]*x19 + b[7]*x68 + b[8]*x69 + b[9]*x49;
 
 }
 void MPC::Update_dPhi_dxL(const std::array<float,MPC_DELAY>& p_h, const std::array<float,MPC_DELAY> &p_l,const std::array<float,MPC_DELAY> &u
@@ -233,7 +238,8 @@ void MPC::UpdateDyn(bool increase_pre)
     if(increase_pre){
         //if we are increasing the pressure
         
-        this->UpdatePhi(this->p_tank_his,this->p_set_his,this->u_his,this->ah,this->bh);
+        this->UpdatePhi(this->p_tank_his,this->p_set_his,this->u_his,this->ah,this->bh,this->Phi);
+        this->UpdatePhi(this->p_tank_hat,this->p_set_hat,this->u_hat,this->ah,this->bh,this->Phi_hat);
         this->Update_dPhi_dxH(this->p_tank_hat,this->p_set_hat,this->u_hat,this->ah,this->bh);
         this->Update_dPhi_du(this->p_tank_hat,this->p_set_hat,this->u_hat,this->ah,this->bh);
         
@@ -241,13 +247,14 @@ void MPC::UpdateDyn(bool increase_pre)
 
     }
     else{
-        this->UpdatePhi(this->p_set_his,this->p_tank_his,this->u_his,this->al,this->bl);
+        this->UpdatePhi(this->p_set_his,this->p_tank_his,this->u_his,this->al,this->bl,this->Phi);
+        this->UpdatePhi(this->p_set_hat,this->p_tank_hat,this->u_hat,this->al,this->bl,this->Phi_hat);
         this->Update_dPhi_dxL(this->p_set_hat,this->p_tank_hat,this->u_hat,this->al,this->bl);
         this->Update_dPhi_du(this->p_set_hat,this->p_tank_hat,this->u_hat, this->al,this->bl);
     }
 
 
-    Eigen::Matrix2f K_mat = 2*Eigen::Matrix2f::Identity()-this->dPhi_dx_T;
+    Eigen::Matrix2f K_mat = Eigen::Matrix2f::Identity()-this->dPhi_dx_T;
     
     // std::cout<<"dPhi_dx: "<<this->dPhi_dx_T<<std::endl;
     // std::cout<<"dPhi_du: "<<this->dPhi_du_T<<std::endl;
@@ -255,7 +262,7 @@ void MPC::UpdateDyn(bool increase_pre)
     // std::cout<<"Phi: "<<this->Phi<<std::endl;
 
     this->B = K_mat.inverse()*this->dPhi_du_T;
-    this->alpha = K_mat.inverse()*(this->Phi-this->dPhi_du_T*this->u_his[MPC_DELAY-1]);
+    this->alpha = K_mat.inverse()*(this->Phi_hat-this->dPhi_du_T*this->u_hat[MPC_DELAY-1]);
 
     
 
@@ -272,7 +279,7 @@ int MPC::GetControl(const double& p_des,const double& ps, const double& pt){
 
 
 
-    int p_diff = (p_des - ps);
+    double p_diff = (p_des - ps)/2; //we scaled the p_diff with the assumption that pressure will have the momentum to go 
     
     
     if(std::abs(p_diff)>320){ //if desired pressure has 1 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
@@ -313,7 +320,7 @@ int MPC::GetControl(const double& p_des,const double& ps, const double& pt){
         // format question to osqp format
         // std::cout<<"diff: "<<p_diff<<std::endl;
         this->q_val = 2*(this->B.coeff(1,0)*this->alpha.coeff(1,0)-p_diff/65536*this->B.coeff(1,0));
-        this->P_val = 2*this->B.coeff(1,0)*this->B.coeff(1,0)/100;//scale up the u to duty instead of duty/100, since q_val/100 and p_val/10000, I just scale p_val/100
+        this->P_val = 2*this->B.coeff(1,0)*this->B.coeff(1,0);//scale up the u to duty instead of duty/100, since q_val/100 and p_val/10000, I just scale p_val/100
         
         
        
@@ -327,8 +334,8 @@ int MPC::GetControl(const double& p_des,const double& ps, const double& pt){
 
         // std::cout<<"pval: "<<this->P_val<<std::endl;
         // std::cout<<"qval: "<<this->q_val<<std::endl;
-        float ideal_duty = -this->q_val/this->P_val+0.5; //for some reason the q_val's sign is opposite TODO: figure out why!
-
+        // float ideal_duty = -this->q_val/this->P_val+0.5; //I scale the result by 100, for some reason the real gradient is way larger TODO: figure out why!
+        float ideal_duty = -100*this->q_val/this->P_val+0.5;
         // std::cout<<"ideal duty: "<<ideal_duty<<std::endl;
         if(ideal_duty<20){
             return 20;
@@ -407,8 +414,8 @@ std::array<float,10> MPC::GetMpcRec(){ //record dPhi_du, dPhi_dx
 
 void MPC::PushPreMeas(const double p_tank,const double p_set,const double duty)
 {
-    this->p_tank_mem[this->meas_idx] = ((float)p_tank - 8000)/65536;
-    this->p_set_mem[this->meas_idx]=((float)p_set - 8000)/65536;
+    this->p_tank_mem[this->meas_idx] = ((float)p_tank -3297.312)/65536.0; //the substraction is to remove the 0.5 V pressure sensor bias and add 1 atm to the equation
+    this->p_set_mem[this->meas_idx]=((float)p_set -3297.312)/65536.0;     // in the lasso regression, we have proved it increases the testing accuracy to stable 90% up
     this->u_mem[this->meas_idx]=(float)duty/100;
     this->meas_idx++;
     if(this->meas_idx>=MPC_DELAY){
@@ -442,7 +449,13 @@ void MPC::UpdateHistory(){
 }
 
 
+float MPC::GetVolumeLinear_mm3(float pos){
+    return (pos*this->volume_slope_6in+this->volume_intercept_6in)*MPC::kArea;
+}
 
 
+float MPC::GetExternalForce(float P, float V, float dP, float dV, float Phi){
+    return 0.0; //TODO: finish this
+}
 
 

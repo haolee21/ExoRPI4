@@ -6,6 +6,7 @@ import time
 import numpy as np
 from PyQt5 import QtCore
 import pdb
+from threading import Lock
 CMD_LEN = 2
 ENC_NUM = 6
 PRE_NUM = 8
@@ -18,7 +19,7 @@ class TCP:
     ip_address='192.168.0.100'
     def __init__(self):
         self.flag = False
-        
+        self.lock = Lock()
         
         
 
@@ -97,26 +98,27 @@ class TCP:
             self.disConCcallback()
             
     def SendCmd(self,cmd,byte_to_read,print_response=True):
-        cmd = cmd+'\n'
-        response = b''
-        try:
-            with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
+        with self.lock:
+            cmd = cmd+'\n'
+            response = b''
+            try:
+                with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
                 
-                s.connect((self.ip_address,self.port))
+                    s.connect((self.ip_address,self.port))
                 
-                s.sendall(cmd.encode())
+                    s.sendall(cmd.encode())
 
-                # s.settimeout(0.1)
-                response = s.recv(byte_to_read)
+                    # s.settimeout(0.1)
+                    response = s.recv(byte_to_read)
                 
                 
                 
                 # response = response[:-1]
                 
 
-        except:
-            print('TCP:Failed\n')
-            self.flag=False
+            except:
+                print('TCP:Failed\n')
+                self.flag=False
             
             
 
@@ -130,8 +132,8 @@ class TCP:
         # response = self.s.recv(byte_to_read+1)#include \n
     
         # response = response[:-1]
-        if print_response:
-            print('Send: '+cmd[:-1].ljust(25)+'Response: '+response.decode())
+            if print_response:
+                print('Send: '+cmd[:-1].ljust(25)+'Response: '+response.decode())
         return response
 
     def Update_test(self):
