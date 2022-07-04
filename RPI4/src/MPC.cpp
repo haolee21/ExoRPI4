@@ -299,13 +299,13 @@ int MPC::GetControl(const double& p_des,const double& ps, const double& pt){
         // double lb = 20; //set the lower bound 20 duty
 
         
-        if((p_des>ps) & (pt>ps)){
+        if((p_des>ps) & (pt>ps) & (pt>p_des)){
             //increasing pressure
             // std::cout<<"increase\n";
             this->UpdateDyn(true);
         
         }
-        else if((p_des<ps)&(ps>pt)){
+        else if((p_des<ps)&(ps>pt)& (p_des>pt)){
             //decreasing pressure
             // std::cout<<"decrease\n";
             this->UpdateDyn(false);
