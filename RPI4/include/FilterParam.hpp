@@ -17,7 +17,7 @@ namespace FilterParam
         const std::array<float,Order+1> a = { 1.       , -1.1429805,  0.4128016};
     }
 
-    namespace Filter20Hz //It is actually 10 Hz, TODO: change it later
+    namespace Filter20Hz 
     {
         const int Order=2;
         const std::array<float,Order+1> b = {0.20657208, 0.41314417, 0.20657208};

@@ -116,6 +116,8 @@ namespace MpcInitParam
          0.05214407,  0.00148457,  0.01240586,  0.01742999, -0.02896622}
 
     };
+
+    const double kLkneMaxLen = 57815.36248175182;
     
 }
 #endif

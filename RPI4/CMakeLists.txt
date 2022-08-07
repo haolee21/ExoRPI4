@@ -31,7 +31,7 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 set(Include_DIR include)
-set(COMMON_DIR /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4/RPI_Teensy)
+set(COMMON_DIR ../RPI_Teensy)
 find_package(Boost 1.75.0 COMPONENTS serialization date_time filesystem REQUIRED)
 find_library(osqp_LIB osqp ${osqp_LIBRARIES})
 

@@ -5,8 +5,8 @@ Valves_hub::Valves_hub()
 pwmRecorder("PWM",PWM_HEADER)//TODO: use correct valve names, perhaps adding it in shared file with Teensy
 ,swRecorder("SW",SW_HEADER)
 ,teensyValveCon(1)
-,LTankCon(MpcInitParam::kLTankCl,MpcInitParam::kLTankCh)
-,LKneCon(MpcInitParam::kLKneCl,MpcInitParam::kLKneCh)
+,LTankCon(MpcInitParam::kLTankCl,MpcInitParam::kLTankCh,1.0)
+,LKneCon(MpcInitParam::kLKneCl,MpcInitParam::kLKneCh,MpcInitParam::kLkneMaxLen)
 ,mpc_ltank_rec("LTank_mpc","Time,dTank,dLTank,LTank_pval,LTank_qval,dPhi_du0,dPhi_du1,dPhi_dx00,dPhi_dx01,dPhi_dx10,dPhi_dx11")
 ,mpc_lkne_rec("LKne_mpc","Time,dLTank,dLKne,LKne_pval,LKne_qval,dPhi_du0,dPhi_du1,dPhi_dx00,dPhi_dx01,dPhi_dx10,dPhi_dx11")
 {
@@ -103,14 +103,14 @@ void Valves_hub::UpdateValve(){
 
     if(hub.mpc_enable[Valves_hub::MPC_Enable::kLTank]){
         
-        int res_duty = hub.LTankCon.GetControl(hub.desired_pre[Valves_hub::PWM_ID::LTANKPRE],pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::Tank]);
+        int res_duty = hub.LTankCon.GetControl(hub.desired_pre[Valves_hub::PWM_ID::LTANKPRE],pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::Tank],1.0);
         
         hub.SetDuty(res_duty,Valves_hub::PWM_ID::LTANKPRE); 
         hub.mpc_ltank_rec.PushData(hub.LTankCon.GetMpcRec());
     }
     if(hub.mpc_enable[Valves_hub::MPC_Enable::kLKne]){
-    
-        int res_duty = hub.LKneCon.GetControl(hub.desired_pre[Valves_hub::PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::LTank]);
+        
+        int res_duty = hub.LKneCon.GetControl(hub.desired_pre[Valves_hub::PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::LTank],hub.LKneCon.GetLenLinear_mm(pre_data[SensorHub::PreName::Pos])/hub.LKneCon.max_len);
         hub.SetDuty(res_duty,Valves_hub::PWM_ID::LKNEPRE);
         hub.mpc_lkne_rec.PushData(hub.LKneCon.GetMpcRec());
     }

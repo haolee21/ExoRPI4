@@ -90,28 +90,33 @@ private:
     bool mpc_enable;
 
     //cylinder volume
-    float GetVolumeLinear_mm3(float pos);
-    static const float kArea;//= 0.31*645.16; //mm^2
     
-    const float volume_slope_6in = 0.0006218871831205513; //TODO: these are only used for linear calibrations
-    const float volume_intercept_6in = 114.13020872532238;
+    static const float kArea;//= 0.31*645.16; //mm^2
+    float phi_scale;
+    
+    const float volume_slope_6in = 0.0006351973436310972; //FIXME: these are only used for linear calibrations
+    const float volume_intercept_6in = 115.68133521647316;
 
     float GetExternalForce(float P,float V,  float dP,float dV, float Phi);
     
     
 public:
-    MPC(std::array<std::array<float,MPC_STATE_NUM>,2> init_cl,std::array<std::array<float,MPC_STATE_NUM>,2> init_ch);
+    MPC(std::array<std::array<float,MPC_STATE_NUM>,2> init_cl,std::array<std::array<float,MPC_STATE_NUM>,2> init_ch,float max_pos);
     ~MPC();
     void UpdateParamH(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     void UpdateParamL(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     
-    int GetControl(const double& p_des,const double& p_cur,const double& p_tank);//It requires current pressure value because all the values storaged in the meme are scaled
+    int GetControl(const double& p_des,const double& p_cur,const double& p_tank,float scale);//It requires current pressure value because all the values storaged in the meme are scaled
 
     //Get values for recorder
     std::array<float,10> GetMpcRec();
 
     void PushPreMeas(const double p_tank,const double p_set,const double duty);
- 
+    
+    float max_len;
+    float GetLenLinear_mm(float pos);
+
+
 };
 
 

@@ -9,17 +9,12 @@ using namespace std;
 
 const float MPC::kArea =  0.31*645.16f;  //unit: mm^2
 
-MPC::MPC(array<array<float,MPC_STATE_NUM>,2> init_cl,array<array<float,MPC_STATE_NUM>,2> init_ch)
+MPC::MPC(array<array<float,MPC_STATE_NUM>,2> init_cl,array<array<float,MPC_STATE_NUM>,2> init_ch,float max_pos)
+: ah(init_ch[0]),bh(init_ch[1]),al(init_cl[0]) ,bl(init_cl[1]) //init model param
+  
 {
 
-    //load default values for the model parameters, it is data from one of the experiment
-    this->ah = init_ch[0];
-    this->bh = init_ch[1];
-
-    this->al = init_cl[0];
-    this->bl = init_cl[1];
-
-
+    this->max_len = this->GetLenLinear_mm(max_pos);
     
     //setup osqp solver
     this->osqp_data.reset(new OSQPData);
@@ -27,6 +22,8 @@ MPC::MPC(array<array<float,MPC_STATE_NUM>,2> init_cl,array<array<float,MPC_STATE
     osqp_set_default_settings(this->osqp_settings.get());
     this->osqp_settings->alpha = 1.0;
     this->osqp_settings->verbose = false;
+
+    this->phi_scale=1.0;
    
     
 }
@@ -253,6 +250,12 @@ void MPC::UpdateDyn(bool increase_pre)
         this->Update_dPhi_du(this->p_set_hat,this->p_tank_hat,this->u_hat, this->al,this->bl);
     }
 
+    //Scale the phi, dphi_du, dphi_dx since the volume may change
+    this->Phi = this->Phi/this->phi_scale;
+    this->Phi_hat = this->Phi_hat/this->phi_scale;
+    this->dPhi_du_T = this->dPhi_du_T/this->phi_scale;
+    this->dPhi_dx_T = this->dPhi_dx_T/this->phi_scale;
+
 
     Eigen::Matrix2f K_mat = Eigen::Matrix2f::Identity()-this->dPhi_dx_T;
     
@@ -274,9 +277,8 @@ void MPC::UpdateDyn(bool increase_pre)
 
 
 
-int MPC::GetControl(const double& p_des,const double& ps, const double& pt){
+int MPC::GetControl(const double& p_des,const double& ps, const double& pt,float scale){
     
-
 
 
     double p_diff = (p_des - ps)/2; //we scaled the p_diff with the assumption that pressure will have the momentum to go 
@@ -449,8 +451,10 @@ void MPC::UpdateHistory(){
 }
 
 
-float MPC::GetVolumeLinear_mm3(float pos){
-    return (pos*this->volume_slope_6in+this->volume_intercept_6in)*MPC::kArea;
+float MPC::GetLenLinear_mm(float pos){ //TODO: this only fit linear case, need to do nonlinear equation when using it on the exoskeleton
+    return pos*this->volume_slope_6in+this->volume_intercept_6in; //152.4 is 6 in cylinder max length
+                                                                               //TODO: need to consider 5" cylinder
+                                                                               //6.71 is just the offset of linear encoder
 }
 
 

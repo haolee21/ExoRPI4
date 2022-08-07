@@ -16,7 +16,7 @@ PRE_DATA_LEN= PRE_NUM*DOUBLE_SIZE
 MPC_LEN=6
 class TCP:
     port =1234
-    ip_address='192.168.0.100'
+    ip_address='192.168.0.105'
     def __init__(self):
         self.flag = False
         self.lock = Lock()
