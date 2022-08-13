@@ -31,6 +31,8 @@
 
 #include "MPC_param.hpp"
 #include "Recorder.hpp"
+#include "DigitalFilter.hpp"
+#include "FilterParam.hpp"
 
 class MPC
 {
@@ -97,11 +99,18 @@ private:
     const float volume_slope_6in = 0.0006351973436310972; //FIXME: these are only used for linear calibrations
     const float volume_intercept_6in = 115.68133521647316;
 
-    float GetExternalForce(float P,float V,  float dP,float dV, float Phi);
-    
-    
+    double GetExternalForce(float P);
+
+    //piston friction compensation
+    double pre_pos;
+    double pos_diff;
+    double cur_pos;
+    double fric_coeff;
+    const double piston_area=0.31; //unit in in2
+    double cur_force;
+    DigitalFilter<double,FilterParam::Filter20Hz_5::Order,1> vel_filter;
 public:
-    MPC(std::array<std::array<float,MPC_STATE_NUM>,2> init_cl,std::array<std::array<float,MPC_STATE_NUM>,2> init_ch,float max_pos);
+    MPC(std::array<std::array<float,MPC_STATE_NUM>,2> init_cl,std::array<std::array<float,MPC_STATE_NUM>,2> init_ch,float max_pos,double fric_coeff=0);
     ~MPC();
     void UpdateParamH(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     void UpdateParamL(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
@@ -109,9 +118,10 @@ public:
     int GetControl(const double& p_des,const double& p_cur,const double& p_tank,float scale);//It requires current pressure value because all the values storaged in the meme are scaled
 
     //Get values for recorder
-    std::array<float,10> GetMpcRec();
+    std::array<double,11> GetMpcRec();
 
-    void PushPreMeas(const double p_tank,const double p_set,const double duty);
+    void PushMeas(const double p_tank,const double p_set,const double duty,double pos);
+    
     
     float max_len;
     float GetLenLinear_mm(float pos);

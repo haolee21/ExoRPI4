@@ -9,8 +9,9 @@ using namespace std;
 
 const float MPC::kArea =  0.31*645.16f;  //unit: mm^2
 
-MPC::MPC(array<array<float,MPC_STATE_NUM>,2> init_cl,array<array<float,MPC_STATE_NUM>,2> init_ch,float max_pos)
-: ah(init_ch[0]),bh(init_ch[1]),al(init_cl[0]) ,bl(init_cl[1]) //init model param
+MPC::MPC(array<array<float,MPC_STATE_NUM>,2> init_cl,array<array<float,MPC_STATE_NUM>,2> init_ch,float max_pos,double _fric_coeff)
+: ah(init_ch[0]),bh(init_ch[1]),al(init_cl[0]) ,bl(init_cl[1]),fric_coeff(_fric_coeff),
+vel_filter(FilterParam::Filter20Hz_5::a,FilterParam::Filter20Hz_5::b) //init model param
   
 {
 
@@ -24,6 +25,8 @@ MPC::MPC(array<array<float,MPC_STATE_NUM>,2> init_cl,array<array<float,MPC_STATE
     this->osqp_settings->verbose = false;
 
     this->phi_scale=1.0;
+    this->pre_pos = 0.0;
+    
    
     
 }
@@ -406,15 +409,15 @@ int MPC::GetControl(const double& p_des,const double& ps, const double& pt,float
 
 }
 
-std::array<float,10> MPC::GetMpcRec(){ //record dPhi_du, dPhi_dx
-    return std::array<float,10>({this->Phi.coeff(0,0),this->Phi.coeff(1,0),this->P_val,this->q_val
+std::array<double,11> MPC::GetMpcRec(){ //record dPhi_du, dPhi_dx
+    return std::array<double,11>({this->Phi.coeff(0,0),this->Phi.coeff(1,0),this->P_val,this->q_val
                                 ,this->dPhi_du_T.coeff(0,0),this->dPhi_du_T.coeff(1,0)
-                                ,this->dPhi_dx_T.coeff(0,0),this->dPhi_dx_T.coeff(0,1),this->dPhi_dx_T.coeff(1,0),this->dPhi_dx_T.coeff(1,1)});
+                                ,this->dPhi_dx_T.coeff(0,0),this->dPhi_dx_T.coeff(0,1),this->dPhi_dx_T.coeff(1,0),this->dPhi_dx_T.coeff(1,1),this->cur_force});
 }
 
 
 
-void MPC::PushPreMeas(const double p_tank,const double p_set,const double duty)
+void MPC::PushMeas(const double p_tank,const double p_set,const double duty,double _pos)
 {
     this->p_tank_mem[this->meas_idx] = ((float)p_tank -3297.312)/65536.0; //the substraction is to remove the 0.5 V pressure sensor bias and add 1 atm to the equation
     this->p_set_mem[this->meas_idx]=((float)p_set -3297.312)/65536.0;     // in the lasso regression, we have proved it increases the testing accuracy to stable 90% up
@@ -423,6 +426,15 @@ void MPC::PushPreMeas(const double p_tank,const double p_set,const double duty)
     if(this->meas_idx>=MPC_DELAY){
         this->meas_idx=0;
     }
+
+    //also calculate force
+    this->pre_pos = this->cur_pos;
+    this->cur_pos = _pos;
+    double temp_pos_diff = this->cur_pos-this->pre_pos;
+    // this->pos_diff = (this->vel_filter.GetFilteredMea(std::array<double,1>{temp_pos_diff}))[0];
+    this->pos_diff = temp_pos_diff;
+    this->cur_force = this->GetExternalForce(p_set);
+
 }
 
 void MPC::UpdateHistory(){
@@ -458,8 +470,13 @@ float MPC::GetLenLinear_mm(float pos){ //TODO: this only fit linear case, need t
 }
 
 
-float MPC::GetExternalForce(float P, float V, float dP, float dV, float Phi){
-    return 0.0; //TODO: finish this
+double MPC::GetExternalForce(float P){
+    //return the external force in lb
+    //TODO: use SI unit in the future
+    //tbh all we need is pressure, yet, I will still keep all the terms for now since theoretically we need them
+    return (P/65536*4.096-0.5)/4*200*this->piston_area+this->fric_coeff*this->pos_diff;
 }
+
+
 
 

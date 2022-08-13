@@ -6,9 +6,9 @@ pwmRecorder("PWM",PWM_HEADER)//TODO: use correct valve names, perhaps adding it 
 ,swRecorder("SW",SW_HEADER)
 ,teensyValveCon(1)
 ,LTankCon(MpcInitParam::kLTankCl,MpcInitParam::kLTankCh,1.0)
-,LKneCon(MpcInitParam::kLKneCl,MpcInitParam::kLKneCh,MpcInitParam::kLkneMaxLen)
-,mpc_ltank_rec("LTank_mpc","Time,dTank,dLTank,LTank_pval,LTank_qval,dPhi_du0,dPhi_du1,dPhi_dx00,dPhi_dx01,dPhi_dx10,dPhi_dx11")
-,mpc_lkne_rec("LKne_mpc","Time,dLTank,dLKne,LKne_pval,LKne_qval,dPhi_du0,dPhi_du1,dPhi_dx00,dPhi_dx01,dPhi_dx10,dPhi_dx11")
+,LKneCon(MpcInitParam::kLKneCl,MpcInitParam::kLKneCh,MpcInitParam::kLkneMaxLen,0.001)
+,mpc_ltank_rec("LTank_mpc","Time,dTank,dLTank,LTank_pval,LTank_qval,dPhi_du0,dPhi_du1,dPhi_dx00,dPhi_dx01,dPhi_dx10,dPhi_dx11,mpc_force")
+,mpc_lkne_rec("LKne_mpc","Time,dLTank,dLKne,LKne_pval,LKne_qval,dPhi_du0,dPhi_du1,dPhi_dx00,dPhi_dx01,dPhi_dx10,dPhi_dx11,mpc_force")
 {
     //Do not set any valve condition here, it will crash
     //I believe the reason is because TeensyI2C is not created yet
@@ -98,8 +98,8 @@ void Valves_hub::UpdateValve(){
     const std::array<double,SensorHub::NUMPRE>& pre_data = SensorHub::GetPreData(); //use ref to avoid copy
 
     //put measurements in mpc controller, we must do this even the mpc controller are not enabled since it relies on the history of the measurements
-    hub.LTankCon.PushPreMeas(pre_data[SensorHub::PreName::Tank],pre_data[SensorHub::PreName::LTank],hub.PWM_Duty[PWM_ID::LTANKPRE]);
-    hub.LKneCon.PushPreMeas(pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::LKne],hub.PWM_Duty[PWM_ID::LKNEPRE]);
+    hub.LTankCon.PushMeas(pre_data[SensorHub::PreName::Tank],pre_data[SensorHub::PreName::LTank],hub.PWM_Duty[PWM_ID::LTANKPRE],0.0);
+    hub.LKneCon.PushMeas(pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::LKne],hub.PWM_Duty[PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::Pos]);
 
     if(hub.mpc_enable[Valves_hub::MPC_Enable::kLTank]){
         

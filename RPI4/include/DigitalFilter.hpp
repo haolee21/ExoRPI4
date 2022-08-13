@@ -12,14 +12,14 @@ private:
     std::array<std::array<T,N>,M> in_buf;
     std::array<std::array<T,N>,M> out_buf;
     int buf_idx;
-    std::array<float,M+1> a;
-    std::array<float,M+1> b;
+    std::array<double,M+1> a;
+    std::array<double,M+1> b;
     
 
 
 
 public:
-    DigitalFilter(std::array<float,M+1>_a,std::array<float,M+1>_b)
+    DigitalFilter(std::array<double,M+1>_a,std::array<double,M+1>_b)
     :a(_a),b(_b)
     {
         this->buf_idx=0;
