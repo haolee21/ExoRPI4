@@ -43,6 +43,7 @@ public:
     //MPC control
     static void StartMPC(Valves_hub::PWM_ID pwm_valve,bool enable);
     static void SetDesiredPre(Valves_hub::PWM_ID pwm_valve,double des_pre);
+    static void SetCylinderMaxLen(Valves_hub::PWM_ID pwm_valve);
     const static std::array<bool,NUM_OF_MPC>& GetMpcCond();
 private:
     

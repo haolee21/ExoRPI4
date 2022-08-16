@@ -7,22 +7,22 @@
 using namespace std;
 
 
-const float MPC::kArea =  0.31*645.16f;  //unit: mm^2
+// const float MPC::kArea =  0.31*645.16f;  //unit: mm^2
 
 MPC::MPC(array<array<float,MPC_STATE_NUM>,2> init_cl,array<array<float,MPC_STATE_NUM>,2> init_ch,float max_pos,double _fric_coeff)
 : ah(init_ch[0]),bh(init_ch[1]),al(init_cl[0]) ,bl(init_cl[1]),fric_coeff(_fric_coeff),
 vel_filter(FilterParam::Filter20Hz_5::a,FilterParam::Filter20Hz_5::b) //init model param
   
 {
-
-    this->max_len = this->GetLenLinear_mm(max_pos);
+    this->max_pos = 56739.5;
+    this->max_len_mm = this->GetLenLinear_mm(max_pos);
     
     //setup osqp solver
-    this->osqp_data.reset(new OSQPData);
-    this->osqp_settings.reset(new OSQPSettings);
-    osqp_set_default_settings(this->osqp_settings.get());
-    this->osqp_settings->alpha = 1.0;
-    this->osqp_settings->verbose = false;
+    // this->osqp_data.reset(new OSQPData);
+    // this->osqp_settings.reset(new OSQPSettings);
+    // osqp_set_default_settings(this->osqp_settings.get());
+    // this->osqp_settings->alpha = 1.0;
+    // this->osqp_settings->verbose = false;
 
     this->phi_scale=1.0;
     this->pre_pos = 0.0;
@@ -329,12 +329,12 @@ int MPC::GetControl(const double& p_des,const double& ps, const double& pt,float
         
         
        
-        c_int P_nnz = 1;
-        c_float P_x[1]={P_val};
-        c_int P_i[1]={0};
-        c_int P_p[2]={0,1};
-        this->osqp_data->n =1;
-        this->osqp_data->P = csc_matrix(this->osqp_data->n,this->osqp_data->n,P_nnz,P_x,P_i,P_p);
+        // c_int P_nnz = 1;
+        // c_float P_x[1]={P_val};
+        // c_int P_i[1]={0};
+        // c_int P_p[2]={0,1};
+        // this->osqp_data->n =1;
+        // this->osqp_data->P = csc_matrix(this->osqp_data->n,this->osqp_data->n,P_nnz,P_x,P_i,P_p);
 
 
         // std::cout<<"pval: "<<this->P_val<<std::endl;
@@ -433,7 +433,7 @@ void MPC::PushMeas(const double p_tank,const double p_set,const double duty,doub
     double temp_pos_diff = this->cur_pos-this->pre_pos;
     // this->pos_diff = (this->vel_filter.GetFilteredMea(std::array<double,1>{temp_pos_diff}))[0];
     this->pos_diff = temp_pos_diff;
-    this->cur_force = this->GetExternalForce(p_set);
+    this->cur_force = this->GetExternalForce(p_set,_pos);
 
 }
 
@@ -463,20 +463,44 @@ void MPC::UpdateHistory(){
 }
 
 
-float MPC::GetLenLinear_mm(float pos){ //TODO: this only fit linear case, need to do nonlinear equation when using it on the exoskeleton
+double MPC::GetLenLinear_mm(double pos){ //TODO: this only fit linear case, need to do nonlinear equation when using it on the exoskeleton
     return pos*this->volume_slope_6in+this->volume_intercept_6in; //152.4 is 6 in cylinder max length
                                                                                //TODO: need to consider 5" cylinder
                                                                                //6.71 is just the offset of linear encoder
 }
 
 
-double MPC::GetExternalForce(float P){
+double MPC::GetExternalForce(double pre,double x){
     //return the external force in lb
-    //TODO: use SI unit in the future
-    //tbh all we need is pressure, yet, I will still keep all the terms for now since theoretically we need them
-    return (P/65536*4.096-0.5)/4*200*this->piston_area+this->fric_coeff*this->pos_diff;
+    //TODO: maybe use SI unit in the future???
+
+
+
+    double compress_x = (pre-8000)*0.00096875/this->spring_k*25.4; //unit in mm
+    double cur_delta_x =this->max_pos-x;
+    if((cur_delta_x-4700)>compress_x/this->volume_slope_6in){ //It turned out the the spring start to compress earlier, the 4700 is an experimental value
+        return (pre/65536*4.096-0.5)/4*200*0.31-0.001*this->pos_diff; 
+    }
+    else{
+        return (this->max_pos-x)*0.0006351973436310972*this->spring_k/25.4;
+    }
+
 }
 
+void MPC::SetCylinderMaxPos(){
+    this->max_pos = this->cur_pos;
+}
+double MPC::GetCylinderScale(double pre,double pos) //get the (cylinder length)/(max cylinder length)
+{
+    double compress_x = (pre-8000)*0.00096875/this->spring_k*25.4; //unit in mm
+    double cur_pos_mm = this->GetLenLinear_mm(pos);
+    double cur_len = this->max_len_mm - cur_pos_mm-4700*this->volume_slope_6in;
+    if(cur_len<compress_x){
+        std::cout<<"get scale: "<<(cur_pos_mm-compress_x)/this->max_len_mm<<std::endl;
+        return (cur_pos_mm+compress_x)/this->max_len_mm;
+    }
+    else{
+        return 1;
+    }
 
-
-
+}

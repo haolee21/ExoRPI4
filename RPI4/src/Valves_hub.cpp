@@ -110,7 +110,7 @@ void Valves_hub::UpdateValve(){
     }
     if(hub.mpc_enable[Valves_hub::MPC_Enable::kLKne]){
         
-        int res_duty = hub.LKneCon.GetControl(hub.desired_pre[Valves_hub::PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::LTank],hub.LKneCon.GetLenLinear_mm(pre_data[SensorHub::PreName::Pos])/hub.LKneCon.max_len);
+        int res_duty = hub.LKneCon.GetControl(hub.desired_pre[Valves_hub::PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::LTank],hub.LKneCon.GetCylinderScale(pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::Pos]));
         hub.SetDuty(res_duty,Valves_hub::PWM_ID::LKNEPRE);
         hub.mpc_lkne_rec.PushData(hub.LKneCon.GetMpcRec());
     }
@@ -190,5 +190,19 @@ void Valves_hub::SetDesiredPre(Valves_hub::PWM_ID pwm_valve,double des_pre){
     Valves_hub& hub = Valves_hub::GetInstance();
     hub.desired_pre[pwm_valve] = des_pre;
 
+}
+
+void Valves_hub::SetCylinderMaxLen(Valves_hub::PWM_ID cylinder){
+    Valves_hub& hub = Valves_hub::GetInstance();
+    switch (cylinder)
+    {
+    case Valves_hub::PWM_ID::LKNEPRE:
+        hub.LKneCon.SetCylinderMaxPos();
+        break;
+    //TODO: complete this
+    
+    default:
+        break;
+    }
 }
 

@@ -10,7 +10,10 @@
  * P_tank < P_set, and P_des > P_slave: output 0
  * 
  * 
- * 
+ * The unit will be SI unit:
+ * length: mm
+ * pressure: kPa
+ * force: mN
 **/
 
 
@@ -86,27 +89,33 @@ private:
     
     //generate MPC constants
 
-    std::unique_ptr<OSQPSettings> osqp_settings;
-    std::unique_ptr<OSQPData> osqp_data;
-    OSQPWorkspace *work;
+    // std::unique_ptr<OSQPSettings> osqp_settings;
+    // std::unique_ptr<OSQPData> osqp_data;
+    // OSQPWorkspace *work;
     bool mpc_enable;
 
     //cylinder volume
     
-    static const float kArea;//= 0.31*645.16; //mm^2
+    // static const float kArea;//= 0.31*645.16; //mm^2
     float phi_scale;
     
-    const float volume_slope_6in = 0.0006351973436310972; //FIXME: these are only used for linear calibrations
-    const float volume_intercept_6in = 115.68133521647316;
+    const double volume_slope_6in = 0.0006351973436310972; //FIXME: these are only used for linear calibrations
+    const double volume_intercept_6in = 115.68133521647316; // unit: mm/adc(pos)
 
-    double GetExternalForce(float P);
-
+    double max_pos;//unit: adc reading //FIXME: this is based on linear calibration //FIXME: this has to be update everytime we run
+    double max_len_mm;
+    const double spring_k = 55.4/2; //although the spec says the k is 55.4 lb/in, but in reality it is only half of it
+                                         // the unit here is lb/in 
+    const double pre_offset = 0.5/4.096*65536;
+    const double piston_area=0.31; //unit: in^2
+    double GetExternalForce(double P,double x);
+    double GetLenLinear_mm(double pos);
     //piston friction compensation
     double pre_pos;
     double pos_diff;
     double cur_pos;
     double fric_coeff;
-    const double piston_area=0.31; //unit in in2
+    
     double cur_force;
     DigitalFilter<double,FilterParam::Filter20Hz_5::Order,1> vel_filter;
 public:
@@ -123,8 +132,9 @@ public:
     void PushMeas(const double p_tank,const double p_set,const double duty,double pos);
     
     
-    float max_len;
-    float GetLenLinear_mm(float pos);
+    
+    double GetCylinderScale(double pre,double pos); //get the (cylinder length)/(max cylinder length)
+    void SetCylinderMaxPos();
 
 
 };
