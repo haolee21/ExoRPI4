@@ -496,7 +496,7 @@ double MPC::GetCylinderScale(double pre,double pos) //get the (cylinder length)/
     double cur_pos_mm = this->GetLenLinear_mm(pos);
     double cur_len = this->max_len_mm - cur_pos_mm-4700*this->volume_slope_6in;
     if(cur_len<compress_x){
-        std::cout<<"get scale: "<<(cur_pos_mm-compress_x)/this->max_len_mm<<std::endl;
+        // std::cout<<"get scale: "<<(cur_pos_mm-compress_x)/this->max_len_mm<<std::endl;
         return (cur_pos_mm+compress_x)/this->max_len_mm;
     }
     else{
