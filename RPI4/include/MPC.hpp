@@ -118,6 +118,7 @@ private:
     
     double cur_force;
     DigitalFilter<double,FilterParam::Filter20Hz_5::Order,1> vel_filter;
+    DigitalFilter<double,FilterParam::Filter20Hz_2::Order,1> force_filter;
 public:
     MPC(std::array<std::array<float,MPC_STATE_NUM>,2> init_cl,std::array<std::array<float,MPC_STATE_NUM>,2> init_ch,float max_pos,double fric_coeff=0);
     ~MPC();

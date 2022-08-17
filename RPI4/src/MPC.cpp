@@ -12,6 +12,7 @@ using namespace std;
 MPC::MPC(array<array<float,MPC_STATE_NUM>,2> init_cl,array<array<float,MPC_STATE_NUM>,2> init_ch,float max_pos,double _fric_coeff)
 : ah(init_ch[0]),bh(init_ch[1]),al(init_cl[0]) ,bl(init_cl[1]),fric_coeff(_fric_coeff),
 vel_filter(FilterParam::Filter20Hz_5::a,FilterParam::Filter20Hz_5::b) //init model param
+,force_filter(FilterParam::Filter20Hz_2::a,FilterParam::Filter20Hz_2::b)
   
 {
     this->max_pos = 56739.5;
@@ -433,7 +434,9 @@ void MPC::PushMeas(const double p_tank,const double p_set,const double duty,doub
     double temp_pos_diff = this->cur_pos-this->pre_pos;
     // this->pos_diff = (this->vel_filter.GetFilteredMea(std::array<double,1>{temp_pos_diff}))[0];
     this->pos_diff = temp_pos_diff;
-    this->cur_force = this->GetExternalForce(p_set,_pos);
+
+
+    this->cur_force =  this->force_filter.GetFilteredMea(std::array<double,1>{this->GetExternalForce(p_set,_pos)})[0];
 
 }
 
