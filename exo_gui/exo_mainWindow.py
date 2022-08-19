@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QAction, QApplication, QCheckBox, QLabel, QLineEdit, QMainWindow,QPushButton, QRadioButton,QWidget,QProgressBar
 from PyQt5.QtWidgets import QLCDNumber
 from PyQt5 import uic,QtCore
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap,QPalette
 
 
 import pyqtgraph as pg
@@ -15,6 +15,7 @@ from ConnectionWindow import *
 from PlotJointWindow import *
 from PlotPressureWindow import *
 from PWM_TestWindow import *
+from ImpConWindow import *
 import math
 import time
 import datetime
@@ -45,7 +46,7 @@ class MW(QMainWindow):
         self.joint_plot_window = PlotJointWindow(self)
         self.pressure_plot_window=PlotPressureWindow(self)
         self.pwm_test_window = PWM_TestWindow(self)
-       
+        self.imp_con_window = ImpWindow(self)
         
         # jointUpdateCB = lambda data:self.joint_plot_window.UpdateData(self,data)
         # preUpdateCB = lambda data:self.pressure_plot_window.UpdateData(self,data)
@@ -68,6 +69,9 @@ class MW(QMainWindow):
 
         self.act_pwm_test =self.findChild(QAction,'act_testPWM_valves')
         self.act_pwm_test.triggered.connect(self.open_pwm_test)
+
+        self.act_imp_con = self.findChild(QAction,'act_ImpCon')
+        self.act_imp_con.triggered.connect(self.imp_con_window.show)
 
         # air reserivor 
         

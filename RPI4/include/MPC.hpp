@@ -36,6 +36,7 @@
 #include "Recorder.hpp"
 #include "DigitalFilter.hpp"
 #include "FilterParam.hpp"
+#include "CylinderParam.hpp"
 
 class MPC
 {
@@ -120,13 +121,13 @@ private:
     DigitalFilter<double,FilterParam::Filter20Hz_5::Order,1> vel_filter;
     DigitalFilter<double,FilterParam::Filter20Hz_2::Order,1> force_filter;
 public:
-    MPC(std::array<std::array<float,MPC_STATE_NUM>,2> init_cl,std::array<std::array<float,MPC_STATE_NUM>,2> init_ch,float max_pos,double fric_coeff=0);
+    MPC(CylinderParam::Params param);
     ~MPC();
     void UpdateParamH(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     void UpdateParamL(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     
     int GetControl(const double& p_des,const double& p_cur,const double& p_tank,float scale);//It requires current pressure value because all the values storaged in the meme are scaled
-
+    int GetImpControl(const double& imp_des, const double& p_cur, const double& p_tank, const double& pos,float scale);
     //Get values for recorder
     std::array<double,11> GetMpcRec();
 

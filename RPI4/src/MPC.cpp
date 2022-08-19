@@ -9,13 +9,13 @@ using namespace std;
 
 // const float MPC::kArea =  0.31*645.16f;  //unit: mm^2
 
-MPC::MPC(array<array<float,MPC_STATE_NUM>,2> init_cl,array<array<float,MPC_STATE_NUM>,2> init_ch,float max_pos,double _fric_coeff)
-: ah(init_ch[0]),bh(init_ch[1]),al(init_cl[0]) ,bl(init_cl[1]),fric_coeff(_fric_coeff),
+MPC::MPC(CylinderParam::Params param)
+: ah(param.ch[0]),bh(param.ch[1]),al(param.cl[0]) ,bl(param.cl[1]),fric_coeff(param.fri_coeff),
 vel_filter(FilterParam::Filter20Hz_5::a,FilterParam::Filter20Hz_5::b) //init model param
 ,force_filter(FilterParam::Filter20Hz_2::a,FilterParam::Filter20Hz_2::b)
   
 {
-    this->max_pos = 56739.5;
+    this->max_pos = param.max_pos;
     this->max_len_mm = this->GetLenLinear_mm(max_pos);
     
     //setup osqp solver
@@ -506,4 +506,13 @@ double MPC::GetCylinderScale(double pre,double pos) //get the (cylinder length)/
         return 1;
     }
 
+}
+
+int MPC::GetImpControl(const double& imp_des, const double& p_cur, const double& p_tank, const double& pos, float scale){
+    //the impedance controller will use the current velocity to estimate the displacement
+    double cur_force = this->GetExternalForce(p_cur,pos); //the force is in lb
+    double p_des = imp_des*this->pos_diff;
+    return this->GetControl(p_des,p_cur,p_tank,scale);
+
+    
 }
