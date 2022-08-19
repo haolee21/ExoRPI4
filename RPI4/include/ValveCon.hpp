@@ -23,6 +23,6 @@ ValveCon::~ValveCon()
 }
 
 void ValveCon::SetPre(const double &p_set,const double &p_cur,const double &p_src,const double scale){
-    this->mpc.GetControl(p_set,p_cur,p_src,scale);
+    this->mpc.GetPreControl(p_set,p_cur,p_src,scale);
 }
 #endif

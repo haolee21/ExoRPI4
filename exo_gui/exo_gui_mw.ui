@@ -725,7 +725,7 @@
      <x>0</x>
      <y>0</y>
      <width>795</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuConnection">
@@ -744,7 +744,7 @@
    </widget>
    <widget class="QMenu" name="menuTask_Settings">
     <property name="title">
-     <string>Task Settings</string>
+     <string>Robot Settings</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuAction">

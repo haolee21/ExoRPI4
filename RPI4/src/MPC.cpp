@@ -281,7 +281,7 @@ void MPC::UpdateDyn(bool increase_pre)
 
 
 
-int MPC::GetControl(const double& p_des,const double& ps, const double& pt,float scale){
+int MPC::GetPreControl(const double& p_des,const double& ps, const double& pt,float scale){
     
 
 
@@ -474,18 +474,20 @@ double MPC::GetLenLinear_mm(double pos){ //TODO: this only fit linear case, need
 
 
 double MPC::GetExternalForce(double pre,double x){
-    //return the external force in lb
-    //TODO: maybe use SI unit in the future???
+    //return the external force in newton
 
 
 
-    double compress_x = (pre-8000)*0.00096875/this->spring_k*25.4; //unit in mm
+    double compress_x = (pre-8000)*2.1547177056884764e-05*this->piston_area/this->spring_k; //unit in mm
     double cur_delta_x =this->max_pos-x;
     if((cur_delta_x-4700)>compress_x/this->volume_slope_6in){ //It turned out the the spring start to compress earlier, the 4700 is an experimental value
-        return (pre/65536*4.096-0.5)/4*200*0.31-0.001*this->pos_diff; 
+
+        return (pre-8000)*2.1547177056884764e-05*this->piston_area-this->fric_coeff*this->pos_diff; //unit newton
+        // return (pre/65536*4.096-0.5)/4*200*0.31-0.001*this->pos_diff; 
     }
     else{
-        return (this->max_pos-x)*0.0006351973436310972*this->spring_k/25.4;
+        return (this->max_pos-x)*this->volume_slope_6in*this->spring_k;// unit: newton
+        // return (this->max_pos-x)*0.0006351973436310972*this->spring_k/25.4;
     }
 
 }
@@ -495,7 +497,7 @@ void MPC::SetCylinderMaxPos(){
 }
 double MPC::GetCylinderScale(double pre,double pos) //get the (cylinder length)/(max cylinder length)
 {
-    double compress_x = (pre-8000)*0.00096875/this->spring_k*25.4; //unit in mm
+    double compress_x = (pre-8000)*2.1547177056884764e-05*this->piston_area/this->spring_k; //unit in mm
     double cur_pos_mm = this->GetLenLinear_mm(pos);
     double cur_len = this->max_len_mm - cur_pos_mm-4700*this->volume_slope_6in;
     if(cur_len<compress_x){
@@ -510,9 +512,9 @@ double MPC::GetCylinderScale(double pre,double pos) //get the (cylinder length)/
 
 int MPC::GetImpControl(const double& imp_des, const double& p_cur, const double& p_tank, const double& pos, float scale){
     //the impedance controller will use the current velocity to estimate the displacement
-    double cur_force = this->GetExternalForce(p_cur,pos); //the force is in lb
-    double p_des = imp_des*this->pos_diff;
-    return this->GetControl(p_des,p_cur,p_tank,scale);
+    double cur_force = this->GetExternalForce(p_cur,pos); 
+    double p_des = (imp_des*this->pos_diff*this->volume_slope_6in)/this->piston_area*4.641208782079999e+04+p_cur;  //N/mm2 * in2/lbf * 4/200 * 2^16/4.096
+    return this->GetPreControl(p_des,p_cur,p_tank,scale);
 
     
 }

@@ -1,5 +1,7 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget,QLabel,QLineEdit,QPushButton
+
+from TCP_Con import TCP, TextToFloat
 class PWM_TestWindow(QWidget):
     def __init__(self,parent=None):
         super().__init__()
@@ -79,13 +81,7 @@ class PWM_TestWindow(QWidget):
         self.btn_LKnePreStop.clicked.connect(self.btn_LKnePre_stop_clicked)
         
     # btn clicked 
-    def text_to_float(self,text):
-       
-        try:
-            res=float(text)
-        except:
-            res=0
-        return res
+
     ## PWM Duty cycle control test
     def btn_LKnePWM_start_clicked(self):
         self.parent.tcp_port.SendCmd('SET:PWM:LKNE:'+str(int(float(self.LKne_duty.text()))),1,True)
@@ -117,14 +113,14 @@ class PWM_TestWindow(QWidget):
     ## all pressure are set in psi, will be convert to voltage reading and send to the exoskeleton
     
     def btn_LTankPre_start_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PRE:LTANK:'+str(self.text_to_float(self.LTank_pre.text())),1,True)#this is to avoid sending invalid commands
+        self.parent.tcp_port.SendCmd('SET:PRE:LTANK:'+str(TextToFloat(self.LTank_pre.text())),1,True)#this is to avoid sending invalid commands
         self.parent.tcp_port.SendCmd('ACT:MPC:LTANK:1',1,True)
     def btn_RTankPre_start_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PRE:RTANK:'+str(self.text_to_float(self.RTank_pre.text())),1,True)
+        self.parent.tcp_port.SendCmd('SET:PRE:RTANK:'+str(TextToFloat(self.RTank_pre.text())),1,True)
         self.parent.tcp_port.SendCmd('ACT:MPC:RTANK:1',1,True)
 
     def btn_LKnePre_start_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PRE:LKNE:'+str(self.text_to_float(self.LKne_pre.text())),1,True)
+        self.parent.tcp_port.SendCmd('SET:PRE:LKNE:'+str(TextToFloat(self.LKne_pre.text())),1,True)
         self.parent.tcp_port.SendCmd('ACT:MPC:LKNE:1',1,True)
 
     def btn_LTankPre_stop_clicked(self):

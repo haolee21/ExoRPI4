@@ -13,7 +13,7 @@
  * The unit will be SI unit:
  * length: mm
  * pressure: kPa
- * force: mN
+ * force: N
 **/
 
 
@@ -105,10 +105,10 @@ private:
 
     double max_pos;//unit: adc reading //FIXME: this is based on linear calibration //FIXME: this has to be update everytime we run
     double max_len_mm;
-    const double spring_k = 55.4/2; //although the spec says the k is 55.4 lb/in, but in reality it is only half of it
-                                         // the unit here is lb/in 
+    const double spring_k = 55.4/2*0.0393701*4.44822; //although the spec says the k is 55.4 lb/in, but in reality it is only half of it
+                                         // the unit here is N/mm
     const double pre_offset = 0.5/4.096*65536;
-    const double piston_area=0.31; //unit: in^2
+    const double piston_area=199.9996; // unit: mm^2 0.31 in2
     double GetExternalForce(double P,double x);
     double GetLenLinear_mm(double pos);
     //piston friction compensation
@@ -126,7 +126,7 @@ public:
     void UpdateParamH(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     void UpdateParamL(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     
-    int GetControl(const double& p_des,const double& p_cur,const double& p_tank,float scale);//It requires current pressure value because all the values storaged in the meme are scaled
+    int GetPreControl(const double& p_des,const double& p_cur,const double& p_tank,float scale);//It requires current pressure value because all the values storaged in the meme are scaled
     int GetImpControl(const double& imp_des, const double& p_cur, const double& p_tank, const double& pos,float scale);
     //Get values for recorder
     std::array<double,11> GetMpcRec();

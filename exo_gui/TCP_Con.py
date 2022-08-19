@@ -149,4 +149,11 @@ class TCP:
         # pdb.set_trace()
         self.updateJoint(receive[:JOINT_DATA_LEN]) 
         self.updatePre(receive[JOINT_DATA_LEN:-2])
+
+def TextToFloat(text):
+    try:
+        res = float(text)
+    except:
+        res=0
+    return res
         

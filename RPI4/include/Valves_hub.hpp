@@ -9,10 +9,31 @@
 #include "MPC.hpp"
 
 #define NUM_OF_MPC 6
+#define NUM_OF_IMP 4
 
 class Valves_hub
 {
+
+private:
+    //MPC Pressure control 
+    MPC LTankCon,LKneCon;
+    std::array<bool,NUM_OF_MPC> mpc_enable;
+    enum class MPC_Enable{
+        kLTank,kLKne,kLAnk,kRTank,kRKne,kRAnk
+    };
+    std::array<bool,NUM_OF_IMP> imp_enagle; //flags to enable impedance control
+    
+    // bool l_tank_enable,r_tank_enable; //when these flags are true, we will calculate the duty of the pwm during update valve conditions
+    std::array<double,PWM_VAL_NUM> desired_pre{0};
+    std::array<double,NUM_OF_IMP> desired_imp{0};
+
+
 public:
+    enum class Joint{
+        kLKne,kLAnk,kRKne,kRAnk
+    };
+
+
     static Valves_hub& GetInstance();
     // static Valves_hub& GetInstance(std::array<double,SensorHub::NUMENC>&,std::array<double,SensorHub::NUMPRE>&); // ideally this initializer should be called first
 
@@ -43,8 +64,11 @@ public:
     //MPC control
     static void StartMPC(Valves_hub::PWM_ID pwm_valve,bool enable);
     static void SetDesiredPre(Valves_hub::PWM_ID pwm_valve,double des_pre);
-    static void SetCylinderMaxLen(Valves_hub::PWM_ID pwm_valve);
     const static std::array<bool,NUM_OF_MPC>& GetMpcCond();
+
+    //Impdence control
+    static void SetDesiredImp(Valves_hub::Joint imp,double imp_val);
+    static void SetCylnMaxPos(Joint joint);
 private:
     
     Valves_hub();
@@ -65,15 +89,7 @@ private:
     
     TeensyI2C teensyValveCon;
 
-    //MPC Pressure control 
-    MPC LTankCon,LKneCon;
-    std::array<bool,NUM_OF_MPC> mpc_enable;
-    enum MPC_Enable{
-        kLTank,kLKne,kLAnk,kRTank,kRKne,kRAnk
-    };
-    // bool l_tank_enable,r_tank_enable; //when these flags are true, we will calculate the duty of the pwm during update valve conditions
-    std::array<double,PWM_VAL_NUM> desired_pre{0};
-
+    
     Recorder<double,11> mpc_ltank_rec; //record p_tank, p_set(target), p_val, q_val
     Recorder<double,11> mpc_lkne_rec;
 

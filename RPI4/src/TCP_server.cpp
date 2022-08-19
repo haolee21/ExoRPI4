@@ -172,6 +172,29 @@ void TCP_server::RecvCmd(){
                 }
 
             }
+            else if(cmd_subClass.compare("IMP")==0){
+                double input = std::stod(Sub_cmd(ret_str,cmd_idx,'\n'));
+                if(cmd_device.compare("LKNE")==0){
+                    Valves_hub::SetDesiredImp(Valves_hub::Joint::kLKne,input);
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                }
+
+            }
+            else if(cmd_subClass.compare("MPOS")==0){
+                if(cmd_device.compare("LKNE")==0){
+                    Valves_hub::SetCylnMaxPos(Valves_hub::Joint::kLKne);
+                }
+                else if(cmd_device.compare("LANK")==0){
+                    Valves_hub::SetCylnMaxPos(Valves_hub::Joint::kLAnk);
+                }
+                else if(cmd_device.compare("RKNE")==0){
+                    Valves_hub::SetCylnMaxPos(Valves_hub::Joint::kRKne);
+                }
+                else if(cmd_device.compare("RANK")==0){
+                    Valves_hub::SetCylnMaxPos(Valves_hub::Joint::kRAnk);
+                }
+
+            }
             else if(cmd_subClass.compare("REC")==0){
                 
                 if(cmd_device.compare("DATA")==0){
@@ -248,7 +271,7 @@ void TCP_server::RecvCmd(){
 
 
         }
-
+    
         else if(cmd_class.compare("CAL")==0){
             if(cmd_subClass.compare("ENC")==0){
                 std::string cmd_device = Sub_cmd(ret_str,cmd_idx,'\n');
