@@ -102,16 +102,27 @@ void Valves_hub::UpdateValve(){
     hub.LKneCon.PushMeas(pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::LKne],hub.PWM_Duty[PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::Pos]);
 
     if(hub.mpc_enable[static_cast<int>(Valves_hub::MPC_Enable::kLTank)]){
-        
         int res_duty = hub.LTankCon.GetPreControl(hub.desired_pre[Valves_hub::PWM_ID::LTANKPRE],pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::Tank],1.0);
         
         hub.SetDuty(res_duty,Valves_hub::PWM_ID::LTANKPRE); 
         hub.mpc_ltank_rec.PushData(hub.LTankCon.GetMpcRec());
     }
     if(hub.mpc_enable[static_cast<int>(Valves_hub::MPC_Enable::kLKne)]){
-        
-        int res_duty = hub.LKneCon.GetPreControl(hub.desired_pre[Valves_hub::PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::LTank],hub.LKneCon.GetCylinderScale(pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::Pos]));
+        int res_duty=0;
+        bool need_bal=false;
+        int ank_duty=0;
+        if(hub.imp_enable[static_cast<int>(Valves_hub::Joint::kLKne)]){
+            res_duty = hub.LKneCon.GetImpControl(hub.desired_imp[static_cast<unsigned>(Valves_hub::Joint::kLKne)],pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::Pos],hub.LKneCon.GetCylinderScale(pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::Pos]),need_bal);
+            if(need_bal){
+                ank_duty=100;
+            }
+        }
+        else{
+            res_duty = hub.LKneCon.GetPreControl(hub.desired_pre[Valves_hub::PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::LTank],hub.LKneCon.GetCylinderScale(pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::Pos]));
+        }
         hub.SetDuty(res_duty,Valves_hub::PWM_ID::LKNEPRE);
+        hub.SetDuty(ank_duty,Valves_hub::PWM_ID::LANKPRE);
+
         hub.mpc_lkne_rec.PushData(hub.LKneCon.GetMpcRec());
     }
     
@@ -192,6 +203,12 @@ void Valves_hub::SetDesiredPre(Valves_hub::PWM_ID pwm_valve,double des_pre){
 
 }
 void Valves_hub::SetDesiredImp(Valves_hub::Joint imp,double imp_val){ //TODO: finish it
+    Valves_hub& hub = Valves_hub::GetInstance();
+    hub.desired_imp[static_cast<unsigned>(imp)]=imp_val;
+    
+}
+void Valves_hub::EnableImpCon(Valves_hub::Joint imp,bool enable){
+    Valves_hub::GetInstance().imp_enable[static_cast<unsigned>(imp)]=enable;
 
 }
 

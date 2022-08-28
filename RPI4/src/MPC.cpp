@@ -10,10 +10,10 @@ using namespace std;
 // const float MPC::kArea =  0.31*645.16f;  //unit: mm^2
 
 MPC::MPC(CylinderParam::Params param)
-: ah(param.ch[0]),bh(param.ch[1]),al(param.cl[0]) ,bl(param.cl[1]),fric_coeff(param.fri_coeff),
+: ah(param.ch[0]),bh(param.ch[1]),al(param.cl[0]) ,bl(param.cl[1]),fric_coeff(param.fri_coeff),piston_area(param.piston_area),
 vel_filter(FilterParam::Filter20Hz_5::a,FilterParam::Filter20Hz_5::b) //init model param
 ,force_filter(FilterParam::Filter20Hz_2::a,FilterParam::Filter20Hz_2::b)
-  
+
 {
     this->max_pos = param.max_pos;
     this->max_len_mm = this->GetLenLinear_mm(max_pos);
@@ -435,7 +435,7 @@ void MPC::PushMeas(const double p_tank,const double p_set,const double duty,doub
     // this->pos_diff = (this->vel_filter.GetFilteredMea(std::array<double,1>{temp_pos_diff}))[0];
     this->pos_diff = temp_pos_diff;
 
-
+    this->cur_max_spring_compress = (p_set-8000)*2.1547177056884764e-05*this->piston_area/this->spring_k; //unit in mm, piston area=0 for air reservoir
     this->cur_force =  this->force_filter.GetFilteredMea(std::array<double,1>{this->GetExternalForce(p_set,_pos)})[0];
 
 }
@@ -476,11 +476,9 @@ double MPC::GetLenLinear_mm(double pos){ //TODO: this only fit linear case, need
 double MPC::GetExternalForce(double pre,double x){
     //return the external force in newton
 
-
-
-    double compress_x = (pre-8000)*2.1547177056884764e-05*this->piston_area/this->spring_k; //unit in mm
+    
     double cur_delta_x =this->max_pos-x;
-    if((cur_delta_x-4700)>compress_x/this->volume_slope_6in){ //It turned out the the spring start to compress earlier, the 4700 is an experimental value
+    if((cur_delta_x-4700)>this->cur_max_spring_compress/this->volume_slope_6in){ //It turned out the the spring start to compress earlier, the 4700 is an experimental value
 
         return (pre-8000)*2.1547177056884764e-05*this->piston_area-this->fric_coeff*this->pos_diff; //unit newton
         // return (pre/65536*4.096-0.5)/4*200*0.31-0.001*this->pos_diff; 
@@ -497,12 +495,12 @@ void MPC::SetCylinderMaxPos(){
 }
 double MPC::GetCylinderScale(double pre,double pos) //get the (cylinder length)/(max cylinder length)
 {
-    double compress_x = (pre-8000)*2.1547177056884764e-05*this->piston_area/this->spring_k; //unit in mm
+    
     double cur_pos_mm = this->GetLenLinear_mm(pos);
     double cur_len = this->max_len_mm - cur_pos_mm-4700*this->volume_slope_6in;
-    if(cur_len<compress_x){
-        // std::cout<<"get scale: "<<(cur_pos_mm-compress_x)/this->max_len_mm<<std::endl;
-        return (cur_pos_mm+compress_x)/this->max_len_mm;
+    if(cur_len<this->cur_max_spring_compress){
+        
+        return (cur_pos_mm-this->cur_max_spring_compress)/this->max_len_mm;
     }
     else{
         return 1;
@@ -510,11 +508,28 @@ double MPC::GetCylinderScale(double pre,double pos) //get the (cylinder length)/
 
 }
 
-int MPC::GetImpControl(const double& imp_des, const double& p_cur, const double& p_tank, const double& pos, float scale){
+int MPC::GetImpControl(const double& imp_des, const double& p_cur, const double& p_tank, const double& pos, float scale,bool &need_bal){
     //the impedance controller will use the current velocity to estimate the displacement
-    double cur_force = this->GetExternalForce(p_cur,pos); 
-    double p_des = (imp_des*this->pos_diff*this->volume_slope_6in)/this->piston_area*4.641208782079999e+04+p_cur;  //N/mm2 * in2/lbf * 4/200 * 2^16/4.096
-    return this->GetPreControl(p_des,p_cur,p_tank,scale);
+
+    //steps: 
+    //       1. calculate desired force based on current position
+    //       2. calculate desired pressure based on current velocity and desired force
+    //       3. command desired pressure
+
+    // if((this->pos_diff*this->volume_slope_6in<0.01)&&(this->pos_diff*this->volume_slope_6in>-0.01)) return 0; //if it does not move more than 0.5mm, no control
+
+    double cur_delta_x = this->max_len_mm-this->GetLenLinear_mm(pos);
+    double des_force = imp_des*cur_delta_x;
+    double des_pre = (des_force+this->fric_coeff*this->pos_diff)/this->piston_area/2.1547177056884764e-05+8000;
+    
+    if(des_pre+1000<p_cur){
+        need_bal=true;
+    }
+    // double p_des = (imp_des*this->pos_diff*this->volume_slope_6in)/this->piston_area*4.641208782079999e+04+p_cur;  //N/mm2 * in2/lbf * 4/200 * 2^16/4.096
+
+    
+    return this->GetPreControl(des_pre,p_cur,p_tank,scale);
+    
 
     
 }

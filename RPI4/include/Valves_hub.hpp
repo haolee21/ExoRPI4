@@ -21,7 +21,7 @@ private:
     enum class MPC_Enable{
         kLTank,kLKne,kLAnk,kRTank,kRKne,kRAnk
     };
-    std::array<bool,NUM_OF_IMP> imp_enagle; //flags to enable impedance control
+    std::array<bool,NUM_OF_IMP> imp_enable; //flags to enable impedance control
     
     // bool l_tank_enable,r_tank_enable; //when these flags are true, we will calculate the duty of the pwm during update valve conditions
     std::array<double,PWM_VAL_NUM> desired_pre{0};
@@ -69,6 +69,7 @@ public:
     //Impdence control
     static void SetDesiredImp(Valves_hub::Joint imp,double imp_val);
     static void SetCylnMaxPos(Joint joint);
+    static void EnableImpCon(Valves_hub::Joint imp,bool flag);
 private:
     
     Valves_hub();

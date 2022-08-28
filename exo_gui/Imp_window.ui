@@ -173,7 +173,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_lkne_cancel">
+        <widget class="QPushButton" name="btn_lkne_stop">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -181,7 +181,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Cancel</string>
+          <string>Stop</string>
          </property>
         </widget>
        </item>
@@ -268,7 +268,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_lank_cancel">
+        <widget class="QPushButton" name="btn_lank_stop">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -276,7 +276,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Cancel</string>
+          <string>Stop</string>
          </property>
         </widget>
        </item>
@@ -368,7 +368,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_rkne_cancel">
+        <widget class="QPushButton" name="btn_rkne_stop">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -376,7 +376,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Cancel</string>
+          <string>Stop</string>
          </property>
         </widget>
        </item>
@@ -468,7 +468,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_rank_cancel">
+        <widget class="QPushButton" name="btn_rank_stop">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -476,7 +476,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Cancel</string>
+          <string>Stop</string>
          </property>
         </widget>
        </item>

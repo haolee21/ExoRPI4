@@ -217,10 +217,9 @@ void TCP_server::RecvCmd(){
             }
         }
         else if(cmd_class.compare("ACT")==0){
-            
+            std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
+            std::string input = Sub_cmd(ret_str,cmd_idx,'\n');
             if(cmd_subClass.compare("MPC")==0){
-                std::string cmd_device = Sub_cmd(ret_str,cmd_idx,':');
-                std::string input = Sub_cmd(ret_str,cmd_idx,'\n');
                 if(cmd_device.compare("LTANK")==0){
                     if(input.compare("1")==0){
                         Valves_hub::StartMPC(Valves_hub::PWM_ID::LTANKPRE,true);
@@ -262,6 +261,46 @@ void TCP_server::RecvCmd(){
                 }
 
 
+
+            }
+            else if(cmd_subClass.compare("IMP")==0){
+                if(cmd_device.compare("LKNE")==0){
+                    if(input.compare("1")==0){
+                        Valves_hub::GetInstance().EnableImpCon(Valves_hub::Joint::kLKne,true);
+                    }
+                    else{
+                        Valves_hub::GetInstance().EnableImpCon(Valves_hub::Joint::kLKne,false);
+                    }
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                }
+                else if(cmd_device.compare("LANK")==0){
+                    if(input.compare("1")==0){
+                        Valves_hub::GetInstance().EnableImpCon(Valves_hub::Joint::kLAnk,true);
+                    }
+                    else{
+                        Valves_hub::GetInstance().EnableImpCon(Valves_hub::Joint::kLAnk,false);
+                    }
+                }
+                else if(cmd_device.compare("RKNE")==0){
+                    if(input.compare("1")==0){
+                        Valves_hub::GetInstance().EnableImpCon(Valves_hub::Joint::kRKne,true);
+                    }
+                    else{
+                        Valves_hub::GetInstance().EnableImpCon(Valves_hub::Joint::kRKne,false);
+                    }
+                    TCP_server::Send_cmd(std::string("1"),socket);
+                }
+                else if(cmd_device.compare("RANK")==0){
+                    if(input.compare("1")==0){
+                        Valves_hub::GetInstance().EnableImpCon(Valves_hub::Joint::kRAnk,true);
+                    }
+                    else{
+                        Valves_hub::GetInstance().EnableImpCon(Valves_hub::Joint::kRAnk,false);
+                    }
+                }
+                else{
+                    TCP_server::Send_cmd(std::string("0"),socket);
+                }
 
             }
             else{

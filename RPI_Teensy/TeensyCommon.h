@@ -2,7 +2,7 @@
 #define PWM_VAL_NUM 6
 #define SW_VAL_NUM 8
 
-#define PWM_HEADER "TIME,LTANK,LKNE_PRE,LANK_PRE,RKNE_PRE,RANK_PRE,R_TANK" //TODO: need 7 pwm I think
+#define PWM_HEADER "TIME,LTANK,LKNE_PRE,LKNE_BAL,RKNE_PRE,RANK_PRE,R_TANK" //TODO: need 7 pwm I think, also add LANK back after we finish the imp test
 #define TEENSY_PWM0 8   //VAL 9
 #define RPI_PWM0 0
 #define TEENSY_PWM1 9 //VAL 10

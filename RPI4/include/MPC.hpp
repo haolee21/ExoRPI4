@@ -93,7 +93,7 @@ private:
     // std::unique_ptr<OSQPSettings> osqp_settings;
     // std::unique_ptr<OSQPData> osqp_data;
     // OSQPWorkspace *work;
-    bool mpc_enable;
+    // bool mpc_enable;
 
     //cylinder volume
     
@@ -105,10 +105,10 @@ private:
 
     double max_pos;//unit: adc reading //FIXME: this is based on linear calibration //FIXME: this has to be update everytime we run
     double max_len_mm;
-    const double spring_k = 55.4/2*0.0393701*4.44822; //although the spec says the k is 55.4 lb/in, but in reality it is only half of it
+    const double spring_k = 55.4*0.0393701*4.44822; //although the spec says the k is 55.4 lb/in, but in reality it is only half of it
                                          // the unit here is N/mm
     const double pre_offset = 0.5/4.096*65536;
-    const double piston_area=199.9996; // unit: mm^2 0.31 in2
+    const double piston_area;
     double GetExternalForce(double P,double x);
     double GetLenLinear_mm(double pos);
     //piston friction compensation
@@ -117,6 +117,7 @@ private:
     double cur_pos;
     double fric_coeff;
     
+    double cur_max_spring_compress;
     double cur_force;
     DigitalFilter<double,FilterParam::Filter20Hz_5::Order,1> vel_filter;
     DigitalFilter<double,FilterParam::Filter20Hz_2::Order,1> force_filter;
@@ -127,7 +128,7 @@ public:
     void UpdateParamL(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     
     int GetPreControl(const double& p_des,const double& p_cur,const double& p_tank,float scale);//It requires current pressure value because all the values storaged in the meme are scaled
-    int GetImpControl(const double& imp_des, const double& p_cur, const double& p_tank, const double& pos,float scale);
+    int GetImpControl(const double& imp_des, const double& p_cur, const double& p_tank, const double& pos,float scale,bool& ank_duty);
     //Get values for recorder
     std::array<double,11> GetMpcRec();
 
