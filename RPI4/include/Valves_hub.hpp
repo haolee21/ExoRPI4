@@ -41,25 +41,22 @@ public:
     
     static void UpdateValve();
     ~Valves_hub();
-    enum SW_ID{
-        LKNEBAL,LANKBAL,RKNEBAL,RANKBAL,
-        FIRST_SW=LKNEBAL,LAST_SW=RANKBAL
-    };
+  
     enum PWM_ID{
-        LTANKPRE,LKNEPRE,
-        LANKPRE,RKNEPRE,RANKPRE,RTANKPRE,
+        LTANKPRE=PCB_VAL_9,LKNEPRE=PCB_VAL_10,
+        LANKPRE=PCB_VAL_14,RKNEPRE=PCB_VAL_12,RANKPRE=PCB_VAL_13,RTANKPRE=PCB_VAL_14,
+        NA1 = PCB_VAL_15, NA2 = PCB_VAL_16,NA3 = PCB_VAL_1,NA4=PCB_VAL_2,NA5=PCB_VAL_3,NA6=PCB_VAL_4,NA7=PCB_VAL_5,NA8=PCB_VAL_6,NA9=PCB_VAL_7,NA10=PCB_VAL_8,
         FIRST_PWM=LTANKPRE,LAST_PWM=RTANKPRE
     };
 
 
     static void SetDuty(uint8_t duty,Valves_hub::PWM_ID id);
     static void SetDuty(const std::array<uint8_t,PWM_VAL_NUM> duty);
-    static void SetSW(bool cond,Valves_hub::SW_ID id);
-    static void SetSW(const std::array<bool,SW_VAL_NUM> cond);
+  
 
     //TCP_server read valve condition
     const static std::array<uint8_t,PWM_VAL_NUM>& GetDuty() ;
-    const static std::array<bool,SW_VAL_NUM>& GetSWValCond();
+    
 
     //MPC control
     static void StartMPC(Valves_hub::PWM_ID pwm_valve,bool enable);
@@ -77,14 +74,11 @@ private:
     
 
     std::array<uint8_t,PWM_VAL_NUM> PWM_Duty{0};
-    std::array<bool,SW_VAL_NUM> SW_ValCond{0}; //using value initializer to set all values to zero
-    void On(Valves_hub::SW_ID sw_valve);//turn on or off the valve
-    void Off(Valves_hub::SW_ID sw_valve);
+
     
     bool valChanged_flag;
 
     Recorder<uint8_t,PWM_VAL_NUM> pwmRecorder;
-    Recorder<bool,SW_VAL_NUM> swRecorder;
 
 
     

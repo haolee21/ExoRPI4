@@ -21,11 +21,11 @@ const uint16_t slave_address = 0x002D;
 I2CSlave& slave = Slave;
 void after_receive(int size);
 
-const int duty_unit = 100; //in micro second, the valve PWM period is 200 Hz
+const int duty_unit = 100; //in micro second, the valve PWM period is 100 Hz
 const unsigned long period_time =duty_unit*100;
 
 const int num_pwm = PWM_VAL_NUM;
-const int num_val = SW_VAL_NUM;
+// const int num_val = SW_VAL_NUM;
 
 int pwm_idx=0;//this is for record the valve id, not the pin id (e.g., pwm1 is pin 8)
 int val_idx=0;
@@ -34,28 +34,38 @@ int val_idx=0;
 
 // create two lists for pwm_valves, pwm_list is the original list, pwm_sort_list is after sorting
 PWM_valve pwm_list[num_pwm] = {
-  PWM_valve(pwm_idx++,TEENSY_PWM0, duty_unit),
   PWM_valve(pwm_idx++,TEENSY_PWM1, duty_unit),
   PWM_valve(pwm_idx++,TEENSY_PWM2, duty_unit),
   PWM_valve(pwm_idx++,TEENSY_PWM3, duty_unit),
   PWM_valve(pwm_idx++,TEENSY_PWM4, duty_unit),
   PWM_valve(pwm_idx++,TEENSY_PWM5, duty_unit),
+  PWM_valve(pwm_idx++,TEENSY_PWM6, duty_unit),
+  PWM_valve(pwm_idx++,TEENSY_PWM7, duty_unit),
+  PWM_valve(pwm_idx++,TEENSY_PWM8, duty_unit),
+  PWM_valve(pwm_idx++,TEENSY_PWM9, duty_unit),
+  PWM_valve(pwm_idx++,TEENSY_PWM10,duty_unit),
+  PWM_valve(pwm_idx++,TEENSY_PWM11,duty_unit),
+  PWM_valve(pwm_idx++,TEENSY_PWM12,duty_unit),
+  PWM_valve(pwm_idx++,TEENSY_PWM13,duty_unit),
+  PWM_valve(pwm_idx++,TEENSY_PWM14,duty_unit),
+  PWM_valve(pwm_idx++,TEENSY_PWM15,duty_unit),
+  PWM_valve(pwm_idx++,TEENSY_PWM16,duty_unit)
 };
 PWM_valve pwm_sort_list[num_pwm];
 
 // normal valve list
-Valve valve_list[num_val] = {
-    Valve(TEENSY_SW0),
-    Valve(TEENSY_SW1),
-    Valve(TEENSY_SW2),
-    Valve(TEENSY_SW3),
-    Valve(TEENSY_SW4),
-    Valve(TEENSY_SW5),
-    Valve(TEENSY_SW6),
-    Valve(TEENSY_SW7)};
+// Valve valve_list[num_val] = {
+//     Valve(TEENSY_SW0),
+//     Valve(TEENSY_SW1),
+//     Valve(TEENSY_SW2),
+//     Valve(TEENSY_SW3),
+//     Valve(TEENSY_SW4),
+//     Valve(TEENSY_SW5),
+//     Valve(TEENSY_SW6),
+//     Valve(TEENSY_SW7)};
 
 // Double receive buffers to hold data from master.
-const size_t slave_rx_buffer_size = num_pwm+num_val;
+const size_t slave_rx_buffer_size = num_pwm;
 uint8_t slave_rx_buffer[slave_rx_buffer_size] = {};
 uint8_t slave_rx_buffer_2[slave_rx_buffer_size] = {};
 volatile size_t slave_bytes_received = 0; //when a variable is not used in the main thread, we need to declared it as volatile to avoid it got deleted when optimized
@@ -152,15 +162,15 @@ void decode_msg()
     pwm_list[i].setDuty((int)slave_rx_buffer_2[i]);
 
   }
-  for (int i = num_pwm; i < num_pwm + num_val;i++){
-    if((bool)slave_rx_buffer_2[i]){
-      valve_list[i-num_pwm].on();
-    }
-    else{
-      valve_list[i-num_pwm].off();
-    }
+  // for (int i = num_pwm; i < num_pwm + num_val;i++){
+  //   if((bool)slave_rx_buffer_2[i]){
+  //     valve_list[i-num_pwm].on();
+  //   }
+  //   else{
+  //     valve_list[i-num_pwm].off();
+  //   }
     
-  }
+  // }
 
 
   // memcpy(pwm_sort_list, pwm_list, sizeof(PWM_valve) * num_pwm);
