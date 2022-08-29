@@ -53,9 +53,9 @@ void Valves_hub::UpdateValve(){
     hub.LKneCon.PushMeas(pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::LKne],hub.PWM_Duty[PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::Pos]);
 
     if(hub.mpc_enable[static_cast<int>(Valves_hub::MPC_Enable::kLTank)]){
-        int res_duty = hub.LTankCon.GetPreControl(hub.desired_pre[Valves_hub::PWM_ID::LTANKPRE],pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::Tank],1.0);
+        int res_duty = hub.LTankCon.GetPreControl(hub.desired_pre[PWM_ID::LTANKPRE],pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::Tank],1.0);
         
-        hub.SetDuty(res_duty,Valves_hub::PWM_ID::LTANKPRE); 
+        hub.SetDuty(res_duty,PWM_ID::LTANKPRE); 
         hub.mpc_ltank_rec.PushData(hub.LTankCon.GetMpcRec());
     }
     if(hub.mpc_enable[static_cast<int>(Valves_hub::MPC_Enable::kLKne)]){
@@ -69,10 +69,10 @@ void Valves_hub::UpdateValve(){
             }
         }
         else{
-            res_duty = hub.LKneCon.GetPreControl(hub.desired_pre[Valves_hub::PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::LTank],hub.LKneCon.GetCylinderScale(pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::Pos]));
+            res_duty = hub.LKneCon.GetPreControl(hub.desired_pre[PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::LTank],hub.LKneCon.GetCylinderScale(pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::Pos]));
         }
-        hub.SetDuty(res_duty,Valves_hub::PWM_ID::LKNEPRE);
-        hub.SetDuty(ank_duty,Valves_hub::PWM_ID::LANKPRE);
+        hub.SetDuty(res_duty,PWM_ID::LKNEPRE);
+        hub.SetDuty(ank_duty,PWM_ID::LANKPRE);
 
         hub.mpc_lkne_rec.PushData(hub.LKneCon.GetMpcRec());
     }
@@ -93,7 +93,7 @@ void Valves_hub::UpdateValve(){
     
 }
 
-void Valves_hub::SetDuty(u_int8_t duty, Valves_hub::PWM_ID id){
+void Valves_hub::SetDuty(u_int8_t duty, PWM_ID id){
     Valves_hub& hub = Valves_hub::GetInstance();
     hub.PWM_Duty[id]=duty;
     hub.valChanged_flag=true;
@@ -116,19 +116,19 @@ const std::array<bool,NUM_OF_MPC>& Valves_hub::GetMpcCond(){
     return std::ref(Valves_hub::GetInstance().mpc_enable);
 }
 
-void Valves_hub::StartMPC(Valves_hub::PWM_ID pwm_valve,bool enable){
+void Valves_hub::StartMPC(PWM_ID pwm_valve,bool enable){
     Valves_hub& hub = Valves_hub::GetInstance();
     
     switch (pwm_valve)
     {
-    case Valves_hub::PWM_ID::LTANKPRE:
+    case PWM_ID::LTANKPRE:
         
         hub.mpc_enable[static_cast<unsigned>(Valves_hub::MPC_Enable::kLTank)] = enable;
         break;
-    case Valves_hub::PWM_ID::RTANKPRE:
+    case PWM_ID::RTANKPRE:
         hub.mpc_enable[static_cast<unsigned>(Valves_hub::MPC_Enable::kRTank)] = enable;
         break;
-    case Valves_hub::PWM_ID::LKNEPRE:
+    case PWM_ID::LKNEPRE:
         hub.mpc_enable[static_cast<unsigned>(Valves_hub::MPC_Enable::kLKne)] = enable;
         break;
     default:
@@ -136,7 +136,7 @@ void Valves_hub::StartMPC(Valves_hub::PWM_ID pwm_valve,bool enable){
     }
 }
 
-void Valves_hub::SetDesiredPre(Valves_hub::PWM_ID pwm_valve,double des_pre){
+void Valves_hub::SetDesiredPre(PWM_ID pwm_valve,double des_pre){
     Valves_hub& hub = Valves_hub::GetInstance();
     hub.desired_pre[pwm_valve] = des_pre;
 

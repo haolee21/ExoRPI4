@@ -119,27 +119,27 @@ void TCP_server::RecvCmd(){
                 uint8_t input = std::stoi(Sub_cmd(ret_str,cmd_idx,'\n'));
                 
                 if(cmd_device.compare("LKNE")==0) {
-                    Valves_hub::SetDuty(input,Valves_hub::LKNEPRE);
+                    Valves_hub::SetDuty(input,PWM_ID::LKNEPRE);
                     TCP_server::Send_cmd(std::string("1"),socket);
                     }
                 else if(cmd_device.compare("LANK")==0){
-                    Valves_hub::SetDuty(input,Valves_hub::LANKPRE);
+                    Valves_hub::SetDuty(input,PWM_ID::LANKPRE);
                     TCP_server::Send_cmd(std::string("1"),socket);
                     }
                 else if(cmd_device.compare("LTANK")==0){
-                    Valves_hub::SetDuty(input,Valves_hub::LTANKPRE);
+                    Valves_hub::SetDuty(input,PWM_ID::LTANKPRE);
                     TCP_server::Send_cmd(std::string("1"),socket);
                     }
                 else if(cmd_device.compare("RKNE")==0){
-                    Valves_hub::SetDuty(input,Valves_hub::RKNEPRE);
+                    Valves_hub::SetDuty(input,PWM_ID::RKNEPRE);
                     TCP_server::Send_cmd(std::string("1"),socket);
                     }
                 else if(cmd_device.compare("RANK")==0){
-                    Valves_hub::SetDuty(input,Valves_hub::RANKPRE);
+                    Valves_hub::SetDuty(input,PWM_ID::RANKPRE);
                     TCP_server::Send_cmd(std::string("1"),socket);
                     }
                 else if(cmd_device.compare("RTANK")==0){
-                    Valves_hub::SetDuty(input,Valves_hub::RTANKPRE);
+                    Valves_hub::SetDuty(input,PWM_ID::RTANKPRE);
                     TCP_server::Send_cmd(std::string("1"),socket);
                     }
                 else{
@@ -151,18 +151,18 @@ void TCP_server::RecvCmd(){
                 float input = std::stof(Sub_cmd(ret_str,cmd_idx,'\n'));
                 double pre_val = (double)(input*320+8000);
                 if(cmd_device.compare("LTANK")==0){
-                    Valves_hub::SetDesiredPre(Valves_hub::PWM_ID::LTANKPRE,pre_val);
+                    Valves_hub::SetDesiredPre(PWM_ID::LTANKPRE,pre_val);
                     TCP_server::Send_cmd(std::string("1"),socket);
                     
                 }
                 else if(cmd_device.compare("RTANK")==0){
-                    Valves_hub::SetDesiredPre(Valves_hub::PWM_ID::RTANKPRE,pre_val);
+                    Valves_hub::SetDesiredPre(PWM_ID::RTANKPRE,pre_val);
                     TCP_server::Send_cmd(std::string("1"),socket);
                     
 
                 }
                 else if(cmd_device.compare("LKNE")==0){
-                    Valves_hub::SetDesiredPre(Valves_hub::PWM_ID::LKNEPRE,pre_val);
+                    Valves_hub::SetDesiredPre(PWM_ID::LKNEPRE,pre_val);
                     TCP_server::Send_cmd(std::string("1"),socket);
                     
 
@@ -222,35 +222,35 @@ void TCP_server::RecvCmd(){
             if(cmd_subClass.compare("MPC")==0){
                 if(cmd_device.compare("LTANK")==0){
                     if(input.compare("1")==0){
-                        Valves_hub::StartMPC(Valves_hub::PWM_ID::LTANKPRE,true);
+                        Valves_hub::StartMPC(PWM_ID::LTANKPRE,true);
                         
                         TCP_server::Send_cmd(std::string("1"),socket);
                     }
                     else{
-                        Valves_hub::StartMPC(Valves_hub::PWM_ID::LTANKPRE,false);
-                        Valves_hub::SetDuty(0,Valves_hub::PWM_ID::LTANKPRE);
+                        Valves_hub::StartMPC(PWM_ID::LTANKPRE,false);
+                        Valves_hub::SetDuty(0,PWM_ID::LTANKPRE);
                         TCP_server::Send_cmd(std::string("1"),socket);
                     }
                 }
                 else if(cmd_device.compare("RTANK")==0){
                     if(input.compare("1")==0){
-                        Valves_hub::StartMPC(Valves_hub::PWM_ID::RTANKPRE,true);
+                        Valves_hub::StartMPC(PWM_ID::RTANKPRE,true);
                         TCP_server::Send_cmd(std::string("1"),socket);
                     }
                     else{
-                        Valves_hub::StartMPC(Valves_hub::PWM_ID::RTANKPRE,false);
-                        Valves_hub::SetDuty(0,Valves_hub::PWM_ID::RTANKPRE);
+                        Valves_hub::StartMPC(PWM_ID::RTANKPRE,false);
+                        Valves_hub::SetDuty(0,PWM_ID::RTANKPRE);
                         TCP_server::Send_cmd(std::string("1"),socket);
                     }
                 }
                 else if(cmd_device.compare("LKNE")==0){
                     if(input.compare("1")==0){
-                        Valves_hub::StartMPC(Valves_hub::PWM_ID::LKNEPRE,true);
+                        Valves_hub::StartMPC(PWM_ID::LKNEPRE,true);
                         TCP_server::Send_cmd(std::string("1"),socket);
                     }
                     else{
-                        Valves_hub::StartMPC(Valves_hub::PWM_ID::LKNEPRE,false);
-                        Valves_hub::SetDuty(0,Valves_hub::PWM_ID::LKNEPRE);
+                        Valves_hub::StartMPC(PWM_ID::LKNEPRE,false);
+                        Valves_hub::SetDuty(0,PWM_ID::LKNEPRE);
                         TCP_server::Send_cmd(std::string("1"),socket);
                     }
                 }
