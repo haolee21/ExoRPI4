@@ -9,14 +9,12 @@ using namespace std;
 
 // const float MPC::kArea =  0.31*645.16f;  //unit: mm^2
 
-MPC::MPC(CylinderParam::Params param)
-: ah(param.ch[0]),bh(param.ch[1]),al(param.cl[0]) ,bl(param.cl[1]),fric_coeff(param.fri_coeff),piston_area(param.piston_area),
-vel_filter(FilterParam::Filter20Hz_5::a,FilterParam::Filter20Hz_5::b) //init model param
-,force_filter(FilterParam::Filter20Hz_2::a,FilterParam::Filter20Hz_2::b)
+MPC::MPC(std::array<std::array<float, MPC_STATE_NUM>,2> cl,std::array<std::array<float, MPC_STATE_NUM>,2> ch)
+: ah(ch[0]),bh(ch[1]),al(cl[0]) ,bl(cl[1])
 
 {
-    this->max_pos = param.max_pos;
-    this->max_len_mm = this->GetLenLinear_mm(max_pos);
+    // this->max_pos = param.max_pos;
+    // this->max_len_mm = this->GetLenLinear_mm(max_pos);
     
     //setup osqp solver
     // this->osqp_data.reset(new OSQPData);
@@ -26,7 +24,7 @@ vel_filter(FilterParam::Filter20Hz_5::a,FilterParam::Filter20Hz_5::b) //init mod
     // this->osqp_settings->verbose = false;
 
     this->phi_scale=1.0;
-    this->pre_pos = 0.0;
+    // this->pre_pos = 0.0;
     
    
     
@@ -410,15 +408,15 @@ int MPC::GetPreControl(const double& p_des,const double& ps, const double& pt,fl
 
 }
 
-std::array<double,11> MPC::GetMpcRec(){ //record dPhi_du, dPhi_dx
-    return std::array<double,11>({this->Phi.coeff(0,0),this->Phi.coeff(1,0),this->P_val,this->q_val
+std::array<double,10> MPC::GetMpcRec(){ //record dPhi_du, dPhi_dx
+    return std::array<double,10>({this->Phi.coeff(0,0),this->Phi.coeff(1,0),this->P_val,this->q_val
                                 ,this->dPhi_du_T.coeff(0,0),this->dPhi_du_T.coeff(1,0)
-                                ,this->dPhi_dx_T.coeff(0,0),this->dPhi_dx_T.coeff(0,1),this->dPhi_dx_T.coeff(1,0),this->dPhi_dx_T.coeff(1,1),this->cur_force});
+                                ,this->dPhi_dx_T.coeff(0,0),this->dPhi_dx_T.coeff(0,1),this->dPhi_dx_T.coeff(1,0),this->dPhi_dx_T.coeff(1,1)});
 }
 
 
 
-void MPC::PushMeas(const double p_tank,const double p_set,const double duty,double _pos)
+void MPC::PushMeas(const double p_tank,const double p_set,const double duty)
 {
     this->p_tank_mem[this->meas_idx] = ((float)p_tank -3297.312)/65536.0; //the substraction is to remove the 0.5 V pressure sensor bias and add 1 atm to the equation
     this->p_set_mem[this->meas_idx]=((float)p_set -3297.312)/65536.0;     // in the lasso regression, we have proved it increases the testing accuracy to stable 90% up
@@ -428,15 +426,15 @@ void MPC::PushMeas(const double p_tank,const double p_set,const double duty,doub
         this->meas_idx=0;
     }
 
-    //also calculate force
-    this->pre_pos = this->cur_pos;
-    this->cur_pos = _pos;
-    double temp_pos_diff = this->cur_pos-this->pre_pos;
-    // this->pos_diff = (this->vel_filter.GetFilteredMea(std::array<double,1>{temp_pos_diff}))[0];
-    this->pos_diff = temp_pos_diff;
+    // //also calculate force
+    // this->pre_pos = this->cur_pos;
+    // this->cur_pos = _pos;
+    // double temp_pos_diff = this->cur_pos-this->pre_pos;
+    // // this->pos_diff = (this->vel_filter.GetFilteredMea(std::array<double,1>{temp_pos_diff}))[0];
+    // this->pos_diff = temp_pos_diff;
 
-    this->cur_max_spring_compress = (p_set-8000)*2.1547177056884764e-05*this->piston_area/this->spring_k; //unit in mm, piston area=0 for air reservoir
-    this->cur_force =  this->force_filter.GetFilteredMea(std::array<double,1>{this->GetExternalForce(p_set,_pos)})[0];
+    // this->cur_max_spring_compress = (p_ext-p_flex)*2.1547177056884764e-05*this->piston_area/this->spring_k; //unit in mm, piston area=0 for air reservoir
+    // this->cur_force =  this->force_filter.GetFilteredMea(std::array<double,1>{this->GetExternalForce(p_ext,p_flex,_pos)})[0];
 
 }
 
@@ -466,70 +464,68 @@ void MPC::UpdateHistory(){
 }
 
 
-double MPC::GetLenLinear_mm(double pos){ //TODO: this only fit linear case, need to do nonlinear equation when using it on the exoskeleton
-    return pos*this->volume_slope_6in+this->volume_intercept_6in; //152.4 is 6 in cylinder max length
-                                                                               //TODO: need to consider 5" cylinder
-                                                                               //6.71 is just the offset of linear encoder
-}
+// double MPC::GetLenLinear_mm(double pos){ //TODO: this only fit linear case, need to do nonlinear equation when using it on the exoskeleton
+//     return pos*this->volume_slope_6in+this->volume_intercept_6in; //152.4 is 6 in cylinder max length
+//                                                                                //TODO: need to consider 5" cylinder
+//                                                                                //6.71 is just the offset of linear encoder
+// }
 
 
-double MPC::GetExternalForce(double pre,double x){
-    //return the external force in newton
+// double MPC::GetExternalForce(double pre_ext,double pre_flex,double x){
+//     //return the external force in newton
 
     
-    double cur_delta_x =this->max_pos-x;
-    if((cur_delta_x-4700)>this->cur_max_spring_compress/this->volume_slope_6in){ //It turned out the the spring start to compress earlier, the 4700 is an experimental value
+//     double cur_delta_x =this->max_pos-x;
+//     if((cur_delta_x-4700)>this->cur_max_spring_compress/this->volume_slope_6in){ //It turned out the the spring start to compress earlier, the 4700 is an experimental value
 
-        return (pre-8000)*2.1547177056884764e-05*this->piston_area-this->fric_coeff*this->pos_diff; //unit newton
-        // return (pre/65536*4.096-0.5)/4*200*0.31-0.001*this->pos_diff; 
-    }
-    else{
-        return (this->max_pos-x)*this->volume_slope_6in*this->spring_k;// unit: newton
-        // return (this->max_pos-x)*0.0006351973436310972*this->spring_k/25.4;
-    }
+//         return (pre_ext-pre_flex)*2.1547177056884764e-05*this->piston_area-this->fric_coeff*this->pos_diff; //unit newton
+//         // return (pre/65536*4.096-0.5)/4*200*0.31-0.001*this->pos_diff; 
+//     }
+//     else{
+//         return (this->max_pos-x)*this->volume_slope_6in*this->spring_k;// unit: newton
+//         // return (this->max_pos-x)*0.0006351973436310972*this->spring_k/25.4;
+//     }
 
-}
+// }
 
-void MPC::SetCylinderMaxPos(){
-    this->max_pos = this->cur_pos;
-}
-double MPC::GetCylinderScale(double pre,double pos) //get the (cylinder length)/(max cylinder length)
-{
+// void MPC::SetCylinderMaxPos(){
+    // this->max_pos = this->cur_pos;
+// }
+// double MPC::GetCylinderScale(double pre,double pos) //get the (cylinder length)/(max cylinder length)
+// {
     
-    double cur_pos_mm = this->GetLenLinear_mm(pos);
-    double cur_len = this->max_len_mm - cur_pos_mm-4700*this->volume_slope_6in;
-    if(cur_len<this->cur_max_spring_compress){
+//     double cur_pos_mm = this->GetLenLinear_mm(pos);
+//     double cur_len = this->max_len_mm - cur_pos_mm-4700*this->volume_slope_6in;
+//     if(cur_len<this->cur_max_spring_compress){
         
-        return (cur_pos_mm-this->cur_max_spring_compress)/this->max_len_mm;
-    }
-    else{
-        return 1;
-    }
+//         return (cur_pos_mm-this->cur_max_spring_compress)/this->max_len_mm;
+//     }
+//     else{
+//         return 1;
+//     }
 
-}
+// }
 
-int MPC::GetImpControl(const double& imp_des, const double& p_cur, const double& p_tank, const double& pos, float scale,bool &need_bal){
-    //the impedance controller will use the current velocity to estimate the displacement
+// void MPC::GetImpControl(const double& imp_des, const double& p_ext,const double& p_flex, const double& p_tank, const double& pos,float scale,int& joint_val_duty,int& joint_bal_duty,int& tank_duty){
+//     //the impedance controller will use the current velocity to estimate the displacement
 
-    //steps: 
-    //       1. calculate desired force based on current position
-    //       2. calculate desired pressure based on current velocity and desired force
-    //       3. command desired pressure
+//     //steps: 
+//     //       1. calculate desired force based on current position
+//     //       2. calculate desired pressure based on current velocity and desired force
+//     //       3. command desired pressure
 
-    // if((this->pos_diff*this->volume_slope_6in<0.01)&&(this->pos_diff*this->volume_slope_6in>-0.01)) return 0; //if it does not move more than 0.5mm, no control
+//     // if((this->pos_diff*this->volume_slope_6in<0.01)&&(this->pos_diff*this->volume_slope_6in>-0.01)) return 0; //if it does not move more than 0.5mm, no control
 
-    double cur_delta_x = this->max_len_mm-this->GetLenLinear_mm(pos);
-    double des_force = imp_des*cur_delta_x;
-    double des_pre = (des_force+this->fric_coeff*this->pos_diff)/this->piston_area/2.1547177056884764e-05+8000;
+//     double cur_delta_x = this->max_len_mm-this->GetLenLinear_mm(pos);
+//     double des_force = imp_des*cur_delta_x;
+//     double des_pre = (des_force+this->fric_coeff*this->pos_diff)/this->piston_area/2.1547177056884764e-05+8000;
     
-    if(des_pre+1000<p_cur){
-        need_bal=true;
-    }
-    // double p_des = (imp_des*this->pos_diff*this->volume_slope_6in)/this->piston_area*4.641208782079999e+04+p_cur;  //N/mm2 * in2/lbf * 4/200 * 2^16/4.096
+  
+//     // double p_des = (imp_des*this->pos_diff*this->volume_slope_6in)/this->piston_area*4.641208782079999e+04+p_cur;  //N/mm2 * in2/lbf * 4/200 * 2^16/4.096
 
     
-    return this->GetPreControl(des_pre,p_cur,p_tank,scale);
+//     joint_val_duty= this->GetPreControl(des_pre,p_ext,p_tank,scale);
     
 
     
-}
+// }

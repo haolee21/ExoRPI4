@@ -6,20 +6,21 @@
 #include "Timer.hpp"
 #include "SensorHub.hpp"
 #include "Recorder.hpp"
+#include "JointCon.hpp"
 #include "MPC.hpp"
 
-#define NUM_OF_MPC 6
-#define NUM_OF_IMP 4
-enum PWM_ID
+enum class PWM_ID //sync with the real connection on the PCB
 {
-    LTANKPRE = PCB_VAL_9,
-    LKNEPRE = PCB_VAL_10,
-    LANKPRE = PCB_VAL_14,
-    RKNEPRE = PCB_VAL_12,
-    RANKPRE = PCB_VAL_13,
-    RTANKPRE = PCB_VAL_14,
-    NA1 = PCB_VAL_15,
-    NA2 = PCB_VAL_16,
+    kLTank = PCB_VAL_9,
+    kLKneExt = PCB_VAL_10,
+    kLKneFlex = PCB_VAL_14,
+    kLAnkExt = PCB_VAL_11,
+    kLAnkFlex = PCB_VAL_12,
+    kRKneExt = PCB_VAL_12,
+    kRKneFlex = PCB_VAL_13,
+    kRAnkExt = PCB_VAL_14,
+    kRankFlex = PCB_VAL_15,
+    kRTank = PCB_VAL_16,
     NA3 = PCB_VAL_1,
     NA4 = PCB_VAL_2,
     NA5 = PCB_VAL_3,
@@ -28,40 +29,47 @@ enum PWM_ID
     NA8 = PCB_VAL_6,
     NA9 = PCB_VAL_7,
     NA10 = PCB_VAL_8,
-    FIRST_PWM = LTANKPRE,
-    LAST_PWM = RTANKPRE
 };
 #define PWM_HEADER "TIME,LTANK_PWM,LKNE_PWM,LKNE_BAL,RKNE_PRE,RANK_PRE,R_TANK" // TODO: need 7 pwm I think, also add LANK back after we finish the imp test
 class Valves_hub
 {
+public:
+    enum class Joint //use for force control, impedance control
+    {
+        kLKne,
+        kLAnk,
+        kRKne,
+        kRAnk,
+        kTotal
+    };
+    enum class Chamber{ //use for pressure control
+        kLKneExt,
+        kLKneFlex,
+        kLAnkExt,
+        kLAnkFlex,
+        kLTank,
+        kRKneExt,
+        kRKneFlex,
+        kRAnkExt,
+        kRAnkFlex,
+        kRTank,
+        kTotal
+
+    };
 
 private:
     // MPC Pressure control
-    MPC LTankCon, LKneCon;
-    std::array<bool, NUM_OF_MPC> mpc_enable;
-    enum class MPC_Enable
-    {
-        kLTank,
-        kLKne,
-        kLAnk,
-        kRTank,
-        kRKne,
-        kRAnk
-    };
-    std::array<bool, NUM_OF_IMP> imp_enable; // flags to enable impedance control
+    // MPC LTankCon, LKneCon;
 
-    // bool l_tank_enable,r_tank_enable; //when these flags are true, we will calculate the duty of the pwm during update valve conditions
-    std::array<double, PWM_VAL_NUM> desired_pre{0};
-    std::array<double, NUM_OF_IMP> desired_imp{0};
+    JointCon left_knee_con, right_knee_con, left_ankle_con, right_ankle_con;
+    std::array<double,(unsigned)Chamber::kTotal> desired_pre{0};
+    std::array<double,(unsigned)Joint::kTotal> desired_imp{0};
+    std::array<double,(unsigned)Joint::kTotal> desired_force{0};
+
+    
 
 public:
-    enum class Joint
-    {
-        kLKne,
-        kLAnk,
-        kRKne,
-        kRAnk
-    };
+    
 
     static Valves_hub &GetInstance();
     // static Valves_hub& GetInstance(std::array<double,SensorHub::NUMENC>&,std::array<double,SensorHub::NUMPRE>&); // ideally this initializer should be called first
@@ -77,15 +85,21 @@ public:
     // TCP_server read valve condition
     const static std::array<uint8_t, PWM_VAL_NUM> &GetDuty();
 
-    // MPC control
-    static void StartMPC(PWM_ID pwm_valve, bool enable);
-    static void SetDesiredPre(PWM_ID pwm_valve, double des_pre);
-    const static std::array<bool, NUM_OF_MPC> &GetMpcCond();
+
+    //Control
+    static std::array<bool,(unsigned)Joint::kTotal> GetControlCond();
+    static void EnableCon(Joint joint,JointCon::ControlMode mode);
+    //Pressure control
+    
+    
+    static void SetDesiredPre(Chamber chamber, double des_pre);
+    const static std::array<bool, (unsigned)Joint::kTotal> &GetJointCond();
 
     // Impdence control
     static void SetDesiredImp(Valves_hub::Joint imp, double imp_val);
     static void SetCylnMaxPos(Joint joint);
-    static void EnableImpCon(Valves_hub::Joint imp, bool flag);
+
+    
 
 private:
     Valves_hub();
@@ -98,8 +112,8 @@ private:
 
     TeensyI2C teensyValveCon;
 
-    Recorder<double, 11> mpc_ltank_rec; // record p_tank, p_set(target), p_val, q_val
-    Recorder<double, 11> mpc_lkne_rec;
+    // Recorder<double, 11> mpc_ltank_rec; // record p_tank, p_set(target), p_val, q_val
+    // Recorder<double, 11> mpc_lkne_rec;
 };
 
 #endif

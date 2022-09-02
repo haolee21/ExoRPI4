@@ -2,17 +2,17 @@
 #include "MPC_param.hpp"
 Valves_hub::Valves_hub()
 :
-pwmRecorder("PWM",PWM_HEADER)//TODO: use correct valve names, perhaps adding it in shared file with Teensy
+left_knee_con(PneumaticParam::kLKne,PneumaticParam::kLTank)
+,right_knee_con(PneumaticParam::kRKne,PneumaticParam::kRTank)
+,left_ankle_con(PneumaticParam::kLAnk,PneumaticParam::kLTank)
+,right_ankle_con(PneumaticParam::kRAnk,PneumaticParam::kRTank)
+,pwmRecorder("PWM",PWM_HEADER)//TODO: use correct valve names, perhaps adding it in shared file with Teensy
 ,teensyValveCon(1)
-,LTankCon(CylinderParam::kLTank)
-,LKneCon(CylinderParam::kLkne)
-,mpc_ltank_rec("LTank_mpc","Time,dTank,dLTank,LTank_pval,LTank_qval,dPhi_du0,dPhi_du1,dPhi_dx00,dPhi_dx01,dPhi_dx10,dPhi_dx11,mpc_force")
-,mpc_lkne_rec("LKne_mpc","Time,dLTank,dLKne,LKne_pval,LKne_qval,dPhi_du0,dPhi_du1,dPhi_dx00,dPhi_dx01,dPhi_dx10,dPhi_dx11,mpc_force")
 {
     //Do not set any valve condition here, it will crash
     //I believe the reason is because TeensyI2C is not created yet
     //I guess the behavior of initialization list is different from I thought
-    this->mpc_enable.fill(false);
+    // this->mpc_enable.fill(false);
   
     
 
@@ -47,38 +47,39 @@ void Valves_hub::UpdateValve(){
 
     //MPC check
     const std::array<double,SensorHub::NUMPRE>& pre_data = SensorHub::GetPreData(); //use ref to avoid copy
-
-    //put measurements in mpc controller, we must do this even the mpc controller are not enabled since it relies on the history of the measurements
-    hub.LTankCon.PushMeas(pre_data[SensorHub::PreName::Tank],pre_data[SensorHub::PreName::LTank],hub.PWM_Duty[PWM_ID::LTANKPRE],0.0);
-    hub.LKneCon.PushMeas(pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::LKne],hub.PWM_Duty[PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::Pos]);
-
-    if(hub.mpc_enable[static_cast<int>(Valves_hub::MPC_Enable::kLTank)]){
-        int res_duty = hub.LTankCon.GetPreControl(hub.desired_pre[PWM_ID::LTANKPRE],pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::Tank],1.0);
-        
-        hub.SetDuty(res_duty,PWM_ID::LTANKPRE); 
-        hub.mpc_ltank_rec.PushData(hub.LTankCon.GetMpcRec());
+    
+    //put measurements in mpc controller, we must do this even the controller are not enabled since it relies on the history of the measurements
+    hub.left_knee_con.PushMeas(pre_data[(unsigned)SensorHub::PreName::LKneExt],pre_data[(unsigned)SensorHub::PreName::LKneFlex],
+                               pre_data[(unsigned)SensorHub::PreName::LTank],pre_data[(unsigned)SensorHub::PreName::Tank],
+                               hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLTank],
+                               pre_data[(unsigned)SensorHub::PreName::Pos]);
+    
+    
+    if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kPreConExt){
+        hub.left_knee_con.GetPreCon(hub.desired_pre[(unsigned)Valves_hub::Chamber::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],JointCon::Chamber::kExt);
+        hub.valChanged_flag=true;
     }
-    if(hub.mpc_enable[static_cast<int>(Valves_hub::MPC_Enable::kLKne)]){
-        int res_duty=0;
-        bool need_bal=false;
-        int ank_duty=0;
-        if(hub.imp_enable[static_cast<int>(Valves_hub::Joint::kLKne)]){
-            res_duty = hub.LKneCon.GetImpControl(hub.desired_imp[static_cast<unsigned>(Valves_hub::Joint::kLKne)],pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::LTank],pre_data[SensorHub::PreName::Pos],hub.LKneCon.GetCylinderScale(pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::Pos]),need_bal);
-            if(need_bal){
-                ank_duty=100;
-            }
-        }
-        else{
-            res_duty = hub.LKneCon.GetPreControl(hub.desired_pre[PWM_ID::LKNEPRE],pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::LTank],hub.LKneCon.GetCylinderScale(pre_data[SensorHub::PreName::LKne],pre_data[SensorHub::PreName::Pos]));
-        }
-        hub.SetDuty(res_duty,PWM_ID::LKNEPRE);
-        hub.SetDuty(ank_duty,PWM_ID::LANKPRE);
-
-        hub.mpc_lkne_rec.PushData(hub.LKneCon.GetMpcRec());
+    else if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kPreConFlex){
+        hub.left_knee_con.GetPreCon(hub.desired_pre[(unsigned)Valves_hub::Chamber::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],JointCon::Chamber::kFlex);
+        hub.valChanged_flag=true;
     }
+    else if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kPreConTank){
+        hub.left_knee_con.GetPreCon(hub.desired_pre[(unsigned)Valves_hub::Chamber::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kLTank],JointCon::Chamber::kTank);
+        hub.valChanged_flag=true;
+    }
+    else if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kForceCon){
+        hub.left_knee_con.GetForceCon(hub.desired_force[(unsigned)Valves_hub::Joint::kLKne],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex], hub.PWM_Duty[(unsigned)PWM_ID::kLTank]);
+        hub.valChanged_flag=true;
+    }
+    else if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kImpCon){
+        hub.left_knee_con.GetImpCon(hub.desired_imp[(unsigned)Valves_hub::Joint::kLKne],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLTank]);
+        hub.valChanged_flag=true;
+    }
+    
     
     
     if(hub.valChanged_flag){
+        
         std::array<char,TeensyI2C::CMDLEN> cmd;
 
         std::memcpy(cmd.begin(),hub.PWM_Duty.begin(),sizeof(uint8_t)*PWM_VAL_NUM);
@@ -95,7 +96,7 @@ void Valves_hub::UpdateValve(){
 
 void Valves_hub::SetDuty(u_int8_t duty, PWM_ID id){
     Valves_hub& hub = Valves_hub::GetInstance();
-    hub.PWM_Duty[id]=duty;
+    hub.PWM_Duty[(unsigned)id]=duty;
     hub.valChanged_flag=true;
     
 
@@ -112,33 +113,29 @@ const std::array<uint8_t,PWM_VAL_NUM>& Valves_hub::GetDuty(){
 }
 
 
-const std::array<bool,NUM_OF_MPC>& Valves_hub::GetMpcCond(){
-    return std::ref(Valves_hub::GetInstance().mpc_enable);
-}
 
-void Valves_hub::StartMPC(PWM_ID pwm_valve,bool enable){
+
+void Valves_hub::EnableCon(Joint joint,JointCon::ControlMode mode){
     Valves_hub& hub = Valves_hub::GetInstance();
-    
-    switch (pwm_valve)
-    {
-    case PWM_ID::LTANKPRE:
-        
-        hub.mpc_enable[static_cast<unsigned>(Valves_hub::MPC_Enable::kLTank)] = enable;
-        break;
-    case PWM_ID::RTANKPRE:
-        hub.mpc_enable[static_cast<unsigned>(Valves_hub::MPC_Enable::kRTank)] = enable;
-        break;
-    case PWM_ID::LKNEPRE:
-        hub.mpc_enable[static_cast<unsigned>(Valves_hub::MPC_Enable::kLKne)] = enable;
-        break;
-    default:
-        break;
+
+    if(joint == Valves_hub::Joint::kLKne){
+        hub.left_knee_con.SetControlMode(mode);
     }
+    else if(joint ==Valves_hub::Joint::kLAnk){
+        hub.left_ankle_con.SetControlMode(mode);
+    }
+    else if(joint == Valves_hub::Joint::kRKne){
+        hub.right_knee_con.SetControlMode(mode);
+    }
+    else if(joint == Valves_hub::Joint::kRAnk){
+        hub.right_ankle_con.SetControlMode(mode);
+    }
+
 }
 
-void Valves_hub::SetDesiredPre(PWM_ID pwm_valve,double des_pre){
+void Valves_hub::SetDesiredPre(Chamber chamber,double des_pre){
     Valves_hub& hub = Valves_hub::GetInstance();
-    hub.desired_pre[pwm_valve] = des_pre;
+    hub.desired_pre[(unsigned)chamber] = des_pre;
 
 }
 void Valves_hub::SetDesiredImp(Valves_hub::Joint imp,double imp_val){ //TODO: finish it
@@ -146,23 +143,31 @@ void Valves_hub::SetDesiredImp(Valves_hub::Joint imp,double imp_val){ //TODO: fi
     hub.desired_imp[static_cast<unsigned>(imp)]=imp_val;
     
 }
-void Valves_hub::EnableImpCon(Valves_hub::Joint imp,bool enable){
-    Valves_hub::GetInstance().imp_enable[static_cast<unsigned>(imp)]=enable;
 
-}
 
 
 
 void Valves_hub::SetCylnMaxPos(Valves_hub::Joint joint){
-    switch (joint)
-    {
-    case Valves_hub::Joint::kLKne:
-        Valves_hub::GetInstance().LKneCon.SetCylinderMaxPos();
-        break;
-    //TODO: finish the rest of the joints
-    default:
-        break;
-    }
+    // switch (joint)
+    // {
+    // case Valves_hub::Joint::kLKne:
+    //     Valves_hub::GetInstance().LKneCon.SetCylinderMaxPos();
+    //     break;
+    // //TODO: finish the rest of the joints
+    // default:
+    //     break;
+    // }
     
 
+}
+std::array<bool,(unsigned)Valves_hub::Joint::kTotal>Valves_hub::GetControlCond(){
+    Valves_hub& hub = Valves_hub::GetInstance();
+    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> cur_cond{0};
+    if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kForceCon || hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kImpCon){
+        cur_cond[0]=true;
+    }
+    if(hub.left_ankle_con.GetControlMode()==JointCon::ControlMode::kForceCon||hub.left_ankle_con.GetControlMode()==JointCon::ControlMode::kImpCon){
+        cur_cond[1]=true;
+    }
+    return cur_cond;
 }

@@ -1,132 +1,163 @@
+from cgitb import text
 from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget,QLabel,QLineEdit,QPushButton
-
+from functools import partial
 from TCP_Con import TCP, TextToFloat
 class PWM_TestWindow(QWidget):
     def __init__(self,parent=None):
         super().__init__()
         self.parent =parent
         uic.loadUi('PWM_TestFun.ui',self)
-        self.btn_LKnePWM_start = self.findChild(QPushButton,'btn_LKnePWM_start')
-        self.btn_LAnkPWM_start = self.findChild(QPushButton,'btn_LAnkPWM_start')
-        self.btn_LTankPWM_start= self.findChild(QPushButton,'btn_LTankPWM_start')
-        self.btn_RKnePWM_start = self.findChild(QPushButton,'btn_RKnePWM_start')
-        self.btn_RAnkPWM_start = self.findChild(QPushButton,'btn_RAnkPWM_start')
-        self.btn_RTankPWM_start=self.findChild(QPushButton,'btn_RTankPWM_start')
+        self.btn_LKneExtDuty_start = self.findChild(QPushButton,'btn_LKneExtDuty_start')
+        self.btn_LKneFlexDuty_start=self.findChild(QPushButton,'btn_LKneFlexDuty_start')
+        self.btn_LAnkExtDuty_start = self.findChild(QPushButton,'btn_LAnkExtDuty_start')
+        self.btn_LAnkFlexDuty_start = self.findChild(QPushButton,'btn_LAnkFlexDuty_start')
+        self.btn_LTankDuty_start= self.findChild(QPushButton,'btn_LTankDuty_start')
 
-        self.btn_LKnePWM_stop = self.findChild(QPushButton,'btn_LKnePWM_stop')
-        self.btn_LAnkPWM_stop = self.findChild(QPushButton,'btn_LAnkPWM_stop')
-        self.btn_LTankPWM_stop= self.findChild(QPushButton,'btn_LTankPWM_stop')
-        self.btn_RKnePWM_stop = self.findChild(QPushButton,'btn_RKnePWM_stop')
-        self.btn_RAnkPWM_stop = self.findChild(QPushButton,'btn_RAnkPWM_stop')
-        self.btn_RTankPWM_stop=self.findChild(QPushButton,'btn_RTankPWM_stop')
+        
+        self.btn_RKneExtDuty_start = self.findChild(QPushButton,'btn_RKneExtDuty_start')
+        self.btn_RKneFlexDuty_start = self.findChild(QPushButton,'btn_RKneFlexDuty_start')
+        self.btn_RAnkExtDuty_start = self.findChild(QPushButton,'btn_RAnkExtDuty_start')
+        self.btn_RAnkFlexDuty_start = self.findChild(QPushButton,'btn_RAnkFlexDuty_start')
+        self.btn_RTankDuty_start=self.findChild(QPushButton,'btn_RTankDuty_start')
+
+        self.btn_LKneExtDuty_stop = self.findChild(QPushButton,'btn_LKneExtDuty_stop')
+        self.btn_LKneFlexDuty_stop=self.findChild(QPushButton,'btn_LKneFlexDuty_stop')
+        self.btn_LAnkExtDuty_stop = self.findChild(QPushButton,'btn_LAnkExtDuty_stop')
+        self.btn_LAnkFlexDuty_stop = self.findChild(QPushButton,'btn_LAnkFlexDuty_stop')
+        self.btn_LTankDuty_stop= self.findChild(QPushButton,'btn_LTankDuty_stop')
+
+        self.btn_RKneExtDuty_stop = self.findChild(QPushButton,'btn_RKneExtDuty_stop')
+        self.btn_RKneFlexDuty_stop=self.findChild(QPushButton,'btn_RKneFlexDuty_stop')
+        self.btn_RAnkExtDuty_stop = self.findChild(QPushButton,'btn_RAnkExtDuty_stop')
+        self.btn_RAnkFlexDuty_stop = self.findChild(QPushButton,'btn_RAnkFlexDuty_stop')
+        self.btn_RTankDuty_stop= self.findChild(QPushButton,'btn_RTankDuty_stop')
 
         self.parent=parent
-        self.LKne_duty=self.findChild(QLineEdit,'lineEdit_LKneDuty')
-        self.LAnk_duty=self.findChild(QLineEdit,'lineEdit_LAnkDuty')
+        self.LKneExt_duty=self.findChild(QLineEdit,'lineEdit_LKneExtDuty')
+        self.LKneFlex_duty=self.findChild(QLineEdit,'lineEdit_LKneFlexDuty')
+        self.LAnkExt_duty=self.findChild(QLineEdit,'lineEdit_LAnkExtDuty')
+        self.LAnkFlex_duty=self.findChild(QLineEdit,'lineEdit_LAnkFlexDuty')
         self.LTank_duty=self.findChild(QLineEdit,'lineEdit_LTankDuty')
 
-        self.RKne_duty=self.findChild(QLineEdit,'lineEdit_RKneDuty')
-        self.RAnk_duty=self.findChild(QLineEdit,'lineEdit_RAnkDuty')
+        self.RKneExt_duty=self.findChild(QLineEdit,'lineEdit_RKneExtDuty')
+        self.RKneFlex_duty=self.findChild(QLineEdit,'lineEdit_RKneFlexDuty')
+        self.RAnkExt_duty=self.findChild(QLineEdit,'lineEdit_RAnkExtDuty')
+        self.RAnkFlex_duty=self.findChild(QLineEdit,'lineEdit_RAnkFlexDuty')
         self.RTank_duty=self.findChild(QLineEdit,'lineEdit_RTankDuty')
 
 
-        self.LKne_pre=self.findChild(QLineEdit,'lineEdit_LKnePre')
-        self.LAnk_pre=self.findChild(QLineEdit,'lineEdit_LAnkPre')
-        self.LTank_pre = self.findChild(QLineEdit,'lineEdit_LTankPre')
-        self.RKne_pre=self.findChild(QLineEdit,'lineEdit_RKnePre')
-        self.RAnk_pre=self.findChild(QLineEdit,'lineEdit_RAnkPre')
-        self.RTank_pre=self.findChild(QLineEdit,'lineEdit_RTankPre')
         
 
 
-        self.btn_LKnePreStr=self.findChild(QPushButton,'btn_LKneCharge_str')
-        self.btn_LAnkPreStr=self.findChild(QPushButton,'btn_LAnkCharge_str')
-        self.btn_LTankPreStr=self.findChild(QPushButton,'btn_LTankCharge_str')
-        self.btn_RKnePreStr=self.findChild(QPushButton,'btn_RKneCharge_str')
-        self.btn_RAnkPreStr=self.findChild(QPushButton,'btn_RAnkCharge_str')
-        self.btn_RTankPreStr=self.findChild(QPushButton,'btn_RTankCharge_str')
+        self.LKneExt_pre=self.findChild(QLineEdit,'lineEdit_LKneExtPre')
+        self.LKneFlex_pre=self.findChild(QLineEdit,'lineEdit_LKneFlexPre')
+        self.LAnkExt_pre=self.findChild(QLineEdit,'lineEdit_LAnkExtPre')
+        self.LAnkFlex_pre=self.findChild(QLineEdit,'lineEdit_LAnkFlexPre')
+        self.LTank_pre = self.findChild(QLineEdit,'lineEdit_LTankPre')
 
-        self.btn_LKnePreStop=self.findChild(QPushButton,'btn_LKneCharge_stop')
-        self.btn_LAnkPreStop=self.findChild(QPushButton,'btn_LAnkCharge_stop')
-        self.btn_LTankPreStop=self.findChild(QPushButton,'btn_LTankCharge_stop')
-        self.btn_RKnePreStop=self.findChild(QPushButton,'btn_RKneCharge_stop')
-        self.btn_RAnkPreStop=self.findChild(QPushButton,'btn_RAnkCharge_stop')
-        self.btn_RTankPreStop=self.findChild(QPushButton,'btn_RTankCharge_stop')
+
+        self.RKneExt_pre=self.findChild(QLineEdit,'lineEdit_RKneExtPre')
+        self.RKneFlex_pre=self.findChild(QLineEdit,'lineEdit_RKneFlexPre')
+        self.RAnkExt_pre=self.findChild(QLineEdit,'lineEdit_RAnkExtPre')
+        self.RAnkFlex_pre=self.findChild(QLineEdit,'lineEdit_RAnkFlexPre')
+        self.RTank_pre = self.findChild(QLineEdit,'lineEdit_RTankPre')
+
+        
+
+
+        self.btn_LKneExtPre_start=self.findChild(QPushButton,'btn_LKneExtPre_start')
+        self.btn_LKneFlexPre_start=self.findChild(QPushButton,'btn_LKneFlexPre_start')
+        self.btn_LAnkExtPre_start = self.findChild(QPushButton,'btn_LAnkExtPre_start')
+        self.btn_LAnkFlexPre_start=self.findChild(QPushButton,'btn_LAnkFlexPre_start')
+        self.btn_LTankPre_start = self.findChild(QPushButton,'btn_LTankPre_start')
+
+        self.btn_RKneExtPre_start = self.findChild(QPushButton,'btn_RKneExtPre_start')
+        self.btn_RKneFlexPre_start=self.findChild(QPushButton,'btn_RKneFlexPre_start')
+        self.btn_RAnkExtPre_start=self.findChild(QPushButton,'btn_RAnkExtPre_start')
+        self.btn_RAnkFlexPre_start=self.findChild(QPushButton,'btn_RAnkFlexPre_start')
+        self.btn_RTankPre_start=self.findChild(QPushButton,'btn_RTankPre_start')
+
+        self.btn_LKneExtPre_stop=self.findChild(QPushButton,'btn_LKneExtPre_stop')
+        self.btn_LKneFlexPre_stop=self.findChild(QPushButton,'btn_LKneFlexPre_stop')
+        self.btn_LAnkExtPre_stop = self.findChild(QPushButton,'btn_LAnkExtPre_stop')
+        self.btn_LAnkFlexPre_stop=self.findChild(QPushButton,'btn_LAnkFlexPre_stop')
+        self.btn_LTankPre_stop = self.findChild(QPushButton,'btn_LTankPre_stop')
+
+        self.btn_RKneExtPre_stop = self.findChild(QPushButton,'btn_RKneExtPre_stop')
+        self.btn_RKneFlexPre_stop=self.findChild(QPushButton,'btn_RKneFlexPre_stop')
+        self.btn_RAnkExtPre_stop=self.findChild(QPushButton,'btn_RAnkExtPre_stop')
+        self.btn_RAnkFlexPre_stop=self.findChild(QPushButton,'btn_RAnkFlexPre_stop')
+        self.btn_RTankPre_stop=self.findChild(QPushButton,'btn_RTankPre_stop')
+
 
         #bind clicked and functions
-        self.btn_LKnePWM_start.clicked.connect(self.btn_LKnePWM_start_clicked)
-        self.btn_LAnkPWM_start.clicked.connect(self.btn_LAnkPWM_start_clicked)
-        self.btn_LTankPWM_start.clicked.connect(self.btn_LTankPWM_start_clicked)
-        self.btn_RKnePWM_start.clicked.connect(self.btn_RKnePWM_start_clicked)
-        self.btn_RAnkPWM_start.clicked.connect(self.btn_RAnkPWM_start_clicked)
-        self.btn_RTankPWM_start.clicked.connect(self.btn_RTankPWM_start_clicked)
+        
+        self.btn_LKneExtDuty_start.clicked.connect(partial(self.DutyStartClicked,'LKNE_EXT',self.LKneExt_duty))
+        self.btn_LKneFlexDuty_start.clicked.connect(partial(self.DutyStartClicked,'LKNE_FLEX',self.LKneFlex_duty))
+        self.btn_LAnkExtDuty_start.clicked.connect(partial(self.DutyStartClicked,'LANK_EXT',self.LAnkExt_duty))
+        self.btn_LAnkFlexDuty_start.clicked.connect(partial(self.DutyStartClicked,'LANK_FLEX',self.LAnkFlex_duty))
+        self.btn_LTankDuty_start.clicked.connect(partial(self.DutyStartClicked,'LTANK',self.LTank_duty))
+        
+        self.btn_RKneExtDuty_start.clicked.connect(partial(self.DutyStartClicked,'RKNE_EXT',self.RKneExt_duty))
+        self.btn_RKneFlexDuty_start.clicked.connect(partial(self.DutyStartClicked,'RKNE_FLEX',self.RKneFlex_duty))
+        self.btn_RAnkExtDuty_start.clicked.connect(partial(self.DutyStartClicked,'RANK_EXT',self.RAnkExt_duty))
+        self.btn_RAnkFlexDuty_start.clicked.connect(partial(self.DutyStartClicked,'RANK_FLEX',self.RAnkFlex_duty))
+        self.btn_RTankDuty_start.clicked.connect(partial(self.DutyStartClicked,'RTANK',self.RTank_duty))
 
-        self.btn_LKnePWM_stop.clicked.connect(self.btn_LKnePWM_stop_clicked)
-        self.btn_LAnkPWM_stop.clicked.connect(self.btn_LAnkPWM_stop_clicked)
-        self.btn_LTankPWM_stop.clicked.connect(self.btn_LTankPWM_stop_clicked)
-        self.btn_RKnePWM_stop.clicked.connect(self.btn_RKnePWM_stop_clicked)
-        self.btn_RAnkPWM_stop.clicked.connect(self.btn_RAnkPWM_stop_clicked)
-        self.btn_RTankPWM_stop.clicked.connect(self.btn_RTankPWM_stop_clicked)
+        self.btn_LKneExtDuty_stop.clicked.connect(partial(self.DutyStopClicked,'LKNE_EXT'))
+        self.btn_LKneFlexDuty_stop.clicked.connect(partial(self.DutyStopClicked,'LKNE_FLEX'))
+        self.btn_LAnkExtDuty_stop.clicked.connect(partial(self.DutyStopClicked,'LANK_EXT'))
+        self.btn_LAnkFlexDuty_stop.clicked.connect(partial(self.DutyStopClicked,'LANK_FLEX'))
+        self.btn_LTankDuty_stop.clicked.connect(partial(self.DutyStopClicked,'LTANK'))
+
+        self.btn_RKneExtDuty_stop.clicked.connect(partial(self.DutyStopClicked,'RKNE_EXT'))
+        self.btn_RKneFlexDuty_stop.clicked.connect(partial(self.DutyStopClicked,'RKNE_FLEX'))
+        self.btn_RAnkExtDuty_stop.clicked.connect(partial(self.DutyStopClicked,'RANK_EXT'))
+        self.btn_RAnkFlexDuty_stop.clicked.connect(partial(self.DutyStopClicked,'RANK_FLEX'))
+        self.btn_RTankDuty_stop.clicked.connect(partial(self.DutyStopClicked,'RTANK'))
+
 
         #pressure control
 
         ## start
-        self.btn_LTankPreStr.clicked.connect(self.btn_LTankPre_start_clicked)
-        self.btn_RTankPreStr.clicked.connect(self.btn_RTankPre_start_clicked)
-        self.btn_LKnePreStr.clicked.connect(self.btn_LKnePre_start_clicked)
-        ## stop
-        self.btn_LTankPreStop.clicked.connect(self.btn_LTankPre_stop_clicked)
-        self.btn_RTankPreStop.clicked.connect(self.btn_RTankPre_stop_clicked)
-        self.btn_LKnePreStop.clicked.connect(self.btn_LKnePre_stop_clicked)
+        self.btn_LKneExtPre_start.clicked.connect(partial(self.PreStartClicked,'LKNE_EXT',self.LKneExt_pre))
+        self.btn_LKneFlexPre_start.clicked.connect(partial(self.PreStartClicked,'LKNE_FLEX',self.LKneFlex_pre))
+        self.btn_LAnkExtPre_start.clicked.connect(partial(self.PreStartClicked,'LANK_EXT',self.LAnkExt_pre))
+        self.btn_LAnkFlexPre_start.clicked.connect(partial(self.PreStartClicked,'LANK_FLEX',self.LAnkFlex_pre))
+        self.btn_LTankPre_start.clicked.connect(partial(self.PreStartClicked,'LTANK',self.LTank_pre))
         
-    # btn clicked 
+        self.btn_RKneExtPre_start.clicked.connect(partial(self.PreStartClicked,'RKNE_EXT',self.RKneExt_pre))
+        self.btn_RKneFlexPre_start.clicked.connect(partial(self.PreStartClicked,'RKNE_FLEX',self.RKneFlex_pre))
+        self.btn_RAnkExtPre_start.clicked.connect(partial(self.PreStartClicked,'RANK_EXT',self.RAnkExt_pre))
+        self.btn_RAnkFlexPre_start.clicked.connect(partial(self.PreStartClicked,'RANK_FLEX',self.RAnkFlex_pre))
+        self.btn_RTankPre_start.clicked.connect(partial(self.PreStartClicked,'RTANK',self.RTank_pre))
+        ## stop
 
-    ## PWM Duty cycle control test
-    def btn_LKnePWM_start_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PWM:LKNE:'+str(int(float(self.LKne_duty.text()))),1,True)
-    def btn_LAnkPWM_start_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PWM:LANK:'+str(int(float(self.LAnk_duty.text()))),1,True)
-    def btn_LTankPWM_start_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PWM:LTANK:'+str(int(float(self.LTank_duty.text()))),1,True)
-    def btn_RKnePWM_start_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PWM:RKNE:'+str(int(float(self.RKne_duty.text()))),1,True)
-    def btn_RAnkPWM_start_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PWM:RANK:'+str(int(float(self.RAnk_duty.text()))),1,True)
-    def btn_RTankPWM_start_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PWM:RTANK:'+str(int(float(self.RTank_duty.text()))),1,True)
+        self.btn_LKneExtPre_stop.clicked.connect(partial(self.DutyStopClicked,'LKNE_EXT'))
+        self.btn_LKneFlexPre_stop.clicked.connect(partial(self.DutyStopClicked,'LKNE_FLEX'))
+        self.btn_LAnkExtPre_stop.clicked.connect(partial(self.DutyStopClicked,'LANK_EXT'))
+        self.btn_LAnkFlexPre_stop.clicked.connect(partial(self.DutyStopClicked,'LANK_FLEX'))
+        self.btn_LTankPre_stop.clicked.connect(partial(self.DutyStopClicked,'LTANK'))
 
-    def btn_LKnePWM_stop_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PWM:LKNE:0',1,True)
-    def btn_LAnkPWM_stop_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PWM:LANK:0',1,True)
-    def btn_LTankPWM_stop_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PWM:LTANK:0',1,True)
-    def btn_RKnePWM_stop_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PWM:RKNE:0',1,True)
-    def btn_RAnkPWM_stop_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PWM:RANK:0',1,True)
-    def btn_RTankPWM_stop_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PWM:RTANK:0',1,True)
+        self.btn_RKneExtPre_stop.clicked.connect(partial(self.DutyStopClicked,'RKNE_EXT'))
+        self.btn_RKneFlexPre_stop.clicked.connect(partial(self.DutyStopClicked,'RKNE_FLEX'))
+        self.btn_RAnkExtPre_stop.clicked.connect(partial(self.DutyStopClicked,'RANK_EXT'))
+        self.btn_RAnkFlexPre_stop.clicked.connect(partial(self.DutyStopClicked,'RANK_FLEX'))
+        self.btn_RTankPre_stop.clicked.connect(partial(self.DutyStopClicked,'RTANK'))
+        
+        
+    # btn clicked
 
-    ## MPC pressure control test
-    ## all pressure are set in psi, will be convert to voltage reading and send to the exoskeleton
+
+    def DutyStartClicked(self,name,duty_lineEdit):
+        self.parent.tcp_port.SendCmd('SET:PWM:'+name+':'+str(TextToFloat(duty_lineEdit.text())),1,True) #convert text to float, if the text is not convertable it will be 0
+        print("text is :",type(text))
+        print(self.LTank_duty.text())
+    def DutyStopClicked(self,name):
+        self.parent.tcp_port.SendCmd('SET:PWM:'+name+':0',1,True)
+
+    def PreStartClicked(self,name,pre_lineEdit):
+        self.parent.tcp_port.SendCmd('SET:PRE:'+name+':'+str(TextToFloat(pre_lineEdit.text())),1,True)
     
-    def btn_LTankPre_start_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PRE:LTANK:'+str(TextToFloat(self.LTank_pre.text())),1,True)#this is to avoid sending invalid commands
-        self.parent.tcp_port.SendCmd('ACT:MPC:LTANK:1',1,True)
-    def btn_RTankPre_start_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PRE:RTANK:'+str(TextToFloat(self.RTank_pre.text())),1,True)
-        self.parent.tcp_port.SendCmd('ACT:MPC:RTANK:1',1,True)
-
-    def btn_LKnePre_start_clicked(self):
-        self.parent.tcp_port.SendCmd('SET:PRE:LKNE:'+str(TextToFloat(self.LKne_pre.text())),1,True)
-        self.parent.tcp_port.SendCmd('ACT:MPC:LKNE:1',1,True)
-
-    def btn_LTankPre_stop_clicked(self):
-        self.parent.tcp_port.SendCmd('ACT:MPC:LTANK:0',1,True)
-    def btn_RTankPre_stop_clicked(self):
-        self.parent.tcp_port.SendCmd('ACT:MPC:RTANK:0',1,True)
-    def btn_LKnePre_stop_clicked(self):
-        self.parent.tcp_port.SendCmd('ACT:MPC:LKNE:0',1,True)
         

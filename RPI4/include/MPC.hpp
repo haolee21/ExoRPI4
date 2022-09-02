@@ -103,41 +103,40 @@ private:
     const double volume_slope_6in = 0.0006351973436310972; //FIXME: these are only used for linear calibrations
     const double volume_intercept_6in = 115.68133521647316; // unit: mm/adc(pos)
 
-    double max_pos;//unit: adc reading //FIXME: this is based on linear calibration //FIXME: this has to be update everytime we run
-    double max_len_mm;
-    const double spring_k = 55.4*0.0393701*4.44822; //although the spec says the k is 55.4 lb/in, but in reality it is only half of it
+
+    const double spring_k = 55.4*0.0393701*4.44822; 
                                          // the unit here is N/mm
     const double pre_offset = 0.5/4.096*65536;
-    const double piston_area;
-    double GetExternalForce(double P,double x);
-    double GetLenLinear_mm(double pos);
+    // const double piston_area;
+    // double GetExternalForce(double p_ext,double p_flex,double x);
+    // double GetLenLinear_mm(double pos);
     //piston friction compensation
-    double pre_pos;
-    double pos_diff;
-    double cur_pos;
-    double fric_coeff;
+    // double pre_pos;
+    // double pos_diff;
+    // double cur_pos;
+    // double fric_coeff;
     
-    double cur_max_spring_compress;
-    double cur_force;
-    DigitalFilter<double,FilterParam::Filter20Hz_5::Order,1> vel_filter;
-    DigitalFilter<double,FilterParam::Filter20Hz_2::Order,1> force_filter;
+    // double cur_max_spring_compress;
+    // double cur_force;
+    // DigitalFilter<double,FilterParam::Filter20Hz_5::Order,1> vel_filter;
+    // DigitalFilter<double,FilterParam::Filter20Hz_2::Order,1> force_filter;
 public:
-    MPC(CylinderParam::Params param);
+    MPC(std::array<std::array<float, MPC_STATE_NUM>,2> cl,std::array<std::array<float, MPC_STATE_NUM>,2> ch);
     ~MPC();
     void UpdateParamH(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     void UpdateParamL(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
     
     int GetPreControl(const double& p_des,const double& p_cur,const double& p_tank,float scale);//It requires current pressure value because all the values storaged in the meme are scaled
-    int GetImpControl(const double& imp_des, const double& p_cur, const double& p_tank, const double& pos,float scale,bool& ank_duty);
+    void GetImpControl(const double& imp_des, const double& p_ext,const double& p_flex, const double& p_tank, const double& pos,float scale,int& joint_val_duty,int& joint_bal_duty,int& tank_duty);
     //Get values for recorder
-    std::array<double,11> GetMpcRec();
+    std::array<double,10> GetMpcRec();
 
-    void PushMeas(const double p_tank,const double p_set,const double duty,double pos);
+    void PushMeas(const double p_tank,const double p_set,const double duty);
     
     
     
-    double GetCylinderScale(double pre,double pos); //get the (cylinder length)/(max cylinder length)
-    void SetCylinderMaxPos();
+    // double GetCylinderScale(double pre,double pos); //get the (cylinder length)/(max cylinder length)
+    // void SetCylinderMaxPos();
 
 
 };

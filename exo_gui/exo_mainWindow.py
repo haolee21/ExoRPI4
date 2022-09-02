@@ -147,23 +147,19 @@ class MW(QMainWindow):
         # set MPC condition display
         self.off_led = QPixmap('off_led.png')
         self.on_led = QPixmap('on_led.png')
-        self.led_mpc_ltank = self.findChild(QLabel,'LED_LTank')
         self.led_mpc_lknee = self.findChild(QLabel,'LED_LKnee')
-        self.led_mpc_rtank = self.findChild(QLabel,'LED_RTank')
         self.led_mpc_rknee = self.findChild(QLabel,'LED_RKnee')
         self.led_mpc_lank = self.findChild(QLabel,'LED_LAnk')
         self.led_mpc_rank = self.findChild(QLabel,'LED_RAnk')
         
 
 
-        self.led_mpc_ltank.setPixmap(self.off_led)
         self.led_mpc_lknee.setPixmap(self.off_led)
-        self.led_mpc_rtank.setPixmap(self.off_led)
         self.led_mpc_rknee.setPixmap(self.off_led)
         self.led_mpc_lank.setPixmap(self.off_led)
         self.led_mpc_rank.setPixmap(self.off_led)
 
-        self.old_mpc_cond = [False]*6
+        self.old_mpc_cond = [False]*4
         
 
 
@@ -321,31 +317,21 @@ class MW(QMainWindow):
     def UpdateMPC_LED(self,led_cond):
         if(self.old_mpc_cond[0]^led_cond[0]):
             if(led_cond[0]):
-                self.led_mpc_ltank.setPixmap(self.on_led)
-            else:
-                self.led_mpc_ltank.setPixmap(self.off_led) 
-        if(self.old_mpc_cond[1]^led_cond[1]):
-            if(led_cond[1]):
                 self.led_mpc_lknee.setPixmap(self.on_led)
             else:
                 self.led_mpc_lknee.setPixmap(self.off_led)
-        if(self.old_mpc_cond[2]^led_cond[2]):
-            if(led_cond[2]):
+        if(self.old_mpc_cond[1]^led_cond[1]):
+            if(led_cond[1]):
                 self.led_mpc_lank.setPixmap(self.on_led)
             else:
                 self.led_mpc_lank.setPixmap(self.off_led)    
-        if(self.old_mpc_cond[3]^led_cond[3]):
-            if(led_cond[3]):
-                self.led_mpc_rtank.setPixmap(self.on_led)
-            else:
-                self.led_mpc_rtank.setPixmap(self.off_led)
-        if(self.old_mpc_cond[4]^led_cond[4]):
-            if(led_cond[4]):
+        if(self.old_mpc_cond[2]^led_cond[2]):
+            if(led_cond[2]):
                 self.led_mpc_rknee.setPixmap(self.on_led)
             else:
                 self.led_mpc_rknee.setPixmap(self.off_led)
-        if(self.old_mpc_cond[5]^led_cond[5]):
-            if(led_cond[5]):
+        if(self.old_mpc_cond[3]^led_cond[3]):
+            if(led_cond[3]):
                 self.led_mpc_rank.setPixmap(self.on_led)
             else:
                 self.led_mpc_rank.setPixmap(self.off_led)

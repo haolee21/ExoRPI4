@@ -2,7 +2,7 @@
 #define PWM_VAL_NUM 16
 // #define SW_VAL_NUM 8
 
-#define PWM_HEADER "TIME,LTANK_PWM,LKNE_PWM,LKNE_BAL,RKNE_PRE,RANK_PRE,R_TANK" //TODO: need 7 pwm I think, also add LANK back after we finish the imp test
+
 #define TEENSY_PWM1 8   //VAL 9
 #define PCB_VAL_9 0   //this is the index when we send the array to teensy
 
