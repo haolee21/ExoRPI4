@@ -164,7 +164,7 @@ void TCP_server::RecvCmd()
                 }
                 else if (cmd_device.compare("RANK_FLEX") == 0)
                 {
-                    Valves_hub::SetDuty(input, PWM_ID::kRankFlex);
+                    Valves_hub::SetDuty(input, PWM_ID::kRAnkFlex);
                     TCP_server::Send_cmd(std::string("1"), socket);
                 }
                 else if (cmd_device.compare("RTANK") == 0)

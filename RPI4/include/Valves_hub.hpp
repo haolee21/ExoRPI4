@@ -19,7 +19,7 @@ enum class PWM_ID //sync with the real connection on the PCB
     kRKneExt = PCB_VAL_12,
     kRKneFlex = PCB_VAL_13,
     kRAnkExt = PCB_VAL_14,
-    kRankFlex = PCB_VAL_15,
+    kRAnkFlex = PCB_VAL_15,
     kRTank = PCB_VAL_16,
     NA3 = PCB_VAL_1,
     NA4 = PCB_VAL_2,
@@ -98,6 +98,9 @@ public:
     // Impdence control
     static void SetDesiredImp(Valves_hub::Joint imp, double imp_val);
     static void SetCylnMaxPos(Joint joint);
+
+    //Force
+    static void SetDesiredForce(Joint joint, double des_force);
 
     
 

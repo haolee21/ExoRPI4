@@ -143,6 +143,10 @@ void Valves_hub::SetDesiredImp(Valves_hub::Joint imp,double imp_val){ //TODO: fi
     hub.desired_imp[static_cast<unsigned>(imp)]=imp_val;
     
 }
+void Valves_hub::SetDesiredForce(Valves_hub::Joint joint, double des_force){
+    Valves_hub& hub = Valves_hub::GetInstance();
+    hub.desired_force[(unsigned)joint]=des_force;
+}
 
 
 
