@@ -22,6 +22,7 @@ private:
     bool Recv(char* buf, int buf_len);
     void Send(char* buf, int buf_len);
     
+    void ProcessCmd(UDP_CmdPacket cmd_packet);
 public:
     UdpServer(/* args */);
     ~UdpServer();

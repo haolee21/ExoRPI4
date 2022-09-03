@@ -20,6 +20,8 @@ struct UDP_CmdData{
     std::array<double,(unsigned)Valves_hub::Chamber::kTotal> des_pre;
     std::array<double,(unsigned)Valves_hub::Joint::kTotal> des_imp;
     std::array<double,(unsigned)Valves_hub::Joint::kTotal> des_force;
+    double epoch_time;
+    bool recorder;
 
 };
 struct UDP_CmdFlag{
@@ -28,6 +30,8 @@ struct UDP_CmdFlag{
     std::array<bool,(unsigned)Valves_hub::Chamber::kTotal> des_pre;
     std::array<bool,(unsigned)Valves_hub::Joint::kTotal> des_imp;
     std::array<bool,(unsigned)Valves_hub::Joint::kTotal> des_force;
+    bool epoch_time;
+    bool recorder;
 
 };
 struct UDP_CmdPacket

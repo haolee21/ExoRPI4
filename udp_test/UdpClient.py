@@ -22,11 +22,15 @@ class UdpCmdPacket(Structure):
               ("des_pre_data",(c_double)*NUM_CHAMBER),
               ("des_imp_data",(c_double)*NUM_JOINT),
               ("des_force_data",(c_double)*NUM_JOINT),
+              ("epoch_time_data",c_double),
+              ("recorder_data",c_bool),
               ("pwm_duty_flag",(c_bool)*PWM_VAL_NUM),
               ("reset_enc_flag",(c_bool)*NUM_ENC),
               ("des_pre_flag",(c_bool)*NUM_CHAMBER),
               ("des_imp_flag",(c_bool)*NUM_JOINT),
-              ("des_force_flag",(c_bool)*NUM_JOINT)]
+              ("des_force_flag",(c_bool)*NUM_JOINT),
+              ("epoch_time_flag",c_bool),
+              ("recorder_flag",c_bool)]
 class UdpClient:
     ip_address="127.0.0.1"
     data_port = UDP_DATA_PORT
@@ -79,11 +83,7 @@ class UdpClient:
         # this function will be periodically called by QTimer
         data_recv = self.udp_data_socket.recvfrom(ctypes.sizeof(UdpDataPacket))
         udp_data_packet = UdpDataPacket.from_buffer_copy(data_recv[0])
-        print("recv sth")
-        print(udp_data_packet.enc_data[0],udp_data_packet.enc_data[1])
-        print(type(udp_data_packet.enc_data))
-        print(np.array(udp_data_packet.enc_data))
-        print(np.array(udp_data_packet.pwm_duty))
+        
 
 
 

@@ -5,6 +5,7 @@
 #include <array>
 #include "Valves_hub.hpp"
 #include "TCP_server.hpp"
+#include "UdpServer.hpp"
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <iomanip>
@@ -23,7 +24,7 @@ int main()
     //for here I assume the time is already set by the user
 
     
-
+    UdpServer udp_server;
 
     
     Timer::Add_senCallback(SensorHub::UpdateLEnc);
