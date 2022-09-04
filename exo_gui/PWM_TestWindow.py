@@ -2,7 +2,9 @@ from cgitb import text
 from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget,QLabel,QLineEdit,QPushButton
 from functools import partial
-from TCP_Con import TCP, TextToFloat
+# from TCP_Con import TCP, TextToFloat
+from UdpClient import *
+from UdpClient import UdpClient
 class PWM_TestWindow(QWidget):
     def __init__(self,parent=None):
         super().__init__()
@@ -150,14 +152,19 @@ class PWM_TestWindow(QWidget):
     # btn clicked
 
 
-    def DutyStartClicked(self,name,duty_lineEdit):
-        self.parent.tcp_port.SendCmd('SET:PWM:'+name+':'+str(TextToFloat(duty_lineEdit.text())),1,True) #convert text to float, if the text is not convertable it will be 0
-        print("text is :",type(text))
-        print(self.LTank_duty.text())
-    def DutyStopClicked(self,name):
-        self.parent.tcp_port.SendCmd('SET:PWM:'+name+':0',1,True)
+    def DutyStartClicked(self,chamber_idx,duty_lineEdit):
+        self.udp_port = UdpClient()
+        self.udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx] = TextToFloat(duty_lineEdit.text())
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx] = True
+        
+    def DutyStopClicked(self,chamber_idx):
+        self.udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx]=0
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx]=True
+        self.udp_port.udp_cmd_packet.con_on_off_data[chamber_idx]=False
+        self.udp_port.udp_cmd_packet.con_on_off_flag[chamber_idx]=True
 
-    def PreStartClicked(self,name,pre_lineEdit):
-        self.parent.tcp_port.SendCmd('SET:PRE:'+name+':'+str(TextToFloat(pre_lineEdit.text())),1,True)
+    def PreStartClicked(self,chamber_idx,pre_lineEdit):
+        self.udp_port.udp_cmd_packet.des_pre_data[chamber_idx]=TextToFloat(pre_lineEdit.text())
+        self.udp_port.udp_cmd_packet.des_pre_flag[chamber_idx]=True
     
         

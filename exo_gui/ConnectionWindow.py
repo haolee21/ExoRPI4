@@ -14,9 +14,8 @@ class ConnectionWindow(QWidget):
 
         self.parent = parent
         self.ip_input = self.findChild(QLineEdit,'ip_lineEdit')
-        self.ip_input.setText(parent.tcp_port.ip_address)
-        self.port_input = self.findChild(QLineEdit,'port_lineEdit')
-        self.port_input.setText(str(parent.tcp_port.port))
+        self.ip_input.setText(parent.udp_port.ip_address)
+        
 
     def btn_ok_clicked(self):
         self.finish_set()
@@ -26,10 +25,9 @@ class ConnectionWindow(QWidget):
     def btn_apply_clicked(self):
         self.finish_set()
     def closeEvent(self,event):
-        self.ip_input.setText(self.parent.tcp_port.ip_address)
-        self.port_input.setText(str(self.parent.tcp_port.port))
+        self.ip_input.setText(self.parent.udp_port.ip_address)
+       
 
     def finish_set(self):
-        self.parent.tcp_port.ip_address=self.ip_input.text()
-        self.parent.tcp_port.port = int(self.port_input.text())
-        self.parent.cur_ip.setText(self.parent.tcp_port.ip_address+':'+str(self.parent.tcp_port.port))
+        self.parent.udp_port.ip_address=self.ip_input.text()
+        self.parent.cur_ip.setText(self.parent.udp_port.ip_address)

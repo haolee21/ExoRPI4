@@ -1,3 +1,4 @@
+from xml.dom.pulldom import PROCESSING_INSTRUCTION
 from PyQt5.QtWidgets import QAction, QApplication, QCheckBox, QLabel, QLineEdit, QMainWindow,QPushButton, QRadioButton,QWidget,QProgressBar
 from PyQt5.QtWidgets import QLCDNumber
 from PyQt5 import uic,QtCore
@@ -8,7 +9,8 @@ import pyqtgraph as pg
 from pyqtgraph import GraphicsLayoutWidget
 
 import numpy as np
-from TCP_Con import TCP
+# from TCP_Con import TCP
+from UdpClient import *
 import pdb
 from collections import deque
 from ConnectionWindow import *
@@ -20,7 +22,8 @@ import math
 import time
 import datetime
 DATALEN=120
-SAMPT = 40
+# SAMPT = 40
+SAMPT = 400
 class SystemData:
     def __init__(self):
         self.ip_address='127.0.0.1'
@@ -38,7 +41,9 @@ class MW(QMainWindow):
         uic.loadUi('exo_gui_mw.ui',self)
         self.setWindowTitle('Bionics LLExo')
 
-        self.tcp_port = TCP()
+        # self.tcp_port = TCP()
+        self.udp_port = UdpClient()
+
         self.dataLen=DATALEN
         self.max_pressure=100.0 #max pressure is 80 psi
         #init all windows, otherwise all data will be lost when we close it
@@ -51,11 +56,11 @@ class MW(QMainWindow):
         # jointUpdateCB = lambda data:self.joint_plot_window.UpdateData(self,data)
         # preUpdateCB = lambda data:self.pressure_plot_window.UpdateData(self,data)
         # self.tcp_port.SetCallBack(jointUpdateCB,preUpdateCB)
-        self.tcp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn,self.UpdateMPC_LED)
+        self.udp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn,self.UpdateMPC_LED)
         # TCP/IP connection
         
         self.cur_ip = self.findChild(QLabel,'cur_ip_label')
-        self.cur_ip.setText(self.tcp_port.ip_address+':'+str(self.tcp_port.port))
+        self.cur_ip.setText(self.udp_port.ip_address)
         self.btn_connect = self.findChild(QPushButton,'btn_connect')
         self.btn_connect.clicked.connect(self.btn_connect_clicked)
         
@@ -176,37 +181,38 @@ class MW(QMainWindow):
         self.actRAnk_task.setChecked(False)
 
     def btn_sendCmd_clicked(self):
-        if self.walkRec_task.isChecked():
-            self.tcp_port.SendCmd('STR:REC:ALL',2)
-            self.walkRec_task.setChecked(False)
-        else:
-            if self.relLKne_task.isChecked():
-                self.tcp_port.SendCmd('STR:REL:LKNE',2)
-            if self.relRKne_task.isChecked():
-                self.tcp_port.SendCmd('STR:REL:RKNE',2)
-            if self.relLAnk_task.isChecked():
-                self.tcp_port.SendCmd('STR:REL:LANK',2)
-            if self.relRAnk_task.isChecked():
-                self.tcp_port.SendCmd('STR:REL:RANK',2)
-            if self.actLKne_task.isChecked():
-                self.tcp_port.SendCmd('STR:ACT:LKNE',2)
-            if self.actRKne_task.isChecked():
-                self.tcp_port.SendCmd('STR:ACT:RKNE',2)
-            if self.actLAnk_task.isChecked():
-                self.tcp_port.SendCmd('STR:ACT:LANK',2)
-            if self.actRAnk_task.isChecked():
-                self.tcp_port.SendCmd('STR:ACT:RANK',2)
-        self.radio_walkRec_checked()
+        # if self.walkRec_task.isChecked():
+        #     self.tcp_port.SendCmd('STR:REC:ALL',2)
+        #     self.walkRec_task.setChecked(False)
+        # else:
+        #     if self.relLKne_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:REL:LKNE',2)
+        #     if self.relRKne_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:REL:RKNE',2)
+        #     if self.relLAnk_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:REL:LANK',2)
+        #     if self.relRAnk_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:REL:RANK',2)
+        #     if self.actLKne_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:ACT:LKNE',2)
+        #     if self.actRKne_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:ACT:RKNE',2)
+        #     if self.actLAnk_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:ACT:LANK',2)
+        #     if self.actRAnk_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:ACT:RANK',2)
+        # self.radio_walkRec_checked()
+        pass
                 
         
         
     def btn_connect_clicked(self):
         
-        if not self.tcp_port.flag:
-            if self.tcp_port.Connect():
+        if not self.udp_port.flag:
+            if self.udp_port.Connect():
                 self.btn_connect.setText('Disconnect')
                 self.timer = QtCore.QTimer()
-                self.timer.timeout.connect(self.tcp_port.DataUpdate)
+                self.timer.timeout.connect(self.udp_port.ReqData)
                 self.timer.start(SAMPT)
 
                
@@ -216,22 +222,25 @@ class MW(QMainWindow):
         else:
             self.timer.stop()
             # self.tcp_port.SendCmd('SET:STOP:TCP:1',2,True)
-            self.tcp_port.Disconnect()
+            self.udp_port.Disconnect()
             self.btn_connect.setText('Connect')
     def btn_updateTime_clicked(self):
-        self.tcp_port.SendCmd('CAL:TIME:EPOCH:'+str(time.time()),1,True)
+        self.udp_port.udp_cmd_packet.epoch_time_data = str(time.time())
+        self.udp_port.udp_cmd_packet.epoch_time_flag = True
     def btn_rec_start_clicked(self):
         if(not self.rec_flag):
             # when clicked, start the recording
             self.btn_updateTime_clicked()
-            self.tcp_port.SendCmd('SET:REC:DATA:1',1)
+            self.udp_port.udp_cmd_packet.recorder_data=True
+            self.udp_port.udp_cmd_packet.recorder_flag=True
             self.rec_flag=True
             self.btn_rec_start.setText('REC End')
             curTime = datetime.datetime.fromtimestamp(time.time())
             self.label_startTime.setText("%04d-" %(curTime.year) + "%02d%02d-" %(curTime.month,curTime.day) + "%02d%02d-" %(curTime.hour,curTime.minute)+"%02d" %(curTime.second))
         else:
             # when clicked, end the recording
-            self.tcp_port.SendCmd('SET:REC:DATA:0',1)
+            self.udp_port.udp_cmd_packet.recorder_data=False
+            self.udp_port.udp_cmd_packet.recorder_flag = True
             self.rec_flag=False
             self.btn_rec_start.setText('REC Start')
     def update_rec_btn(self,flag_read):
@@ -250,7 +259,7 @@ class MW(QMainWindow):
 
     def found_disconnect(self):
         self.timer.stop()
-        self.tcp_port.Disconnect()
+        self.udp_port.Disconnect()
         self.btn_connect.setText('Connect')
     def update_air_volume(self,volume):
         cur_pre = volume*0.003125-25
@@ -268,23 +277,24 @@ class MW(QMainWindow):
         self.pwm_test_window.show()
         
     def btn_resetLHipS_clicked(self):
-        self.tcp_port.SendCmd('CAL:ENC:LHIP_S',1,True)
+        self.udp_port.udp_cmd_packet.reset_enc_flag[ENC_LHIP_S]=True
     def btn_resetLKneS_clicked(self):
-        self.tcp_port.SendCmd('CAL:ENC:LKNE_S',1,True)
+        self.udp_port.udp_cmd_packet.reset_enc_flag[ENC_LKNE_S]=True
     def btn_resetLAnkS_clicked(self):
-        self.tcp_port.SendCmd('CAL:ENC:LANK_S',1,True)
+        self.udp_port.udp_cmd_packet.reset_enc_flag[ENC_LANK_S]=True
     def btn_resetRHipS_clicked(self):
-        self.tcp_port.SendCmd('CAL:ENC:RHIP_S',1,True)
+        self.udp_port.udp_cmd_packet.reset_enc_flag[ENC_RHIP_S]=True
     def btn_resetRKneS_clicked(self):
-        self.tcp_port.SendCmd('CAL:ENC:RKNE_S',1,True)
+        self.udp_port.udp_cmd_packet.reset_enc_flag[ENC_RKNE_S]=True
     def btn_resetRAnkS_clicked(self):
-        self.tcp_port.SendCmd('CAL:ENC:RANK_S',1,True)
+        self.udp_port.udp_cmd_packet.reset_enc_flag[ENC_RANK_S]=True
 
 
 
     def btn_dischargeAll_clicked(self):
-        ret = self.tcp_port.SendCmd('STR:REL:ALL',2)
-        print('Discharge all air  ',ret.decode())
+        pass
+        #TODO finish
+
 
     def get_exo_model(self):
         #data format = [LHip,LKne,LAnk,RHip,RKne,RAnk]

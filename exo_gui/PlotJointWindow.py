@@ -88,38 +88,44 @@ class PlotJointWindow(QWidget):
         # self.parent.rtplot_data[0]=int.from_bytes(data[0:2],'little')*0.087890625
         
 
-        self.parent.rtplot_data[0]=struct.unpack("d",data[0:DOUBLE_SIZE])[0]*0.087890625
+        # self.parent.rtplot_data[0]=struct.unpack("d",data[0:DOUBLE_SIZE])[0]*0.087890625
+        self.parent.rtplot_data[0] = data[0]*0.087890625
         self.l_hipData.append(self.parent.rtplot_data[0])
         self.left_hip_line.setData(self.l_hipData)
 
         self.l_kneeData.popleft()
         # self.parent.rtplot_data[1]=int.from_bytes(data[2:4],'little')*0.087890625
-        self.parent.rtplot_data[1]=struct.unpack("d",data[DOUBLE_SIZE*1:DOUBLE_SIZE*2])[0]*0.087890625
+        # self.parent.rtplot_data[1]=struct.unpack("d",data[DOUBLE_SIZE*1:DOUBLE_SIZE*2])[0]*0.087890625
+        self.parent.rtplot_data[1] = data[1]*0.087890625
         self.l_kneeData.append(self.parent.rtplot_data[1])
         self.left_knee_line.setData(self.l_kneeData)
 
         self.l_ankData.popleft()
         # self.parent.rtplot_data[2]=int.from_bytes(data[4:6],'little')*0.087890625
-        self.parent.rtplot_data[2]=struct.unpack("d",data[DOUBLE_SIZE*2:DOUBLE_SIZE*3])[0]*0.087890625
+        # self.parent.rtplot_data[2]=struct.unpack("d",data[DOUBLE_SIZE*2:DOUBLE_SIZE*3])[0]*0.087890625
+        self.parent.rtplot_data[2] = data[2]*0.087890625
         self.l_ankData.append(self.parent.rtplot_data[2])
         self.left_ankle_line.setData(self.l_ankData)
         
 
         self.r_hipData.popleft()
         # self.parent.rtplot_data[3]=int.from_bytes(data[6:8],'little')*0.087890625
-        self.parent.rtplot_data[3]=struct.unpack("d",data[DOUBLE_SIZE*3:DOUBLE_SIZE*4])[0]*0.087890625
+        # self.parent.rtplot_data[3]=struct.unpack("d",data[DOUBLE_SIZE*3:DOUBLE_SIZE*4])[0]*0.087890625
+        self.parent.rtplot_data[3] = data[3]*0.087890625
         self.r_hipData.append(self.parent.rtplot_data[3])
         self.right_hip_line.setData(self.r_hipData)
         
         self.r_kneeData.popleft()
         # self.parent.rtplot_data[4]=int.from_bytes(data[8:10],'little')*0.087890625
-        self.parent.rtplot_data[4]=struct.unpack("d",data[DOUBLE_SIZE*4:DOUBLE_SIZE*5])[0]*0.087890625
+        # self.parent.rtplot_data[4]=struct.unpack("d",data[DOUBLE_SIZE*4:DOUBLE_SIZE*5])[0]*0.087890625
+        self.parent.rtplot_data[4]=data[4]*0.087890625
         self.r_kneeData.append(self.parent.rtplot_data[4])
         self.right_knee_line.setData(self.r_kneeData)
 
         self.r_ankData.popleft()
         # self.parent.rtplot_data[5]=int.from_bytes(data[10:12],'little')*0.087890625
-        self.parent.rtplot_data[5]=struct.unpack("d",data[DOUBLE_SIZE*5:DOUBLE_SIZE*6])[0]*0.087890625
+        # self.parent.rtplot_data[5]=struct.unpack("d",data[DOUBLE_SIZE*5:DOUBLE_SIZE*6])[0]*0.087890625
+        self.parent.rtplot_data[5]=data[5]*0.087890625
         self.r_ankData.append(self.parent.rtplot_data[5])
         self.right_ankle_line.setData(self.r_ankData)
 

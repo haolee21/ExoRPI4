@@ -19,7 +19,7 @@ int main()
     long int interval = 1*SEC;
 
 
-    TCP_server tcp_server;//it needs to connect to a client in order to sync the time when boot
+    // TCP_server tcp_server;//it needs to connect to a client in order to sync the time when boot
     //Whenever you want to use it, please sync the time of the system first
     //for here I assume the time is already set by the user
 
