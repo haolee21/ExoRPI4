@@ -22,8 +22,8 @@ import math
 import time
 import datetime
 DATALEN=120
-# SAMPT = 40
-SAMPT = 400
+SAMPT = 40
+# SAMPT = 400
 class SystemData:
     def __init__(self):
         self.ip_address='127.0.0.1'
@@ -262,6 +262,7 @@ class MW(QMainWindow):
         self.udp_port.Disconnect()
         self.btn_connect.setText('Connect')
     def update_air_volume(self,volume):
+        
         cur_pre = volume*0.003125-25
         self.tank_pre.display(cur_pre)
         if cur_pre>self.max_pressure:

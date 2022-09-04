@@ -39,13 +39,13 @@ RANK_FLEX=8
 RTANK=9
 
 class UdpDataPacket(Structure):
-    _fields_=[("pwm_duty",(c_int)*PWM_VAL_NUM),
+    _fields_=[("pwm_duty",(c_byte)*PWM_VAL_NUM),
               ("enc_data",(c_double)*NUM_ENC),
               ("pre_data1",(c_double)*NUM_PRE),
               ("con_status",(c_bool)*NUM_JOINT),
               ("rec_status",c_bool)]
 class UdpCmdPacket(Structure):
-    _fields_=[("pwm_duty_data",(c_int)*PWM_VAL_NUM),
+    _fields_=[("pwm_duty_data",(c_byte)*PWM_VAL_NUM),
               ("des_pre_data",(c_double)*NUM_CHAMBER),
               ("des_imp_data",(c_double)*NUM_JOINT),
               ("des_force_data",(c_double)*NUM_JOINT),
@@ -66,7 +66,7 @@ class UdpClient:
     data_port = UDP_DATA_PORT
     cmd_port = UDP_CMD_PORT
     def __init__(self):
-        self.udp_data_packet = UdpDataPacket()
+        
         self.udp_cmd_packet = UdpCmdPacket()
         self.flag = False
         self.udp_cmd_socket = socket.socket(family=socket.AF_INET,type=socket.SOCK_DGRAM)
@@ -99,34 +99,19 @@ class UdpClient:
 
     def ReqData(self):
     #     # this function will periodically called by QTimer
-        print("req data")
+        
         if self.flag:
-            print("data packet size")
-            print(ctypes.sizeof(UdpCmdPacket))
-            self.udp_cmd_packet.des_pre_flag[2]=True
-            self.udp_cmd_packet.reset_enc_flag[1]=True
-            self.udp_cmd_packet.des_pre_data[4]=1.5
-            self.udp_cmd_packet.epoch_time_data=1.1
-            self.udp_cmd_packet.recorder_data=True
-            self.udp_cmd_packet.con_on_off_data[0] = True
-            self.udp_cmd_packet.con_on_off_data[2] =True
-            self.udp_cmd_packet.pwm_duty_flag[0]=True
-            self.udp_cmd_packet.pwm_duty_flag[1]=True
-            self.udp_cmd_packet.pwm_duty_flag[2]=True
-            self.udp_cmd_packet.pwm_duty_flag[3]=True
-            self.udp_cmd_packet.pwm_duty_flag[4]=True
-
-            self.udp_cmd_packet.con_on_off_flag[3]=True
             
-
             server_address=(self.ip_address,UDP_CMD_PORT)
             send_bytes= self.udp_cmd_socket.sendto(self.udp_cmd_packet,server_address)
-            print("send bytes: ",send_bytes)
-            self.udp_cmd_packet = UdpCmdPacket()
+            
+            #reset all cmd flags after the current one is sent
+            pwm_flag_reset = [False]*PWM_VAL_NUM
+            self.udp_cmd_packet.pwm_duty_flag = (ctypes.c_bool * PWM_VAL_NUM)(*pwm_flag_reset)
 
             
             
-            print(send_bytes)
+            
             self.CheckRecv()
             
 
@@ -134,19 +119,24 @@ class UdpClient:
     def CheckRecv(self):
         # this function will be periodically called by QTimer
         data_recv = self.udp_data_socket.recvfrom(ctypes.sizeof(UdpDataPacket))
-        print("client recv")
         udp_data_packet = UdpDataPacket.from_buffer_copy(data_recv[0])
 
-        print(udp_data_packet.pre_data1[0])
-        # self.updateJoint(udp_data_packet.enc_data)
-        # self.updatePre(udp_data_packet.pre_data1)
-        # self.updateTank(self.udp_data_packet.pre_data1[4]) 
-        # self.recBtnUpdate(udp_data_packet.rec_status)
+        
+        self.updateJoint(udp_data_packet.enc_data)
+        self.updatePre(udp_data_packet.pre_data1)
+        self.updateTank(udp_data_packet.pre_data1[4]) 
+        self.recBtnUpdate(udp_data_packet.rec_status)
         
 
 def TextToFloat(text):
     try:
         res = float(text)
+    except:
+        res=0
+    return res
+def TextToInt(text):
+    try:
+        res = int(text)
     except:
         res=0
     return res

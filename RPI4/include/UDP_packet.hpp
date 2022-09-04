@@ -10,14 +10,14 @@
 
 struct UDP_DataPacket
 {
-    std::array<int,PWM_VAL_NUM> pwm_duty;
+    std::array<u_int8_t,PWM_VAL_NUM> pwm_duty;
     std::array<double,SensorHub::NUMENC> enc_data;
     std::array<double,SensorHub::NUMPRE> pre_data1;
     std::array<bool,(unsigned)Valves_hub::Joint::kTotal> con_status;
     bool recorder;
 };
 struct UDP_CmdPacket{
-    std::array<int,PWM_VAL_NUM> pwm_duty;
+    std::array<u_int8_t,PWM_VAL_NUM> pwm_duty;
     std::array<double,(unsigned)Valves_hub::Chamber::kTotal> des_pre;
     std::array<double,(unsigned)Valves_hub::Joint::kTotal> des_imp;
     std::array<double,(unsigned)Valves_hub::Joint::kTotal> des_force;
