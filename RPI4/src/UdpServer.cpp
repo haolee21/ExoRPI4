@@ -136,8 +136,6 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
         std::cout<<"change pwm duty\n";
         if (cmd_packet.pwm_duty_flag[(unsigned)Valves_hub::Chamber::kLTank])
         {
-            std::cout<<"change ltank\n";
-            std::cout<<"duty: "<<(int)cmd_packet.pwm_duty[(unsigned)(Valves_hub::Chamber::kLTank)]<<std::endl;
             Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kNone);
             Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)Valves_hub::Chamber::kLTank], PWM_ID::kLTank);
         }
@@ -189,58 +187,59 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
     }
     if (this->CheckCmdSet(cmd_packet.des_pre_flag.begin(), cmd_packet.des_pre_flag.size()))
     {
-       
+        
         if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kLTank])
         {
+            
             Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kPreConTank);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kLTank,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kLTank]);
+            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kLTank,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kLTank]* 320 + 8000);
         }
         if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kLKneExt])
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kPreConExt);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kLKneExt,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kLKneExt]);
+            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kLKneExt,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kLKneExt]* 320 + 8000);
         }
         if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kLKneFlex])
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kPreConFlex);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kLKneFlex,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kLKneFlex]);
+            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kLKneFlex,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kLKneFlex]* 320 + 8000);
             
         }
         if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kLAnkExt])
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kLAnk, JointCon::ControlMode::kPreConExt);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kLAnkExt,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kLAnkExt]);
+            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kLAnkExt,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kLAnkExt]* 320 + 8000);
         }
         if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kLAnkFlex])
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kLAnk, JointCon::ControlMode::kPreConFlex);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kLAnkFlex,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kLAnkFlex]);
+            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kLAnkFlex,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kLAnkFlex]* 320 + 8000);
         }
         if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kRTank])
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kPreConTank);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kRTank,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kRTank]);
+            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kRTank,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kRTank]* 320 + 8000);
         }
         if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kRKneExt])
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kPreConExt);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kRKneExt,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kRKneExt]);
+            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kRKneExt,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kRKneExt]* 320 + 8000);
         }
         if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kRKneFlex])
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kPreConFlex);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kRKneFlex,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kRKneFlex]);
+            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kRKneFlex,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kRKneFlex]* 320 + 8000);
             
         }
         if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kRAnkExt])
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kRAnk, JointCon::ControlMode::kPreConExt);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kRAnkExt,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kRAnkExt]);
+            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kRAnkExt,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kRAnkExt]* 320 + 8000);
         }
         if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kRAnkFlex])
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kRAnk, JointCon::ControlMode::kPreConFlex);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kRAnkFlex,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kRAnkFlex]);
+            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kRAnkFlex,cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kRAnkFlex]* 320 + 8000);
         }
     }
 
@@ -296,9 +295,13 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
     // update robot's time
     if (cmd_packet.epoch_time_flag)
     {
+        std::cout << "Set DateTime\n";
+        std::cout<< cmd_packet.epoch_time<<std::endl;
         timeval time;
-        int input_usec = cmd_packet.epoch_time - floor(cmd_packet.epoch_time) * 1000000;
-        time.tv_sec = cmd_packet.epoch_time;
+        int input_usec = (cmd_packet.epoch_time - floor(cmd_packet.epoch_time)) * 1000000;
+
+        std::cout<<input_usec<<std::endl;
+        time.tv_sec = (int)cmd_packet.epoch_time;
         time.tv_usec = input_usec;
         settimeofday(&time, NULL);
     }

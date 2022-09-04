@@ -106,26 +106,43 @@ class UdpClient:
             send_bytes= self.udp_cmd_socket.sendto(self.udp_cmd_packet,server_address)
             
             #reset all cmd flags after the current one is sent
-            pwm_flag_reset = [False]*PWM_VAL_NUM
-            self.udp_cmd_packet.pwm_duty_flag = (ctypes.c_bool * PWM_VAL_NUM)(*pwm_flag_reset)
+            # pwm_flag_reset = [False]*PWM_VAL_NUM
+            # reset_enc_flag_reset = [False]*NUM_ENC
+            # des_pre_flag_reset = [False]*NUM_CHAMBER
+            # des_imp_flag_reset = [False]*NUM_JOINT
+            # des_force_flag_reset = [False]*NUM_JOINT
+            # con_on_off_flag_reset = [False]*
 
             
-            
-            
+            #   ("reset_enc_flag",(c_bool)*NUM_ENC),
+            #   ("des_pre_flag",(c_bool)*NUM_CHAMBER),
+            #   ("des_imp_flag",(c_bool)*NUM_JOINT),
+            #   ("des_force_flag",(c_bool)*NUM_JOINT),
+            #   ("epoch_time_flag",c_bool),
+            #   ("recorder_flag",c_bool),
+            #   ("con_on_off_flag",(c_bool)*NUM_JOINT)
+
+            # self.udp_cmd_packet.pwm_duty_flag = (ctypes.c_bool * PWM_VAL_NUM)(*pwm_flag_reset)
+            self.udp_cmd_packet = UdpCmdPacket()
             self.CheckRecv()
+            
+            
+            
             
 
 
     def CheckRecv(self):
+       
         # this function will be periodically called by QTimer
         data_recv = self.udp_data_socket.recvfrom(ctypes.sizeof(UdpDataPacket))
-        udp_data_packet = UdpDataPacket.from_buffer_copy(data_recv[0])
+        if(len(data_recv[0])==ctypes.sizeof(UdpDataPacket)):
+            udp_data_packet = UdpDataPacket.from_buffer_copy(data_recv[0])
 
-        
-        self.updateJoint(udp_data_packet.enc_data)
-        self.updatePre(udp_data_packet.pre_data1)
-        self.updateTank(udp_data_packet.pre_data1[4]) 
-        self.recBtnUpdate(udp_data_packet.rec_status)
+    
+            self.updateJoint(udp_data_packet.enc_data)
+            self.updatePre(udp_data_packet.pre_data1)
+            self.updateTank(udp_data_packet.pre_data1[4]) 
+            self.recBtnUpdate(udp_data_packet.rec_status)
         
 
 def TextToFloat(text):

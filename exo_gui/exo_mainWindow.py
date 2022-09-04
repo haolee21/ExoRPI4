@@ -1,9 +1,9 @@
-from xml.dom.pulldom import PROCESSING_INSTRUCTION
+
 from PyQt5.QtWidgets import QAction, QApplication, QCheckBox, QLabel, QLineEdit, QMainWindow,QPushButton, QRadioButton,QWidget,QProgressBar
 from PyQt5.QtWidgets import QLCDNumber
 from PyQt5 import uic,QtCore
-from PyQt5.QtGui import QPixmap,QPalette
-
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import QThread
 
 import pyqtgraph as pg
 from pyqtgraph import GraphicsLayoutWidget
@@ -166,7 +166,7 @@ class MW(QMainWindow):
 
         self.old_mpc_cond = [False]*4
         
-
+        
 
         self.show()
     def radio_walkRec_checked(self):
@@ -225,7 +225,7 @@ class MW(QMainWindow):
             self.udp_port.Disconnect()
             self.btn_connect.setText('Connect')
     def btn_updateTime_clicked(self):
-        self.udp_port.udp_cmd_packet.epoch_time_data = str(time.time())
+        self.udp_port.udp_cmd_packet.epoch_time_data = time.time()
         self.udp_port.udp_cmd_packet.epoch_time_flag = True
     def btn_rec_start_clicked(self):
         if(not self.rec_flag):

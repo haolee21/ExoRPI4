@@ -64,6 +64,7 @@ void Valves_hub::UpdateValve(){
         hub.valChanged_flag=true;
     }
     else if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kPreConTank){
+        std::cout<<"ValveLoop: Tank pressure control\n";
         hub.left_knee_con.GetPreCon(hub.desired_pre[(unsigned)Valves_hub::Chamber::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kLTank],JointCon::Chamber::kTank);
         hub.valChanged_flag=true;
     }
