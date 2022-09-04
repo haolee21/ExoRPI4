@@ -38,6 +38,7 @@ RANK_EXT=7
 RANK_FLEX=8
 RTANK=9
 
+
 class UdpDataPacket(Structure):
     _fields_=[("pwm_duty",(c_byte)*PWM_VAL_NUM),
               ("enc_data",(c_double)*NUM_ENC),
@@ -72,15 +73,18 @@ class UdpClient:
         self.udp_cmd_socket = socket.socket(family=socket.AF_INET,type=socket.SOCK_DGRAM)
         self.udp_data_socket = socket.socket(family=socket.AF_INET,type=socket.SOCK_DGRAM)
         self.udp_data_socket.bind(("0.0.0.0",self.data_port)) #python required server listen to 0.0.0.0
-       
+        self.udp_data_socket.settimeout(0.01)
+
+        self.disconnect_count=0 #if continuously timeout, disconnect (call disConCcallback)
     def Connect(self):
         
-        
+        self.disconnect_count=0
         # self.udp_cmd_socket.bind((self.ip_address,self.cmd_port))
         self.flag=True
         return self.flag
     def Disconnect(self):
         self.flag=False
+        
         
         
 
@@ -134,16 +138,21 @@ class UdpClient:
     def CheckRecv(self):
        
         # this function will be periodically called by QTimer
-        data_recv = self.udp_data_socket.recvfrom(ctypes.sizeof(UdpDataPacket))
-        if(len(data_recv[0])==ctypes.sizeof(UdpDataPacket)):
-            udp_data_packet = UdpDataPacket.from_buffer_copy(data_recv[0])
+        try:
+            data_recv = self.udp_data_socket.recvfrom(ctypes.sizeof(UdpDataPacket))
+            if(len(data_recv[0])==ctypes.sizeof(UdpDataPacket)):
+                self.disconnect_count=0
+                udp_data_packet = UdpDataPacket.from_buffer_copy(data_recv[0])
 
-    
-            self.updateJoint(udp_data_packet.enc_data)
-            self.updatePre(udp_data_packet.pre_data1)
-            self.updateTank(udp_data_packet.pre_data1[4]) 
-            self.recBtnUpdate(udp_data_packet.rec_status)
         
+                self.updateJoint(udp_data_packet.enc_data)
+                self.updatePre(udp_data_packet.pre_data1)
+                self.updateTank(udp_data_packet.pre_data1[4]) 
+                self.recBtnUpdate(udp_data_packet.rec_status)
+        except:
+            self.disconnect_count = self.disconnect_count+1
+            if(self.disconnect_count>10):
+                self.disConCcallback()
 
 def TextToFloat(text):
     try:
