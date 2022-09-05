@@ -13,24 +13,23 @@ enum class PWM_ID //sync with the real connection on the PCB
 {
     kLTank = PCB_VAL_9,
     kLKneExt = PCB_VAL_10,
-    kLKneFlex = PCB_VAL_14,
-    kLAnkExt = PCB_VAL_11,
-    kLAnkFlex = PCB_VAL_12,
-    kRKneExt = PCB_VAL_12,
-    kRKneFlex = PCB_VAL_13,
-    kRAnkExt = PCB_VAL_14,
-    kRAnkFlex = PCB_VAL_15,
-    kRTank = PCB_VAL_16,
-    NA3 = PCB_VAL_1,
-    NA4 = PCB_VAL_2,
-    NA5 = PCB_VAL_3,
-    NA6 = PCB_VAL_4,
-    NA7 = PCB_VAL_5,
-    NA8 = PCB_VAL_6,
-    NA9 = PCB_VAL_7,
-    NA10 = PCB_VAL_8,
+    kLKneFlex = PCB_VAL_11,
+    kLRel = PCB_VAL_12,
+    kLAnkExt = PCB_VAL_13,
+    kLAnkFlex= PCB_VAL_14,
+    kRTank = PCB_VAL_15,
+    kRKneExt = PCB_VAL_16,
+    kRKneFlex = PCB_VAL_1,
+    kRAnkExt = PCB_VAL_2,
+    kRAnkFlex = PCB_VAL_3,
+    NA1 = PCB_VAL_4,
+    NA2 = PCB_VAL_5,
+    NA3 = PCB_VAL_6,
+    NA4 = PCB_VAL_7,
+    NA5 = PCB_VAL_8,
+    NA6 = PCB_VAL_9,
 };
-#define PWM_HEADER "TIME,LTANK_PWM,LKNE_PWM,LKNE_BAL,RKNE_PRE,RANK_PRE,R_TANK" // TODO: need 7 pwm I think, also add LANK back after we finish the imp test
+#define PWM_HEADER "TIME,LTANK_PWM,LKNE_EXT_PWM,LKNE_FLEX_PWM,LREL_PWM,LANK_EXT_PWM,LANK_FLEX_PWM,RTANK_PWM,RKNE_EXT_PWM,RKEN_FLEX_PWM,RANK_EXT_PWM,RANK_FLEX_PWM,NA1_PWM,NA2_PWM,NA3_PWN,NA4_PWM,NA5_PWM,NA6_PWM" // TODO: need 7 pwm I think, also add LANK back after we finish the imp test
 class Valves_hub
 {
 public:
@@ -85,6 +84,8 @@ public:
     // TCP_server read valve condition
     const static std::array<uint8_t, PWM_VAL_NUM> &GetDuty();
 
+    // Basic control function
+    static void ReleasePre();
 
     //Control
     static std::array<bool,(unsigned)Joint::kTotal> GetControlCond();
