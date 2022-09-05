@@ -35,7 +35,7 @@ class PWM_TestWindow(QWidget):
         self.btn_RAnkFlexDuty_stop = self.findChild(QPushButton,'btn_RAnkFlexDuty_stop')
         self.btn_RTankDuty_stop= self.findChild(QPushButton,'btn_RTankDuty_stop')
 
-        self.parent=parent
+        
         self.LKneExt_duty=self.findChild(QLineEdit,'lineEdit_LKneExtDuty')
         self.LKneFlex_duty=self.findChild(QLineEdit,'lineEdit_LKneFlexDuty')
         self.LAnkExt_duty=self.findChild(QLineEdit,'lineEdit_LAnkExtDuty')
