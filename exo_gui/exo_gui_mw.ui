@@ -345,12 +345,12 @@
      <string>Reset RAnkle</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_dischargeAllAir">
+   <widget class="QPushButton" name="btn_discharge">
     <property name="geometry">
      <rect>
       <x>190</x>
       <y>600</y>
-      <width>131</width>
+      <width>71</width>
       <height>41</height>
      </rect>
     </property>
@@ -585,6 +585,19 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QPushButton" name="btn_lock">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>600</y>
+      <width>71</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Lock</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

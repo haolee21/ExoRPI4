@@ -133,7 +133,7 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
     }
     if (this->CheckCmdSet(cmd_packet.pwm_duty_flag.begin(), cmd_packet.pwm_duty_flag.size()))
     {
-        std::cout<<"change pwm duty\n";
+        
         if (cmd_packet.pwm_duty_flag[(unsigned)Valves_hub::Chamber::kLTank])
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kNone);
@@ -183,6 +183,9 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kRAnk, JointCon::ControlMode::kNone);
             Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)Valves_hub::Chamber::kRAnkFlex], PWM_ID::kRAnkFlex);
+        }
+        if (cmd_packet.pwm_duty_flag[(unsigned)Valves_hub::Chamber::kAtoms]){
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)Valves_hub::Chamber::kAtoms],PWM_ID::kLRel); //TODO: exhaust port may also have left and right?? need to change this part in the future
         }
     }
     if (this->CheckCmdSet(cmd_packet.des_pre_flag.begin(), cmd_packet.des_pre_flag.size()))

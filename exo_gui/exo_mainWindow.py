@@ -1,4 +1,5 @@
 
+from pickle import TRUE
 from PyQt5.QtWidgets import QAction, QApplication, QCheckBox, QLabel, QLineEdit, QMainWindow,QPushButton, QRadioButton,QWidget,QProgressBar
 from PyQt5.QtWidgets import QLCDNumber
 from PyQt5 import uic,QtCore
@@ -85,7 +86,12 @@ class MW(QMainWindow):
         self.tank_pre.setDigitCount(5)
         # connection setting
         self.value = 0
-        
+
+        # exhaust 
+        self.btn_discharge = self.findChild(QPushButton,'btn_discharge')
+        self.btn_lock = self.findChild(QPushButton,'btn_lock')
+        self.btn_discharge.clicked.connect(self.btn_discharge_clicked)
+        self.btn_lock.clicked.connect(self.btn_lock_clicked)
 
         # create exo plot
         self.numJoint=6
@@ -292,9 +298,19 @@ class MW(QMainWindow):
 
 
 
-    def btn_dischargeAll_clicked(self):
-        pass
-        #TODO finish
+    def btn_discharge_clicked(self):
+        #TODO: this only release LKNE_FLEX pressure
+        self.udp_port.udp_cmd_packet.pwm_duty_data[ATMOS]=100
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[ATMOS]=True
+         
+    def btn_lock_clicked(self):
+        self.udp_port.udp_cmd_packet.pwm_duty_data[ATMOS]=0
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[ATMOS]=True
+
+
+            
+
+        
 
 
     def get_exo_model(self):

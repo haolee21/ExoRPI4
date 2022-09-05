@@ -52,6 +52,7 @@ public:
         kRAnkExt,
         kRAnkFlex,
         kRTank,
+        kAtoms, //exhaust 
         kTotal
 
     };
