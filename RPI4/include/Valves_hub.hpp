@@ -11,25 +11,27 @@
 
 enum class PWM_ID //sync with the real connection on the PCB
 {
+
     kLTank = PCB_VAL_9,
     kLKneExt = PCB_VAL_10,
     kLKneFlex = PCB_VAL_11,
-    kLRel = PCB_VAL_12,
-    kLAnkExt = PCB_VAL_13,
-    kLAnkFlex= PCB_VAL_14,
-    kRTank = PCB_VAL_15,
-    kRKneExt = PCB_VAL_16,
-    kRKneFlex = PCB_VAL_1,
-    kRAnkExt = PCB_VAL_2,
-    kRAnkFlex = PCB_VAL_3,
-    NA1 = PCB_VAL_4,
-    NA2 = PCB_VAL_5,
-    NA3 = PCB_VAL_6,
-    NA4 = PCB_VAL_7,
+    kLKneAnk = PCB_VAL_12,
+    kLKneExut = PCB_VAL_13,
+    kLAnkExt = PCB_VAL_14,
+    kLAnkExut= PCB_VAL_15,
+    NA1 = PCB_VAL_16,
+    kRTank = PCB_VAL_1,
+    kRKneExt = PCB_VAL_2,
+    kRKneFlex = PCB_VAL_3,
+    kRKneAnk = PCB_VAL_4,
+    kRKneExut = PCB_VAL_5,
+    kRAnkExt = PCB_VAL_6,
+    kRAnkExut= PCB_VAL_7,
     NA5 = PCB_VAL_8,
-    NA6 = PCB_VAL_9,
+    
 };
-#define PWM_HEADER "TIME,LTANK_PWM,LKNE_EXT_PWM,LKNE_FLEX_PWM,LREL_PWM,LANK_EXT_PWM,LANK_FLEX_PWM,RTANK_PWM,RKNE_EXT_PWM,RKEN_FLEX_PWM,RANK_EXT_PWM,RANK_FLEX_PWM,NA1_PWM,NA2_PWM,NA3_PWN,NA4_PWM,NA5_PWM,NA6_PWM" // TODO: need 7 pwm I think, also add LANK back after we finish the imp test
+#define PWM_HEADER "TIME,LTANK_PWM,LKNE_EXT_PWM,LKNE_FLEX_PWM,LKNE_ANK_PWM,LKNE_EXUT_PWM,LANK_EXT_PWM,LANK_EXUT_PWM,NA1_PWM,RTANK_PWM,RKNE_EXT_PWM,RKEN_FLEX_PWM,RKNE_ANK_PWM,RKNE_EXUT_PWM,RANK_EXT_PWM,RANK_EXUT_PWM,NA5_PWM"
+                 
 class Valves_hub
 {
 public:
@@ -45,12 +47,10 @@ public:
         kLKneExt,
         kLKneFlex,
         kLAnkExt,
-        kLAnkFlex,
         kLTank,
         kRKneExt,
         kRKneFlex,
         kRAnkExt,
-        kRAnkFlex,
         kRTank,
         kAtoms, //exhaust 
         kTotal

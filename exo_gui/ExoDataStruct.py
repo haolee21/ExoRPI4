@@ -1,4 +1,5 @@
 from ctypes import *
+import ctypes
 
 
 # from struct import Struct
@@ -8,7 +9,7 @@ PWM_VAL_NUM=16
 NUM_ENC = 6
 NUM_PRE = 8
 NUM_JOINT=4
-NUM_CHAMBER=11
+NUM_CHAMBER=9
 
 #encoder index
 ENC_LHIP_S=0
@@ -28,14 +29,12 @@ JOINT_RANK=3
 LKNE_EXT=0
 LKNE_FLEX=1
 LANK_EXT=2
-LANK_FLEX=3
-LTANK=4
-RKNE_EXT=5
-RKNE_FLEX=6
-RANK_EXT=7
-RANK_FLEX=8
-RTANK=9
-ATMOS=10 #exhaust
+LTANK=3
+RKNE_EXT=4
+RKNE_FLEX=5
+RANK_EXT=6
+RTANK=7
+ATMOS=8 #exhaust
 
 #adc index
 LTANK_ADC = 0
@@ -44,7 +43,24 @@ FORCE_ADC =2
 POS_ADC=3
 TANK_ADC=4
 LKNE_FLEX_ADC=5
+LANK_EXT_ADC=6
 
+#PWM ID, should be the enum PWM_ID value
+LTANK_PWM=0
+LKNE_EXT_PWM=1
+LKNE_FLEX_PWM=2
+LKNE_ANK_PWM=3
+LKNE_EXUT_PWM=4
+LANK_EXT_PWM=5
+LANK_EXUT_PWM=6
+
+RTANK_PWM=8
+RKNE_EXT_PWM=9
+RKNE_FLEX_PWM=10
+RKNE_ANK_PWM=11
+RKNE_EXUT_PWM=12
+RANK_EXT_PWM=13
+RANK_EXUT_PWM=14
 
 
 class UdpDataPacket(Structure):
@@ -69,3 +85,12 @@ class UdpCmdPacket(Structure):
               ("epoch_time_flag",c_bool),
               ("recorder_flag",c_bool),
               ("con_on_off_flag",(c_bool)*NUM_JOINT)]
+    def __init__(self):
+        self.pwm_duty_flag=(ctypes.c_bool*PWM_VAL_NUM)((False)*PWM_VAL_NUM)
+        self.reset_enc_flag = (ctypes.c_bool*NUM_ENC)((False)*NUM_ENC)
+        self.des_pre_flag = (ctypes.c_bool*NUM_CHAMBER)((False)*NUM_CHAMBER)
+        self.des_imp_flag = (ctypes.c_bool*NUM_JOINT)((False)*NUM_JOINT)
+        self.des_force_flag = (ctypes.c_bool*NUM_JOINT)((False)*NUM_JOINT)
+        self.epoch_time_flag = False
+        self.recorder_flag=False
+        self.con_on_off_flag = (ctypes.c_bool*NUM_JOINT)((False)*NUM_JOINT)

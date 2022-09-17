@@ -6,7 +6,7 @@ import numpy as np
 from ExoDataStruct import *
     
 class UdpClient:
-    ip_address='192.168.0.104'
+    ip_address='192.168.1.4'
     data_port = UDP_DATA_PORT
     cmd_port = UDP_CMD_PORT
     def __init__(self):
@@ -31,13 +31,14 @@ class UdpClient:
         
         
 
-    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback,recBtnUpdate,conCondUpdate):
+    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback,recBtnUpdate,conCondUpdate,pwm_lcd_update):
         self.updateJoint = updateJointFun
         self.updatePre = updatePreFun
         self.updateTank = updateTankFun
         self.disConCcallback = disConCallback
         self.recBtnUpdate = recBtnUpdate
         self.conCondUpdate = conCondUpdate
+        self.pwm_lcd_update = pwm_lcd_update
     
     def SetIP_Port(self,address,tx_port,rx_port):
         self.ip_address=address
@@ -87,11 +88,13 @@ class UdpClient:
                 self.disconnect_count=0
                 udp_data_packet = UdpDataPacket.from_buffer_copy(data_recv[0])
 
-        
                 self.updateJoint(udp_data_packet.enc_data)
                 self.updatePre(udp_data_packet.pre_data1)
                 self.updateTank(udp_data_packet.pre_data1[4]) 
                 self.recBtnUpdate(udp_data_packet.rec_status)
+                self.pwm_lcd_update(udp_data_packet.pwm_duty)
+                
+                
         except:
             self.disconnect_count = self.disconnect_count+1
             if(self.disconnect_count>100):

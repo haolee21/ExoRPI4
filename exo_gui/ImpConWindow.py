@@ -55,7 +55,8 @@ class ImpWindow(QWidget):
         self.parent.udp_port.udp_cmd_packet.des_imp_data[joint_idx]=TextToFloat(line_edit.text())
         self.parent.udp_port.udp_cmd_packet.des_imp_flag[joint_idx]=True
     def ImpStop(self,joint_idx):
-        self.parent.udp_port = UdpClient()
+        
         self.parent.udp_port.udp_cmd_packet.con_on_off_data[joint_idx]=False
         self.parent.udp_port.udp_cmd_packet.con_on_off_flag[joint_idx]=True
-        
+        # self.parent.udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx]=0
+        # self.parent.udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx]=True

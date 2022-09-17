@@ -19,9 +19,12 @@ from PlotJointWindow import *
 from PlotPressureWindow import *
 from PWM_TestWindow import *
 from ImpConWindow import *
+from PwmValueWindow import *
+from PressureConWindow import *
 import math
 import time
 import datetime
+import threading
 DATALEN=120
 SAMPT = 40
 # SAMPT = 400
@@ -53,11 +56,12 @@ class MW(QMainWindow):
         self.pressure_plot_window=PlotPressureWindow(self)
         self.pwm_test_window = PWM_TestWindow(self)
         self.imp_con_window = ImpWindow(self)
-        
+        self.pwm_value_window = PwmValueWindow(self)
+        self.pre_con_window = PressureConWindow(self)
         # jointUpdateCB = lambda data:self.joint_plot_window.UpdateData(self,data)
         # preUpdateCB = lambda data:self.pressure_plot_window.UpdateData(self,data)
         # self.tcp_port.SetCallBack(jointUpdateCB,preUpdateCB)
-        self.udp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn,self.UpdateMPC_LED)
+        self.udp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn,self.UpdateMPC_LED,self.pwm_value_window.UpdateLCD)
         # TCP/IP connection
         
         self.cur_ip = self.findChild(QLabel,'cur_ip_label')
@@ -79,6 +83,12 @@ class MW(QMainWindow):
         self.act_imp_con = self.findChild(QAction,'act_ImpCon')
         self.act_imp_con.triggered.connect(self.imp_con_window.show)
 
+        self.act_pwm_disp = self.findChild(QAction,'actionPWM_Duty')
+        self.act_pwm_disp.triggered.connect(self.pwm_value_window.show)
+
+        self.act_pre_con = self.findChild(QAction,'actionTest_Pressure_Control')
+        self.act_pre_con.triggered.connect(self.pre_con_window.show)
+
         # air reserivor 
         
         self.air_volume = self.findChild(QProgressBar,'air_volumn')
@@ -92,7 +102,8 @@ class MW(QMainWindow):
         self.btn_lock = self.findChild(QPushButton,'btn_lock')
         self.btn_discharge.clicked.connect(self.btn_discharge_clicked)
         self.btn_lock.clicked.connect(self.btn_lock_clicked)
-
+        self.discharge_thread = None 
+        
         # create exo plot
         self.numJoint=6
         self.model_plot_widget = self.findChild(GraphicsLayoutWidget,'exo_rt_plot')
@@ -299,13 +310,38 @@ class MW(QMainWindow):
 
 
     def btn_discharge_clicked(self):
-        #TODO: this only release LKNE_FLEX pressure
-        self.udp_port.udp_cmd_packet.pwm_duty_data[ATMOS]=100
-        self.udp_port.udp_cmd_packet.pwm_duty_flag[ATMOS]=True
+        #add sleep to avoid high instant current
+        # the power supply cannot output that much current 
+        if self.discharge_thread:
+            if self.discharge_thread.is_alive():
+                self.discharge_thread.join()
+        self.discharge_thread= threading.Thread(target=self.discharge_process)
+        self.discharge_thread.start()
+        
+    def discharge_process(self):
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXUT_PWM]=100
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXUT_PWM]=True
+        time.sleep(1)
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXT_PWM]=100
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXT_PWM]=True
+        time.sleep(1)
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_FLEX_PWM]=100
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_FLEX_PWM]=True
+        time.sleep(1)
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_ANK_PWM]=100
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_ANK_PWM]=True
          
     def btn_lock_clicked(self):
-        self.udp_port.udp_cmd_packet.pwm_duty_data[ATMOS]=0
-        self.udp_port.udp_cmd_packet.pwm_duty_flag[ATMOS]=True
+        if self.discharge_thread.is_alive():
+            self.discharge_thread.join()
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXUT_PWM]=0
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXUT_PWM]=True
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXT_PWM]=0
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXT_PWM]=True
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_FLEX_PWM]=0
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_FLEX_PWM]=True
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_ANK_PWM]=0
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_ANK_PWM]=True
 
 
             

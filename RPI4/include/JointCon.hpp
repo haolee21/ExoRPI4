@@ -1,6 +1,7 @@
 #ifndef JOINT_CON_HPP
 #define JOINT_CON_HPP
 #include <array>
+#include <osqp/osqp.h>
 #include "MPC.hpp"
 #include "DigitalFilter.hpp"
 #include "CylinderParam.hpp"
@@ -8,7 +9,7 @@
 class JointCon
 {
 public:
-    JointCon(PneumaticParam::CylinderParam cyln_param, PneumaticParam::ReservoirParam reservoir_param);
+    JointCon(PneumaticParam::CylinderParam cyln_param, PneumaticParam::ReservoirParam reservoir_param,std::string joint_con_name);
     ~JointCon();
     enum class Chamber
     {
@@ -52,6 +53,9 @@ private:
     double pre_tank;
     double pre_main_tank;
     double cur_force;                                       // unit: N
+    double L_ext;                                      // unit: mm
+    double L_flex;                                     // unit: mm
+    
     const double volume_slope_6in = 0.0006351973436310972;  // FIXME: these are only used for linear calibrations
     const double volume_intercept_6in = 115.68133521647316; // unit: mm/adc(pos)
 
@@ -62,6 +66,17 @@ private:
     // filter
     DigitalFilter<double, FilterParam::Filter20Hz_2::Order, 1> vel_filter;
     DigitalFilter<double, FilterParam::Filter20Hz_2::Order, 1> force_filter;
+
+
+    // std::unique_ptr<OSQPSettings> osqp_settings;
+    // std::unique_ptr<OSQPData> osqp_data;
+    // OSQPWorkspace *work;
+
+    double GetPre_KPa(double pre_adc);
+
+    Recorder<double,5> joint_con_rec;
+
+
 };
 
 #endif

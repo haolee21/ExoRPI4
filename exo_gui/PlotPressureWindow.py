@@ -19,41 +19,49 @@ class PlotPressureWindow(QWidget):
 
 
         self.left_tank_plot = self.left_plot_widget.addPlot(colspan=1,title='Left Tank Pressure')
-        self.left_tank_plot.setYRange(-30,self.parent.max_pressure)
+        self.left_tank_plot.setYRange(-1,self.parent.max_pressure)
         self.left_tank_plot.setLabel('left','Pressure (psi)')
         self.left_tank_plot.setLabel('bottom','Time (sec)')
         self.left_tank_line = self.left_tank_plot.plot(pen=pg.mkPen('b', width=1))
+        self.left_tank_yaxis = self.left_tank_plot.getAxis('left')
+        self.left_tank_yaxis.setTickSpacing(20,10)
 
         self.left_plot_widget.nextRow()
         self.left_knee_ext_plot = self.left_plot_widget.addPlot(colspan=1,title='Knee Extension Pressure')
-        self.left_knee_ext_plot.setYRange(-30,self.parent.max_pressure)
+        self.left_knee_ext_plot.setYRange(-1,self.parent.max_pressure)
         self.left_knee_ext_plot.setLabel('left','Pressure (psi)')
         self.left_knee_ext_plot.setLabel('bottom','Time (sec)')
         self.left_knee_ext_line = self.left_knee_ext_plot.plot(pen=pg.mkPen('b', width=1))
+        self.left_knee_ext_yaxis = self.left_knee_ext_plot.getAxis('left')
+        self.left_knee_ext_yaxis.setTickSpacing(20,10)
 
         self.left_plot_widget.nextRow()
         self.left_knee_flex_plot = self.left_plot_widget.addPlot(colspan=1,title='Knee Flexion Pressure')
-        self.left_knee_flex_plot.setYRange(-30,self.parent.max_pressure)
+        self.left_knee_flex_plot.setYRange(-1,self.parent.max_pressure)
         self.left_knee_flex_plot.setLabel('left','Pressure (psi)')
         self.left_knee_flex_plot.setLabel('bottom','Time (sec)')
         self.left_knee_flex_line = self.left_knee_flex_plot.plot(pen=pg.mkPen('b', width=1))
+        self.left_knee_flex_yaxis = self.left_knee_flex_plot.getAxis('left')
+        self.left_knee_flex_yaxis.setTickSpacing(20,10)
         
 
         self.left_plot_widget.nextRow()
         self.left_ankle_ext_plot = self.left_plot_widget.addPlot(colspan=1,title='Ankle Extension Pressure')
-        self.left_ankle_ext_plot.setYRange(-30,self.parent.max_pressure)
+        self.left_ankle_ext_plot.setYRange(-1,self.parent.max_pressure)
         self.left_ankle_ext_plot.setLabel('left','Pressure (psi)')
         self.left_ankle_ext_plot.setLabel('bottom','Time (sec)')
         self.left_ankle_ext_line = self.left_ankle_ext_plot.plot(pen=pg.mkPen('b', width=1))
-
+        self.left_ankle_ext_yaxis = self.left_ankle_ext_plot.getAxis('left')
+        self.left_ankle_ext_yaxis.setTickSpacing(20,10)
 
         self.left_plot_widget.nextRow()
         self.left_ankle_flex_plot = self.left_plot_widget.addPlot(colspan=1,title='Ankle Flexion Pressure')
-        self.left_ankle_flex_plot.setYRange(-30,self.parent.max_pressure)
+        self.left_ankle_flex_plot.setYRange(-1,self.parent.max_pressure)
         self.left_ankle_flex_plot.setLabel('left','Pressure (psi)')
         self.left_ankle_flex_plot.setLabel('bottom','Time (sec)')
         self.left_ankle_flex_line = self.left_ankle_flex_plot.plot(pen=pg.mkPen('b', width=1))
-
+        self.left_ankle_flex_yaxis = self.left_ankle_flex_plot.getAxis('left')
+        self.left_ankle_flex_yaxis.setTickSpacing(20,10)
 
 
 
@@ -62,41 +70,50 @@ class PlotPressureWindow(QWidget):
         self.right_plot_widget.setBackground('w')
         # self.right_kneePre_plot.setYRange(-30,self.parent.max_pressure) #TODO: change the unit back to psi when fully integrated
         self.right_tank_plot = self.right_plot_widget.addPlot(colspan=1,title='Main Tank Pressure')
-        self.right_tank_plot.setYRange(-30,self.parent.max_pressure)
-        self.right_tank_plot.setLabel('right','Pressure (psi)')
+        self.right_tank_plot.setYRange(-1,self.parent.max_pressure)
+        self.right_tank_plot.setLabel('left','Pressure (psi)')
         self.right_tank_plot.setLabel('bottom','Time (sec)')
         self.right_tank_line = self.right_tank_plot.plot(pen=pg.mkPen('b', width=1))
-
+        self.right_tank_yaxis = self.right_tank_plot.getAxis('left')
+        self.right_tank_yaxis.setTickSpacing(20,10)
 
         self.right_plot_widget.nextRow()
         self.right_knee_ext_plot = self.right_plot_widget.addPlot(colspan=1,title='Force')
         self.right_knee_ext_plot.setYRange(0,2**16)
-        self.right_knee_ext_plot.setLabel('right','Pressure (psi)')
+        self.right_knee_ext_plot.setLabel('left','Pressure (psi)')
         self.right_knee_ext_plot.setLabel('bottom','Time (sec)')
         self.right_knee_ext_line = self.right_knee_ext_plot.plot(pen=pg.mkPen('b', width=1))
+        # self.right_knee_ext_yaxis = self.right_knee_ext_plot.getAxis('right')
+        # self.right_knee_ext_yaxis.setTickSpacing(20,10)
+
 
         self.right_plot_widget.nextRow()
         self.right_knee_flex_plot = self.right_plot_widget.addPlot(colspan=1,title='Position')
         self.right_knee_flex_plot.setYRange(0,2**16)
-        self.right_knee_flex_plot.setLabel('right','Pressure (psi)')
+        self.right_knee_flex_plot.setLabel('left','Pressure (psi)')
         self.right_knee_flex_plot.setLabel('bottom','Time (sec)')
         self.right_knee_flex_line = self.right_knee_flex_plot.plot(pen=pg.mkPen('b', width=1))
-        
+        # self.right_knee_flex_yaxis = self.right_knee_flex_plot.getAxis('right')
+        # self.right_knee_flex_yaxis.setTickSpacing(20,10)
 
         self.right_plot_widget.nextRow()
         self.right_ankle_ext_plot = self.right_plot_widget.addPlot(colspan=1,title='Ankle Extension Pressure')
-        self.right_ankle_ext_plot.setYRange(-30,self.parent.max_pressure)
-        self.right_ankle_ext_plot.setLabel('right','Pressure (psi)')
+        self.right_ankle_ext_plot.setYRange(-1,self.parent.max_pressure)
+        self.right_ankle_ext_plot.setLabel('left','Pressure (psi)')
         self.right_ankle_ext_plot.setLabel('bottom','Time (sec)')
         self.right_ankle_ext_line = self.right_ankle_ext_plot.plot(pen=pg.mkPen('b', width=1))
+        self.right_ankle_ext_yaxis = self.right_ankle_ext_plot.getAxis('left')
+        self.right_ankle_ext_yaxis.setTickSpacing(20,10)
 
 
         self.right_plot_widget.nextRow()
         self.right_ankle_flex_plot = self.right_plot_widget.addPlot(colspan=1,title='Ankle Flexion Pressure')
-        self.right_ankle_flex_plot.setYRange(-30,self.parent.max_pressure)
-        self.right_ankle_flex_plot.setLabel('right','Pressure (psi)')
+        self.right_ankle_flex_plot.setYRange(-1,self.parent.max_pressure)
+        self.right_ankle_flex_plot.setLabel('left','Pressure (psi)')
         self.right_ankle_flex_plot.setLabel('bottom','Time (sec)')
         self.right_ankle_flex_line = self.right_ankle_flex_plot.plot(pen=pg.mkPen('b', width=1))
+        self.right_ankle_flex_yaxis = self.right_ankle_flex_plot.getAxis('left')
+        self.right_ankle_flex_yaxis.setTickSpacing(20,10)
 
         self.setWindowTitle('Pressure')
 
@@ -129,9 +146,9 @@ class PlotPressureWindow(QWidget):
         self.l_kne_flex_data.append(data[LKNE_FLEX_ADC]*0.003125-25)
         self.left_knee_flex_line.setData(self.l_kne_flex_data)
 
-        # self.l_ank_ext_data.popleft()
-        # self.l_ank_ext_data.append(data[LANK_EXT_ADC]*0.003125-25)
-        # self.left_ankle_ext_line.setData(self.l_ank_ext_data)
+        self.l_ank_ext_data.popleft()
+        self.l_ank_ext_data.append(data[LANK_EXT_ADC]*0.003125-25)
+        self.left_ankle_ext_line.setData(self.l_ank_ext_data)
 
         # self.l_ank_flex_data.popleft()
         # self.l_ank_flex_data.append(data[LANK_FLEX_ADC]*0.003125-25)

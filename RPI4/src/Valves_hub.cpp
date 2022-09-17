@@ -2,10 +2,10 @@
 #include "MPC_param.hpp"
 Valves_hub::Valves_hub()
 :
-left_knee_con(PneumaticParam::kLKne,PneumaticParam::kLTank)
-,right_knee_con(PneumaticParam::kRKne,PneumaticParam::kRTank)
-,left_ankle_con(PneumaticParam::kLAnk,PneumaticParam::kLTank)
-,right_ankle_con(PneumaticParam::kRAnk,PneumaticParam::kRTank)
+left_knee_con(PneumaticParam::kLKne,PneumaticParam::kLTank,"left_knee")
+,right_knee_con(PneumaticParam::kRKne,PneumaticParam::kRTank,"right_knee")
+,left_ankle_con(PneumaticParam::kLAnk,PneumaticParam::kLTank,"left_ankle")
+,right_ankle_con(PneumaticParam::kRAnk,PneumaticParam::kRTank,"right_ankle")
 ,pwmRecorder("PWM",PWM_HEADER)//TODO: use correct valve names, perhaps adding it in shared file with Teensy
 ,teensyValveCon(1)
 {
@@ -73,6 +73,7 @@ void Valves_hub::UpdateValve(){
         hub.valChanged_flag=true;
     }
     else if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kImpCon){
+        // std::cout<<"do imp control\n";
         hub.left_knee_con.GetImpCon(hub.desired_imp[(unsigned)Valves_hub::Joint::kLKne],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLTank]);
         hub.valChanged_flag=true;
     }
@@ -81,6 +82,14 @@ void Valves_hub::UpdateValve(){
     
     if(hub.valChanged_flag){
         
+        //check all pwm duty are below 100
+        for(int i=0;i<TeensyI2C::CMDLEN;i++){
+            if(hub.PWM_Duty[i]>100)
+                hub.PWM_Duty[i]=100;
+            else if (hub.PWM_Duty[i]<0)
+                hub.PWM_Duty[i]=0;
+        }
+
         std::array<char,TeensyI2C::CMDLEN> cmd;
 
         std::memcpy(cmd.begin(),hub.PWM_Duty.begin(),sizeof(uint8_t)*PWM_VAL_NUM);

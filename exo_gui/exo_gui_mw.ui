@@ -606,7 +606,7 @@
      <x>0</x>
      <y>0</y>
      <width>795</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuConnection">
@@ -634,6 +634,7 @@
     </property>
     <addaction name="actionTest_SW_Valves"/>
     <addaction name="act_testPWM_valves"/>
+    <addaction name="actionTest_Pressure_Control"/>
     <addaction name="act_ImpCon"/>
    </widget>
    <addaction name="menuConnection"/>
@@ -680,6 +681,11 @@
   <action name="act_ImpCon">
    <property name="text">
     <string>Test Impedance Control</string>
+   </property>
+  </action>
+  <action name="actionTest_Pressure_Control">
+   <property name="text">
+    <string>Test Pressure Control</string>
    </property>
   </action>
  </widget>
