@@ -27,8 +27,8 @@ namespace PneumaticParam
 
         MpcInitParam::kLKneCl,
         MpcInitParam::kLKneCh,
-        MpcInitParam::kLKneBal, // TODO: update it with balance param
-        MpcInitParam::kLKneBal,
+        MpcInitParam::kLKneCl, //TODO: update it with the real param
+        MpcInitParam::kLKneCh,
         56739.5,
         0.0088964432, // 0.001 in psi,
         387.096,      // unit: mm^2 (0.6 in2)
