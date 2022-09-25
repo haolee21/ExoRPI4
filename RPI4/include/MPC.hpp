@@ -38,40 +38,41 @@
 #include "FilterParam.hpp"
 #include "CylinderParam.hpp"
 
+#define MPC_HEAD "Time,Phi_1,Phi_2,dPhi1_dx1,dPhi1_dx2,dPhi2_dx1,dPhi2_dx2,dPhi1_du,dPhi2_du"
 class MPC
 {
 private:
     // Please reference to the equation note
     
     
-    Eigen::Matrix<float,2,1> B;
-    Eigen::Matrix<float,2,1> alpha;
+    Eigen::Matrix<double,2,1> B;
+    Eigen::Matrix<double,2,1> alpha;
     void UpdateDyn(bool increase_pre);
     //parameter of OSQP
-    float P_val,q_val;
-    const Eigen::Matrix<float,1,2> H_h; // when I define state, I define it as 
-    const Eigen::Matrix<float,1,2> H_l;
-    Eigen::Matrix<float,2,1> Phi; //this will be useful if we want to estimate the flow rate
-    Eigen::Matrix<float,2,1> Phi_hat;
-    Eigen::Matrix<float,2,2> dPhi_dx_T;
-    Eigen::Matrix<float,2,1> dPhi_du_T;
-    void UpdatePhi(const std::array<float,MPC_DELAY> ph,const std::array<float,MPC_DELAY> pl,const std::array<float,MPC_DELAY> u,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b,Eigen::Matrix<float,2,1>& _phi);
-    void Update_dPhi_dxL(const std::array<float,MPC_DELAY>& ph, const std::array<float,MPC_DELAY> &pl,const std::array<float,MPC_DELAY> &d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
-    void Update_dPhi_dxH(const std::array<float,MPC_DELAY>& ph,const std::array<float,MPC_DELAY> &pl,const std::array<float,MPC_DELAY>& d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
-    void Update_dPhi_du(const std::array<float,MPC_DELAY>& ph,const std::array<float,MPC_DELAY> &pl,const std::array<float,MPC_DELAY>& d,const std::array<float,MPC_STATE_NUM>& a,const std::array<float,MPC_STATE_NUM> &b);
+    double P_val,q_val;
+    const Eigen::Matrix<double,1,2> H_h; // when I define state, I define it as 
+    const Eigen::Matrix<double,1,2> H_l;
+    Eigen::Matrix<double,2,1> Phi; //this will be useful if we want to estimate the flow rate
+    Eigen::Matrix<double,2,1> Phi_hat;
+    Eigen::Matrix<double,2,2> dPhi_dx_T;
+    Eigen::Matrix<double,2,1> dPhi_du_T;
+    void UpdatePhi(const std::array<double,MPC_DELAY> ph,const std::array<double,MPC_DELAY> pl,const std::array<double,MPC_DELAY> u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b,Eigen::Matrix<double,2,1>& _phi);
+    void Update_dPhi_dxL(const std::array<double,MPC_DELAY>& ph, const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY> &d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    void Update_dPhi_dxH(const std::array<double,MPC_DELAY>& ph,const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY>& d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    void Update_dPhi_du(const std::array<double,MPC_DELAY>& ph,const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY>& d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
 
     //Mem for previous measurements
-    std::array<float,MPC_DELAY> p_tank_mem; //mem is just for storage, pop the oldest ones and put the newest one there, the order may be 34512
-    std::array<float,MPC_DELAY> p_set_mem;
-    std::array<float,MPC_DELAY> u_mem;
+    std::array<double,MPC_DELAY> p_tank_mem; //mem is just for storage, pop the oldest ones and put the newest one there, the order may be 34512
+    std::array<double,MPC_DELAY> p_set_mem;
+    std::array<double,MPC_DELAY> u_mem;
 
-    std::array<float,MPC_DELAY> p_tank_his;
-    std::array<float,MPC_DELAY> p_set_his;
-    std::array<float,MPC_DELAY> u_his;
+    std::array<double,MPC_DELAY> p_tank_his;
+    std::array<double,MPC_DELAY> p_set_his;
+    std::array<double,MPC_DELAY> u_his;
 
-    std::array<float,MPC_DELAY> p_tank_hat;
-    std::array<float,MPC_DELAY> p_set_hat;
-    std::array<float,MPC_DELAY> u_hat;
+    std::array<double,MPC_DELAY> p_tank_hat;
+    std::array<double,MPC_DELAY> p_set_hat;
+    std::array<double,MPC_DELAY> u_hat;
     // void SortHistory();
     void UpdateHistory();
 
@@ -80,10 +81,10 @@ private:
     
     // the cylinders are divided into master and slave
     // we control the 
-    std::array<float,MPC_STATE_NUM> ah;
-    std::array<float,MPC_STATE_NUM> bh;
-    std::array<float,MPC_STATE_NUM> al;
-    std::array<float,MPC_STATE_NUM> bl;
+    std::array<double,MPC_STATE_NUM> ah;
+    std::array<double,MPC_STATE_NUM> bh;
+    std::array<double,MPC_STATE_NUM> al;
+    std::array<double,MPC_STATE_NUM> bl;
 
 
 
@@ -97,8 +98,8 @@ private:
 
     //cylinder volume
     
-    // static const float kArea;//= 0.31*645.16; //mm^2
-    float phi_scale;
+    // static const double kArea;//= 0.31*645.16; //mm^2
+    double phi_scale;
     
     const double volume_slope_6in = 0.0006351973436310972; //FIXME: these are only used for linear calibrations
     const double volume_intercept_6in = 115.68133521647316; // unit: mm/adc(pos)
@@ -120,14 +121,15 @@ private:
     // double cur_force;
     // DigitalFilter<double,FilterParam::Filter20Hz_5::Order,1> vel_filter;
     // DigitalFilter<double,FilterParam::Filter20Hz_2::Order,1> force_filter;
+    Recorder<double,8> mpc_rec;
 public:
-    MPC(std::array<std::array<float, MPC_STATE_NUM>,2> cl,std::array<std::array<float, MPC_STATE_NUM>,2> ch);
+    MPC(std::array<std::array<double, MPC_STATE_NUM>,2> cl,std::array<std::array<double, MPC_STATE_NUM>,2> ch,std::string file_name);
     ~MPC();
-    void UpdateParamH(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
-    void UpdateParamL(std::array<float,MPC_STATE_NUM> new_param0,std::array<float,MPC_STATE_NUM> new_param1);
+    void UpdateParamH(std::array<double,MPC_STATE_NUM> new_param0,std::array<double,MPC_STATE_NUM> new_param1);
+    void UpdateParamL(std::array<double,MPC_STATE_NUM> new_param0,std::array<double,MPC_STATE_NUM> new_param1);
     
-    int GetPreControl(const double& p_des,const double& p_cur,const double& p_tank,float scale);//It requires current pressure value because all the values storaged in the meme are scaled
-    void GetImpControl(const double& imp_des, const double& p_ext,const double& p_flex, const double& p_tank, const double& pos,float scale,int& joint_val_duty,int& joint_bal_duty,int& tank_duty);
+    int GetPreControl(const double& p_des,const double& p_cur,const double& p_tank,double scale);//It requires current pressure value because all the values storaged in the meme are scaled
+    void GetImpControl(const double& imp_des, const double& p_ext,const double& p_flex, const double& p_tank, const double& pos,double scale,int& joint_val_duty,int& joint_bal_duty,int& tank_duty);
     //Get values for recorder
     std::array<double,10> GetMpcRec();
 

@@ -8,10 +8,10 @@ namespace PneumaticParam
 
     struct CylinderParam
     {
-        std::array<std::array<float, MPC_STATE_NUM>, 2> cl_ext;
-        std::array<std::array<float, MPC_STATE_NUM>, 2> ch_ext;
-        std::array<std::array<float, MPC_STATE_NUM>, 2> cl_flex;
-        std::array<std::array<float, MPC_STATE_NUM>, 2> ch_flex;
+        std::array<std::array<double, MPC_STATE_NUM>, 2> cl_ext;
+        std::array<std::array<double, MPC_STATE_NUM>, 2> ch_ext;
+        std::array<std::array<double, MPC_STATE_NUM>, 2> cl_flex;
+        std::array<std::array<double, MPC_STATE_NUM>, 2> ch_flex;
         double max_pos;
         double fri_coeff;
         double piston_area_ext;
@@ -19,8 +19,8 @@ namespace PneumaticParam
     };
     struct ReservoirParam
     {
-        std::array<std::array<float, MPC_STATE_NUM>, 2> cl;
-        std::array<std::array<float, MPC_STATE_NUM>, 2> ch;
+        std::array<std::array<double, MPC_STATE_NUM>, 2> cl;
+        std::array<std::array<double, MPC_STATE_NUM>, 2> ch;
     };
 
     const CylinderParam kLKne = {

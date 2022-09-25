@@ -1,7 +1,7 @@
 #include <osqp/osqp.h>
 #include "JointCon.hpp"
 JointCon::JointCon(PneumaticParam::CylinderParam ext_param,PneumaticParam::ReservoirParam reservoir_param,std::string joint_con_name)
-    : ext_con(ext_param.cl_ext,ext_param.ch_ext),flex_con(ext_param.cl_flex,ext_param.ch_flex), tank_con(reservoir_param.cl,reservoir_param.ch),
+    : ext_con(ext_param.cl_ext,ext_param.ch_ext,joint_con_name+"_ext"),flex_con(ext_param.cl_flex,ext_param.ch_flex,joint_con_name+"_flex"), tank_con(reservoir_param.cl,reservoir_param.ch,joint_con_name+"_tank"),
       piston_area_ext(ext_param.piston_area_ext), piston_area_flex(ext_param.piston_area_flex), fric_coeff(ext_param.fri_coeff), max_pos(ext_param.max_pos), vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b),
       joint_con_rec(joint_con_name,"Time,L_ext,L_flex,cur_force,max_spring_compress,delta_x")
 {
@@ -166,11 +166,11 @@ void JointCon::GetForceCon(const double des_force, u_int8_t &ext_duty, u_int8_t 
     // {
     //     // std::cout<<"need to decrease force but cannot recycle\n";
     //     double des_force_mN = (des_force + this->fric_coeff * this->pos_diff)*1000; //to make our life easier, we use mN to match kPa and mm^2
-    //     // c_float P_x[3] = {this->piston_area_ext,this->piston_area_ext*this->piston_area_flex,this->piston_area_flex*this->piston_area_flex};
+    //     // c_double P_x[3] = {this->piston_area_ext,this->piston_area_ext*this->piston_area_flex,this->piston_area_flex*this->piston_area_flex};
     //     // c_int P_nnz = 3;
     //     // c_int P_i[3] = {0,0,1};
     //     // c_int P_p[3]={0,1,3};
-    //     // c_float q[2]={-des_force*this->piston_area_ext,des_force*this->piston_area_flex};
+    //     // c_double q[2]={-des_force*this->piston_area_ext,des_force*this->piston_area_flex};
 
        
     //     // std::cout<<"num: "<<des_p_ext_num<<std::endl;
@@ -235,6 +235,7 @@ void JointCon::GetPreCon(const double des_pre, u_int8_t &duty, Chamber chamber)
     {
     case JointCon::Chamber::kExt:
         duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
+        
         break;
     case JointCon::Chamber::kFlex:
         break;

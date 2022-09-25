@@ -179,7 +179,7 @@
 //             }
 //             else if (cmd_subClass.compare("PRE") == 0)
 //             {
-//                 float input = std::stof(Sub_cmd(ret_str, cmd_idx, '\n'));
+//                 double input = std::stof(Sub_cmd(ret_str, cmd_idx, '\n'));
 //                 double pre_val = (double)(input * 320 + 8000);
 //                 if (cmd_device.compare("LTANK") == 0)
 //                 {

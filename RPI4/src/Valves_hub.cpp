@@ -48,7 +48,6 @@ void Valves_hub::UpdateValve(){
     //MPC check
     const std::array<double,SensorHub::NUMPRE>& pre_data = SensorHub::GetPreData(); //use ref to avoid copy
     
-    //put measurements in mpc controller, we must do this even the controller are not enabled since it relies on the history of the measurements
     hub.left_knee_con.PushMeas(pre_data[(unsigned)SensorHub::PreName::LKneExt],pre_data[(unsigned)SensorHub::PreName::LKneFlex],
                                pre_data[(unsigned)SensorHub::PreName::LTank],pre_data[(unsigned)SensorHub::PreName::Tank],
                                hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLTank],
@@ -64,7 +63,7 @@ void Valves_hub::UpdateValve(){
         hub.valChanged_flag=true;
     }
     else if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kPreConTank){
-        std::cout<<"ValveLoop: Tank pressure control\n";
+        // std::cout<<"ValveLoop: Tank pressure control\n";
         hub.left_knee_con.GetPreCon(hub.desired_pre[(unsigned)Valves_hub::Chamber::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kLTank],JointCon::Chamber::kTank);
         hub.valChanged_flag=true;
     }
@@ -99,6 +98,8 @@ void Valves_hub::UpdateValve(){
         
         
     }
+    //put measurements in mpc controller, we must do this even the controller are not enabled since it relies on the history of the measurements
+    
     hub.pwmRecorder.PushData(hub.GetDuty());
 
     
