@@ -25,7 +25,7 @@ MPC::MPC(std::array<std::array<double, MPC_STATE_NUM>, 2> cl, std::array<std::ar
 
     this->phi_scale = 1.0;
     // this->pre_pos = 0.0;
-    this->meas_idx=0;
+    this->meas_idx = 0;
 }
 
 MPC::~MPC()
@@ -391,6 +391,165 @@ void MPC::Update_dPhi_dxL(const std::array<double, MPC_DELAY> &p_h, const std::a
     this->dPhi_dx_T << -a[168] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[168] * x20 + a[170] * x26 + a[171] * x27 + a[172] * x24 + a[173] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[168] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[168] * x20 + b[170] * x26 + b[171] * x27 + b[172] * x24 + b[173] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
 }
 
+void MPC::Update_dPhi_dxL2(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+{
+    double x0 = a[162] * u[23];
+    double x1 = (p_l[23] * p_l[23]);
+    double x2 = p_h[23] * u[23] / x1;
+    double x3 = p_l[23] / p_h[23];
+    double x4 = 2 * u[23];
+    double x5 = a[165] * x4;
+    double x6 = a[167] * x4;
+    double x7 = (p_h[23] * p_h[23]);
+    double x8 = 1.0 / x7;
+    double x9 = p_l[23] * x8;
+    double x10 = (u[23] * u[23]);
+    double x11 = 2 * x10;
+    double x12 = a[166] * x11;
+    double x13 = 1 - x3;
+    double x14 = p_h[23] * x11;
+    double x15 = a[163] * x14;
+    double x16 = (x13 * x13);
+    double x17 = (u[23] * u[23] * u[23]);
+    double x18 = 3 * x17 * x7;
+    double x19 = a[164] * x18;
+    double x20 = u[23] / p_l[23];
+    double x21 = x1 * x8;
+    double x22 = x1 / (p_h[23] * p_h[23] * p_h[23]);
+    double x23 = 1 - x21;
+    double x24 = u[23] * x23;
+    double x25 = x10 * x23;
+    double x26 = p_l[23] * x11 * x13;
+    double x27 = 3 * p_h[23] * p_l[23] * x16 * x17;
+    double x28 = (x13 * x13 * x13);
+    double x29 = b[162] * u[23];
+    double x30 = b[165] * x4;
+    double x31 = b[167] * x4;
+    double x32 = b[166] * x11;
+    double x33 = b[163] * x14;
+    double x34 = b[164] * x18;
+    this->dPhi_dx2_T << -a[161] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[161] * x20 + a[163] * x26 + a[164] * x27 + a[165] * x24 + a[166] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[161] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[161] * x20 + b[163] * x26 + b[164] * x27 + b[165] * x24 + b[166] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
+}
+
+void MPC::Update_dPhi_dxL3(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+{
+    double x0 = a[155] * u[22];
+    double x1 = (p_l[22] * p_l[22]);
+    double x2 = p_h[22] * u[22] / x1;
+    double x3 = p_l[22] / p_h[22];
+    double x4 = 2 * u[22];
+    double x5 = a[158] * x4;
+    double x6 = a[160] * x4;
+    double x7 = (p_h[22] * p_h[22]);
+    double x8 = 1.0 / x7;
+    double x9 = p_l[22] * x8;
+    double x10 = (u[22] * u[22]);
+    double x11 = 2 * x10;
+    double x12 = a[159] * x11;
+    double x13 = 1 - x3;
+    double x14 = p_h[22] * x11;
+    double x15 = a[156] * x14;
+    double x16 = (x13 * x13);
+    double x17 = (u[22] * u[22] * u[22]);
+    double x18 = 3 * x17 * x7;
+    double x19 = a[157] * x18;
+    double x20 = u[22] / p_l[22];
+    double x21 = x1 * x8;
+    double x22 = x1 / (p_h[22] * p_h[22] * p_h[22]);
+    double x23 = 1 - x21;
+    double x24 = u[22] * x23;
+    double x25 = x10 * x23;
+    double x26 = p_l[22] * x11 * x13;
+    double x27 = 3 * p_h[22] * p_l[22] * x16 * x17;
+    double x28 = (x13 * x13 * x13);
+    double x29 = b[155] * u[22];
+    double x30 = b[158] * x4;
+    double x31 = b[160] * x4;
+    double x32 = b[159] * x11;
+    double x33 = b[156] * x14;
+    double x34 = b[157] * x18;
+    this->dPhi_dx3_T << -a[154] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[154] * x20 + a[156] * x26 + a[157] * x27 + a[158] * x24 + a[159] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[154] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[154] * x20 + b[156] * x26 + b[157] * x27 + b[158] * x24 + b[159] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
+}
+void MPC::Update_dPhi_dxL4(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+{
+    double x0 = a[148] * u[21];
+    double x1 = (p_l[21] * p_l[21]);
+    double x2 = p_h[21] * u[21] / x1;
+    double x3 = p_l[21] / p_h[21];
+    double x4 = 2 * u[21];
+    double x5 = a[151] * x4;
+    double x6 = a[153] * x4;
+    double x7 = (p_h[21] * p_h[21]);
+    double x8 = 1.0 / x7;
+    double x9 = p_l[21] * x8;
+    double x10 = (u[21] * u[21]);
+    double x11 = 2 * x10;
+    double x12 = a[152] * x11;
+    double x13 = 1 - x3;
+    double x14 = p_h[21] * x11;
+    double x15 = a[149] * x14;
+    double x16 = (x13 * x13);
+    double x17 = (u[21] * u[21] * u[21]);
+    double x18 = 3 * x17 * x7;
+    double x19 = a[150] * x18;
+    double x20 = u[21] / p_l[21];
+    double x21 = x1 * x8;
+    double x22 = x1 / (p_h[21] * p_h[21] * p_h[21]);
+    double x23 = 1 - x21;
+    double x24 = u[21] * x23;
+    double x25 = x10 * x23;
+    double x26 = p_l[21] * x11 * x13;
+    double x27 = 3 * p_h[21] * p_l[21] * x16 * x17;
+    double x28 = (x13 * x13 * x13);
+    double x29 = b[148] * u[21];
+    double x30 = b[151] * x4;
+    double x31 = b[153] * x4;
+    double x32 = b[152] * x11;
+    double x33 = b[149] * x14;
+    double x34 = b[150] * x18;
+    this->dPhi_dx4_T << -a[147] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[147] * x20 + a[149] * x26 + a[150] * x27 + a[151] * x24 + a[152] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[147] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[147] * x20 + b[149] * x26 + b[150] * x27 + b[151] * x24 + b[152] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
+}
+void MPC::Update_dPhi_dxL5(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+{
+    double x0 = a[141] * u[20];
+    double x1 = (p_l[20] * p_l[20]);
+    double x2 = p_h[20] * u[20] / x1;
+    double x3 = p_l[20] / p_h[20];
+    double x4 = 2 * u[20];
+    double x5 = a[144] * x4;
+    double x6 = a[146] * x4;
+    double x7 = (p_h[20] * p_h[20]);
+    double x8 = 1.0 / x7;
+    double x9 = p_l[20] * x8;
+    double x10 = (u[20] * u[20]);
+    double x11 = 2 * x10;
+    double x12 = a[145] * x11;
+    double x13 = 1 - x3;
+    double x14 = p_h[20] * x11;
+    double x15 = a[142] * x14;
+    double x16 = (x13 * x13);
+    double x17 = (u[20] * u[20] * u[20]);
+    double x18 = 3 * x17 * x7;
+    double x19 = a[143] * x18;
+    double x20 = u[20] / p_l[20];
+    double x21 = x1 * x8;
+    double x22 = x1 / (p_h[20] * p_h[20] * p_h[20]);
+    double x23 = 1 - x21;
+    double x24 = u[20] * x23;
+    double x25 = x10 * x23;
+    double x26 = p_l[20] * x11 * x13;
+    double x27 = 3 * p_h[20] * p_l[20] * x16 * x17;
+    double x28 = (x13 * x13 * x13);
+    double x29 = b[141] * u[20];
+    double x30 = b[144] * x4;
+    double x31 = b[146] * x4;
+    double x32 = b[145] * x11;
+    double x33 = b[142] * x14;
+    double x34 = b[143] * x18;
+
+    this->dPhi_dx5_T << -a[140] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[140] * x20 + a[142] * x26 + a[143] * x27 + a[144] * x24 + a[145] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[140] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[140] * x20 + b[142] * x26 + b[143] * x27 + b[144] * x24 + b[145] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
+}
+
 void MPC::Update_dPhi_dxH(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = u[24] / p_l[24];
@@ -431,6 +590,168 @@ void MPC::Update_dPhi_dxH(const std::array<double, MPC_DELAY> &p_h, const std::a
     double x35 = b[171] * x25;
     this->dPhi_dx_T << a[168] * x0 + a[171] * x23 + a[172] * x16 + a[173] * x17 + p_l[24] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[168] * x27 - p_h[24] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[168] * x0 + b[171] * x23 + b[172] * x16 + b[173] * x17 + p_l[24] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[168] * x27 - p_h[24] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
 }
+void MPC::Update_dPhi_dxH2(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+{
+    double x0 = u[23] / p_l[23];
+    double x1 = p_l[23] / p_h[23];
+    double x2 = a[162] * u[23];
+    double x3 = (p_h[23] * p_h[23]);
+    double x4 = 1.0 / x3;
+    double x5 = (p_l[23] * p_l[23]);
+    double x6 = x4 * x5;
+    double x7 = 2 * u[23];
+    double x8 = a[165] * x7;
+    double x9 = a[167] * x7;
+    double x10 = x5 / (p_h[23] * p_h[23] * p_h[23]);
+    double x11 = 1 - x1;
+    double x12 = (u[23] * u[23]);
+    double x13 = 2 * x12;
+    double x14 = a[166] * x13;
+    double x15 = 1 - x6;
+    double x16 = u[23] * x15;
+    double x17 = x12 * x15;
+    double x18 = a[163] * x13;
+    double x19 = x11 * x18;
+    double x20 = (x11 * x11);
+    double x21 = p_h[23] * x20;
+    double x22 = 3 * (u[23] * u[23] * u[23]);
+    double x23 = p_l[23] * x21 * x22;
+    double x24 = (x11 * x11 * x11);
+    double x25 = x22 * x3;
+    double x26 = a[164] * x25;
+    double x27 = p_h[23] * u[23] / x5;
+    double x28 = p_l[23] * x4;
+    double x29 = b[162] * u[23];
+    double x30 = b[165] * x7;
+    double x31 = b[167] * x7;
+    double x32 = b[166] * x13;
+    double x33 = b[163] * x13;
+    double x34 = x11 * x33;
+    double x35 = b[164] * x25;
+    this->dPhi_dx2_T << a[161] * x0 + a[164] * x23 + a[165] * x16 + a[166] * x17 + p_l[23] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[161] * x27 - p_h[23] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[161] * x0 + b[164] * x23 + b[165] * x16 + b[166] * x17 + p_l[23] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[161] * x27 - p_h[23] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
+}
+void MPC::Update_dPhi_dxH3(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+{
+    double x0 = u[22] / p_l[22];
+    double x1 = p_l[22] / p_h[22];
+    double x2 = a[155] * u[22];
+    double x3 = (p_h[22] * p_h[22]);
+    double x4 = 1.0 / x3;
+    double x5 = (p_l[22] * p_l[22]);
+    double x6 = x4 * x5;
+    double x7 = 2 * u[22];
+    double x8 = a[158] * x7;
+    double x9 = a[160] * x7;
+    double x10 = x5 / (p_h[22] * p_h[22] * p_h[22]);
+    double x11 = 1 - x1;
+    double x12 = (u[22] * u[22]);
+    double x13 = 2 * x12;
+    double x14 = a[159] * x13;
+    double x15 = 1 - x6;
+    double x16 = u[22] * x15;
+    double x17 = x12 * x15;
+    double x18 = a[156] * x13;
+    double x19 = x11 * x18;
+    double x20 = (x11 * x11);
+    double x21 = p_h[22] * x20;
+    double x22 = 3 * (u[22] * u[22] * u[22]);
+    double x23 = p_l[22] * x21 * x22;
+    double x24 = (x11 * x11 * x11);
+    double x25 = x22 * x3;
+    double x26 = a[157] * x25;
+    double x27 = p_h[22] * u[22] / x5;
+    double x28 = p_l[22] * x4;
+    double x29 = b[155] * u[22];
+    double x30 = b[158] * x7;
+    double x31 = b[160] * x7;
+    double x32 = b[159] * x13;
+    double x33 = b[156] * x13;
+    double x34 = x11 * x33;
+    double x35 = b[157] * x25;
+    this->dPhi_dx3_T << a[154] * x0 + a[157] * x23 + a[158] * x16 + a[159] * x17 + p_l[22] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[154] * x27 - p_h[22] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[154] * x0 + b[157] * x23 + b[158] * x16 + b[159] * x17 + p_l[22] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[154] * x27 - p_h[22] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
+}
+void MPC::Update_dPhi_dxH4(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+{
+    double x0 = u[21] / p_l[21];
+    double x1 = p_l[21] / p_h[21];
+    double x2 = a[148] * u[21];
+    double x3 = (p_h[21] * p_h[21]);
+    double x4 = 1.0 / x3;
+    double x5 = (p_l[21] * p_l[21]);
+    double x6 = x4 * x5;
+    double x7 = 2 * u[21];
+    double x8 = a[151] * x7;
+    double x9 = a[153] * x7;
+    double x10 = x5 / (p_h[21] * p_h[21] * p_h[21]);
+    double x11 = 1 - x1;
+    double x12 = (u[21] * u[21]);
+    double x13 = 2 * x12;
+    double x14 = a[152] * x13;
+    double x15 = 1 - x6;
+    double x16 = u[21] * x15;
+    double x17 = x12 * x15;
+    double x18 = a[149] * x13;
+    double x19 = x11 * x18;
+    double x20 = (x11 * x11);
+    double x21 = p_h[21] * x20;
+    double x22 = 3 * (u[21] * u[21] * u[21]);
+    double x23 = p_l[21] * x21 * x22;
+    double x24 = (x11 * x11 * x11);
+    double x25 = x22 * x3;
+    double x26 = a[150] * x25;
+    double x27 = p_h[21] * u[21] / x5;
+    double x28 = p_l[21] * x4;
+    double x29 = b[148] * u[21];
+    double x30 = b[151] * x7;
+    double x31 = b[153] * x7;
+    double x32 = b[152] * x13;
+    double x33 = b[149] * x13;
+    double x34 = x11 * x33;
+    double x35 = b[150] * x25;
+
+    this->dPhi_dx4_T << a[147] * x0 + a[150] * x23 + a[151] * x16 + a[152] * x17 + p_l[21] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[147] * x27 - p_h[21] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[147] * x0 + b[150] * x23 + b[151] * x16 + b[152] * x17 + p_l[21] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[147] * x27 - p_h[21] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
+}
+void MPC::Update_dPhi_dxH5(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+{
+    double x0 = u[20] / p_l[20];
+    double x1 = p_l[20] / p_h[20];
+    double x2 = a[141] * u[20];
+    double x3 = (p_h[20] * p_h[20]);
+    double x4 = 1.0 / x3;
+    double x5 = (p_l[20] * p_l[20]);
+    double x6 = x4 * x5;
+    double x7 = 2 * u[20];
+    double x8 = a[144] * x7;
+    double x9 = a[146] * x7;
+    double x10 = x5 / (p_h[20] * p_h[20] * p_h[20]);
+    double x11 = 1 - x1;
+    double x12 = (u[20] * u[20]);
+    double x13 = 2 * x12;
+    double x14 = a[145] * x13;
+    double x15 = 1 - x6;
+    double x16 = u[20] * x15;
+    double x17 = x12 * x15;
+    double x18 = a[142] * x13;
+    double x19 = x11 * x18;
+    double x20 = (x11 * x11);
+    double x21 = p_h[20] * x20;
+    double x22 = 3 * (u[20] * u[20] * u[20]);
+    double x23 = p_l[20] * x21 * x22;
+    double x24 = (x11 * x11 * x11);
+    double x25 = x22 * x3;
+    double x26 = a[143] * x25;
+    double x27 = p_h[20] * u[20] / x5;
+    double x28 = p_l[20] * x4;
+    double x29 = b[141] * u[20];
+    double x30 = b[144] * x7;
+    double x31 = b[146] * x7;
+    double x32 = b[145] * x13;
+    double x33 = b[142] * x13;
+    double x34 = x11 * x33;
+    double x35 = b[143] * x25;
+    this->dPhi_dx5_T << a[140] * x0 + a[143] * x23 + a[144] * x16 + a[145] * x17 + p_l[20] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[140] * x27 - p_h[20] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[140] * x0 + b[143] * x23 + b[144] * x16 + b[145] * x17 + p_l[20] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[140] * x27 - p_h[20] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
+}
+
 void MPC::Update_dPhi_du(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = p_h[24] / p_l[24];
@@ -443,7 +764,65 @@ void MPC::Update_dPhi_du(const std::array<double, MPC_DELAY> &p_h, const std::ar
     double x7 = x5 * x6;
     double x8 = (x1 * x1) * x3 * x6;
     double x9 = 3 * (p_h[24] * p_h[24] * p_h[24]) * (u[24] * u[24]) * (x1 * x1 * x1);
-    this->dPhi_du_T << a[168]*x0 + a[169]*x2 + a[170]*x8 + a[171]*x9 + a[172]*x5 + a[173]*x7 + a[174]*x4, b[168]*x0 + b[169]*x2 + b[170]*x8 + b[171]*x9 + b[172]*x5 + b[173]*x7 + b[174]*x4;
+    this->dPhi_du_T << a[168] * x0 + a[169] * x2 + a[170] * x8 + a[171] * x9 + a[172] * x5 + a[173] * x7 + a[174] * x4, b[168] * x0 + b[169] * x2 + b[170] * x8 + b[171] * x9 + b[172] * x5 + b[173] * x7 + b[174] * x4;
+}
+void MPC::Update_dPhi_du2(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+{
+    double x0 = p_h[23] / p_l[23];
+    double x1 = 1 - p_l[23] / p_h[23];
+    double x2 = p_h[23] * x1;
+    double x3 = (p_h[23] * p_h[23]);
+    double x4 = -(p_l[23] * p_l[23]) / x3 + 1;
+    double x5 = p_h[23] * x4;
+    double x6 = 2 * u[23];
+    double x7 = x5 * x6;
+    double x8 = (x1 * x1) * x3 * x6;
+    double x9 = 3 * (p_h[23] * p_h[23] * p_h[23]) * (u[23] * u[23]) * (x1 * x1 * x1);
+    this->dPhi_du2_T << a[161] * x0 + a[162] * x2 + a[163] * x8 + a[164] * x9 + a[165] * x5 + a[166] * x7 + a[167] * x4, b[161] * x0 + b[162] * x2 + b[163] * x8 + b[164] * x9 + b[165] * x5 + b[166] * x7 + b[167] * x4;
+}
+
+void MPC::Update_dPhi_du3(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+{
+    double x0 = p_h[22] / p_l[22];
+    double x1 = 1 - p_l[22] / p_h[22];
+    double x2 = p_h[22] * x1;
+    double x3 = (p_h[22] * p_h[22]);
+    double x4 = -(p_l[22] * p_l[22]) / x3 + 1;
+    double x5 = p_h[22] * x4;
+    double x6 = 2 * u[22];
+    double x7 = x5 * x6;
+    double x8 = (x1 * x1) * x3 * x6;
+    double x9 = 3 * (p_h[22] * p_h[22] * p_h[22]) * (u[22] * u[22]) * (x1 * x1 * x1);
+    this->dPhi_du3_T << a[154] * x0 + a[155] * x2 + a[156] * x8 + a[157] * x9 + a[158] * x5 + a[159] * x7 + a[160] * x4, b[154] * x0 + b[155] * x2 + b[156] * x8 + b[157] * x9 + b[158] * x5 + b[159] * x7 + b[160] * x4;
+}
+
+void MPC::Update_dPhi_du4(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+{
+    double x0 = p_h[21] / p_l[21];
+    double x1 = 1 - p_l[21] / p_h[21];
+    double x2 = p_h[21] * x1;
+    double x3 = (p_h[21] * p_h[21]);
+    double x4 = -(p_l[21] * p_l[21]) / x3 + 1;
+    double x5 = p_h[21] * x4;
+    double x6 = 2 * u[21];
+    double x7 = x5 * x6;
+    double x8 = (x1 * x1) * x3 * x6;
+    double x9 = 3 * (p_h[21] * p_h[21] * p_h[21]) * (u[21] * u[21]) * (x1 * x1 * x1);
+    this->dPhi_du4_T << a[147] * x0 + a[148] * x2 + a[149] * x8 + a[150] * x9 + a[151] * x5 + a[152] * x7 + a[153] * x4, b[147] * x0 + b[148] * x2 + b[149] * x8 + b[150] * x9 + b[151] * x5 + b[152] * x7 + b[153] * x4;
+}
+void MPC::Update_dPhi_du5(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+{
+    double x0 = p_h[20] / p_l[20];
+    double x1 = 1 - p_l[20] / p_h[20];
+    double x2 = p_h[20] * x1;
+    double x3 = (p_h[20] * p_h[20]);
+    double x4 = -(p_l[20] * p_l[20]) / x3 + 1;
+    double x5 = p_h[20] * x4;
+    double x6 = 2 * u[20];
+    double x7 = x5 * x6;
+    double x8 = (x1 * x1) * x3 * x6;
+    double x9 = 3 * (p_h[20] * p_h[20] * p_h[20]) * (u[20] * u[20]) * (x1 * x1 * x1);
+    this->dPhi_du5_T << a[140] * x0 + a[141] * x2 + a[142] * x8 + a[143] * x9 + a[144] * x5 + a[145] * x7 + a[146] * x4, b[140] * x0 + b[141] * x2 + b[142] * x8 + b[143] * x9 + b[144] * x5 + b[145] * x7 + b[146] * x4;
 }
 
 void MPC::UpdateDyn(bool increase_pre)
@@ -454,16 +833,16 @@ void MPC::UpdateDyn(bool increase_pre)
         // if we are increasing the pressure
 
         this->UpdatePhi(this->p_tank_his, this->p_set_his, this->u_his, this->ah, this->bh, this->Phi);
-        this->UpdatePhi(this->p_tank_hat, this->p_set_hat, this->u_hat, this->ah, this->bh, this->Phi_hat);
-        this->Update_dPhi_dxH(this->p_tank_hat, this->p_set_hat, this->u_hat, this->ah, this->bh);
-        this->Update_dPhi_du(this->p_tank_hat, this->p_set_hat, this->u_hat, this->ah, this->bh);
+        this->UpdatePhi(this->p_tank_his, this->p_set_his, this->u_hat, this->ah, this->bh, this->Phi_hat);
+        this->Update_dPhi_dxH(this->p_tank_his, this->p_set_his, this->u_hat, this->ah, this->bh);
+        this->Update_dPhi_du(this->p_tank_his, this->p_set_his, this->u_hat, this->ah, this->bh);
     }
     else
     {
         this->UpdatePhi(this->p_set_his, this->p_tank_his, this->u_his, this->al, this->bl, this->Phi);
-        this->UpdatePhi(this->p_set_hat, this->p_tank_hat, this->u_hat, this->al, this->bl, this->Phi_hat);
-        this->Update_dPhi_dxL(this->p_set_hat, this->p_tank_hat, this->u_hat, this->al, this->bl);
-        this->Update_dPhi_du(this->p_set_hat, this->p_tank_hat, this->u_hat, this->al, this->bl);
+        this->UpdatePhi(this->p_set_his, this->p_tank_his, this->u_hat, this->al, this->bl, this->Phi_hat);
+        this->Update_dPhi_dxL(this->p_set_his, this->p_tank_his, this->u_hat, this->al, this->bl);
+        this->Update_dPhi_du(this->p_set_his, this->p_tank_his, this->u_hat, this->al, this->bl);
     }
 
     // Scale the phi, dphi_du, dphi_dx since the volume may change
@@ -487,8 +866,8 @@ int MPC::GetPreControl(const double &p_des, const double &ps, const double &pt, 
 {
 
     double p_diff = (p_des - ps); // we scaled the p_diff with the assumption that pressure will have the momentum to go
-
-    if (std::abs(p_diff) > 320)
+    this->p_diff_des = p_diff;
+    if (std::abs(p_diff) > 640)
     { // if desired pressure has 1 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
 
         // double lb;
@@ -526,9 +905,12 @@ int MPC::GetPreControl(const double &p_des, const double &ps, const double &pt, 
         }
 
         // format question to osqp format
-        
+
         // std::cout << "alpha: " << this->alpha.coeff(0, 0) << ',' << this->alpha.coeff(1, 0) << std::endl;
         // std::cout << "B: " << this->B.coeff(0, 0) << ',' << this->B.coeff(1, 0) << std::endl;
+
+        p_diff = p_diff / 5;
+
         this->q_val = (this->B.coeff(1, 0) * this->alpha.coeff(1, 0) + p_diff / 65536 * this->B.coeff(1, 0));
         this->P_val = this->B.coeff(1, 0) * this->B.coeff(1, 0); // scale up the u to duty instead of duty/100, since q_val/100 and p_val/10000, I just scale p_val/100
 
@@ -543,20 +925,24 @@ int MPC::GetPreControl(const double &p_des, const double &ps, const double &pt, 
         // std::cout<<"qval: "<<this->q_val<<std::endl;
 
         // double ideal_duty = 100*this->q_val / this->P_val + 0.5;
-        double ideal_duty = 100*(p_diff/65536-this->alpha.coeff(1,0))/this->B.coeff(1,0);
-        
-        
-        std::cout<<"real p_diff: "<<this->Phi.coeff(1,0)*65536<<std::endl;
-        
-        std::cout<<std::endl;
+        // double ideal_duty = 100*(p_diff/65536-this->alpha.coeff(1,0))/this->B.coeff(1,0);
+        double ideal_duty = 100 * ((p_diff / 65536 - this->Phi_hat.coeff(1, 0)) / this->dPhi_du_T.coeff(1, 0) + this->u_hat[MPC_DELAY - 1]);
+
+        // std::cout<<"real p_diff: "<<this->Phi.coeff(1,0)*65536<<std::endl;
+
+        // std::cout<<std::endl;
         std::cout << "ideal duty: " << ideal_duty << std::endl;
-        std::cout << "des pdiff: " << p_diff << std::endl;
-        std::cout << "control p_diff: " << (this->alpha.coeff(1, 0) + this->B.coeff(1, 0) * ideal_duty/100) * 65536 << std::endl;
-        
-        if (ideal_duty < 20)
+        // std::cout << "control p_diff: " << (this->alpha.coeff(1, 0) + this->B.coeff(1, 0) * ideal_duty/100) * 65536 << std::endl;
+        // std::cout << "des pdiff: " << p_diff << std::endl;
+
+        if (ideal_duty < 0)
+        {
+            return 0;
+        }
+        else if (ideal_duty < 15 && ideal_duty > 5)
         {
             // return 0;
-            return 20;
+            return 15;
         }
         else if (ideal_duty > 100)
             return 100;
@@ -615,6 +1001,7 @@ int MPC::GetPreControl(const double &p_des, const double &ps, const double &pt, 
     else
     {
         this->Phi << 0, 0;
+        this->Phi_hat << 0, 0;
         this->dPhi_dx_T << 0, 0, 0, 0;
         this->dPhi_du_T << 0, 0;
         this->P_val = 0;
@@ -628,20 +1015,26 @@ std::array<double, 10> MPC::GetMpcRec()
     return std::array<double, 10>({this->Phi.coeff(0, 0), this->Phi.coeff(1, 0), this->P_val, this->q_val, this->dPhi_du_T.coeff(0, 0), this->dPhi_du_T.coeff(1, 0), this->dPhi_dx_T.coeff(0, 0), this->dPhi_dx_T.coeff(0, 1), this->dPhi_dx_T.coeff(1, 0), this->dPhi_dx_T.coeff(1, 1)});
 }
 
-void MPC::PushMeas(const double p_tank, const double p_set, const double duty)
+void MPC::PushMeas(const double p_tank, const double p_set, const uint8_t duty)
 {
     this->p_tank_mem[this->meas_idx] = ((double)p_tank - 3297.312) / 65536.0; // the substraction is to remove the 0.5 V pressure sensor bias and add 1 atm to the equation
     this->p_set_mem[this->meas_idx] = ((double)p_set - 3297.312) / 65536.0;   // in the lasso regression, we have proved it increases the testing accuracy to stable 90% up
-    this->u_mem[this->meas_idx] = (double)duty / 100;
+    this->u_mem[this->meas_idx] = ((double)duty) / 100;
     this->meas_idx++;
-    this->meas_idx%=MPC_DELAY;
-    
+    this->meas_idx %= MPC_DELAY;
+
     this->mpc_rec.PushData(
-        std::array<double, 8>{this->Phi.coeff(0, 0), this->Phi.coeff(1, 0), this->dPhi_dx_T.coeff(0, 0), this->dPhi_dx_T.coeff(0, 1), this->dPhi_dx_T.coeff(1, 0), this->dPhi_dx_T.coeff(1, 1), this->dPhi_du_T.coeff(0, 0), this->dPhi_du_T.coeff(1, 0)});
+        std::array<double, 11>{this->p_diff_des, this->Phi.coeff(0, 0), this->Phi.coeff(1, 0), this->Phi_hat.coeff(0, 0), this->Phi_hat.coeff(1, 0), this->dPhi_dx_T.coeff(0, 0), this->dPhi_dx_T.coeff(0, 1), this->dPhi_dx_T.coeff(1, 0), this->dPhi_dx_T.coeff(1, 1), this->dPhi_du_T.coeff(0, 0), this->dPhi_du_T.coeff(1, 0)});
 }
 
 void MPC::UpdateHistory()
 {
+    std::memset(this->p_tank_his.begin(), 0, this->p_tank_his.size());
+    std::memset(this->p_tank_hat.begin(), 0, this->p_tank_hat.size());
+    std::memset(this->p_set_his.begin(), 0, this->p_set_his.size());
+    std::memset(this->p_set_hat.begin(), 0, this->p_set_hat.size());
+    std::memset(this->u_his.begin(), 0, this->u_his.size());
+    std::memset(this->u_hat.begin(), 0, this->u_hat.size());
 
     for (int i = 0; i < MPC_DELAY - 1; i++)
     {
@@ -660,7 +1053,8 @@ void MPC::UpdateHistory()
 
     this->p_tank_hat[MPC_DELAY - 1] = this->p_tank_mem[(this->meas_idx + MPC_DELAY - 1) % MPC_DELAY];
     this->p_set_hat[MPC_DELAY - 1] = this->p_set_mem[(this->meas_idx + MPC_DELAY - 1) % MPC_DELAY];
-    this->u_hat[MPC_DELAY - 1] = this->u_mem[(this->meas_idx + MPC_DELAY - 1) % MPC_DELAY];
+    // this->u_hat[MPC_DELAY - 1] = this->u_mem[(this->meas_idx + MPC_DELAY - 1) % MPC_DELAY];
+    this->u_hat[MPC_DELAY - 1] = 0.2;
 
     // std::cout<<"mem values: "<<this->p_tank_his[0]<<std::endl;
 }
