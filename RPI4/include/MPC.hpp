@@ -21,7 +21,6 @@
 #ifndef MPC_H
 #define MPC_H
 
-#define LIN_CONST_LEN 2
 
 #include<math.h>
 #include<memory>
@@ -38,7 +37,8 @@
 #include "FilterParam.hpp"
 #include "CylinderParam.hpp"
 
-#define MPC_HEAD "Time,P_diff_des,Phi_1,Phi_2,Phi_hat_1,Phi_hat_2,dPhi1_dx1,dPhi1_dx2,dPhi2_dx1,dPhi2_dx2,dPhi1_du,dPhi2_du"
+#define MPC_HEAD "Time,F_0,F_1,dF_0,dF_1,u_n,u_n1,u_n2,yn1,yn2,yn3"
+#define MPC_TIME_HORIZON 3
 class MPC
 {
 private:
@@ -47,64 +47,56 @@ private:
     
     Eigen::Matrix<double,2,1> B;
     Eigen::Matrix<double,2,1> alpha;
-    void UpdateDyn(bool increase_pre);
+    int DutyCalculate(bool increase_pre,std::array<float,MPC_TIME_HORIZON> y_des,double scale);
     //parameter of OSQP
-    double P_val,q_val;
-    double p_diff_des; //TODO: remove this after verifying control
-
-    const Eigen::Matrix<double,1,2> H_h; // when I define state, I define it as 
-    const Eigen::Matrix<double,1,2> H_l;
-    Eigen::Matrix<double,2,1> Phi; //this will be useful if we want to estimate the flow rate
-    Eigen::Matrix<double,2,1> Phi_hat;
-    Eigen::Matrix<double,2,2> dPhi_dx_T;
-    Eigen::Matrix<double,2,1> dPhi_du_T;
-
-    Eigen::Matrix<double,2,2> dPhi_dx2_T;
-    Eigen::Matrix<double,2,1> dPhi_du2_T;
-    Eigen::Matrix<double,2,2> dPhi_dx3_T;
-    Eigen::Matrix<double,2,1> dPhi_du3_T;
-
-    Eigen::Matrix<double,2,2> dPhi_dx4_T;
-    Eigen::Matrix<double,2,1> dPhi_du4_T;
-    Eigen::Matrix<double,2,2> dPhi_dx5_T;
-    Eigen::Matrix<double,2,1> dPhi_du5_T;
 
 
-    void UpdatePhi(const std::array<double,MPC_DELAY> ph,const std::array<double,MPC_DELAY> pl,const std::array<double,MPC_DELAY> u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b,Eigen::Matrix<double,2,1>& _phi);
-    void Update_dPhi_dxL(const std::array<double,MPC_DELAY>& ph, const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY> &d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
-    void Update_dPhi_dxH(const std::array<double,MPC_DELAY>& ph,const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY>& d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
-    void Update_dPhi_du(const std::array<double,MPC_DELAY>& ph,const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY>& d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    const double kUBar = 0.15;// Lower bound of duty
+    // const Eigen::Matrix<double,1,2> H_h; // when I define state, I define it as 
+    // const Eigen::Matrix<double,1,2> H_l;
+    Eigen::Matrix<double,2,1> cur_F; //this will be useful if we want to estimate the flow rate
+    Eigen::Matrix<double,2,1> cur_dF;
+    double u_n,u_n1,u_n2; //only u_n is used, but we should also record u_n1 and u_n2
+    Eigen::Matrix<double,2,1> x_n1;
+    Eigen::Matrix<double,2,1> x_n2;
+    Eigen::Matrix<double,2,1> x_n3;
 
-    void Update_dPhi_dxL2(const std::array<double,MPC_DELAY>& ph, const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY> &d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
-    void Update_dPhi_dxH2(const std::array<double,MPC_DELAY>& ph,const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY>& d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
-    void Update_dPhi_du2(const std::array<double,MPC_DELAY>& ph,const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY>& d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+
+    Eigen::Matrix<double,2,1> UpdateF(const double* ph,const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    Eigen::Matrix<double,2,2> Update_dF_dxL_T(const double* ph, const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    Eigen::Matrix<double,2,2> Update_dF_dxH_T(const double* ph, const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    Eigen::Matrix<double,2,1> Update_dF_du_T(const double* ph, const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+
+    Eigen::Matrix<double,2,2> Update_dF_dxL1_T(const double* ph, const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    Eigen::Matrix<double,2,2> Update_dF_dxH1_T(const double* ph, const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    Eigen::Matrix<double,2,1> Update_dF_du1_T(const double* ph, const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
     
-    void Update_dPhi_dxL3(const std::array<double,MPC_DELAY>& ph, const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY> &d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
-    void Update_dPhi_dxH3(const std::array<double,MPC_DELAY>& ph,const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY>& d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
-    void Update_dPhi_du3(const std::array<double,MPC_DELAY>& ph,const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY>& d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    Eigen::Matrix<double,2,2> Update_dF_dxL2_T(const double* ph, const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    Eigen::Matrix<double,2,2> Update_dF_dxH2_T(const double* ph,const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    Eigen::Matrix<double,2,1> Update_dF_du2_T(const double* ph,const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
 
-    void Update_dPhi_dxL4(const std::array<double,MPC_DELAY>& ph, const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY> &d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
-    void Update_dPhi_dxH4(const std::array<double,MPC_DELAY>& ph,const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY>& d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
-    void Update_dPhi_du4(const std::array<double,MPC_DELAY>& ph,const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY>& d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    Eigen::Matrix<double,2,2> Update_dF_dxL3_T(const double* ph, const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    Eigen::Matrix<double,2,2> Update_dF_dxH3_T(const double* ph,const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    Eigen::Matrix<double,2,1> Update_dF_du3_T(const double* ph,const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
 
-    void Update_dPhi_dxL5(const std::array<double,MPC_DELAY>& ph, const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY> &d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
-    void Update_dPhi_dxH5(const std::array<double,MPC_DELAY>& ph,const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY>& d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
-    void Update_dPhi_du5(const std::array<double,MPC_DELAY>& ph,const std::array<double,MPC_DELAY> &pl,const std::array<double,MPC_DELAY>& d,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    Eigen::Matrix<double,2,2> Update_dF_dxL4_T(const double* ph, const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    Eigen::Matrix<double,2,2> Update_dF_dxH4_T(const double* ph, const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
+    Eigen::Matrix<double,2,1> Update_dF_du4_T(const double* ph,const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
 
     //Mem for previous measurements
     std::array<double,MPC_DELAY> p_tank_mem; //mem is just for storage, pop the oldest ones and put the newest one there, the order may be 34512
     std::array<double,MPC_DELAY> p_set_mem;
     std::array<double,MPC_DELAY> u_mem;
 
-    std::array<double,MPC_DELAY> p_tank_his;
-    std::array<double,MPC_DELAY> p_set_his;
-    std::array<double,MPC_DELAY> u_his;
+    std::array<double,MPC_DELAY+MPC_TIME_HORIZON> p_tank_his;
+    std::array<double,MPC_DELAY+MPC_TIME_HORIZON> p_set_his;
+    std::array<double,MPC_DELAY+MPC_TIME_HORIZON> u_his;
 
-    std::array<double,MPC_DELAY> p_tank_hat;
-    std::array<double,MPC_DELAY> p_set_hat;
-    std::array<double,MPC_DELAY> u_hat;
+    // std::array<double,MPC_DELAY> p_tank_hat;
+    // std::array<double,MPC_DELAY> p_set_hat;
+    // std::array<double,MPC_DELAY> u_hat;
     // void SortHistory();
-    void UpdateHistory();
+    void UpdateHistory(double p_set,double p_tank);
 
     unsigned meas_idx;
 
@@ -121,9 +113,9 @@ private:
     
     //generate MPC constants
 
-    // std::unique_ptr<OSQPSettings> osqp_settings;
-    // std::unique_ptr<OSQPData> osqp_data;
-    // OSQPWorkspace *work;
+    std::unique_ptr<OSQPSettings> osqp_settings;
+    std::unique_ptr<OSQPData> osqp_data;
+    OSQPWorkspace *work;
     // bool mpc_enable;
 
     //cylinder volume
@@ -151,7 +143,7 @@ private:
     // double cur_force;
     // DigitalFilter<double,FilterParam::Filter20Hz_5::Order,1> vel_filter;
     // DigitalFilter<double,FilterParam::Filter20Hz_2::Order,1> force_filter;
-    Recorder<double,11> mpc_rec;
+    Recorder<double,10> mpc_rec;
 public:
     MPC(std::array<std::array<double, MPC_STATE_NUM>,2> cl,std::array<std::array<double, MPC_STATE_NUM>,2> ch,std::string file_name);
     ~MPC();
@@ -162,7 +154,6 @@ public:
     int GetPreControl(const double& p_des,const double& p_cur,const double& p_tank,double scale);//It requires current pressure value because all the values storaged in the meme are scaled
     void GetImpControl(const double& imp_des, const double& p_ext,const double& p_flex, const double& p_tank, const double& pos,double scale,int& joint_val_duty,int& joint_bal_duty,int& tank_duty);
     //Get values for recorder
-    std::array<double,10> GetMpcRec();
 
     void PushMeas(const double p_tank,const double p_set,const uint8_t duty);
     

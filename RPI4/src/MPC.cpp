@@ -17,11 +17,11 @@ MPC::MPC(std::array<std::array<double, MPC_STATE_NUM>, 2> cl, std::array<std::ar
     // this->max_len_mm = this->GetLenLinear_mm(max_pos);
 
     // setup osqp solver
-    //  this->osqp_data.reset(new OSQPData);
-    //  this->osqp_settings.reset(new OSQPSettings);
-    //  osqp_set_default_settings(this->osqp_settings.get());
-    //  this->osqp_settings->alpha = 1.0;
-    //  this->osqp_settings->verbose = false;
+    this->osqp_data.reset(new OSQPData);
+    this->osqp_settings.reset(new OSQPSettings);
+    osqp_set_default_settings(this->osqp_settings.get());
+    this->osqp_settings->alpha = 1.0;
+    this->osqp_settings->verbose = false;
 
     this->phi_scale = 1.0;
     // this->pre_pos = 0.0;
@@ -30,6 +30,16 @@ MPC::MPC(std::array<std::array<double, MPC_STATE_NUM>, 2> cl, std::array<std::ar
 
 MPC::~MPC()
 {
+    // clean up osqp
+    osqp_cleanup(work);
+    if (this->osqp_data.get())
+    {
+        if (this->osqp_data->A)
+            c_free(this->osqp_data->A);
+        if (this->osqp_data->P)
+            c_free(this->osqp_data->P);
+        c_free(this->osqp_data.get());
+    }
 }
 void MPC::UpdateParamH(array<double, MPC_STATE_NUM> new_a, array<double, MPC_STATE_NUM> new_b)
 {
@@ -42,9 +52,8 @@ void MPC::UpdateParamL(array<double, MPC_STATE_NUM> new_a, array<double, MPC_STA
     this->al = new_a;
     this->bl = new_b;
 }
-void MPC::UpdatePhi(const std::array<double, MPC_DELAY> p_h, const std::array<double, MPC_DELAY> p_l,
-                    const std::array<double, MPC_DELAY> u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b,
-                    Eigen::Matrix<double, 2, 1> &_phi)
+Eigen::Matrix<double, 2, 1> MPC::UpdateF(const double *p_h, const double *p_l,
+                                         const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     // Record the old Phi
     double x0 = p_h[0] * u[0];
@@ -347,10 +356,11 @@ void MPC::UpdatePhi(const std::array<double, MPC_DELAY> p_h, const std::array<do
     double x297 = x172 * x248 * (x96 * x96);
     double x298 = (p_h[13] * p_h[13] * p_h[13]) * (u[13] * u[13] * u[13]) * (x96 * x96 * x96);
     double x299 = x118 * x208 * (x94 * x94);
-
-    _phi << a[0] * x1 + a[100] * x250 + a[101] * x251 + a[102] * x175 + a[103] * x201 + a[104] * x102 + a[105] * x3 + a[106] * x51 + a[107] * x252 + a[108] * x253 + a[109] * x176 + a[10] * x254 + a[110] * x203 + a[111] * x105 + a[112] * x5 + a[113] * x53 + a[114] * x255 + a[115] * x256 + a[116] * x177 + a[117] * x205 + a[118] * x108 + a[119] * x7 + a[11] * x178 + a[120] * x55 + a[121] * x257 + a[122] * x258 + a[123] * x179 + a[124] * x207 + a[125] * x111 + a[126] * x9 + a[127] * x57 + a[128] * x259 + a[129] * x260 + a[12] * x209 + a[130] * x180 + a[131] * x211 + a[132] * x114 + a[133] * x11 + a[134] * x59 + a[135] * x261 + a[136] * x262 + a[137] * x181 + a[138] * x213 + a[139] * x117 + a[13] * x120 + a[140] * x13 + a[141] * x61 + a[142] * x263 + a[143] * x264 + a[144] * x182 + a[145] * x215 + a[146] * x123 + a[147] * x15 + a[148] * x63 + a[149] * x265 + a[14] * x17 + a[150] * x266 + a[151] * x183 + a[152] * x217 + a[153] * x126 + a[154] * x19 + a[155] * x65 + a[156] * x267 + a[157] * x268 + a[158] * x184 + a[159] * x219 + a[15] * x67 + a[160] * x129 + a[161] * x21 + a[162] * x69 + a[163] * x269 + a[164] * x270 + a[165] * x185 + a[166] * x221 + a[167] * x132 + a[168] * x23 + a[169] * x71 + a[16] * x271 + a[170] * x272 + a[171] * x273 + a[172] * x186 + a[173] * x223 + a[174] * x135 + a[17] * x274 + a[18] * x187 + a[19] * x225 + a[1] * x73 + a[20] * x138 + a[21] * x25 + a[22] * x75 + a[23] * x275 + a[24] * x276 + a[25] * x188 + a[26] * x227 + a[27] * x141 + a[28] * x27 + a[29] * x77 + a[2] * x277 + a[30] * x278 + a[31] * x279 + a[32] * x189 + a[33] * x229 + a[34] * x144 + a[35] * x29 + a[36] * x79 + a[37] * x280 + a[38] * x281 + a[39] * x190 + a[3] * x282 + a[40] * x231 + a[41] * x147 + a[42] * x31 + a[43] * x81 + a[44] * x283 + a[45] * x284 + a[46] * x191 + a[47] * x233 + a[48] * x150 + a[49] * x33 + a[4] * x192 + a[50] * x83 + a[51] * x285 + a[52] * x286 + a[53] * x193 + a[54] * x235 + a[55] * x153 + a[56] * x35 + a[57] * x85 + a[58] * x287 + a[59] * x288 + a[5] * x237 + a[60] * x194 + a[61] * x239 + a[62] * x156 + a[63] * x37 + a[64] * x87 + a[65] * x289 + a[66] * x290 + a[67] * x195 + a[68] * x241 + a[69] * x159 + a[6] * x162 + a[70] * x39 + a[71] * x89 + a[72] * x291 + a[73] * x292 + a[74] * x196 + a[75] * x243 + a[76] * x165 + a[77] * x41 + a[78] * x91 + a[79] * x293 + a[7] * x43 + a[80] * x294 + a[81] * x197 + a[82] * x245 + a[83] * x168 + a[84] * x45 + a[85] * x93 + a[86] * x295 + a[87] * x296 + a[88] * x198 + a[89] * x247 + a[8] * x95 + a[90] * x171 + a[91] * x47 + a[92] * x97 + a[93] * x297 + a[94] * x298 + a[95] * x199 + a[96] * x249 + a[97] * x174 + a[98] * x49 + a[99] * x99 + a[9] * x299, b[0] * x1 + b[100] * x250 + b[101] * x251 + b[102] * x175 + b[103] * x201 + b[104] * x102 + b[105] * x3 + b[106] * x51 + b[107] * x252 + b[108] * x253 + b[109] * x176 + b[10] * x254 + b[110] * x203 + b[111] * x105 + b[112] * x5 + b[113] * x53 + b[114] * x255 + b[115] * x256 + b[116] * x177 + b[117] * x205 + b[118] * x108 + b[119] * x7 + b[11] * x178 + b[120] * x55 + b[121] * x257 + b[122] * x258 + b[123] * x179 + b[124] * x207 + b[125] * x111 + b[126] * x9 + b[127] * x57 + b[128] * x259 + b[129] * x260 + b[12] * x209 + b[130] * x180 + b[131] * x211 + b[132] * x114 + b[133] * x11 + b[134] * x59 + b[135] * x261 + b[136] * x262 + b[137] * x181 + b[138] * x213 + b[139] * x117 + b[13] * x120 + b[140] * x13 + b[141] * x61 + b[142] * x263 + b[143] * x264 + b[144] * x182 + b[145] * x215 + b[146] * x123 + b[147] * x15 + b[148] * x63 + b[149] * x265 + b[14] * x17 + b[150] * x266 + b[151] * x183 + b[152] * x217 + b[153] * x126 + b[154] * x19 + b[155] * x65 + b[156] * x267 + b[157] * x268 + b[158] * x184 + b[159] * x219 + b[15] * x67 + b[160] * x129 + b[161] * x21 + b[162] * x69 + b[163] * x269 + b[164] * x270 + b[165] * x185 + b[166] * x221 + b[167] * x132 + b[168] * x23 + b[169] * x71 + b[16] * x271 + b[170] * x272 + b[171] * x273 + b[172] * x186 + b[173] * x223 + b[174] * x135 + b[17] * x274 + b[18] * x187 + b[19] * x225 + b[1] * x73 + b[20] * x138 + b[21] * x25 + b[22] * x75 + b[23] * x275 + b[24] * x276 + b[25] * x188 + b[26] * x227 + b[27] * x141 + b[28] * x27 + b[29] * x77 + b[2] * x277 + b[30] * x278 + b[31] * x279 + b[32] * x189 + b[33] * x229 + b[34] * x144 + b[35] * x29 + b[36] * x79 + b[37] * x280 + b[38] * x281 + b[39] * x190 + b[3] * x282 + b[40] * x231 + b[41] * x147 + b[42] * x31 + b[43] * x81 + b[44] * x283 + b[45] * x284 + b[46] * x191 + b[47] * x233 + b[48] * x150 + b[49] * x33 + b[4] * x192 + b[50] * x83 + b[51] * x285 + b[52] * x286 + b[53] * x193 + b[54] * x235 + b[55] * x153 + b[56] * x35 + b[57] * x85 + b[58] * x287 + b[59] * x288 + b[5] * x237 + b[60] * x194 + b[61] * x239 + b[62] * x156 + b[63] * x37 + b[64] * x87 + b[65] * x289 + b[66] * x290 + b[67] * x195 + b[68] * x241 + b[69] * x159 + b[6] * x162 + b[70] * x39 + b[71] * x89 + b[72] * x291 + b[73] * x292 + b[74] * x196 + b[75] * x243 + b[76] * x165 + b[77] * x41 + b[78] * x91 + b[79] * x293 + b[7] * x43 + b[80] * x294 + b[81] * x197 + b[82] * x245 + b[83] * x168 + b[84] * x45 + b[85] * x93 + b[86] * x295 + b[87] * x296 + b[88] * x198 + b[89] * x247 + b[8] * x95 + b[90] * x171 + b[91] * x47 + b[92] * x97 + b[93] * x297 + b[94] * x298 + b[95] * x199 + b[96] * x249 + b[97] * x174 + b[98] * x49 + b[99] * x99 + b[9] * x299;
+    Eigen::Matrix<double, 2, 1> f;
+    f << a[0] * x1 + a[100] * x250 + a[101] * x251 + a[102] * x175 + a[103] * x201 + a[104] * x102 + a[105] * x3 + a[106] * x51 + a[107] * x252 + a[108] * x253 + a[109] * x176 + a[10] * x254 + a[110] * x203 + a[111] * x105 + a[112] * x5 + a[113] * x53 + a[114] * x255 + a[115] * x256 + a[116] * x177 + a[117] * x205 + a[118] * x108 + a[119] * x7 + a[11] * x178 + a[120] * x55 + a[121] * x257 + a[122] * x258 + a[123] * x179 + a[124] * x207 + a[125] * x111 + a[126] * x9 + a[127] * x57 + a[128] * x259 + a[129] * x260 + a[12] * x209 + a[130] * x180 + a[131] * x211 + a[132] * x114 + a[133] * x11 + a[134] * x59 + a[135] * x261 + a[136] * x262 + a[137] * x181 + a[138] * x213 + a[139] * x117 + a[13] * x120 + a[140] * x13 + a[141] * x61 + a[142] * x263 + a[143] * x264 + a[144] * x182 + a[145] * x215 + a[146] * x123 + a[147] * x15 + a[148] * x63 + a[149] * x265 + a[14] * x17 + a[150] * x266 + a[151] * x183 + a[152] * x217 + a[153] * x126 + a[154] * x19 + a[155] * x65 + a[156] * x267 + a[157] * x268 + a[158] * x184 + a[159] * x219 + a[15] * x67 + a[160] * x129 + a[161] * x21 + a[162] * x69 + a[163] * x269 + a[164] * x270 + a[165] * x185 + a[166] * x221 + a[167] * x132 + a[168] * x23 + a[169] * x71 + a[16] * x271 + a[170] * x272 + a[171] * x273 + a[172] * x186 + a[173] * x223 + a[174] * x135 + a[17] * x274 + a[18] * x187 + a[19] * x225 + a[1] * x73 + a[20] * x138 + a[21] * x25 + a[22] * x75 + a[23] * x275 + a[24] * x276 + a[25] * x188 + a[26] * x227 + a[27] * x141 + a[28] * x27 + a[29] * x77 + a[2] * x277 + a[30] * x278 + a[31] * x279 + a[32] * x189 + a[33] * x229 + a[34] * x144 + a[35] * x29 + a[36] * x79 + a[37] * x280 + a[38] * x281 + a[39] * x190 + a[3] * x282 + a[40] * x231 + a[41] * x147 + a[42] * x31 + a[43] * x81 + a[44] * x283 + a[45] * x284 + a[46] * x191 + a[47] * x233 + a[48] * x150 + a[49] * x33 + a[4] * x192 + a[50] * x83 + a[51] * x285 + a[52] * x286 + a[53] * x193 + a[54] * x235 + a[55] * x153 + a[56] * x35 + a[57] * x85 + a[58] * x287 + a[59] * x288 + a[5] * x237 + a[60] * x194 + a[61] * x239 + a[62] * x156 + a[63] * x37 + a[64] * x87 + a[65] * x289 + a[66] * x290 + a[67] * x195 + a[68] * x241 + a[69] * x159 + a[6] * x162 + a[70] * x39 + a[71] * x89 + a[72] * x291 + a[73] * x292 + a[74] * x196 + a[75] * x243 + a[76] * x165 + a[77] * x41 + a[78] * x91 + a[79] * x293 + a[7] * x43 + a[80] * x294 + a[81] * x197 + a[82] * x245 + a[83] * x168 + a[84] * x45 + a[85] * x93 + a[86] * x295 + a[87] * x296 + a[88] * x198 + a[89] * x247 + a[8] * x95 + a[90] * x171 + a[91] * x47 + a[92] * x97 + a[93] * x297 + a[94] * x298 + a[95] * x199 + a[96] * x249 + a[97] * x174 + a[98] * x49 + a[99] * x99 + a[9] * x299, b[0] * x1 + b[100] * x250 + b[101] * x251 + b[102] * x175 + b[103] * x201 + b[104] * x102 + b[105] * x3 + b[106] * x51 + b[107] * x252 + b[108] * x253 + b[109] * x176 + b[10] * x254 + b[110] * x203 + b[111] * x105 + b[112] * x5 + b[113] * x53 + b[114] * x255 + b[115] * x256 + b[116] * x177 + b[117] * x205 + b[118] * x108 + b[119] * x7 + b[11] * x178 + b[120] * x55 + b[121] * x257 + b[122] * x258 + b[123] * x179 + b[124] * x207 + b[125] * x111 + b[126] * x9 + b[127] * x57 + b[128] * x259 + b[129] * x260 + b[12] * x209 + b[130] * x180 + b[131] * x211 + b[132] * x114 + b[133] * x11 + b[134] * x59 + b[135] * x261 + b[136] * x262 + b[137] * x181 + b[138] * x213 + b[139] * x117 + b[13] * x120 + b[140] * x13 + b[141] * x61 + b[142] * x263 + b[143] * x264 + b[144] * x182 + b[145] * x215 + b[146] * x123 + b[147] * x15 + b[148] * x63 + b[149] * x265 + b[14] * x17 + b[150] * x266 + b[151] * x183 + b[152] * x217 + b[153] * x126 + b[154] * x19 + b[155] * x65 + b[156] * x267 + b[157] * x268 + b[158] * x184 + b[159] * x219 + b[15] * x67 + b[160] * x129 + b[161] * x21 + b[162] * x69 + b[163] * x269 + b[164] * x270 + b[165] * x185 + b[166] * x221 + b[167] * x132 + b[168] * x23 + b[169] * x71 + b[16] * x271 + b[170] * x272 + b[171] * x273 + b[172] * x186 + b[173] * x223 + b[174] * x135 + b[17] * x274 + b[18] * x187 + b[19] * x225 + b[1] * x73 + b[20] * x138 + b[21] * x25 + b[22] * x75 + b[23] * x275 + b[24] * x276 + b[25] * x188 + b[26] * x227 + b[27] * x141 + b[28] * x27 + b[29] * x77 + b[2] * x277 + b[30] * x278 + b[31] * x279 + b[32] * x189 + b[33] * x229 + b[34] * x144 + b[35] * x29 + b[36] * x79 + b[37] * x280 + b[38] * x281 + b[39] * x190 + b[3] * x282 + b[40] * x231 + b[41] * x147 + b[42] * x31 + b[43] * x81 + b[44] * x283 + b[45] * x284 + b[46] * x191 + b[47] * x233 + b[48] * x150 + b[49] * x33 + b[4] * x192 + b[50] * x83 + b[51] * x285 + b[52] * x286 + b[53] * x193 + b[54] * x235 + b[55] * x153 + b[56] * x35 + b[57] * x85 + b[58] * x287 + b[59] * x288 + b[5] * x237 + b[60] * x194 + b[61] * x239 + b[62] * x156 + b[63] * x37 + b[64] * x87 + b[65] * x289 + b[66] * x290 + b[67] * x195 + b[68] * x241 + b[69] * x159 + b[6] * x162 + b[70] * x39 + b[71] * x89 + b[72] * x291 + b[73] * x292 + b[74] * x196 + b[75] * x243 + b[76] * x165 + b[77] * x41 + b[78] * x91 + b[79] * x293 + b[7] * x43 + b[80] * x294 + b[81] * x197 + b[82] * x245 + b[83] * x168 + b[84] * x45 + b[85] * x93 + b[86] * x295 + b[87] * x296 + b[88] * x198 + b[89] * x247 + b[8] * x95 + b[90] * x171 + b[91] * x47 + b[92] * x97 + b[93] * x297 + b[94] * x298 + b[95] * x199 + b[96] * x249 + b[97] * x174 + b[98] * x49 + b[99] * x99 + b[9] * x299;
+    return f;
 }
-void MPC::Update_dPhi_dxL(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = a[169] * u[24];
     double x1 = (p_l[24] * p_l[24]);
@@ -387,11 +397,12 @@ void MPC::Update_dPhi_dxL(const std::array<double, MPC_DELAY> &p_h, const std::a
     double x32 = b[173] * x11;
     double x33 = b[170] * x14;
     double x34 = b[171] * x18;
-
-    this->dPhi_dx_T << -a[168] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[168] * x20 + a[170] * x26 + a[171] * x27 + a[172] * x24 + a[173] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[168] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[168] * x20 + b[170] * x26 + b[171] * x27 + b[172] * x24 + b[173] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
+    Eigen::Matrix<double, 2, 2> dF_dx_T;
+    dF_dx_T << -a[168] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[168] * x20 + a[170] * x26 + a[171] * x27 + a[172] * x24 + a[173] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[168] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[168] * x20 + b[170] * x26 + b[171] * x27 + b[172] * x24 + b[173] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
+    return dF_dx_T;
 }
 
-void MPC::Update_dPhi_dxL2(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL1_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = a[162] * u[23];
     double x1 = (p_l[23] * p_l[23]);
@@ -428,10 +439,13 @@ void MPC::Update_dPhi_dxL2(const std::array<double, MPC_DELAY> &p_h, const std::
     double x32 = b[166] * x11;
     double x33 = b[163] * x14;
     double x34 = b[164] * x18;
-    this->dPhi_dx2_T << -a[161] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[161] * x20 + a[163] * x26 + a[164] * x27 + a[165] * x24 + a[166] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[161] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[161] * x20 + b[163] * x26 + b[164] * x27 + b[165] * x24 + b[166] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
+
+    Eigen::Matrix<double, 2, 2> dF_dx2_T;
+    dF_dx2_T << -a[161] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[161] * x20 + a[163] * x26 + a[164] * x27 + a[165] * x24 + a[166] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[161] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[161] * x20 + b[163] * x26 + b[164] * x27 + b[165] * x24 + b[166] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
+    return dF_dx2_T;
 }
 
-void MPC::Update_dPhi_dxL3(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL2_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = a[155] * u[22];
     double x1 = (p_l[22] * p_l[22]);
@@ -468,9 +482,12 @@ void MPC::Update_dPhi_dxL3(const std::array<double, MPC_DELAY> &p_h, const std::
     double x32 = b[159] * x11;
     double x33 = b[156] * x14;
     double x34 = b[157] * x18;
-    this->dPhi_dx3_T << -a[154] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[154] * x20 + a[156] * x26 + a[157] * x27 + a[158] * x24 + a[159] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[154] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[154] * x20 + b[156] * x26 + b[157] * x27 + b[158] * x24 + b[159] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
+
+    Eigen::Matrix<double, 2, 2> dF_dx3_T;
+    dF_dx3_T << -a[154] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[154] * x20 + a[156] * x26 + a[157] * x27 + a[158] * x24 + a[159] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[154] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[154] * x20 + b[156] * x26 + b[157] * x27 + b[158] * x24 + b[159] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
+    return dF_dx3_T;
 }
-void MPC::Update_dPhi_dxL4(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL3_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = a[148] * u[21];
     double x1 = (p_l[21] * p_l[21]);
@@ -507,9 +524,11 @@ void MPC::Update_dPhi_dxL4(const std::array<double, MPC_DELAY> &p_h, const std::
     double x32 = b[152] * x11;
     double x33 = b[149] * x14;
     double x34 = b[150] * x18;
-    this->dPhi_dx4_T << -a[147] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[147] * x20 + a[149] * x26 + a[150] * x27 + a[151] * x24 + a[152] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[147] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[147] * x20 + b[149] * x26 + b[150] * x27 + b[151] * x24 + b[152] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
+    Eigen::Matrix<double, 2, 2> dF_dx4_T;
+    dF_dx4_T << -a[147] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[147] * x20 + a[149] * x26 + a[150] * x27 + a[151] * x24 + a[152] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[147] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[147] * x20 + b[149] * x26 + b[150] * x27 + b[151] * x24 + b[152] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
+    return dF_dx4_T;
 }
-void MPC::Update_dPhi_dxL5(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL4_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = a[141] * u[20];
     double x1 = (p_l[20] * p_l[20]);
@@ -547,10 +566,12 @@ void MPC::Update_dPhi_dxL5(const std::array<double, MPC_DELAY> &p_h, const std::
     double x33 = b[142] * x14;
     double x34 = b[143] * x18;
 
-    this->dPhi_dx5_T << -a[140] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[140] * x20 + a[142] * x26 + a[143] * x27 + a[144] * x24 + a[145] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[140] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[140] * x20 + b[142] * x26 + b[143] * x27 + b[144] * x24 + b[145] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
+    Eigen::Matrix<double, 2, 2> dF_dx5_T;
+    dF_dx5_T << -a[140] * x2 - x0 - x12 * x3 - x13 * x15 - x16 * x19 - x3 * x5 - x6 * x9, a[140] * x20 + a[142] * x26 + a[143] * x27 + a[144] * x24 + a[145] * x25 + x0 * x13 + x0 * x3 + x12 * x21 + x15 * x16 + x19 * x28 + x21 * x5 + x22 * x6, -b[140] * x2 - x13 * x33 - x16 * x34 - x29 - x3 * x30 - x3 * x32 - x31 * x9, b[140] * x20 + b[142] * x26 + b[143] * x27 + b[144] * x24 + b[145] * x25 + x13 * x29 + x16 * x33 + x21 * x30 + x21 * x32 + x22 * x31 + x28 * x34 + x29 * x3;
+    return dF_dx5_T;
 }
 
-void MPC::Update_dPhi_dxH(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = u[24] / p_l[24];
     double x1 = p_l[24] / p_h[24];
@@ -588,9 +609,11 @@ void MPC::Update_dPhi_dxH(const std::array<double, MPC_DELAY> &p_h, const std::a
     double x33 = b[170] * x13;
     double x34 = x11 * x33;
     double x35 = b[171] * x25;
-    this->dPhi_dx_T << a[168] * x0 + a[171] * x23 + a[172] * x16 + a[173] * x17 + p_l[24] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[168] * x27 - p_h[24] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[168] * x0 + b[171] * x23 + b[172] * x16 + b[173] * x17 + p_l[24] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[168] * x27 - p_h[24] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
+    Eigen::Matrix<double, 2, 2> dF_dx_T;
+    dF_dx_T << a[168] * x0 + a[171] * x23 + a[172] * x16 + a[173] * x17 + p_l[24] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[168] * x27 - p_h[24] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[168] * x0 + b[171] * x23 + b[172] * x16 + b[173] * x17 + p_l[24] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[168] * x27 - p_h[24] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
+    return dF_dx_T;
 }
-void MPC::Update_dPhi_dxH2(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH1_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = u[23] / p_l[23];
     double x1 = p_l[23] / p_h[23];
@@ -628,9 +651,12 @@ void MPC::Update_dPhi_dxH2(const std::array<double, MPC_DELAY> &p_h, const std::
     double x33 = b[163] * x13;
     double x34 = x11 * x33;
     double x35 = b[164] * x25;
-    this->dPhi_dx2_T << a[161] * x0 + a[164] * x23 + a[165] * x16 + a[166] * x17 + p_l[23] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[161] * x27 - p_h[23] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[161] * x0 + b[164] * x23 + b[165] * x16 + b[166] * x17 + p_l[23] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[161] * x27 - p_h[23] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
+
+    Eigen::Matrix<double, 2, 2> dF_dx2_T;
+    dF_dx2_T << a[161] * x0 + a[164] * x23 + a[165] * x16 + a[166] * x17 + p_l[23] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[161] * x27 - p_h[23] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[161] * x0 + b[164] * x23 + b[165] * x16 + b[166] * x17 + p_l[23] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[161] * x27 - p_h[23] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
+    return dF_dx2_T;
 }
-void MPC::Update_dPhi_dxH3(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH2_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = u[22] / p_l[22];
     double x1 = p_l[22] / p_h[22];
@@ -668,9 +694,11 @@ void MPC::Update_dPhi_dxH3(const std::array<double, MPC_DELAY> &p_h, const std::
     double x33 = b[156] * x13;
     double x34 = x11 * x33;
     double x35 = b[157] * x25;
-    this->dPhi_dx3_T << a[154] * x0 + a[157] * x23 + a[158] * x16 + a[159] * x17 + p_l[22] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[154] * x27 - p_h[22] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[154] * x0 + b[157] * x23 + b[158] * x16 + b[159] * x17 + p_l[22] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[154] * x27 - p_h[22] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
+    Eigen::Matrix<double, 2, 2> dF_dx3_T;
+    dF_dx3_T << a[154] * x0 + a[157] * x23 + a[158] * x16 + a[159] * x17 + p_l[22] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[154] * x27 - p_h[22] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[154] * x0 + b[157] * x23 + b[158] * x16 + b[159] * x17 + p_l[22] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[154] * x27 - p_h[22] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
+    return dF_dx3_T;
 }
-void MPC::Update_dPhi_dxH4(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH3_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = u[21] / p_l[21];
     double x1 = p_l[21] / p_h[21];
@@ -709,9 +737,11 @@ void MPC::Update_dPhi_dxH4(const std::array<double, MPC_DELAY> &p_h, const std::
     double x34 = x11 * x33;
     double x35 = b[150] * x25;
 
-    this->dPhi_dx4_T << a[147] * x0 + a[150] * x23 + a[151] * x16 + a[152] * x17 + p_l[21] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[147] * x27 - p_h[21] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[147] * x0 + b[150] * x23 + b[151] * x16 + b[152] * x17 + p_l[21] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[147] * x27 - p_h[21] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
+    Eigen::Matrix<double, 2, 2> dF_dx4_T;
+    dF_dx4_T << a[147] * x0 + a[150] * x23 + a[151] * x16 + a[152] * x17 + p_l[21] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[147] * x27 - p_h[21] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[147] * x0 + b[150] * x23 + b[151] * x16 + b[152] * x17 + p_l[21] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[147] * x27 - p_h[21] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
+    return dF_dx4_T;
 }
-void MPC::Update_dPhi_dxH5(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH4_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = u[20] / p_l[20];
     double x1 = p_l[20] / p_h[20];
@@ -749,10 +779,12 @@ void MPC::Update_dPhi_dxH5(const std::array<double, MPC_DELAY> &p_h, const std::
     double x33 = b[142] * x13;
     double x34 = x11 * x33;
     double x35 = b[143] * x25;
-    this->dPhi_dx5_T << a[140] * x0 + a[143] * x23 + a[144] * x16 + a[145] * x17 + p_l[20] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[140] * x27 - p_h[20] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[140] * x0 + b[143] * x23 + b[144] * x16 + b[145] * x17 + p_l[20] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[140] * x27 - p_h[20] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
+    Eigen::Matrix<double, 2, 2> dF_dx5_T;
+    dF_dx5_T << a[140] * x0 + a[143] * x23 + a[144] * x16 + a[145] * x17 + p_l[20] * x19 + x1 * x2 + x10 * x9 + x11 * x2 + x14 * x6 + x18 * x21 + x24 * x26 + x6 * x8, -a[140] * x27 - p_h[20] * x19 - x1 * x14 - x1 * x8 - x2 - x20 * x26 - x28 * x9, b[140] * x0 + b[143] * x23 + b[144] * x16 + b[145] * x17 + p_l[20] * x34 + x1 * x29 + x10 * x31 + x11 * x29 + x21 * x33 + x24 * x35 + x30 * x6 + x32 * x6, -b[140] * x27 - p_h[20] * x34 - x1 * x30 - x1 * x32 - x20 * x35 - x28 * x31 - x29;
+    return dF_dx5_T;
 }
 
-void MPC::Update_dPhi_du(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 1> MPC::Update_dF_du_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = p_h[24] / p_l[24];
     double x1 = 1 - p_l[24] / p_h[24];
@@ -764,9 +796,11 @@ void MPC::Update_dPhi_du(const std::array<double, MPC_DELAY> &p_h, const std::ar
     double x7 = x5 * x6;
     double x8 = (x1 * x1) * x3 * x6;
     double x9 = 3 * (p_h[24] * p_h[24] * p_h[24]) * (u[24] * u[24]) * (x1 * x1 * x1);
-    this->dPhi_du_T << a[168] * x0 + a[169] * x2 + a[170] * x8 + a[171] * x9 + a[172] * x5 + a[173] * x7 + a[174] * x4, b[168] * x0 + b[169] * x2 + b[170] * x8 + b[171] * x9 + b[172] * x5 + b[173] * x7 + b[174] * x4;
+    Eigen::Matrix<double, 2, 1> dF_du_T;
+    dF_du_T << a[168] * x0 + a[169] * x2 + a[170] * x8 + a[171] * x9 + a[172] * x5 + a[173] * x7 + a[174] * x4, b[168] * x0 + b[169] * x2 + b[170] * x8 + b[171] * x9 + b[172] * x5 + b[173] * x7 + b[174] * x4;
+    return dF_du_T;
 }
-void MPC::Update_dPhi_du2(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 1> MPC::Update_dF_du1_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = p_h[23] / p_l[23];
     double x1 = 1 - p_l[23] / p_h[23];
@@ -778,10 +812,12 @@ void MPC::Update_dPhi_du2(const std::array<double, MPC_DELAY> &p_h, const std::a
     double x7 = x5 * x6;
     double x8 = (x1 * x1) * x3 * x6;
     double x9 = 3 * (p_h[23] * p_h[23] * p_h[23]) * (u[23] * u[23]) * (x1 * x1 * x1);
-    this->dPhi_du2_T << a[161] * x0 + a[162] * x2 + a[163] * x8 + a[164] * x9 + a[165] * x5 + a[166] * x7 + a[167] * x4, b[161] * x0 + b[162] * x2 + b[163] * x8 + b[164] * x9 + b[165] * x5 + b[166] * x7 + b[167] * x4;
+    Eigen::Matrix<double, 2, 1> dF_du2_T;
+    dF_du2_T << a[161] * x0 + a[162] * x2 + a[163] * x8 + a[164] * x9 + a[165] * x5 + a[166] * x7 + a[167] * x4, b[161] * x0 + b[162] * x2 + b[163] * x8 + b[164] * x9 + b[165] * x5 + b[166] * x7 + b[167] * x4;
+    return dF_du2_T;
 }
 
-void MPC::Update_dPhi_du3(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 1> MPC::Update_dF_du2_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = p_h[22] / p_l[22];
     double x1 = 1 - p_l[22] / p_h[22];
@@ -793,10 +829,12 @@ void MPC::Update_dPhi_du3(const std::array<double, MPC_DELAY> &p_h, const std::a
     double x7 = x5 * x6;
     double x8 = (x1 * x1) * x3 * x6;
     double x9 = 3 * (p_h[22] * p_h[22] * p_h[22]) * (u[22] * u[22]) * (x1 * x1 * x1);
-    this->dPhi_du3_T << a[154] * x0 + a[155] * x2 + a[156] * x8 + a[157] * x9 + a[158] * x5 + a[159] * x7 + a[160] * x4, b[154] * x0 + b[155] * x2 + b[156] * x8 + b[157] * x9 + b[158] * x5 + b[159] * x7 + b[160] * x4;
+    Eigen::Matrix<double, 2, 1> dF_du3_T;
+    dF_du3_T << a[154] * x0 + a[155] * x2 + a[156] * x8 + a[157] * x9 + a[158] * x5 + a[159] * x7 + a[160] * x4, b[154] * x0 + b[155] * x2 + b[156] * x8 + b[157] * x9 + b[158] * x5 + b[159] * x7 + b[160] * x4;
+    return dF_du3_T;
 }
 
-void MPC::Update_dPhi_du4(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 1> MPC::Update_dF_du3_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = p_h[21] / p_l[21];
     double x1 = 1 - p_l[21] / p_h[21];
@@ -808,9 +846,11 @@ void MPC::Update_dPhi_du4(const std::array<double, MPC_DELAY> &p_h, const std::a
     double x7 = x5 * x6;
     double x8 = (x1 * x1) * x3 * x6;
     double x9 = 3 * (p_h[21] * p_h[21] * p_h[21]) * (u[21] * u[21]) * (x1 * x1 * x1);
-    this->dPhi_du4_T << a[147] * x0 + a[148] * x2 + a[149] * x8 + a[150] * x9 + a[151] * x5 + a[152] * x7 + a[153] * x4, b[147] * x0 + b[148] * x2 + b[149] * x8 + b[150] * x9 + b[151] * x5 + b[152] * x7 + b[153] * x4;
+    Eigen::Matrix<double, 2, 1> dF_du4_T;
+    dF_du4_T << a[147] * x0 + a[148] * x2 + a[149] * x8 + a[150] * x9 + a[151] * x5 + a[152] * x7 + a[153] * x4, b[147] * x0 + b[148] * x2 + b[149] * x8 + b[150] * x9 + b[151] * x5 + b[152] * x7 + b[153] * x4;
+    return dF_du4_T;
 }
-void MPC::Update_dPhi_du5(const std::array<double, MPC_DELAY> &p_h, const std::array<double, MPC_DELAY> &p_l, const std::array<double, MPC_DELAY> &u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+Eigen::Matrix<double, 2, 1> MPC::Update_dF_du4_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
 {
     double x0 = p_h[20] / p_l[20];
     double x1 = 1 - p_l[20] / p_h[20];
@@ -822,53 +862,192 @@ void MPC::Update_dPhi_du5(const std::array<double, MPC_DELAY> &p_h, const std::a
     double x7 = x5 * x6;
     double x8 = (x1 * x1) * x3 * x6;
     double x9 = 3 * (p_h[20] * p_h[20] * p_h[20]) * (u[20] * u[20]) * (x1 * x1 * x1);
-    this->dPhi_du5_T << a[140] * x0 + a[141] * x2 + a[142] * x8 + a[143] * x9 + a[144] * x5 + a[145] * x7 + a[146] * x4, b[140] * x0 + b[141] * x2 + b[142] * x8 + b[143] * x9 + b[144] * x5 + b[145] * x7 + b[146] * x4;
+    Eigen::Matrix<double, 2, 1> dF_du5_T;
+    dF_du5_T << a[140] * x0 + a[141] * x2 + a[142] * x8 + a[143] * x9 + a[144] * x5 + a[145] * x7 + a[146] * x4, b[140] * x0 + b[141] * x2 + b[142] * x8 + b[143] * x9 + b[144] * x5 + b[145] * x7 + b[146] * x4;
+    return dF_du5_T;
 }
 
-void MPC::UpdateDyn(bool increase_pre)
+int MPC::DutyCalculate(bool increase_pre, std::array<float, MPC_TIME_HORIZON> y_des, double scale)
 {
-    this->UpdateHistory();
+
+    Eigen::Matrix<double, 2, 1> f_p1, f_p2, f_p3;
+    Eigen::Matrix<double, 2, 1> df_dun_p1_T, df_dun_p2_T, df_dun_p3_T;
+    Eigen::Matrix<double, 2, 1> df_dun1_p2_T, df_dun1_p3_T, df_dun2_p3_T;
+    Eigen::Matrix<double, 2, 2> df_dxn_p2_T, df_dxn_p3_T, df_dxn1_p3_T;
+
+    Eigen::Matrix<double, 2, 1> F_offset;
+    F_offset << *(this->p_tank_his.end() - 1), *(this->p_set_his.end() - 1);
+
+    double *p_h;
+    double *p_l;
+    std::array<double, MPC_STATE_NUM> *cur_a;
+    std::array<double, MPC_STATE_NUM> *cur_b;
+
     if (increase_pre)
     {
         // if we are increasing the pressure
 
-        this->UpdatePhi(this->p_tank_his, this->p_set_his, this->u_his, this->ah, this->bh, this->Phi);
-        this->UpdatePhi(this->p_tank_his, this->p_set_his, this->u_hat, this->ah, this->bh, this->Phi_hat);
-        this->Update_dPhi_dxH(this->p_tank_his, this->p_set_his, this->u_hat, this->ah, this->bh);
-        this->Update_dPhi_du(this->p_tank_his, this->p_set_his, this->u_hat, this->ah, this->bh);
+        p_h = this->p_tank_his.begin();
+        p_l = this->p_set_his.begin();
+        cur_a = &this->ah;
+        cur_b = &this->bh;
+
+        // this->cur_F = scale * this->UpdateF(this->p_tank_his.begin(), this->p_set_his.begin(), this->u_his.begin(), this->ah, this->bh) + F_offset;
+
+        // f_p1 = scale * this->UpdateF(this->p_tank_his.begin(), this->p_set_his.begin(), this->u_his.begin() + 1, this->ah, this->bh) + F_offset;
+        // f_p2 = scale * this->UpdateF(this->p_tank_his.begin() + 1, this->p_set_his.begin() + 1, this->u_his.begin() + 2, this->ah, this->bh) + F_offset;
+        // f_p3 = scale * this->UpdateF(this->p_tank_his.begin() + 2, this->p_set_his.begin() + 2, this->u_his.begin() + 3, this->ah, this->bh) + F_offset;
+
+        // df_dun_p1_T = scale * this->Update_dF_du_T(this->p_tank_his.begin(), this->p_set_his.begin(), this->u_his.begin() + 1, this->ah, this->bh);
+        // df_dun_p2_T = scale * this->Update_dF_du_T(this->p_tank_his.begin() + 1, this->p_set_his.begin() + 1, this->u_his.begin() + 2, this->ah, this->bh);
+        // df_dun_p3_T = scale * this->Update_dF_du_T(this->p_tank_his.begin() + 2, this->p_set_his.begin() + 2, this->u_his.begin() + 3, this->ah, this->bh);
+
+        // df_dun1_p2_T = scale * this->Update_dF_du1_T(this->p_tank_his.begin() + 1, this->p_set_his.begin() + 1, this->u_his.begin() + 2, this->ah, this->bh);
+        // df_dun1_p3_T = scale * this->Update_dF_du1_T(this->p_tank_his.begin() + 2, this->p_set_his.begin() + 2, this->u_his.begin() + 3, this->ah, this->bh);
+        // df_dun2_p3_T = scale * this->Update_dF_du2_T(this->p_tank_his.begin() + 2, this->p_set_his.begin() + 2, this->u_his.begin() + 3, this->ah, this->bh);
+
+        // df_dxn_p2_T = scale * this->Update_dF_dxH_T(this->p_tank_his.begin() + 1, this->p_set_his.begin() + 1, this->u_his.begin() + 2, this->ah, this->bh);
+        // df_dxn_p3_T = scale * this->Update_dF_dxH_T(this->p_tank_his.begin() + 2, this->p_set_his.begin() + 2, this->u_his.begin() + 3, this->ah, this->bh);
+
+        // df_dxn1_p3_T = this->Update_dF_dxH1_T(this->p_tank_his.begin() + 2, this->p_set_his.begin() + 2, this->u_his.begin() + 3, this->ah, this->bh);
     }
     else
     {
-        this->UpdatePhi(this->p_set_his, this->p_tank_his, this->u_his, this->al, this->bl, this->Phi);
-        this->UpdatePhi(this->p_set_his, this->p_tank_his, this->u_hat, this->al, this->bl, this->Phi_hat);
-        this->Update_dPhi_dxL(this->p_set_his, this->p_tank_his, this->u_hat, this->al, this->bl);
-        this->Update_dPhi_du(this->p_set_his, this->p_tank_his, this->u_hat, this->al, this->bl);
+        p_h = this->p_set_his.begin();
+        p_l = this->p_tank_his.begin();
+        cur_a = &this->al;
+        cur_b = &this->bl;
+        // this->cur_F = this->UpdateF(this->p_set_his.begin(), this->p_tank_his.begin(), this->u_his.begin(), this->al, this->bl) + F_offset;
+
+        // f_p1 = this->UpdateF(this->p_set_his.begin(), this->p_tank_his.begin(), this->u_his.begin() + 1, this->al, this->bl) + F_offset;
+        // f_p2 = this->UpdateF(this->p_set_his.begin() + 1, this->p_tank_his.begin() + 1, this->u_his.begin() + 2, this->al, this->bl) + F_offset;
+        // f_p3 = this->UpdateF(this->p_set_his.begin() + 2, this->p_tank_his.begin() + 2, this->u_his.begin() + 3, this->al, this->bl) + F_offset;
+
+        // df_dun_p1_T = this->Update_dF_du_T(this->p_set_his.begin(), this->p_tank_his.begin(), this->u_his.begin() + 1, this->al, this->bl);
+        // df_dun_p2_T = this->Update_dF_du_T(this->p_set_his.begin() + 1, this->p_tank_his.begin() + 1, this->u_his.begin() + 2, this->al, this->bl);
+        // df_dun_p3_T = this->Update_dF_du_T(this->p_set_his.begin() + 2, this->p_tank_his.begin() + 2, this->u_his.begin() + 3, this->al, this->bl);
+
+        // df_dun1_p2_T = this->Update_dF_du1_T(this->p_set_his.begin() + 1, this->p_tank_his.begin() + 1, this->u_his.begin() + 2, this->al, this->bl);
+        // df_dun1_p3_T = this->Update_dF_du1_T(this->p_set_his.begin() + 2, this->p_tank_his.begin() + 2, this->u_his.begin() + 3, this->al, this->bl);
+        // df_dun2_p3_T = this->Update_dF_du2_T(this->p_set_his.begin() + 2, this->p_tank_his.begin() + 2, this->u_his.begin() + 3, this->al, this->bl);
+
+        // df_dxn_p2_T = this->Update_dF_dxL_T(this->p_set_his.begin() + 1, this->p_tank_his.begin() + 1, this->u_his.begin() + 2, this->al, this->bl);
+        // df_dxn_p3_T = this->Update_dF_dxL_T(this->p_set_his.begin() + 2, this->p_tank_his.begin() + 2, this->u_his.begin() + 3, this->al, this->bl);
+
+        // df_dxn1_p3_T = this->Update_dF_dxL1_T(this->p_set_his.begin() + 2, this->p_tank_his.begin() + 2, this->u_his.begin() + 3, this->al, this->bl);
     }
 
-    // Scale the phi, dphi_du, dphi_dx since the volume may change
-    this->Phi = this->Phi / this->phi_scale;
-    this->Phi_hat = this->Phi_hat / this->phi_scale;
-    this->dPhi_du_T = this->dPhi_du_T / this->phi_scale;
-    this->dPhi_dx_T = this->dPhi_dx_T / this->phi_scale;
+    this->cur_dF = scale * this->UpdateF(p_h, p_l, this->u_his.begin(), *cur_a, *cur_b);
+    this->cur_F = this->cur_dF+ F_offset;
 
-    Eigen::Matrix2d K_mat = Eigen::Matrix2d::Identity() - this->dPhi_dx_T;
+    f_p1 = scale * this->UpdateF(p_h, p_l, this->u_his.begin() + 1, *cur_a, *cur_b) + F_offset;
+    f_p2 = scale * this->UpdateF(p_h + 1, p_l + 1, this->u_his.begin() + 2, *cur_a, *cur_b) + F_offset;
+    f_p3 = scale * this->UpdateF(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b) + F_offset;
 
-    // std::cout<<"dPhi_dx: "<<this->dPhi_dx_T<<std::endl;
-    // std::cout<<"dPhi_du: "<<this->dPhi_du_T<<std::endl;
-    // std::cout<<"K_mat: "<<K_mat<<std::endl;
-    // std::cout<<"Phi: "<<this->Phi<<std::endl;
+    df_dun_p1_T = scale * this->Update_dF_du_T(p_h, p_l, this->u_his.begin() + 1, *cur_a, *cur_b);
+    df_dun_p2_T = scale * this->Update_dF_du_T(p_h + 1, p_l + 1, this->u_his.begin() + 2, *cur_a, *cur_b);
+    df_dun_p3_T = scale * this->Update_dF_du_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
 
-    this->B = K_mat.inverse() * this->dPhi_du_T;
-    this->alpha = K_mat.inverse() * (this->Phi_hat - this->dPhi_du_T * this->u_hat[MPC_DELAY - 1]);
+    df_dun1_p2_T = scale * this->Update_dF_du1_T(p_h + 1, p_l + 1, this->u_his.begin() + 2, *cur_a, *cur_b);
+    df_dun1_p3_T = scale * this->Update_dF_du1_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
+    df_dun2_p3_T = scale * this->Update_dF_du2_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
+
+    df_dxn_p2_T = scale * this->Update_dF_dxH_T(p_h + 1, p_l + 1, this->u_his.begin() + 2, *cur_a, *cur_b);
+    df_dxn_p3_T = scale * this->Update_dF_dxH_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
+
+    df_dxn1_p3_T = scale*this->Update_dF_dxH1_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
+
+    Eigen::Matrix<double, 2, 1> x_bar;
+    Eigen::Matrix<double, 2, 1> zero_col(0, 0);
+
+    x_bar << this->p_tank_his[MPC_DELAY], this->p_set_his[MPC_DELAY];
+
+    Eigen::Matrix<double, 2, 1> A1 = f_p1 - df_dun_p1_T * MPC::kUBar;
+    Eigen::Matrix<double, 2, 3> B1;
+    B1 << df_dun_p1_T, zero_col, zero_col;
+
+    Eigen::Matrix<double, 2, 1> A2 = f_p2 + df_dxn_p2_T * A1 - (df_dun_p2_T + df_dun1_p2_T) * MPC::kUBar - df_dxn_p2_T * x_bar;
+    Eigen::Matrix<double, 2, 3> B2;
+    B2 << df_dun1_p2_T, df_dun_p2_T, zero_col;
+    B2 += df_dxn_p2_T * B1;
+
+    Eigen::Matrix<double, 2, 1> A3 = f_p3 + (df_dxn_p3_T + df_dxn1_p3_T) * (A2 - x_bar) - (df_dun_p3_T + df_dun1_p3_T + df_dun2_p3_T) * MPC::kUBar;
+    Eigen::Matrix<double, 2, 3> B3;
+    B3 << df_dun2_p3_T, df_dun1_p3_T, df_dun_p3_T;
+    B3 += df_dxn_p3_T * B2 + df_dxn1_p3_T * B2;
+
+    // combine all matrices
+    Eigen::Matrix<double, 1, 2> H(0, 1);
+    Eigen::Matrix<double, 3, 1> A_all;
+    Eigen::Matrix<double, 3, 3> B_all;
+    A_all << H * A1, H * A2, H * A3;
+    B_all << H * B1, H * B2, H * B3;
+    Eigen::Matrix<double, 3, 1> y_des_vec;
+    y_des_vec << y_des[0], y_des[1], y_des[2];
+    Eigen::Matrix<double, 3, 3> P_mat = B_all.transpose() * B_all;
+    Eigen::Matrix<double, 1, 3> q_mat = -1 * y_des_vec.transpose() * B_all + A_all.transpose() * B_all;
+
+    // std::cout<<"pmat: "<<P_mat<<std::endl;
+    // std::cout<<"qmat: "<<q_mat<<std::endl;
+    // std::cout<<"ydes: "<<y_des[0]<<','<<y_des[1]<<','<<y_des[2]<<std::endl;
+    // std::cout<<"ycur: "<<this->p_set_his[MPC_DELAY]<<std::endl;
+    // form the problem into osqp
+    c_float P_x[6] = {P_mat.coeff(0, 0), P_mat.coeff(0, 1), P_mat.coeff(1, 1), P_mat.coeff(0, 2), P_mat.coeff(1, 2), P_mat.coeff(2, 2)};
+    c_int P_i[6] = {0, 0, 1, 0, 1, 2};
+    c_int P_p[4] = {0, 1, 3, 6};
+    c_int P_nnz = 6;
+    c_float q[3] = {q_mat.coeff(0, 0), q_mat.coeff(0, 1), q_mat.coeff(0, 2)};
+
+    c_int A_nnz = 3;
+    c_float A_x[3] = {1, 1, 1};
+    c_int A_i[3] = {0, 1, 2};
+    c_int A_p[4] = {0, 1, 2, 3};
+    c_float l[3] = {0, 0, 0};
+    c_float u[3] = {1, 1, 1};
+    c_int n = 3;
+    c_int m = 3;
+    // populate the data
+    this->osqp_data->n = n;
+    this->osqp_data->m = m;
+    this->osqp_data->P = csc_matrix(n, n, P_nnz, P_x, P_i, P_p);
+    this->osqp_data->q = q;
+    this->osqp_data->A = csc_matrix(m, n, A_nnz, A_x, A_i, A_p);
+    this->osqp_data->l = l;
+    this->osqp_data->u = u;
+
+    // solve osqp
+    c_int exit_flag = osqp_setup(&this->work, this->osqp_data.get(), this->osqp_settings.get());
+    osqp_solve(this->work);
+
+    this->u_n = *(this->work->solution->x);
+    this->u_n1 = *(this->work->solution->x + 1);
+    this->u_n2 = *(this->work->solution->x + 2);
+
+    Eigen::Matrix<double, 3, 1> u_vec;
+    u_vec << this->u_n, this->u_n1, this->u_n2;
+    // std::cout<<"u vec: "<<u_vec<<std::endl;
+
+    this->x_n1 = A1 + B1 * u_vec;
+    this->x_n2 = A2 + B2 * u_vec;
+    this->x_n3 = A3 + B3 * u_vec;
+    // std::cout<<"u_n: "<<this->u_n<<", u_1: "<<this->u_n1<<", u_2: "<<this->u_n2<<std::endl;
+    // std::cout<<"x_n1: "<<this->x_n1.coeff(1,0)<<", x_n2: "<<this->x_n2.coeff(1,0)<<", x_n3: "<<this->x_n3.coeff(1,0)<<std::endl;
+
+    // auto res_err = u_vec.transpose()*P_mat*u_vec+2*q_mat*u_vec;
+    // std::cout<<"residual: "<<res_err*2<<std::endl;
+    // auto err = y_des_vec-A_all-B_all*u_vec;
+    // auto res_err2 = err.norm();
+    // std::cout<<"real residual: "<<res_err2<<std::endl;
+    return (int)(this->u_n * 100 + 0.5);
 }
 
 int MPC::GetPreControl(const double &p_des, const double &ps, const double &pt, double scale)
 {
 
     double p_diff = (p_des - ps); // we scaled the p_diff with the assumption that pressure will have the momentum to go
-    this->p_diff_des = p_diff;
-    if (std::abs(p_diff) > 640)
-    { // if desired pressure has 1 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
+
+    if (std::abs(p_diff) > 320) // 640 is 2 psi
+    {                           // if desired pressure has 1 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
 
         // double lb;
         // if(std::abs(pt-ps)<1310){ //if the difference is less than 10 psi, we can operate the valve with lower duty
@@ -883,59 +1062,38 @@ int MPC::GetPreControl(const double &p_des, const double &ps, const double &pt, 
         // }
 
         // double lb = 20; //set the lower bound 20 duty
-
+        float p_des_scale = ((float)p_des) / 65536.0;
+        std::array<float, MPC_TIME_HORIZON> y_des{p_des_scale, p_des_scale, p_des_scale};
+        // std::cout<<"p_diff: "<<p_diff/65536<<std::endl;
+        this->UpdateHistory(ps, pt);
+        int ideal_duty = 0;
         if ((p_des > ps) & (pt > ps) & (pt > p_des))
         {
             // increasing pressure
             //  std::cout<<"increase\n";
-            this->UpdateDyn(true);
+
+            ideal_duty = this->DutyCalculate(true, y_des, scale);
         }
         else if ((p_des < ps) & (ps > pt) & (p_des > pt))
         {
             // decreasing pressure
             //  std::cout<<"decrease\n";
-            this->UpdateDyn(false);
+            ideal_duty = this->DutyCalculate(false, y_des, scale);
         }
         else
         {
-            this->Phi << 0, 0;
-            this->P_val = 0;
-            this->q_val = 0;
+
             return 0;
         }
-
-        // format question to osqp format
-
-        // std::cout << "alpha: " << this->alpha.coeff(0, 0) << ',' << this->alpha.coeff(1, 0) << std::endl;
-        // std::cout << "B: " << this->B.coeff(0, 0) << ',' << this->B.coeff(1, 0) << std::endl;
-
-        p_diff = p_diff / 5;
-
-        this->q_val = (this->B.coeff(1, 0) * this->alpha.coeff(1, 0) + p_diff / 65536 * this->B.coeff(1, 0));
-        this->P_val = this->B.coeff(1, 0) * this->B.coeff(1, 0); // scale up the u to duty instead of duty/100, since q_val/100 and p_val/10000, I just scale p_val/100
-
-        // c_int P_nnz = 1;
-        // c_double P_x[1]={P_val};
-        // c_int P_i[1]={0};
-        // c_int P_p[2]={0,1};
-        // this->osqp_data->n =1;
-        // this->osqp_data->P = csc_matrix(this->osqp_data->n,this->osqp_data->n,P_nnz,P_x,P_i,P_p);
-
-        // std::cout<<"pval: "<<this->P_val<<std::endl;
-        // std::cout<<"qval: "<<this->q_val<<std::endl;
-
-        // double ideal_duty = 100*this->q_val / this->P_val + 0.5;
-        // double ideal_duty = 100*(p_diff/65536-this->alpha.coeff(1,0))/this->B.coeff(1,0);
-        double ideal_duty = 100 * ((p_diff / 65536 - this->Phi_hat.coeff(1, 0)) / this->dPhi_du_T.coeff(1, 0) + this->u_hat[MPC_DELAY - 1]);
 
         // std::cout<<"real p_diff: "<<this->Phi.coeff(1,0)*65536<<std::endl;
 
         // std::cout<<std::endl;
-        std::cout << "ideal duty: " << ideal_duty << std::endl;
+        // std::cout << "ideal duty: " << ideal_duty << std::endl;
         // std::cout << "control p_diff: " << (this->alpha.coeff(1, 0) + this->B.coeff(1, 0) * ideal_duty/100) * 65536 << std::endl;
         // std::cout << "des pdiff: " << p_diff << std::endl;
 
-        if (ideal_duty < 0)
+        if (ideal_duty <= 5)
         {
             return 0;
         }
@@ -950,69 +1108,16 @@ int MPC::GetPreControl(const double &p_des, const double &ps, const double &pt, 
         {
             return ideal_duty;
         }
-
-        /* osqp is not working......
-
-
-        c_double q[1]={q_val};
-        this->osqp_data->q = q;
-        // std::cout<<"pval: "<<p_val<<std::endl;
-
-        c_int A_nnz = 1;
-        this->osqp_data->m = 1;
-        c_double A_x[1]={1};
-        c_int A_i[1]={0};
-        c_int A_p[2]={0,1};
-        this->osqp_data->A = csc_matrix(this->osqp_data->m,this->osqp_data->n,A_nnz,A_x,A_i,A_p);
-
-        c_double l[1]={lb};
-        c_double u[1]={100};
-
-        this->osqp_data->l = l;
-        this->osqp_data->u = u;
-
-
-
-        int set_up_flag = osqp_setup(&this->work,this->osqp_data.get(),this->osqp_settings.get());
-
-        int solve_err=0;
-        int duty=0;
-        if(!set_up_flag)
-            solve_err = osqp_solve(this->work);
-        if(!solve_err){
-            duty = *this->work->solution->x+0.5;
-            // if(duty<30)
-            //     duty =0;
-        }
-        else{
-            std::cout<<"osqp failed\n";
-        }
-
-
-        // std::cout<<"pval: "<<p_val<<std::endl;
-        // std::cout<<"qval: "<<q_val<<std::endl;
-        // std::cout<<"ps: "<<ps<<std::endl;
-        // std::cout<<"pt: "<<pt<<std::endl;
-        // std::cout<<"p_des: "<<p_des<<std::endl;
-
-        return duty;
-        */
     }
     else
     {
-        this->Phi << 0, 0;
-        this->Phi_hat << 0, 0;
-        this->dPhi_dx_T << 0, 0, 0, 0;
-        this->dPhi_du_T << 0, 0;
-        this->P_val = 0;
-        this->q_val = 0;
+        // this->cur_F << 0, 0;
+        this->cur_dF <<0,0;
+        this->u_n = 0;
+        this->u_n1 = 0;
+        this->u_n2 = 0;
         return 0;
     }
-}
-
-std::array<double, 10> MPC::GetMpcRec()
-{ // record dPhi_du, dPhi_dx
-    return std::array<double, 10>({this->Phi.coeff(0, 0), this->Phi.coeff(1, 0), this->P_val, this->q_val, this->dPhi_du_T.coeff(0, 0), this->dPhi_du_T.coeff(1, 0), this->dPhi_dx_T.coeff(0, 0), this->dPhi_dx_T.coeff(0, 1), this->dPhi_dx_T.coeff(1, 0), this->dPhi_dx_T.coeff(1, 1)});
 }
 
 void MPC::PushMeas(const double p_tank, const double p_set, const uint8_t duty)
@@ -1024,37 +1129,28 @@ void MPC::PushMeas(const double p_tank, const double p_set, const uint8_t duty)
     this->meas_idx %= MPC_DELAY;
 
     this->mpc_rec.PushData(
-        std::array<double, 11>{this->p_diff_des, this->Phi.coeff(0, 0), this->Phi.coeff(1, 0), this->Phi_hat.coeff(0, 0), this->Phi_hat.coeff(1, 0), this->dPhi_dx_T.coeff(0, 0), this->dPhi_dx_T.coeff(0, 1), this->dPhi_dx_T.coeff(1, 0), this->dPhi_dx_T.coeff(1, 1), this->dPhi_du_T.coeff(0, 0), this->dPhi_du_T.coeff(1, 0)});
+        std::array<double, 10>{this->cur_F.coeff(0, 0), this->cur_F.coeff(1, 0),this->cur_dF.coeff(0,0),this->cur_dF.coeff(1,0), this->u_n, this->u_n1, this->u_n2, this->x_n1.coeff(1, 0), this->x_n2.coeff(1, 0), this->x_n3.coeff(1, 0)});
 }
 
-void MPC::UpdateHistory()
+void MPC::UpdateHistory(double p_set, double p_tank)
 {
     std::memset(this->p_tank_his.begin(), 0, this->p_tank_his.size());
-    std::memset(this->p_tank_hat.begin(), 0, this->p_tank_hat.size());
     std::memset(this->p_set_his.begin(), 0, this->p_set_his.size());
-    std::memset(this->p_set_hat.begin(), 0, this->p_set_hat.size());
     std::memset(this->u_his.begin(), 0, this->u_his.size());
-    std::memset(this->u_hat.begin(), 0, this->u_hat.size());
 
-    for (int i = 0; i < MPC_DELAY - 1; i++)
+    for (int i = 0; i < MPC_DELAY; i++)
     {
         this->p_tank_his[i] = this->p_tank_mem[(this->meas_idx + i) % MPC_DELAY];
         this->p_set_his[i] = this->p_set_mem[(this->meas_idx + i) % MPC_DELAY];
         this->u_his[i] = this->u_mem[(this->meas_idx + i) % MPC_DELAY];
-
-        this->p_tank_hat[i] = this->p_tank_mem[(this->meas_idx + i + 1) % MPC_DELAY];
-        this->p_set_hat[i] = this->p_set_mem[(this->meas_idx + i + 1) % MPC_DELAY];
-        this->u_hat[i] = this->u_mem[(this->meas_idx + i + 1) % MPC_DELAY];
     }
 
-    this->p_tank_his[MPC_DELAY - 1] = this->p_tank_mem[(this->meas_idx + MPC_DELAY - 1) % MPC_DELAY];
-    this->p_set_his[MPC_DELAY - 1] = this->p_set_mem[(this->meas_idx + MPC_DELAY - 1) % MPC_DELAY];
-    this->u_his[MPC_DELAY - 1] = this->u_mem[(this->meas_idx + MPC_DELAY - 1) % MPC_DELAY];
-
-    this->p_tank_hat[MPC_DELAY - 1] = this->p_tank_mem[(this->meas_idx + MPC_DELAY - 1) % MPC_DELAY];
-    this->p_set_hat[MPC_DELAY - 1] = this->p_set_mem[(this->meas_idx + MPC_DELAY - 1) % MPC_DELAY];
-    // this->u_hat[MPC_DELAY - 1] = this->u_mem[(this->meas_idx + MPC_DELAY - 1) % MPC_DELAY];
-    this->u_hat[MPC_DELAY - 1] = 0.2;
+    for (int i = 0; i < MPC_TIME_HORIZON; i++)
+    {
+        this->p_tank_his[i + MPC_DELAY] = p_tank / 65536;
+        this->p_set_his[i + MPC_DELAY] = p_set / 65536;
+        this->u_his[i + MPC_DELAY] = MPC::kUBar; // use the lower bound first, in case the previous duty was 0
+    }
 
     // std::cout<<"mem values: "<<this->p_tank_his[0]<<std::endl;
 }
