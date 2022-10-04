@@ -45,9 +45,14 @@ void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_flex, c
     this->cur_force = this->GetExternalForce();
 
     this->joint_con_rec.PushData(std::array<double,5>{this->L_ext,this->L_flex,this->cur_force,this->cur_max_spring_compress,this->cur_delta_x});
-
-
 }
+void JointCon::RecData(){
+    this->ext_con.RecData();
+    this->flex_con.RecData();
+    this->tank_con.RecData();
+}
+
+
 void JointCon::GetForceCon(const double des_force, u_int8_t &ext_duty, u_int8_t &flex_duty, u_int8_t &tank_duty)
 {
     /**

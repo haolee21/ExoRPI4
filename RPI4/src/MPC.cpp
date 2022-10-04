@@ -870,10 +870,23 @@ Eigen::Matrix<double, 2, 1> MPC::Update_dF_du4_T(const double *p_h, const double
 int MPC::DutyCalculate(bool increase_pre, std::array<float, MPC_TIME_HORIZON> y_des, double scale)
 {
 
-    Eigen::Matrix<double, 2, 1> f_p1, f_p2, f_p3;
-    Eigen::Matrix<double, 2, 1> df_dun_p1_T, df_dun_p2_T, df_dun_p3_T;
-    Eigen::Matrix<double, 2, 1> df_dun1_p2_T, df_dun1_p3_T, df_dun2_p3_T;
-    Eigen::Matrix<double, 2, 2> df_dxn_p2_T, df_dxn_p3_T, df_dxn1_p3_T;
+    this->y_des1 = y_des[0];
+    this->y_des2 = y_des[1];
+    this->y_des3 = y_des[2];
+    this->y_des4 = y_des[3];
+    this->y_des5 = y_des[4];
+
+    Eigen::Matrix<double, 2, 1> f_p1, f_p2, f_p3, f_p4, f_p5;
+    Eigen::Matrix<double, 2, 1> df_dun_p1_T, df_dun_p2_T, df_dun_p3_T, df_dun_p4_T, df_dun_p5_T;
+    Eigen::Matrix<double, 2, 1> df_dun1_p2_T, df_dun1_p3_T, df_dun1_p4_T, df_dun1_p5_T;
+    Eigen::Matrix<double, 2, 1> df_dun2_p3_T, df_dun2_p4_T, df_dun2_p5_T;
+    Eigen::Matrix<double, 2, 1> df_dun3_p4_T, df_dun3_p5_T;
+    Eigen::Matrix<double, 2, 1> df_dun4_p5_T;
+
+    Eigen::Matrix<double, 2, 2> df_dxn_p2_T, df_dxn_p3_T, df_dxn_p4_T, df_dxn_p5_T;
+    Eigen::Matrix<double, 2, 2> df_dxn1_p3_T, df_dxn1_p4_T, df_dxn1_p5_T;
+    Eigen::Matrix<double, 2, 2> df_dxn2_p4_T, df_dxn2_p5_T;
+    Eigen::Matrix<double, 2, 2> df_dxn3_p5_T;
 
     Eigen::Matrix<double, 2, 1> F_offset;
     F_offset << *(this->p_tank_his.end() - 1), *(this->p_set_his.end() - 1);
@@ -938,24 +951,47 @@ int MPC::DutyCalculate(bool increase_pre, std::array<float, MPC_TIME_HORIZON> y_
     }
 
     this->cur_dF = scale * this->UpdateF(p_h, p_l, this->u_his.begin(), *cur_a, *cur_b);
-    this->cur_F = this->cur_dF+ F_offset;
+    this->cur_F = this->cur_dF + F_offset;
 
     f_p1 = scale * this->UpdateF(p_h, p_l, this->u_his.begin() + 1, *cur_a, *cur_b) + F_offset;
     f_p2 = scale * this->UpdateF(p_h + 1, p_l + 1, this->u_his.begin() + 2, *cur_a, *cur_b) + F_offset;
     f_p3 = scale * this->UpdateF(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b) + F_offset;
+    f_p4 = scale * this->UpdateF(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b) + F_offset;
+    f_p5 = scale * this->UpdateF(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b) + F_offset;
 
     df_dun_p1_T = scale * this->Update_dF_du_T(p_h, p_l, this->u_his.begin() + 1, *cur_a, *cur_b);
     df_dun_p2_T = scale * this->Update_dF_du_T(p_h + 1, p_l + 1, this->u_his.begin() + 2, *cur_a, *cur_b);
     df_dun_p3_T = scale * this->Update_dF_du_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
+    df_dun_p4_T = scale * this->Update_dF_du_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dun_p5_T = scale * this->Update_dF_du_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
 
     df_dun1_p2_T = scale * this->Update_dF_du1_T(p_h + 1, p_l + 1, this->u_his.begin() + 2, *cur_a, *cur_b);
     df_dun1_p3_T = scale * this->Update_dF_du1_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
+    df_dun1_p4_T = scale * this->Update_dF_du1_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dun1_p5_T = scale * this->Update_dF_du1_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
+
     df_dun2_p3_T = scale * this->Update_dF_du2_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
+    df_dun2_p4_T = scale * this->Update_dF_du2_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dun2_p5_T = scale * this->Update_dF_du2_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
+
+    df_dun3_p4_T = scale * this->Update_dF_du3_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dun3_p5_T = scale * this->Update_dF_du3_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
+
+    df_dun4_p5_T = scale * this->Update_dF_du4_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
 
     df_dxn_p2_T = scale * this->Update_dF_dxH_T(p_h + 1, p_l + 1, this->u_his.begin() + 2, *cur_a, *cur_b);
     df_dxn_p3_T = scale * this->Update_dF_dxH_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
+    df_dxn_p4_T = scale * this->Update_dF_dxH_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dxn_p5_T = scale * this->Update_dF_dxH_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
 
-    df_dxn1_p3_T = scale*this->Update_dF_dxH1_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
+    df_dxn1_p3_T = scale * this->Update_dF_dxH1_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
+    df_dxn1_p4_T = scale * this->Update_dF_dxH1_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dxn1_p5_T = scale * this->Update_dF_dxH1_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
+
+    df_dxn2_p4_T = scale * this->Update_dF_dxH2_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dxn2_p5_T = scale * this->Update_dF_dxH2_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
+
+    df_dxn3_p5_T = scale * this->Update_dF_dxH3_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
 
     Eigen::Matrix<double, 2, 1> x_bar;
     Eigen::Matrix<double, 2, 1> zero_col(0, 0);
@@ -963,49 +999,63 @@ int MPC::DutyCalculate(bool increase_pre, std::array<float, MPC_TIME_HORIZON> y_
     x_bar << this->p_tank_his[MPC_DELAY], this->p_set_his[MPC_DELAY];
 
     Eigen::Matrix<double, 2, 1> A1 = f_p1 - df_dun_p1_T * MPC::kUBar;
-    Eigen::Matrix<double, 2, 3> B1;
-    B1 << df_dun_p1_T, zero_col, zero_col;
+    Eigen::Matrix<double, 2, MPC_TIME_HORIZON> B1;
+    B1 << df_dun_p1_T, zero_col, zero_col, zero_col, zero_col;
 
     Eigen::Matrix<double, 2, 1> A2 = f_p2 + df_dxn_p2_T * A1 - (df_dun_p2_T + df_dun1_p2_T) * MPC::kUBar - df_dxn_p2_T * x_bar;
-    Eigen::Matrix<double, 2, 3> B2;
-    B2 << df_dun1_p2_T, df_dun_p2_T, zero_col;
+    Eigen::Matrix<double, 2, MPC_TIME_HORIZON> B2;
+    B2 << df_dun1_p2_T, df_dun_p2_T, zero_col, zero_col, zero_col;
     B2 += df_dxn_p2_T * B1;
 
-    Eigen::Matrix<double, 2, 1> A3 = f_p3 + (df_dxn_p3_T + df_dxn1_p3_T) * (A2 - x_bar) - (df_dun_p3_T + df_dun1_p3_T + df_dun2_p3_T) * MPC::kUBar;
-    Eigen::Matrix<double, 2, 3> B3;
-    B3 << df_dun2_p3_T, df_dun1_p3_T, df_dun_p3_T;
-    B3 += df_dxn_p3_T * B2 + df_dxn1_p3_T * B2;
+    Eigen::Matrix<double, 2, 1> A3 = f_p3 + df_dxn_p3_T * (A2 - x_bar) + df_dxn1_p3_T * (A1 - x_bar) - (df_dun_p3_T + df_dun1_p3_T + df_dun2_p3_T) * MPC::kUBar;
+    Eigen::Matrix<double, 2, MPC_TIME_HORIZON> B3;
+    B3 << df_dun2_p3_T, df_dun1_p3_T, df_dun_p3_T, zero_col, zero_col;
+    B3 += df_dxn_p3_T * B2 + df_dxn1_p3_T * B1;
+
+    Eigen::Matrix<double, 2, 1> A4 = f_p4 + df_dxn_p4_T * (A3 - x_bar) + df_dxn1_p4_T * (A2 - x_bar) + df_dxn2_p4_T * (A1 - x_bar) - (df_dun_p4_T + df_dun1_p4_T + df_dun2_p4_T + df_dun3_p4_T) * MPC::kUBar;
+    Eigen::Matrix<double, 2, MPC_TIME_HORIZON> B4;
+    B4 << df_dun3_p4_T, df_dun2_p4_T, df_dun1_p4_T, df_dun_p4_T, zero_col;
+    B4 += df_dxn_p4_T * B3 + df_dxn1_p4_T * B2 + df_dxn2_p4_T * B1;
+
+    Eigen::Matrix<double, 2, 1> A5 = f_p5 + df_dxn_p5_T * (A4 - x_bar) + df_dxn1_p5_T * (A3 - x_bar) + df_dxn2_p5_T * (A2 - x_bar) + df_dxn3_p5_T * (A1 - x_bar) - (df_dun_p5_T + df_dun1_p5_T + df_dun2_p5_T + df_dun3_p5_T + df_dun4_p5_T) * MPC::kUBar;
+    Eigen::Matrix<double, 2, MPC_TIME_HORIZON> B5;
+    B5 << df_dun4_p5_T, df_dun3_p5_T, df_dun2_p5_T, df_dun1_p5_T, df_dun_p5_T;
+    B5 += df_dxn_p5_T * B4 + df_dxn1_p5_T * B3 + df_dxn2_p5_T * B2 + df_dxn3_p5_T * B1;
 
     // combine all matrices
     Eigen::Matrix<double, 1, 2> H(0, 1);
-    Eigen::Matrix<double, 3, 1> A_all;
-    Eigen::Matrix<double, 3, 3> B_all;
-    A_all << H * A1, H * A2, H * A3;
-    B_all << H * B1, H * B2, H * B3;
-    Eigen::Matrix<double, 3, 1> y_des_vec;
-    y_des_vec << y_des[0], y_des[1], y_des[2];
-    Eigen::Matrix<double, 3, 3> P_mat = B_all.transpose() * B_all;
-    Eigen::Matrix<double, 1, 3> q_mat = -1 * y_des_vec.transpose() * B_all + A_all.transpose() * B_all;
+    Eigen::Matrix<double, MPC_TIME_HORIZON, 1> A_all;
+    Eigen::Matrix<double, MPC_TIME_HORIZON, MPC_TIME_HORIZON> B_all;
+    A_all << H * A1, H * A2, H * A3, H * A4, H * A5;
+    B_all << H * B1, H * B2, H * B3, H * B4, H * B5;
+    Eigen::Matrix<double, MPC_TIME_HORIZON, 1> y_des_vec;
+    y_des_vec << y_des[0], y_des[1], y_des[2], y_des[3], y_des[4];
+    Eigen::Matrix<double, MPC_TIME_HORIZON, MPC_TIME_HORIZON> P_mat = B_all.transpose() * B_all;
+    Eigen::Matrix<double, 1, MPC_TIME_HORIZON> q_mat = -1 * y_des_vec.transpose() * B_all + A_all.transpose() * B_all;
 
     // std::cout<<"pmat: "<<P_mat<<std::endl;
     // std::cout<<"qmat: "<<q_mat<<std::endl;
     // std::cout<<"ydes: "<<y_des[0]<<','<<y_des[1]<<','<<y_des[2]<<std::endl;
     // std::cout<<"ycur: "<<this->p_set_his[MPC_DELAY]<<std::endl;
     // form the problem into osqp
-    c_float P_x[6] = {P_mat.coeff(0, 0), P_mat.coeff(0, 1), P_mat.coeff(1, 1), P_mat.coeff(0, 2), P_mat.coeff(1, 2), P_mat.coeff(2, 2)};
-    c_int P_i[6] = {0, 0, 1, 0, 1, 2};
-    c_int P_p[4] = {0, 1, 3, 6};
-    c_int P_nnz = 6;
-    c_float q[3] = {q_mat.coeff(0, 0), q_mat.coeff(0, 1), q_mat.coeff(0, 2)};
+    c_float P_x[(MPC_TIME_HORIZON + 1) * MPC_TIME_HORIZON / 2] = {P_mat.coeff(0, 0),
+                                                                  P_mat.coeff(0, 1), P_mat.coeff(1, 1),
+                                                                  P_mat.coeff(0, 2), P_mat.coeff(1, 2), P_mat.coeff(2, 2),
+                                                                  P_mat.coeff(0, 3), P_mat.coeff(1, 3), P_mat.coeff(2, 3), P_mat.coeff(3, 3),
+                                                                  P_mat.coeff(0, 4), P_mat.coeff(1, 4), P_mat.coeff(2, 4), P_mat.coeff(3, 4), P_mat.coeff(4, 4)};
+    c_int P_i[(MPC_TIME_HORIZON + 1) * MPC_TIME_HORIZON / 2] = {0, 0, 1, 0, 1, 2, 0, 1, 2, 3, 0, 1, 2, 3, 4};
+    c_int P_p[MPC_TIME_HORIZON + 1] = {0, 1, 3, 6, 10, 15};
+    c_int P_nnz = (MPC_TIME_HORIZON + 1) * MPC_TIME_HORIZON / 2;
+    c_float q[MPC_TIME_HORIZON] = {q_mat.coeff(0, 0), q_mat.coeff(0, 1), q_mat.coeff(0, 2), q_mat.coeff(0, 3), q_mat.coeff(0, 4)};
 
-    c_int A_nnz = 3;
-    c_float A_x[3] = {1, 1, 1};
-    c_int A_i[3] = {0, 1, 2};
-    c_int A_p[4] = {0, 1, 2, 3};
-    c_float l[3] = {0, 0, 0};
-    c_float u[3] = {1, 1, 1};
-    c_int n = 3;
-    c_int m = 3;
+    c_int A_nnz = MPC_TIME_HORIZON;
+    c_float A_x[MPC_TIME_HORIZON] = {1, 1, 1, 1, 1};
+    c_int A_i[MPC_TIME_HORIZON] = {0, 1, 2, 3, 4};
+    c_int A_p[MPC_TIME_HORIZON + 1] = {0, 1, 2, 3, 4, 5};
+    c_float l[MPC_TIME_HORIZON] = {0.15, 0, 0, 0, 0};
+    c_float u[MPC_TIME_HORIZON] = {1, 1, 1, 1, 1};
+    c_int n = MPC_TIME_HORIZON;
+    c_int m = MPC_TIME_HORIZON;
     // populate the data
     this->osqp_data->n = n;
     this->osqp_data->m = m;
@@ -1022,14 +1072,18 @@ int MPC::DutyCalculate(bool increase_pre, std::array<float, MPC_TIME_HORIZON> y_
     this->u_n = *(this->work->solution->x);
     this->u_n1 = *(this->work->solution->x + 1);
     this->u_n2 = *(this->work->solution->x + 2);
+    this->u_n3 = *(this->work->solution->x + 3);
+    this->u_n4 = *(this->work->solution->x + 4);
 
-    Eigen::Matrix<double, 3, 1> u_vec;
-    u_vec << this->u_n, this->u_n1, this->u_n2;
+    Eigen::Matrix<double, MPC_TIME_HORIZON, 1> u_vec;
+    u_vec << this->u_n, this->u_n1, this->u_n2, this->u_n3, this->u_n4;
     // std::cout<<"u vec: "<<u_vec<<std::endl;
 
     this->x_n1 = A1 + B1 * u_vec;
     this->x_n2 = A2 + B2 * u_vec;
     this->x_n3 = A3 + B3 * u_vec;
+    this->x_n4 = A4 + B4 * u_vec;
+    this->x_n5 = A5 + B5 * u_vec;
     // std::cout<<"u_n: "<<this->u_n<<", u_1: "<<this->u_n1<<", u_2: "<<this->u_n2<<std::endl;
     // std::cout<<"x_n1: "<<this->x_n1.coeff(1,0)<<", x_n2: "<<this->x_n2.coeff(1,0)<<", x_n3: "<<this->x_n3.coeff(1,0)<<std::endl;
 
@@ -1045,8 +1099,8 @@ int MPC::GetPreControl(const double &p_des, const double &ps, const double &pt, 
 {
 
     double p_diff = (p_des - ps); // we scaled the p_diff with the assumption that pressure will have the momentum to go
-
-    if (std::abs(p_diff) > 320) // 640 is 2 psi
+    // std::cout<<"p_diff: "<<p_diff<<std::endl;
+    if (std::abs(p_diff) > 100) // 640 is 2 psi
     {                           // if desired pressure has 1 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
 
         // double lb;
@@ -1062,10 +1116,14 @@ int MPC::GetPreControl(const double &p_des, const double &ps, const double &pt, 
         // }
 
         // double lb = 20; //set the lower bound 20 duty
-        float p_des_scale = ((float)p_des) / 65536.0;
-        std::array<float, MPC_TIME_HORIZON> y_des{p_des_scale, p_des_scale, p_des_scale};
+        float p_des_scale = ((float)p_des - 3297.312) / 65536.0;
+        std::array<float, MPC_TIME_HORIZON> y_des{p_des_scale, p_des_scale, p_des_scale, p_des_scale, p_des_scale};
         // std::cout<<"p_diff: "<<p_diff/65536<<std::endl;
         this->UpdateHistory(ps, pt);
+
+        // std::cout<<"current p_des scale: "<<p_des_scale<<std::endl;
+        // std::cout<<"current p_cur scale: "<<this->p_set_his[MPC_TIME_HORIZON]<<std::endl;
+
         int ideal_duty = 0;
         if ((p_des > ps) & (pt > ps) & (pt > p_des))
         {
@@ -1112,7 +1170,7 @@ int MPC::GetPreControl(const double &p_des, const double &ps, const double &pt, 
     else
     {
         // this->cur_F << 0, 0;
-        this->cur_dF <<0,0;
+        this->cur_dF << 0, 0;
         this->u_n = 0;
         this->u_n1 = 0;
         this->u_n2 = 0;
@@ -1128,8 +1186,12 @@ void MPC::PushMeas(const double p_tank, const double p_set, const uint8_t duty)
     this->meas_idx++;
     this->meas_idx %= MPC_DELAY;
 
+    this->cur_F << ((double)p_tank - 3297.312) / 65536.0, ((double)p_set - 3297.312) / 65536.0;
+}
+void MPC::RecData()
+{
     this->mpc_rec.PushData(
-        std::array<double, 10>{this->cur_F.coeff(0, 0), this->cur_F.coeff(1, 0),this->cur_dF.coeff(0,0),this->cur_dF.coeff(1,0), this->u_n, this->u_n1, this->u_n2, this->x_n1.coeff(1, 0), this->x_n2.coeff(1, 0), this->x_n3.coeff(1, 0)});
+        std::array<double, 19>{this->cur_F.coeff(0, 0), this->cur_F.coeff(1, 0), this->cur_dF.coeff(0, 0), this->cur_dF.coeff(1, 0), this->u_n, this->u_n1, this->u_n2, this->u_n3, this->u_n4, this->x_n1.coeff(1, 0), this->x_n2.coeff(1, 0), this->x_n3.coeff(1, 0), this->x_n4.coeff(1, 0), this->x_n5.coeff(1, 0),this->y_des1,this->y_des2,this->y_des3,this->y_des4,this->y_des5});
 }
 
 void MPC::UpdateHistory(double p_set, double p_tank)
@@ -1147,8 +1209,8 @@ void MPC::UpdateHistory(double p_set, double p_tank)
 
     for (int i = 0; i < MPC_TIME_HORIZON; i++)
     {
-        this->p_tank_his[i + MPC_DELAY] = p_tank / 65536;
-        this->p_set_his[i + MPC_DELAY] = p_set / 65536;
+        this->p_tank_his[i + MPC_DELAY] = (p_tank - 3297.312) / 65536;
+        this->p_set_his[i + MPC_DELAY] = (p_set - 3297.312) / 65536;
         this->u_his[i + MPC_DELAY] = MPC::kUBar; // use the lower bound first, in case the previous duty was 0
     }
 

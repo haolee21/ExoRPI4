@@ -37,8 +37,8 @@
 #include "FilterParam.hpp"
 #include "CylinderParam.hpp"
 
-#define MPC_HEAD "Time,F_0,F_1,dF_0,dF_1,u_n,u_n1,u_n2,yn1,yn2,yn3"
-#define MPC_TIME_HORIZON 3
+#define MPC_HEAD "Time,F_0,F_1,dF_0,dF_1,u_n,u_n1,u_n2,u_n3,u_n4,yn1,yn2,yn3,yn4,yn5,y_des1,y_des2,y_des3,y_des4,y_des5"
+#define MPC_TIME_HORIZON 5
 class MPC
 {
 private:
@@ -51,15 +51,18 @@ private:
     //parameter of OSQP
 
 
-    const double kUBar = 0.15;// Lower bound of duty
+    const double kUBar = 0.05;// FIXME: test if making it not the lower bound improve the performance
     // const Eigen::Matrix<double,1,2> H_h; // when I define state, I define it as 
     // const Eigen::Matrix<double,1,2> H_l;
     Eigen::Matrix<double,2,1> cur_F; //this will be useful if we want to estimate the flow rate
     Eigen::Matrix<double,2,1> cur_dF;
-    double u_n,u_n1,u_n2; //only u_n is used, but we should also record u_n1 and u_n2
+    double u_n,u_n1,u_n2,u_n3,u_n4; //only u_n is used, but we should also record u_n1 and u_n2
     Eigen::Matrix<double,2,1> x_n1;
     Eigen::Matrix<double,2,1> x_n2;
     Eigen::Matrix<double,2,1> x_n3;
+    Eigen::Matrix<double,2,1> x_n4;
+    Eigen::Matrix<double,2,1> x_n5;
+    double y_des1,y_des2,y_des3,y_des4,y_des5;
 
 
     Eigen::Matrix<double,2,1> UpdateF(const double* ph,const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
@@ -143,7 +146,7 @@ private:
     // double cur_force;
     // DigitalFilter<double,FilterParam::Filter20Hz_5::Order,1> vel_filter;
     // DigitalFilter<double,FilterParam::Filter20Hz_2::Order,1> force_filter;
-    Recorder<double,10> mpc_rec;
+    Recorder<double,19> mpc_rec;
 public:
     MPC(std::array<std::array<double, MPC_STATE_NUM>,2> cl,std::array<std::array<double, MPC_STATE_NUM>,2> ch,std::string file_name);
     ~MPC();
@@ -156,7 +159,7 @@ public:
     //Get values for recorder
 
     void PushMeas(const double p_tank,const double p_set,const uint8_t duty);
-    
+    void RecData();
     
     
     // double GetCylinderScale(double pre,double pos); //get the (cylinder length)/(max cylinder length)

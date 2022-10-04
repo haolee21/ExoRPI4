@@ -99,7 +99,7 @@ void Valves_hub::UpdateValve(){
         
     }
     //put measurements in mpc controller, we must do this even the controller are not enabled since it relies on the history of the measurements
-    
+    hub.left_knee_con.RecData();
     hub.pwmRecorder.PushData(hub.GetDuty());
 
     
