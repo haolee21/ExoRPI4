@@ -310,12 +310,12 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
     // update robot's time
     if (cmd_packet.epoch_time_flag)
     {
-        std::cout << "Set DateTime\n";
-        std::cout<< cmd_packet.epoch_time<<std::endl;
+        // std::cout << "Set DateTime\n";
+        // std::cout<< cmd_packet.epoch_time<<std::endl;
         timeval time;
         int input_usec = (cmd_packet.epoch_time - floor(cmd_packet.epoch_time)) * 1000000;
 
-        std::cout<<input_usec<<std::endl;
+        // std::cout<<input_usec<<std::endl;
         time.tv_sec = (int)cmd_packet.epoch_time;
         time.tv_usec = input_usec;
         settimeofday(&time, NULL);
