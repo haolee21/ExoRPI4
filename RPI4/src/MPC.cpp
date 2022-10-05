@@ -52,551 +52,551 @@ void MPC::UpdateParamL(array<double, MPC_STATE_NUM> new_a, array<double, MPC_STA
     this->al = new_a;
     this->bl = new_b;
 }
-Eigen::Matrix<double, 2, 1> MPC::UpdateF(const double *p_h, const double *p_l,
-                                         const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    // Record the old Phi
-    double x0 = p_h[0] * u[0];
-    double x1 = x0 / p_l[0];
-    double x2 = p_h[2] * u[2];
-    double x3 = x2 / p_l[2];
-    double x4 = p_h[3] * u[3];
-    double x5 = x4 / p_l[3];
-    double x6 = p_h[4] * u[4];
-    double x7 = x6 / p_l[4];
-    double x8 = p_h[5] * u[5];
-    double x9 = x8 / p_l[5];
-    double x10 = p_h[6] * u[6];
-    double x11 = x10 / p_l[6];
-    double x12 = p_h[7] * u[7];
-    double x13 = x12 / p_l[7];
-    double x14 = p_h[8] * u[8];
-    double x15 = x14 / p_l[8];
-    double x16 = p_h[9] * u[9];
-    double x17 = x16 / p_l[9];
-    double x18 = p_h[10] * u[10];
-    double x19 = x18 / p_l[10];
-    double x20 = p_h[11] * u[11];
-    double x21 = x20 / p_l[11];
-    double x22 = p_h[1] * u[1];
-    double x23 = x22 / p_l[1];
-    double x24 = p_h[12] * u[12];
-    double x25 = x24 / p_l[12];
-    double x26 = p_h[13] * u[13];
-    double x27 = x26 / p_l[13];
-    double x28 = p_h[14] * u[14];
-    double x29 = x28 / p_l[14];
-    double x30 = 1 - p_l[2] / p_h[2];
-    double x31 = x2 * x30;
-    double x32 = 1 - p_l[3] / p_h[3];
-    double x33 = x32 * x4;
-    double x34 = 1 - p_l[0] / p_h[0];
-    double x35 = x0 * x34;
-    double x36 = 1 - p_l[4] / p_h[4];
-    double x37 = x36 * x6;
-    double x38 = 1 - p_l[5] / p_h[5];
-    double x39 = x38 * x8;
-    double x40 = 1 - p_l[6] / p_h[6];
-    double x41 = x10 * x40;
-    double x42 = 1 - p_l[7] / p_h[7];
-    double x43 = x12 * x42;
-    double x44 = 1 - p_l[8] / p_h[8];
-    double x45 = x14 * x44;
-    double x46 = 1 - p_l[9] / p_h[9];
-    double x47 = x16 * x46;
-    double x48 = 1 - p_l[10] / p_h[10];
-    double x49 = x18 * x48;
-    double x50 = 1 - p_l[11] / p_h[11];
-    double x51 = x20 * x50;
-    double x52 = 1 - p_l[12] / p_h[12];
-    double x53 = x24 * x52;
-    double x54 = 1 - p_l[13] / p_h[13];
-    double x55 = x26 * x54;
-    double x56 = 1 - p_l[1] / p_h[1];
-    double x57 = x22 * x56;
-    double x58 = 1 - p_l[14] / p_h[14];
-    double x59 = x28 * x58;
-    double x60 = (p_h[2] * p_h[2]);
-    double x61 = -(p_l[2] * p_l[2]) / x60 + 1;
-    double x62 = u[2] * x61;
-    double x63 = (p_h[3] * p_h[3]);
-    double x64 = -(p_l[3] * p_l[3]) / x63 + 1;
-    double x65 = u[3] * x64;
-    double x66 = (p_h[4] * p_h[4]);
-    double x67 = -(p_l[4] * p_l[4]) / x66 + 1;
-    double x68 = u[4] * x67;
-    double x69 = (p_h[5] * p_h[5]);
-    double x70 = -(p_l[5] * p_l[5]) / x69 + 1;
-    double x71 = u[5] * x70;
-    double x72 = (p_h[6] * p_h[6]);
-    double x73 = -(p_l[6] * p_l[6]) / x72 + 1;
-    double x74 = u[6] * x73;
-    double x75 = (p_h[7] * p_h[7]);
-    double x76 = -(p_l[7] * p_l[7]) / x75 + 1;
-    double x77 = u[7] * x76;
-    double x78 = (p_h[8] * p_h[8]);
-    double x79 = -(p_l[8] * p_l[8]) / x78 + 1;
-    double x80 = u[8] * x79;
-    double x81 = (p_h[9] * p_h[9]);
-    double x82 = -(p_l[9] * p_l[9]) / x81 + 1;
-    double x83 = u[9] * x82;
-    double x84 = (p_h[0] * p_h[0]);
-    double x85 = -(p_l[0] * p_l[0]) / x84 + 1;
-    double x86 = u[0] * x85;
-    double x87 = (p_h[10] * p_h[10]);
-    double x88 = -(p_l[10] * p_l[10]) / x87 + 1;
-    double x89 = u[10] * x88;
-    double x90 = (p_h[11] * p_h[11]);
-    double x91 = -(p_l[11] * p_l[11]) / x90 + 1;
-    double x92 = u[11] * x91;
-    double x93 = (p_h[12] * p_h[12]);
-    double x94 = -(p_l[12] * p_l[12]) / x93 + 1;
-    double x95 = u[12] * x94;
-    double x96 = (p_h[13] * p_h[13]);
-    double x97 = -(p_l[13] * p_l[13]) / x96 + 1;
-    double x98 = u[13] * x97;
-    double x99 = (p_h[14] * p_h[14]);
-    double x100 = -(p_l[14] * p_l[14]) / x99 + 1;
-    double x101 = u[14] * x100;
-    double x102 = (p_h[1] * p_h[1]);
-    double x103 = -(p_l[1] * p_l[1]) / x102 + 1;
-    double x104 = u[1] * x103;
-    double x105 = (u[2] * u[2]);
-    double x106 = p_h[2] * x105 * x61;
-    double x107 = (u[3] * u[3]);
-    double x108 = p_h[3] * x107 * x64;
-    double x109 = (u[4] * u[4]);
-    double x110 = p_h[4] * x109 * x67;
-    double x111 = (u[5] * u[5]);
-    double x112 = p_h[5] * x111 * x70;
-    double x113 = (u[6] * u[6]);
-    double x114 = p_h[6] * x113 * x73;
-    double x115 = (u[7] * u[7]);
-    double x116 = p_h[7] * x115 * x76;
-    double x117 = (u[0] * u[0]);
-    double x118 = p_h[0] * x117 * x85;
-    double x119 = (u[8] * u[8]);
-    double x120 = p_h[8] * x119 * x79;
-    double x121 = (u[9] * u[9]);
-    double x122 = p_h[9] * x121 * x82;
-    double x123 = (u[10] * u[10]);
-    double x124 = p_h[10] * x123 * x88;
-    double x125 = (u[11] * u[11]);
-    double x126 = p_h[11] * x125 * x91;
-    double x127 = (u[12] * u[12]);
-    double x128 = p_h[12] * x127 * x94;
-    double x129 = (u[13] * u[13]);
-    double x130 = p_h[13] * x129 * x97;
-    double x131 = (u[14] * u[14]);
-    double x132 = p_h[14] * x100 * x131;
-    double x133 = (u[1] * u[1]);
-    double x134 = p_h[1] * x103 * x133;
-    double x135 = x105 * (x30 * x30) * x60;
-    double x136 = x107 * (x32 * x32) * x63;
-    double x137 = x109 * (x36 * x36) * x66;
-    double x138 = x111 * (x38 * x38) * x69;
-    double x139 = x117 * (x34 * x34) * x84;
-    double x140 = x113 * (x40 * x40) * x72;
-    double x141 = x115 * (x42 * x42) * x75;
-    double x142 = x119 * (x44 * x44) * x78;
-    double x143 = x121 * (x46 * x46) * x81;
-    double x144 = x123 * (x48 * x48) * x87;
-    double x145 = x125 * (x50 * x50) * x90;
-    double x146 = x127 * (x52 * x52) * x93;
-    double x147 = x129 * (x54 * x54) * x96;
-    double x148 = x131 * (x58 * x58) * x99;
-    double x149 = x102 * x133 * (x56 * x56);
-    Eigen::Matrix<double, 2, 1> f;
-    f << a[0] * x1 + a[10] * x3 + a[11] * x31 + a[12] * x135 + a[13] * x106 + a[14] * x62 + a[15] * x5 + a[16] * x33 + a[17] * x136 + a[18] * x108 + a[19] * x65 + a[1] * x35 + a[20] * x7 + a[21] * x37 + a[22] * x137 + a[23] * x110 + a[24] * x68 + a[25] * x9 + a[26] * x39 + a[27] * x138 + a[28] * x112 + a[29] * x71 + a[2] * x139 + a[30] * x11 + a[31] * x41 + a[32] * x140 + a[33] * x114 + a[34] * x74 + a[35] * x13 + a[36] * x43 + a[37] * x141 + a[38] * x116 + a[39] * x77 + a[3] * x118 + a[40] * x15 + a[41] * x45 + a[42] * x142 + a[43] * x120 + a[44] * x80 + a[45] * x17 + a[46] * x47 + a[47] * x143 + a[48] * x122 + a[49] * x83 + a[4] * x86 + a[50] * x19 + a[51] * x49 + a[52] * x144 + a[53] * x124 + a[54] * x89 + a[55] * x21 + a[56] * x51 + a[57] * x145 + a[58] * x126 + a[59] * x92 + a[5] * x23 + a[60] * x25 + a[61] * x53 + a[62] * x146 + a[63] * x128 + a[64] * x95 + a[65] * x27 + a[66] * x55 + a[67] * x147 + a[68] * x130 + a[69] * x98 + a[6] * x57 + a[70] * x29 + a[71] * x59 + a[72] * x148 + a[73] * x132 + a[74] * x101 + a[7] * x149 + a[8] * x134 + a[9] * x104, b[0] * x1 + b[10] * x3 + b[11] * x31 + b[12] * x135 + b[13] * x106 + b[14] * x62 + b[15] * x5 + b[16] * x33 + b[17] * x136 + b[18] * x108 + b[19] * x65 + b[1] * x35 + b[20] * x7 + b[21] * x37 + b[22] * x137 + b[23] * x110 + b[24] * x68 + b[25] * x9 + b[26] * x39 + b[27] * x138 + b[28] * x112 + b[29] * x71 + b[2] * x139 + b[30] * x11 + b[31] * x41 + b[32] * x140 + b[33] * x114 + b[34] * x74 + b[35] * x13 + b[36] * x43 + b[37] * x141 + b[38] * x116 + b[39] * x77 + b[3] * x118 + b[40] * x15 + b[41] * x45 + b[42] * x142 + b[43] * x120 + b[44] * x80 + b[45] * x17 + b[46] * x47 + b[47] * x143 + b[48] * x122 + b[49] * x83 + b[4] * x86 + b[50] * x19 + b[51] * x49 + b[52] * x144 + b[53] * x124 + b[54] * x89 + b[55] * x21 + b[56] * x51 + b[57] * x145 + b[58] * x126 + b[59] * x92 + b[5] * x23 + b[60] * x25 + b[61] * x53 + b[62] * x146 + b[63] * x128 + b[64] * x95 + b[65] * x27 + b[66] * x55 + b[67] * x147 + b[68] * x130 + b[69] * x98 + b[6] * x57 + b[70] * x29 + b[71] * x59 + b[72] * x148 + b[73] * x132 + b[74] * x101 + b[7] * x149 + b[8] * x134 + b[9] * x104;
-    return f;
-}
+// Eigen::Matrix<double, 2, 1> MPC::UpdateF(const double *p_h, const double *p_l,
+//                                          const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     // Record the old Phi
+//     double x0 = p_h[0] * u[0];
+//     double x1 = x0 / p_l[0];
+//     double x2 = p_h[2] * u[2];
+//     double x3 = x2 / p_l[2];
+//     double x4 = p_h[3] * u[3];
+//     double x5 = x4 / p_l[3];
+//     double x6 = p_h[4] * u[4];
+//     double x7 = x6 / p_l[4];
+//     double x8 = p_h[5] * u[5];
+//     double x9 = x8 / p_l[5];
+//     double x10 = p_h[6] * u[6];
+//     double x11 = x10 / p_l[6];
+//     double x12 = p_h[7] * u[7];
+//     double x13 = x12 / p_l[7];
+//     double x14 = p_h[8] * u[8];
+//     double x15 = x14 / p_l[8];
+//     double x16 = p_h[9] * u[9];
+//     double x17 = x16 / p_l[9];
+//     double x18 = p_h[10] * u[10];
+//     double x19 = x18 / p_l[10];
+//     double x20 = p_h[11] * u[11];
+//     double x21 = x20 / p_l[11];
+//     double x22 = p_h[1] * u[1];
+//     double x23 = x22 / p_l[1];
+//     double x24 = p_h[12] * u[12];
+//     double x25 = x24 / p_l[12];
+//     double x26 = p_h[13] * u[13];
+//     double x27 = x26 / p_l[13];
+//     double x28 = p_h[14] * u[14];
+//     double x29 = x28 / p_l[14];
+//     double x30 = 1 - p_l[2] / p_h[2];
+//     double x31 = x2 * x30;
+//     double x32 = 1 - p_l[3] / p_h[3];
+//     double x33 = x32 * x4;
+//     double x34 = 1 - p_l[0] / p_h[0];
+//     double x35 = x0 * x34;
+//     double x36 = 1 - p_l[4] / p_h[4];
+//     double x37 = x36 * x6;
+//     double x38 = 1 - p_l[5] / p_h[5];
+//     double x39 = x38 * x8;
+//     double x40 = 1 - p_l[6] / p_h[6];
+//     double x41 = x10 * x40;
+//     double x42 = 1 - p_l[7] / p_h[7];
+//     double x43 = x12 * x42;
+//     double x44 = 1 - p_l[8] / p_h[8];
+//     double x45 = x14 * x44;
+//     double x46 = 1 - p_l[9] / p_h[9];
+//     double x47 = x16 * x46;
+//     double x48 = 1 - p_l[10] / p_h[10];
+//     double x49 = x18 * x48;
+//     double x50 = 1 - p_l[11] / p_h[11];
+//     double x51 = x20 * x50;
+//     double x52 = 1 - p_l[12] / p_h[12];
+//     double x53 = x24 * x52;
+//     double x54 = 1 - p_l[13] / p_h[13];
+//     double x55 = x26 * x54;
+//     double x56 = 1 - p_l[1] / p_h[1];
+//     double x57 = x22 * x56;
+//     double x58 = 1 - p_l[14] / p_h[14];
+//     double x59 = x28 * x58;
+//     double x60 = (p_h[2] * p_h[2]);
+//     double x61 = -(p_l[2] * p_l[2]) / x60 + 1;
+//     double x62 = u[2] * x61;
+//     double x63 = (p_h[3] * p_h[3]);
+//     double x64 = -(p_l[3] * p_l[3]) / x63 + 1;
+//     double x65 = u[3] * x64;
+//     double x66 = (p_h[4] * p_h[4]);
+//     double x67 = -(p_l[4] * p_l[4]) / x66 + 1;
+//     double x68 = u[4] * x67;
+//     double x69 = (p_h[5] * p_h[5]);
+//     double x70 = -(p_l[5] * p_l[5]) / x69 + 1;
+//     double x71 = u[5] * x70;
+//     double x72 = (p_h[6] * p_h[6]);
+//     double x73 = -(p_l[6] * p_l[6]) / x72 + 1;
+//     double x74 = u[6] * x73;
+//     double x75 = (p_h[7] * p_h[7]);
+//     double x76 = -(p_l[7] * p_l[7]) / x75 + 1;
+//     double x77 = u[7] * x76;
+//     double x78 = (p_h[8] * p_h[8]);
+//     double x79 = -(p_l[8] * p_l[8]) / x78 + 1;
+//     double x80 = u[8] * x79;
+//     double x81 = (p_h[9] * p_h[9]);
+//     double x82 = -(p_l[9] * p_l[9]) / x81 + 1;
+//     double x83 = u[9] * x82;
+//     double x84 = (p_h[0] * p_h[0]);
+//     double x85 = -(p_l[0] * p_l[0]) / x84 + 1;
+//     double x86 = u[0] * x85;
+//     double x87 = (p_h[10] * p_h[10]);
+//     double x88 = -(p_l[10] * p_l[10]) / x87 + 1;
+//     double x89 = u[10] * x88;
+//     double x90 = (p_h[11] * p_h[11]);
+//     double x91 = -(p_l[11] * p_l[11]) / x90 + 1;
+//     double x92 = u[11] * x91;
+//     double x93 = (p_h[12] * p_h[12]);
+//     double x94 = -(p_l[12] * p_l[12]) / x93 + 1;
+//     double x95 = u[12] * x94;
+//     double x96 = (p_h[13] * p_h[13]);
+//     double x97 = -(p_l[13] * p_l[13]) / x96 + 1;
+//     double x98 = u[13] * x97;
+//     double x99 = (p_h[14] * p_h[14]);
+//     double x100 = -(p_l[14] * p_l[14]) / x99 + 1;
+//     double x101 = u[14] * x100;
+//     double x102 = (p_h[1] * p_h[1]);
+//     double x103 = -(p_l[1] * p_l[1]) / x102 + 1;
+//     double x104 = u[1] * x103;
+//     double x105 = (u[2] * u[2]);
+//     double x106 = p_h[2] * x105 * x61;
+//     double x107 = (u[3] * u[3]);
+//     double x108 = p_h[3] * x107 * x64;
+//     double x109 = (u[4] * u[4]);
+//     double x110 = p_h[4] * x109 * x67;
+//     double x111 = (u[5] * u[5]);
+//     double x112 = p_h[5] * x111 * x70;
+//     double x113 = (u[6] * u[6]);
+//     double x114 = p_h[6] * x113 * x73;
+//     double x115 = (u[7] * u[7]);
+//     double x116 = p_h[7] * x115 * x76;
+//     double x117 = (u[0] * u[0]);
+//     double x118 = p_h[0] * x117 * x85;
+//     double x119 = (u[8] * u[8]);
+//     double x120 = p_h[8] * x119 * x79;
+//     double x121 = (u[9] * u[9]);
+//     double x122 = p_h[9] * x121 * x82;
+//     double x123 = (u[10] * u[10]);
+//     double x124 = p_h[10] * x123 * x88;
+//     double x125 = (u[11] * u[11]);
+//     double x126 = p_h[11] * x125 * x91;
+//     double x127 = (u[12] * u[12]);
+//     double x128 = p_h[12] * x127 * x94;
+//     double x129 = (u[13] * u[13]);
+//     double x130 = p_h[13] * x129 * x97;
+//     double x131 = (u[14] * u[14]);
+//     double x132 = p_h[14] * x100 * x131;
+//     double x133 = (u[1] * u[1]);
+//     double x134 = p_h[1] * x103 * x133;
+//     double x135 = x105 * (x30 * x30) * x60;
+//     double x136 = x107 * (x32 * x32) * x63;
+//     double x137 = x109 * (x36 * x36) * x66;
+//     double x138 = x111 * (x38 * x38) * x69;
+//     double x139 = x117 * (x34 * x34) * x84;
+//     double x140 = x113 * (x40 * x40) * x72;
+//     double x141 = x115 * (x42 * x42) * x75;
+//     double x142 = x119 * (x44 * x44) * x78;
+//     double x143 = x121 * (x46 * x46) * x81;
+//     double x144 = x123 * (x48 * x48) * x87;
+//     double x145 = x125 * (x50 * x50) * x90;
+//     double x146 = x127 * (x52 * x52) * x93;
+//     double x147 = x129 * (x54 * x54) * x96;
+//     double x148 = x131 * (x58 * x58) * x99;
+//     double x149 = x102 * x133 * (x56 * x56);
+//     Eigen::Matrix<double, 2, 1> f;
+//     f << a[0] * x1 + a[10] * x3 + a[11] * x31 + a[12] * x135 + a[13] * x106 + a[14] * x62 + a[15] * x5 + a[16] * x33 + a[17] * x136 + a[18] * x108 + a[19] * x65 + a[1] * x35 + a[20] * x7 + a[21] * x37 + a[22] * x137 + a[23] * x110 + a[24] * x68 + a[25] * x9 + a[26] * x39 + a[27] * x138 + a[28] * x112 + a[29] * x71 + a[2] * x139 + a[30] * x11 + a[31] * x41 + a[32] * x140 + a[33] * x114 + a[34] * x74 + a[35] * x13 + a[36] * x43 + a[37] * x141 + a[38] * x116 + a[39] * x77 + a[3] * x118 + a[40] * x15 + a[41] * x45 + a[42] * x142 + a[43] * x120 + a[44] * x80 + a[45] * x17 + a[46] * x47 + a[47] * x143 + a[48] * x122 + a[49] * x83 + a[4] * x86 + a[50] * x19 + a[51] * x49 + a[52] * x144 + a[53] * x124 + a[54] * x89 + a[55] * x21 + a[56] * x51 + a[57] * x145 + a[58] * x126 + a[59] * x92 + a[5] * x23 + a[60] * x25 + a[61] * x53 + a[62] * x146 + a[63] * x128 + a[64] * x95 + a[65] * x27 + a[66] * x55 + a[67] * x147 + a[68] * x130 + a[69] * x98 + a[6] * x57 + a[70] * x29 + a[71] * x59 + a[72] * x148 + a[73] * x132 + a[74] * x101 + a[7] * x149 + a[8] * x134 + a[9] * x104, b[0] * x1 + b[10] * x3 + b[11] * x31 + b[12] * x135 + b[13] * x106 + b[14] * x62 + b[15] * x5 + b[16] * x33 + b[17] * x136 + b[18] * x108 + b[19] * x65 + b[1] * x35 + b[20] * x7 + b[21] * x37 + b[22] * x137 + b[23] * x110 + b[24] * x68 + b[25] * x9 + b[26] * x39 + b[27] * x138 + b[28] * x112 + b[29] * x71 + b[2] * x139 + b[30] * x11 + b[31] * x41 + b[32] * x140 + b[33] * x114 + b[34] * x74 + b[35] * x13 + b[36] * x43 + b[37] * x141 + b[38] * x116 + b[39] * x77 + b[3] * x118 + b[40] * x15 + b[41] * x45 + b[42] * x142 + b[43] * x120 + b[44] * x80 + b[45] * x17 + b[46] * x47 + b[47] * x143 + b[48] * x122 + b[49] * x83 + b[4] * x86 + b[50] * x19 + b[51] * x49 + b[52] * x144 + b[53] * x124 + b[54] * x89 + b[55] * x21 + b[56] * x51 + b[57] * x145 + b[58] * x126 + b[59] * x92 + b[5] * x23 + b[60] * x25 + b[61] * x53 + b[62] * x146 + b[63] * x128 + b[64] * x95 + b[65] * x27 + b[66] * x55 + b[67] * x147 + b[68] * x130 + b[69] * x98 + b[6] * x57 + b[70] * x29 + b[71] * x59 + b[72] * x148 + b[73] * x132 + b[74] * x101 + b[7] * x149 + b[8] * x134 + b[9] * x104;
+//     return f;
+// }
 
-Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = a[71] * u[14];
-    double x1 = (p_l[14] * p_l[14]);
-    double x2 = p_h[14] * u[14] / x1;
-    double x3 = 2 * u[14];
-    double x4 = a[74] * x3;
-    double x5 = (p_h[14]);
-    double x6 = p_l[14] * x5;
-    double x7 = p_l[14] / p_h[14];
-    double x8 = (u[14] * u[14]);
-    double x9 = 2 * x8;
-    double x10 = a[73] * x9;
-    double x11 = 1 - x7;
-    double x12 = p_h[14] * x9;
-    double x13 = a[72] * x12;
-    double x14 = u[14] / p_l[14];
-    double x15 = x1 / (p_h[14] * p_h[14] * p_h[14]);
-    double x16 = x1 * x5;
-    double x17 = x8 * (1 - x16);
-    double x18 = p_l[14] * x11 * x9;
-    double x19 = (x11 * x11);
-    double x20 = b[71] * u[14];
-    double x21 = b[74] * x3;
-    double x22 = b[73] * x9;
-    double x23 = b[72] * x12;
-    Eigen::Matrix<double, 2, 2> dF_dx_T;
-    dF_dx_T << -a[70] * x2 - x0 - x10 * x7 - x11 * x13 - x4 * x6, a[70] * x14 + a[72] * x18 + a[73] * x17 + x0 * x11 + x0 * x7 + x10 * x16 + x13 * x19 + x15 * x4, -b[70] * x2 - x11 * x23 - x20 - x21 * x6 - x22 * x7, b[70] * x14 + b[72] * x18 + b[73] * x17 + x11 * x20 + x15 * x21 + x16 * x22 + x19 * x23 + x20 * x7;
-    return dF_dx_T;
-}
+// Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = a[71] * u[14];
+//     double x1 = (p_l[14] * p_l[14]);
+//     double x2 = p_h[14] * u[14] / x1;
+//     double x3 = 2 * u[14];
+//     double x4 = a[74] * x3;
+//     double x5 = (p_h[14]);
+//     double x6 = p_l[14] * x5;
+//     double x7 = p_l[14] / p_h[14];
+//     double x8 = (u[14] * u[14]);
+//     double x9 = 2 * x8;
+//     double x10 = a[73] * x9;
+//     double x11 = 1 - x7;
+//     double x12 = p_h[14] * x9;
+//     double x13 = a[72] * x12;
+//     double x14 = u[14] / p_l[14];
+//     double x15 = x1 / (p_h[14] * p_h[14] * p_h[14]);
+//     double x16 = x1 * x5;
+//     double x17 = x8 * (1 - x16);
+//     double x18 = p_l[14] * x11 * x9;
+//     double x19 = (x11 * x11);
+//     double x20 = b[71] * u[14];
+//     double x21 = b[74] * x3;
+//     double x22 = b[73] * x9;
+//     double x23 = b[72] * x12;
+//     Eigen::Matrix<double, 2, 2> dF_dx_T;
+//     dF_dx_T << -a[70] * x2 - x0 - x10 * x7 - x11 * x13 - x4 * x6, a[70] * x14 + a[72] * x18 + a[73] * x17 + x0 * x11 + x0 * x7 + x10 * x16 + x13 * x19 + x15 * x4, -b[70] * x2 - x11 * x23 - x20 - x21 * x6 - x22 * x7, b[70] * x14 + b[72] * x18 + b[73] * x17 + x11 * x20 + x15 * x21 + x16 * x22 + x19 * x23 + x20 * x7;
+//     return dF_dx_T;
+// }
 
-Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL1_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = a[66] * u[13];
-    double x1 = (p_l[13] * p_l[13]);
-    double x2 = p_h[13] * u[13] / x1;
-    double x3 = 2 * u[13];
-    double x4 = a[69] * x3;
-    double x5 = (p_h[13]);
-    double x6 = p_l[13] * x5;
-    double x7 = p_l[13] / p_h[13];
-    double x8 = (u[13] * u[13]);
-    double x9 = 2 * x8;
-    double x10 = a[68] * x9;
-    double x11 = 1 - x7;
-    double x12 = p_h[13] * x9;
-    double x13 = a[67] * x12;
-    double x14 = u[13] / p_l[13];
-    double x15 = x1 / (p_h[13] * p_h[13] * p_h[13]);
-    double x16 = x1 * x5;
-    double x17 = x8 * (1 - x16);
-    double x18 = p_l[13] * x11 * x9;
-    double x19 = (x11 * x11);
-    double x20 = b[66] * u[13];
-    double x21 = b[69] * x3;
-    double x22 = b[68] * x9;
-    double x23 = b[67] * x12;
+// Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL1_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = a[66] * u[13];
+//     double x1 = (p_l[13] * p_l[13]);
+//     double x2 = p_h[13] * u[13] / x1;
+//     double x3 = 2 * u[13];
+//     double x4 = a[69] * x3;
+//     double x5 = (p_h[13]);
+//     double x6 = p_l[13] * x5;
+//     double x7 = p_l[13] / p_h[13];
+//     double x8 = (u[13] * u[13]);
+//     double x9 = 2 * x8;
+//     double x10 = a[68] * x9;
+//     double x11 = 1 - x7;
+//     double x12 = p_h[13] * x9;
+//     double x13 = a[67] * x12;
+//     double x14 = u[13] / p_l[13];
+//     double x15 = x1 / (p_h[13] * p_h[13] * p_h[13]);
+//     double x16 = x1 * x5;
+//     double x17 = x8 * (1 - x16);
+//     double x18 = p_l[13] * x11 * x9;
+//     double x19 = (x11 * x11);
+//     double x20 = b[66] * u[13];
+//     double x21 = b[69] * x3;
+//     double x22 = b[68] * x9;
+//     double x23 = b[67] * x12;
 
-    Eigen::Matrix<double, 2, 2> dF_dx2_T;
-    dF_dx2_T << -a[65] * x2 - x0 - x10 * x7 - x11 * x13 - x4 * x6, a[65] * x14 + a[67] * x18 + a[68] * x17 + x0 * x11 + x0 * x7 + x10 * x16 + x13 * x19 + x15 * x4, -b[65] * x2 - x11 * x23 - x20 - x21 * x6 - x22 * x7, b[65] * x14 + b[67] * x18 + b[68] * x17 + x11 * x20 + x15 * x21 + x16 * x22 + x19 * x23 + x20 * x7;
-    return dF_dx2_T;
-}
+//     Eigen::Matrix<double, 2, 2> dF_dx2_T;
+//     dF_dx2_T << -a[65] * x2 - x0 - x10 * x7 - x11 * x13 - x4 * x6, a[65] * x14 + a[67] * x18 + a[68] * x17 + x0 * x11 + x0 * x7 + x10 * x16 + x13 * x19 + x15 * x4, -b[65] * x2 - x11 * x23 - x20 - x21 * x6 - x22 * x7, b[65] * x14 + b[67] * x18 + b[68] * x17 + x11 * x20 + x15 * x21 + x16 * x22 + x19 * x23 + x20 * x7;
+//     return dF_dx2_T;
+// }
 
-Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL2_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = a[61] * u[12];
-    double x1 = (p_l[12] * p_l[12]);
-    double x2 = p_h[12] * u[12] / x1;
-    double x3 = 2 * u[12];
-    double x4 = a[64] * x3;
-    double x5 = (p_h[12]);
-    double x6 = p_l[12] * x5;
-    double x7 = p_l[12] / p_h[12];
-    double x8 = (u[12] * u[12]);
-    double x9 = 2 * x8;
-    double x10 = a[63] * x9;
-    double x11 = 1 - x7;
-    double x12 = p_h[12] * x9;
-    double x13 = a[62] * x12;
-    double x14 = u[12] / p_l[12];
-    double x15 = x1 / (p_h[12] * p_h[12] * p_h[12]);
-    double x16 = x1 * x5;
-    double x17 = x8 * (1 - x16);
-    double x18 = p_l[12] * x11 * x9;
-    double x19 = (x11 * x11);
-    double x20 = b[61] * u[12];
-    double x21 = b[64] * x3;
-    double x22 = b[63] * x9;
-    double x23 = b[62] * x12;
+// Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL2_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = a[61] * u[12];
+//     double x1 = (p_l[12] * p_l[12]);
+//     double x2 = p_h[12] * u[12] / x1;
+//     double x3 = 2 * u[12];
+//     double x4 = a[64] * x3;
+//     double x5 = (p_h[12]);
+//     double x6 = p_l[12] * x5;
+//     double x7 = p_l[12] / p_h[12];
+//     double x8 = (u[12] * u[12]);
+//     double x9 = 2 * x8;
+//     double x10 = a[63] * x9;
+//     double x11 = 1 - x7;
+//     double x12 = p_h[12] * x9;
+//     double x13 = a[62] * x12;
+//     double x14 = u[12] / p_l[12];
+//     double x15 = x1 / (p_h[12] * p_h[12] * p_h[12]);
+//     double x16 = x1 * x5;
+//     double x17 = x8 * (1 - x16);
+//     double x18 = p_l[12] * x11 * x9;
+//     double x19 = (x11 * x11);
+//     double x20 = b[61] * u[12];
+//     double x21 = b[64] * x3;
+//     double x22 = b[63] * x9;
+//     double x23 = b[62] * x12;
 
-    Eigen::Matrix<double, 2, 2> dF_dx3_T;
-    dF_dx3_T << -a[60] * x2 - x0 - x10 * x7 - x11 * x13 - x4 * x6, a[60] * x14 + a[62] * x18 + a[63] * x17 + x0 * x11 + x0 * x7 + x10 * x16 + x13 * x19 + x15 * x4, -b[60] * x2 - x11 * x23 - x20 - x21 * x6 - x22 * x7, b[60] * x14 + b[62] * x18 + b[63] * x17 + x11 * x20 + x15 * x21 + x16 * x22 + x19 * x23 + x20 * x7;
-    return dF_dx3_T;
-}
-Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL3_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = a[56] * u[11];
-    double x1 = (p_l[11] * p_l[11]);
-    double x2 = p_h[11] * u[11] / x1;
-    double x3 = 2 * u[11];
-    double x4 = a[59] * x3;
-    double x5 = (p_h[11]);
-    double x6 = p_l[11] * x5;
-    double x7 = p_l[11] / p_h[11];
-    double x8 = (u[11] * u[11]);
-    double x9 = 2 * x8;
-    double x10 = a[58] * x9;
-    double x11 = 1 - x7;
-    double x12 = p_h[11] * x9;
-    double x13 = a[57] * x12;
-    double x14 = u[11] / p_l[11];
-    double x15 = x1 / (p_h[11] * p_h[11] * p_h[11]);
-    double x16 = x1 * x5;
-    double x17 = x8 * (1 - x16);
-    double x18 = p_l[11] * x11 * x9;
-    double x19 = (x11 * x11);
-    double x20 = b[56] * u[11];
-    double x21 = b[59] * x3;
-    double x22 = b[58] * x9;
-    double x23 = b[57] * x12;
-    Eigen::Matrix<double, 2, 2> dF_dx4_T;
-    dF_dx4_T << -a[55] * x2 - x0 - x10 * x7 - x11 * x13 - x4 * x6, a[55] * x14 + a[57] * x18 + a[58] * x17 + x0 * x11 + x0 * x7 + x10 * x16 + x13 * x19 + x15 * x4, -b[55] * x2 - x11 * x23 - x20 - x21 * x6 - x22 * x7, b[55] * x14 + b[57] * x18 + b[58] * x17 + x11 * x20 + x15 * x21 + x16 * x22 + x19 * x23 + x20 * x7;
-    return dF_dx4_T;
-}
-Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL4_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = a[51] * u[10];
-    double x1 = (p_l[10] * p_l[10]);
-    double x2 = p_h[10] * u[10] / x1;
-    double x3 = 2 * u[10];
-    double x4 = a[54] * x3;
-    double x5 = (p_h[10]);
-    double x6 = p_l[10] * x5;
-    double x7 = p_l[10] / p_h[10];
-    double x8 = (u[10] * u[10]);
-    double x9 = 2 * x8;
-    double x10 = a[53] * x9;
-    double x11 = 1 - x7;
-    double x12 = p_h[10] * x9;
-    double x13 = a[52] * x12;
-    double x14 = u[10] / p_l[10];
-    double x15 = x1 / (p_h[10] * p_h[10] * p_h[10]);
-    double x16 = x1 * x5;
-    double x17 = x8 * (1 - x16);
-    double x18 = p_l[10] * x11 * x9;
-    double x19 = (x11 * x11);
-    double x20 = b[51] * u[10];
-    double x21 = b[54] * x3;
-    double x22 = b[53] * x9;
-    double x23 = b[52] * x12;
+//     Eigen::Matrix<double, 2, 2> dF_dx3_T;
+//     dF_dx3_T << -a[60] * x2 - x0 - x10 * x7 - x11 * x13 - x4 * x6, a[60] * x14 + a[62] * x18 + a[63] * x17 + x0 * x11 + x0 * x7 + x10 * x16 + x13 * x19 + x15 * x4, -b[60] * x2 - x11 * x23 - x20 - x21 * x6 - x22 * x7, b[60] * x14 + b[62] * x18 + b[63] * x17 + x11 * x20 + x15 * x21 + x16 * x22 + x19 * x23 + x20 * x7;
+//     return dF_dx3_T;
+// }
+// Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL3_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = a[56] * u[11];
+//     double x1 = (p_l[11] * p_l[11]);
+//     double x2 = p_h[11] * u[11] / x1;
+//     double x3 = 2 * u[11];
+//     double x4 = a[59] * x3;
+//     double x5 = (p_h[11]);
+//     double x6 = p_l[11] * x5;
+//     double x7 = p_l[11] / p_h[11];
+//     double x8 = (u[11] * u[11]);
+//     double x9 = 2 * x8;
+//     double x10 = a[58] * x9;
+//     double x11 = 1 - x7;
+//     double x12 = p_h[11] * x9;
+//     double x13 = a[57] * x12;
+//     double x14 = u[11] / p_l[11];
+//     double x15 = x1 / (p_h[11] * p_h[11] * p_h[11]);
+//     double x16 = x1 * x5;
+//     double x17 = x8 * (1 - x16);
+//     double x18 = p_l[11] * x11 * x9;
+//     double x19 = (x11 * x11);
+//     double x20 = b[56] * u[11];
+//     double x21 = b[59] * x3;
+//     double x22 = b[58] * x9;
+//     double x23 = b[57] * x12;
+//     Eigen::Matrix<double, 2, 2> dF_dx4_T;
+//     dF_dx4_T << -a[55] * x2 - x0 - x10 * x7 - x11 * x13 - x4 * x6, a[55] * x14 + a[57] * x18 + a[58] * x17 + x0 * x11 + x0 * x7 + x10 * x16 + x13 * x19 + x15 * x4, -b[55] * x2 - x11 * x23 - x20 - x21 * x6 - x22 * x7, b[55] * x14 + b[57] * x18 + b[58] * x17 + x11 * x20 + x15 * x21 + x16 * x22 + x19 * x23 + x20 * x7;
+//     return dF_dx4_T;
+// }
+// Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxL4_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = a[51] * u[10];
+//     double x1 = (p_l[10] * p_l[10]);
+//     double x2 = p_h[10] * u[10] / x1;
+//     double x3 = 2 * u[10];
+//     double x4 = a[54] * x3;
+//     double x5 = (p_h[10]);
+//     double x6 = p_l[10] * x5;
+//     double x7 = p_l[10] / p_h[10];
+//     double x8 = (u[10] * u[10]);
+//     double x9 = 2 * x8;
+//     double x10 = a[53] * x9;
+//     double x11 = 1 - x7;
+//     double x12 = p_h[10] * x9;
+//     double x13 = a[52] * x12;
+//     double x14 = u[10] / p_l[10];
+//     double x15 = x1 / (p_h[10] * p_h[10] * p_h[10]);
+//     double x16 = x1 * x5;
+//     double x17 = x8 * (1 - x16);
+//     double x18 = p_l[10] * x11 * x9;
+//     double x19 = (x11 * x11);
+//     double x20 = b[51] * u[10];
+//     double x21 = b[54] * x3;
+//     double x22 = b[53] * x9;
+//     double x23 = b[52] * x12;
 
-    Eigen::Matrix<double, 2, 2> dF_dx5_T;
-    dF_dx5_T << -a[50] * x2 - x0 - x10 * x7 - x11 * x13 - x4 * x6, a[50] * x14 + a[52] * x18 + a[53] * x17 + x0 * x11 + x0 * x7 + x10 * x16 + x13 * x19 + x15 * x4, -b[50] * x2 - x11 * x23 - x20 - x21 * x6 - x22 * x7, b[50] * x14 + b[52] * x18 + b[53] * x17 + x11 * x20 + x15 * x21 + x16 * x22 + x19 * x23 + x20 * x7;
-    return dF_dx5_T;
-}
+//     Eigen::Matrix<double, 2, 2> dF_dx5_T;
+//     dF_dx5_T << -a[50] * x2 - x0 - x10 * x7 - x11 * x13 - x4 * x6, a[50] * x14 + a[52] * x18 + a[53] * x17 + x0 * x11 + x0 * x7 + x10 * x16 + x13 * x19 + x15 * x4, -b[50] * x2 - x11 * x23 - x20 - x21 * x6 - x22 * x7, b[50] * x14 + b[52] * x18 + b[53] * x17 + x11 * x20 + x15 * x21 + x16 * x22 + x19 * x23 + x20 * x7;
+//     return dF_dx5_T;
+// }
 
-Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = u[14] / p_l[14];
-    double x1 = p_l[14] / p_h[14];
-    double x2 = a[71] * u[14];
-    double x3 = 2 * u[14];
-    double x4 = a[74] * x3;
-    double x5 = (p_l[14] * p_l[14]);
-    double x6 = x5 / (p_h[14] * p_h[14] * p_h[14]);
-    double x7 = 1 - x1;
-    double x8 = (p_h[14]);
-    double x9 = x5 * x8;
-    double x10 = (u[14] * u[14]);
-    double x11 = 2 * x10;
-    double x12 = a[73] * x11;
-    double x13 = x10 * (1 - x9);
-    double x14 = a[72] * x11;
-    double x15 = p_l[14] * x7;
-    double x16 = (x7 * x7);
-    double x17 = p_h[14] * x14;
-    double x18 = p_h[14] * u[14] / x5;
-    double x19 = p_l[14] * x8;
-    double x20 = b[71] * u[14];
-    double x21 = b[74] * x3;
-    double x22 = b[73] * x11;
-    double x23 = b[72] * x11;
-    double x24 = p_h[14] * x23;
-    Eigen::Matrix<double, 2, 2> dF_dx_T;
-    dF_dx_T << a[70] * x0 + a[73] * x13 + x1 * x2 + x12 * x9 + x14 * x15 + x16 * x17 + x2 * x7 + x4 * x6, -a[70] * x18 - x1 * x12 - x17 * x7 - x19 * x4 - x2, b[70] * x0 + b[73] * x13 + x1 * x20 + x15 * x23 + x16 * x24 + x20 * x7 + x21 * x6 + x22 * x9, -b[70] * x18 - x1 * x22 - x19 * x21 - x20 - x24 * x7;
-    return dF_dx_T;
-}
-Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH1_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = u[13] / p_l[13];
-    double x1 = p_l[13] / p_h[13];
-    double x2 = a[66] * u[13];
-    double x3 = 2 * u[13];
-    double x4 = a[69] * x3;
-    double x5 = (p_l[13] * p_l[13]);
-    double x6 = x5 / (p_h[13] * p_h[13] * p_h[13]);
-    double x7 = 1 - x1;
-    double x8 = (p_h[13]);
-    double x9 = x5 * x8;
-    double x10 = (u[13] * u[13]);
-    double x11 = 2 * x10;
-    double x12 = a[68] * x11;
-    double x13 = x10 * (1 - x9);
-    double x14 = a[67] * x11;
-    double x15 = p_l[13] * x7;
-    double x16 = (x7 * x7);
-    double x17 = p_h[13] * x14;
-    double x18 = p_h[13] * u[13] / x5;
-    double x19 = p_l[13] * x8;
-    double x20 = b[66] * u[13];
-    double x21 = b[69] * x3;
-    double x22 = b[68] * x11;
-    double x23 = b[67] * x11;
-    double x24 = p_h[13] * x23;
+// Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = u[14] / p_l[14];
+//     double x1 = p_l[14] / p_h[14];
+//     double x2 = a[71] * u[14];
+//     double x3 = 2 * u[14];
+//     double x4 = a[74] * x3;
+//     double x5 = (p_l[14] * p_l[14]);
+//     double x6 = x5 / (p_h[14] * p_h[14] * p_h[14]);
+//     double x7 = 1 - x1;
+//     double x8 = (p_h[14]);
+//     double x9 = x5 * x8;
+//     double x10 = (u[14] * u[14]);
+//     double x11 = 2 * x10;
+//     double x12 = a[73] * x11;
+//     double x13 = x10 * (1 - x9);
+//     double x14 = a[72] * x11;
+//     double x15 = p_l[14] * x7;
+//     double x16 = (x7 * x7);
+//     double x17 = p_h[14] * x14;
+//     double x18 = p_h[14] * u[14] / x5;
+//     double x19 = p_l[14] * x8;
+//     double x20 = b[71] * u[14];
+//     double x21 = b[74] * x3;
+//     double x22 = b[73] * x11;
+//     double x23 = b[72] * x11;
+//     double x24 = p_h[14] * x23;
+//     Eigen::Matrix<double, 2, 2> dF_dx_T;
+//     dF_dx_T << a[70] * x0 + a[73] * x13 + x1 * x2 + x12 * x9 + x14 * x15 + x16 * x17 + x2 * x7 + x4 * x6, -a[70] * x18 - x1 * x12 - x17 * x7 - x19 * x4 - x2, b[70] * x0 + b[73] * x13 + x1 * x20 + x15 * x23 + x16 * x24 + x20 * x7 + x21 * x6 + x22 * x9, -b[70] * x18 - x1 * x22 - x19 * x21 - x20 - x24 * x7;
+//     return dF_dx_T;
+// }
+// Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH1_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = u[13] / p_l[13];
+//     double x1 = p_l[13] / p_h[13];
+//     double x2 = a[66] * u[13];
+//     double x3 = 2 * u[13];
+//     double x4 = a[69] * x3;
+//     double x5 = (p_l[13] * p_l[13]);
+//     double x6 = x5 / (p_h[13] * p_h[13] * p_h[13]);
+//     double x7 = 1 - x1;
+//     double x8 = (p_h[13]);
+//     double x9 = x5 * x8;
+//     double x10 = (u[13] * u[13]);
+//     double x11 = 2 * x10;
+//     double x12 = a[68] * x11;
+//     double x13 = x10 * (1 - x9);
+//     double x14 = a[67] * x11;
+//     double x15 = p_l[13] * x7;
+//     double x16 = (x7 * x7);
+//     double x17 = p_h[13] * x14;
+//     double x18 = p_h[13] * u[13] / x5;
+//     double x19 = p_l[13] * x8;
+//     double x20 = b[66] * u[13];
+//     double x21 = b[69] * x3;
+//     double x22 = b[68] * x11;
+//     double x23 = b[67] * x11;
+//     double x24 = p_h[13] * x23;
 
-    Eigen::Matrix<double, 2, 2> dF_dx2_T;
-    dF_dx2_T << a[65] * x0 + a[68] * x13 + x1 * x2 + x12 * x9 + x14 * x15 + x16 * x17 + x2 * x7 + x4 * x6, -a[65] * x18 - x1 * x12 - x17 * x7 - x19 * x4 - x2, b[65] * x0 + b[68] * x13 + x1 * x20 + x15 * x23 + x16 * x24 + x20 * x7 + x21 * x6 + x22 * x9, -b[65] * x18 - x1 * x22 - x19 * x21 - x20 - x24 * x7;
-    return dF_dx2_T;
-}
-Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH2_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = u[12] / p_l[12];
-    double x1 = p_l[12] / p_h[12];
-    double x2 = a[61] * u[12];
-    double x3 = 2 * u[12];
-    double x4 = a[64] * x3;
-    double x5 = (p_l[12] * p_l[12]);
-    double x6 = x5 / (p_h[12] * p_h[12] * p_h[12]);
-    double x7 = 1 - x1;
-    double x8 = (p_h[12]);
-    double x9 = x5 * x8;
-    double x10 = (u[12] * u[12]);
-    double x11 = 2 * x10;
-    double x12 = a[63] * x11;
-    double x13 = x10 * (1 - x9);
-    double x14 = a[62] * x11;
-    double x15 = p_l[12] * x7;
-    double x16 = (x7 * x7);
-    double x17 = p_h[12] * x14;
-    double x18 = p_h[12] * u[12] / x5;
-    double x19 = p_l[12] * x8;
-    double x20 = b[61] * u[12];
-    double x21 = b[64] * x3;
-    double x22 = b[63] * x11;
-    double x23 = b[62] * x11;
-    double x24 = p_h[12] * x23;
-    Eigen::Matrix<double, 2, 2> dF_dx3_T;
-    dF_dx3_T << a[60] * x0 + a[63] * x13 + x1 * x2 + x12 * x9 + x14 * x15 + x16 * x17 + x2 * x7 + x4 * x6, -a[60] * x18 - x1 * x12 - x17 * x7 - x19 * x4 - x2, b[60] * x0 + b[63] * x13 + x1 * x20 + x15 * x23 + x16 * x24 + x20 * x7 + x21 * x6 + x22 * x9, -b[60] * x18 - x1 * x22 - x19 * x21 - x20 - x24 * x7;
-    return dF_dx3_T;
-}
-Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH3_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = u[11] / p_l[11];
-    double x1 = p_l[11] / p_h[11];
-    double x2 = a[56] * u[11];
-    double x3 = 2 * u[11];
-    double x4 = a[59] * x3;
-    double x5 = (p_l[11] * p_l[11]);
-    double x6 = x5 / (p_h[11] * p_h[11] * p_h[11]);
-    double x7 = 1 - x1;
-    double x8 = (p_h[11]);
-    double x9 = x5 * x8;
-    double x10 = (u[11] * u[11]);
-    double x11 = 2 * x10;
-    double x12 = a[58] * x11;
-    double x13 = x10 * (1 - x9);
-    double x14 = a[57] * x11;
-    double x15 = p_l[11] * x7;
-    double x16 = (x7 * x7);
-    double x17 = p_h[11] * x14;
-    double x18 = p_h[11] * u[11] / x5;
-    double x19 = p_l[11] * x8;
-    double x20 = b[56] * u[11];
-    double x21 = b[59] * x3;
-    double x22 = b[58] * x11;
-    double x23 = b[57] * x11;
-    double x24 = p_h[11] * x23;
+//     Eigen::Matrix<double, 2, 2> dF_dx2_T;
+//     dF_dx2_T << a[65] * x0 + a[68] * x13 + x1 * x2 + x12 * x9 + x14 * x15 + x16 * x17 + x2 * x7 + x4 * x6, -a[65] * x18 - x1 * x12 - x17 * x7 - x19 * x4 - x2, b[65] * x0 + b[68] * x13 + x1 * x20 + x15 * x23 + x16 * x24 + x20 * x7 + x21 * x6 + x22 * x9, -b[65] * x18 - x1 * x22 - x19 * x21 - x20 - x24 * x7;
+//     return dF_dx2_T;
+// }
+// Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH2_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = u[12] / p_l[12];
+//     double x1 = p_l[12] / p_h[12];
+//     double x2 = a[61] * u[12];
+//     double x3 = 2 * u[12];
+//     double x4 = a[64] * x3;
+//     double x5 = (p_l[12] * p_l[12]);
+//     double x6 = x5 / (p_h[12] * p_h[12] * p_h[12]);
+//     double x7 = 1 - x1;
+//     double x8 = (p_h[12]);
+//     double x9 = x5 * x8;
+//     double x10 = (u[12] * u[12]);
+//     double x11 = 2 * x10;
+//     double x12 = a[63] * x11;
+//     double x13 = x10 * (1 - x9);
+//     double x14 = a[62] * x11;
+//     double x15 = p_l[12] * x7;
+//     double x16 = (x7 * x7);
+//     double x17 = p_h[12] * x14;
+//     double x18 = p_h[12] * u[12] / x5;
+//     double x19 = p_l[12] * x8;
+//     double x20 = b[61] * u[12];
+//     double x21 = b[64] * x3;
+//     double x22 = b[63] * x11;
+//     double x23 = b[62] * x11;
+//     double x24 = p_h[12] * x23;
+//     Eigen::Matrix<double, 2, 2> dF_dx3_T;
+//     dF_dx3_T << a[60] * x0 + a[63] * x13 + x1 * x2 + x12 * x9 + x14 * x15 + x16 * x17 + x2 * x7 + x4 * x6, -a[60] * x18 - x1 * x12 - x17 * x7 - x19 * x4 - x2, b[60] * x0 + b[63] * x13 + x1 * x20 + x15 * x23 + x16 * x24 + x20 * x7 + x21 * x6 + x22 * x9, -b[60] * x18 - x1 * x22 - x19 * x21 - x20 - x24 * x7;
+//     return dF_dx3_T;
+// }
+// Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH3_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = u[11] / p_l[11];
+//     double x1 = p_l[11] / p_h[11];
+//     double x2 = a[56] * u[11];
+//     double x3 = 2 * u[11];
+//     double x4 = a[59] * x3;
+//     double x5 = (p_l[11] * p_l[11]);
+//     double x6 = x5 / (p_h[11] * p_h[11] * p_h[11]);
+//     double x7 = 1 - x1;
+//     double x8 = (p_h[11]);
+//     double x9 = x5 * x8;
+//     double x10 = (u[11] * u[11]);
+//     double x11 = 2 * x10;
+//     double x12 = a[58] * x11;
+//     double x13 = x10 * (1 - x9);
+//     double x14 = a[57] * x11;
+//     double x15 = p_l[11] * x7;
+//     double x16 = (x7 * x7);
+//     double x17 = p_h[11] * x14;
+//     double x18 = p_h[11] * u[11] / x5;
+//     double x19 = p_l[11] * x8;
+//     double x20 = b[56] * u[11];
+//     double x21 = b[59] * x3;
+//     double x22 = b[58] * x11;
+//     double x23 = b[57] * x11;
+//     double x24 = p_h[11] * x23;
 
-    Eigen::Matrix<double, 2, 2> dF_dx4_T;
-    dF_dx4_T << a[55] * x0 + a[58] * x13 + x1 * x2 + x12 * x9 + x14 * x15 + x16 * x17 + x2 * x7 + x4 * x6, -a[55] * x18 - x1 * x12 - x17 * x7 - x19 * x4 - x2, b[55] * x0 + b[58] * x13 + x1 * x20 + x15 * x23 + x16 * x24 + x20 * x7 + x21 * x6 + x22 * x9, -b[55] * x18 - x1 * x22 - x19 * x21 - x20 - x24 * x7;
-    return dF_dx4_T;
-}
-Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH4_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = u[10] / p_l[10];
-    double x1 = p_l[10] / p_h[10];
-    double x2 = a[51] * u[10];
-    double x3 = 2 * u[10];
-    double x4 = a[54] * x3;
-    double x5 = (p_l[10] * p_l[10]);
-    double x6 = x5 / (p_h[10] * p_h[10] * p_h[10]);
-    double x7 = 1 - x1;
-    double x8 = (p_h[10]);
-    double x9 = x5 * x8;
-    double x10 = (u[10] * u[10]);
-    double x11 = 2 * x10;
-    double x12 = a[53] * x11;
-    double x13 = x10 * (1 - x9);
-    double x14 = a[52] * x11;
-    double x15 = p_l[10] * x7;
-    double x16 = (x7 * x7);
-    double x17 = p_h[10] * x14;
-    double x18 = p_h[10] * u[10] / x5;
-    double x19 = p_l[10] * x8;
-    double x20 = b[51] * u[10];
-    double x21 = b[54] * x3;
-    double x22 = b[53] * x11;
-    double x23 = b[52] * x11;
-    double x24 = p_h[10] * x23;
-    Eigen::Matrix<double, 2, 2> dF_dx5_T;
-    dF_dx5_T << a[50] * x0 + a[53] * x13 + x1 * x2 + x12 * x9 + x14 * x15 + x16 * x17 + x2 * x7 + x4 * x6, -a[50] * x18 - x1 * x12 - x17 * x7 - x19 * x4 - x2, b[50] * x0 + b[53] * x13 + x1 * x20 + x15 * x23 + x16 * x24 + x20 * x7 + x21 * x6 + x22 * x9, -b[50] * x18 - x1 * x22 - x19 * x21 - x20 - x24 * x7;
-    return dF_dx5_T;
-}
+//     Eigen::Matrix<double, 2, 2> dF_dx4_T;
+//     dF_dx4_T << a[55] * x0 + a[58] * x13 + x1 * x2 + x12 * x9 + x14 * x15 + x16 * x17 + x2 * x7 + x4 * x6, -a[55] * x18 - x1 * x12 - x17 * x7 - x19 * x4 - x2, b[55] * x0 + b[58] * x13 + x1 * x20 + x15 * x23 + x16 * x24 + x20 * x7 + x21 * x6 + x22 * x9, -b[55] * x18 - x1 * x22 - x19 * x21 - x20 - x24 * x7;
+//     return dF_dx4_T;
+// }
+// Eigen::Matrix<double, 2, 2> MPC::Update_dF_dxH4_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = u[10] / p_l[10];
+//     double x1 = p_l[10] / p_h[10];
+//     double x2 = a[51] * u[10];
+//     double x3 = 2 * u[10];
+//     double x4 = a[54] * x3;
+//     double x5 = (p_l[10] * p_l[10]);
+//     double x6 = x5 / (p_h[10] * p_h[10] * p_h[10]);
+//     double x7 = 1 - x1;
+//     double x8 = (p_h[10]);
+//     double x9 = x5 * x8;
+//     double x10 = (u[10] * u[10]);
+//     double x11 = 2 * x10;
+//     double x12 = a[53] * x11;
+//     double x13 = x10 * (1 - x9);
+//     double x14 = a[52] * x11;
+//     double x15 = p_l[10] * x7;
+//     double x16 = (x7 * x7);
+//     double x17 = p_h[10] * x14;
+//     double x18 = p_h[10] * u[10] / x5;
+//     double x19 = p_l[10] * x8;
+//     double x20 = b[51] * u[10];
+//     double x21 = b[54] * x3;
+//     double x22 = b[53] * x11;
+//     double x23 = b[52] * x11;
+//     double x24 = p_h[10] * x23;
+//     Eigen::Matrix<double, 2, 2> dF_dx5_T;
+//     dF_dx5_T << a[50] * x0 + a[53] * x13 + x1 * x2 + x12 * x9 + x14 * x15 + x16 * x17 + x2 * x7 + x4 * x6, -a[50] * x18 - x1 * x12 - x17 * x7 - x19 * x4 - x2, b[50] * x0 + b[53] * x13 + x1 * x20 + x15 * x23 + x16 * x24 + x20 * x7 + x21 * x6 + x22 * x9, -b[50] * x18 - x1 * x22 - x19 * x21 - x20 - x24 * x7;
+//     return dF_dx5_T;
+// }
 
-Eigen::Matrix<double, 2, 1> MPC::Update_dF_du_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = p_h[14] / p_l[14];
-    double x1 = 1 - p_l[14] / p_h[14];
-    double x2 = p_h[14] * x1;
-    double x3 = (p_h[14] * p_h[14]);
-    double x4 = -(p_l[14] * p_l[14]) / x3 + 1;
-    double x5 = 2 * u[14];
-    double x6 = p_h[14] * x4 * x5;
-    double x7 = (x1 * x1) * x3 * x5;
-    Eigen::Matrix<double, 2, 1> dF_du_T;
-    dF_du_T << a[70] * x0 + a[71] * x2 + a[72] * x7 + a[73] * x6 + a[74] * x4, b[70] * x0 + b[71] * x2 + b[72] * x7 + b[73] * x6 + b[74] * x4;
-    return dF_du_T;
-}
-Eigen::Matrix<double, 2, 1> MPC::Update_dF_du1_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = p_h[13] / p_l[13];
-    double x1 = 1 - p_l[13] / p_h[13];
-    double x2 = p_h[13] * x1;
-    double x3 = (p_h[13] * p_h[13]);
-    double x4 = -(p_l[13] * p_l[13]) / x3 + 1;
-    double x5 = 2 * u[13];
-    double x6 = p_h[13] * x4 * x5;
-    double x7 = (x1 * x1) * x3 * x5;
-    Eigen::Matrix<double, 2, 1> dF_du2_T;
-    dF_du2_T << a[65] * x0 + a[66] * x2 + a[67] * x7 + a[68] * x6 + a[69] * x4, b[65] * x0 + b[66] * x2 + b[67] * x7 + b[68] * x6 + b[69] * x4;
-    return dF_du2_T;
-}
+// Eigen::Matrix<double, 2, 1> MPC::Update_dF_du_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = p_h[14] / p_l[14];
+//     double x1 = 1 - p_l[14] / p_h[14];
+//     double x2 = p_h[14] * x1;
+//     double x3 = (p_h[14] * p_h[14]);
+//     double x4 = -(p_l[14] * p_l[14]) / x3 + 1;
+//     double x5 = 2 * u[14];
+//     double x6 = p_h[14] * x4 * x5;
+//     double x7 = (x1 * x1) * x3 * x5;
+//     Eigen::Matrix<double, 2, 1> dF_du_T;
+//     dF_du_T << a[70] * x0 + a[71] * x2 + a[72] * x7 + a[73] * x6 + a[74] * x4, b[70] * x0 + b[71] * x2 + b[72] * x7 + b[73] * x6 + b[74] * x4;
+//     return dF_du_T;
+// }
+// Eigen::Matrix<double, 2, 1> MPC::Update_dF_du1_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = p_h[13] / p_l[13];
+//     double x1 = 1 - p_l[13] / p_h[13];
+//     double x2 = p_h[13] * x1;
+//     double x3 = (p_h[13] * p_h[13]);
+//     double x4 = -(p_l[13] * p_l[13]) / x3 + 1;
+//     double x5 = 2 * u[13];
+//     double x6 = p_h[13] * x4 * x5;
+//     double x7 = (x1 * x1) * x3 * x5;
+//     Eigen::Matrix<double, 2, 1> dF_du2_T;
+//     dF_du2_T << a[65] * x0 + a[66] * x2 + a[67] * x7 + a[68] * x6 + a[69] * x4, b[65] * x0 + b[66] * x2 + b[67] * x7 + b[68] * x6 + b[69] * x4;
+//     return dF_du2_T;
+// }
 
-Eigen::Matrix<double, 2, 1> MPC::Update_dF_du2_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = p_h[12] / p_l[12];
-    double x1 = 1 - p_l[12] / p_h[12];
-    double x2 = p_h[12] * x1;
-    double x3 = (p_h[12] * p_h[12]);
-    double x4 = -(p_l[12] * p_l[12]) / x3 + 1;
-    double x5 = 2 * u[12];
-    double x6 = p_h[12] * x4 * x5;
-    double x7 = (x1 * x1) * x3 * x5;
-    Eigen::Matrix<double, 2, 1> dF_du3_T;
-    dF_du3_T << a[60] * x0 + a[61] * x2 + a[62] * x7 + a[63] * x6 + a[64] * x4, b[60] * x0 + b[61] * x2 + b[62] * x7 + b[63] * x6 + b[64] * x4;
-    return dF_du3_T;
-}
+// Eigen::Matrix<double, 2, 1> MPC::Update_dF_du2_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = p_h[12] / p_l[12];
+//     double x1 = 1 - p_l[12] / p_h[12];
+//     double x2 = p_h[12] * x1;
+//     double x3 = (p_h[12] * p_h[12]);
+//     double x4 = -(p_l[12] * p_l[12]) / x3 + 1;
+//     double x5 = 2 * u[12];
+//     double x6 = p_h[12] * x4 * x5;
+//     double x7 = (x1 * x1) * x3 * x5;
+//     Eigen::Matrix<double, 2, 1> dF_du3_T;
+//     dF_du3_T << a[60] * x0 + a[61] * x2 + a[62] * x7 + a[63] * x6 + a[64] * x4, b[60] * x0 + b[61] * x2 + b[62] * x7 + b[63] * x6 + b[64] * x4;
+//     return dF_du3_T;
+// }
 
-Eigen::Matrix<double, 2, 1> MPC::Update_dF_du3_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = p_h[11] / p_l[11];
-    double x1 = 1 - p_l[11] / p_h[11];
-    double x2 = p_h[11] * x1;
-    double x3 = (p_h[11] * p_h[11]);
-    double x4 = -(p_l[11] * p_l[11]) / x3 + 1;
-    double x5 = 2 * u[11];
-    double x6 = p_h[11] * x4 * x5;
-    double x7 = (x1 * x1) * x3 * x5;
-    Eigen::Matrix<double, 2, 1> dF_du4_T;
-    dF_du4_T << a[55] * x0 + a[56] * x2 + a[57] * x7 + a[58] * x6 + a[59] * x4, b[55] * x0 + b[56] * x2 + b[57] * x7 + b[58] * x6 + b[59] * x4;
-    return dF_du4_T;
-}
-Eigen::Matrix<double, 2, 1> MPC::Update_dF_du4_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
-{
-    double x0 = p_h[10] / p_l[10];
-    double x1 = 1 - p_l[10] / p_h[10];
-    double x2 = p_h[10] * x1;
-    double x3 = (p_h[10] * p_h[10]);
-    double x4 = -(p_l[10] * p_l[10]) / x3 + 1;
-    double x5 = 2 * u[10];
-    double x6 = p_h[10] * x4 * x5;
-    double x7 = (x1 * x1) * x3 * x5;
-    Eigen::Matrix<double, 2, 1> dF_du5_T;
-    dF_du5_T << a[50] * x0 + a[51] * x2 + a[52] * x7 + a[53] * x6 + a[54] * x4, b[50] * x0 + b[51] * x2 + b[52] * x7 + b[53] * x6 + b[54] * x4;
-    return dF_du5_T;
-}
+// Eigen::Matrix<double, 2, 1> MPC::Update_dF_du3_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = p_h[11] / p_l[11];
+//     double x1 = 1 - p_l[11] / p_h[11];
+//     double x2 = p_h[11] * x1;
+//     double x3 = (p_h[11] * p_h[11]);
+//     double x4 = -(p_l[11] * p_l[11]) / x3 + 1;
+//     double x5 = 2 * u[11];
+//     double x6 = p_h[11] * x4 * x5;
+//     double x7 = (x1 * x1) * x3 * x5;
+//     Eigen::Matrix<double, 2, 1> dF_du4_T;
+//     dF_du4_T << a[55] * x0 + a[56] * x2 + a[57] * x7 + a[58] * x6 + a[59] * x4, b[55] * x0 + b[56] * x2 + b[57] * x7 + b[58] * x6 + b[59] * x4;
+//     return dF_du4_T;
+// }
+// Eigen::Matrix<double, 2, 1> MPC::Update_dF_du4_T(const double *p_h, const double *p_l, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b)
+// {
+//     double x0 = p_h[10] / p_l[10];
+//     double x1 = 1 - p_l[10] / p_h[10];
+//     double x2 = p_h[10] * x1;
+//     double x3 = (p_h[10] * p_h[10]);
+//     double x4 = -(p_l[10] * p_l[10]) / x3 + 1;
+//     double x5 = 2 * u[10];
+//     double x6 = p_h[10] * x4 * x5;
+//     double x7 = (x1 * x1) * x3 * x5;
+//     Eigen::Matrix<double, 2, 1> dF_du5_T;
+//     dF_du5_T << a[50] * x0 + a[51] * x2 + a[52] * x7 + a[53] * x6 + a[54] * x4, b[50] * x0 + b[51] * x2 + b[52] * x7 + b[53] * x6 + b[54] * x4;
+//     return dF_du5_T;
+// }
 
 int MPC::DutyCalculate(bool increase_pre, std::array<float, MPC_TIME_HORIZON> y_des, double scale)
 {
