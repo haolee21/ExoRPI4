@@ -35,6 +35,12 @@ namespace FilterParam
         const std::array<double,Order+1> b = {0.02193962, 0.1096981 , 0.21939621, 0.21939621, 0.1096981 ,0.02193962};
         const std::array<double,Order+1> a = {1.        , -0.98532524,  0.97384933, -0.38635656,  0.11116384, -0.01126351};
     }
+    namespace Filter15Hz_5
+    {
+        const int Order = 5;
+        const std::array<double,Order+1> b = {0.0069332 , 0.03466598, 0.06933196, 0.06933196, 0.03466598, 0.0069332};
+        const std::array<double,Order+1> a = {1.        , -1.97590162,  2.01347303, -1.10261798,  0.32761833, -0.04070949};
+    }
     
 }
 #endif

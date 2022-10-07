@@ -97,7 +97,9 @@ void JointCon::GetForceCon(const double des_force, u_int8_t &ext_duty, u_int8_t 
         flex_duty=0;
     }
     else{
-        //if the force is too high, we can either recycle the pressure, or send them to the other end of the cylinder
+        //if the force is too high, we have 3 choices
+        // 1. If des_pre > pre_tank: pump the air in the cylinder back to reservior
+        // 2. If des_pre < pre_tank, and 
         if(des_pre<this->pre_tank){
             //we cannot recycle if the desired pressure is lower than the current tank pressure
             double des_force_mN = (des_force + this->fric_coeff * this->pos_diff)*1000; //to make our life easier, we use mN to match kPa and mm^2
@@ -240,7 +242,6 @@ void JointCon::GetPreCon(const double des_pre, u_int8_t &duty, Chamber chamber)
     {
     case JointCon::Chamber::kExt:
         duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
-        
         break;
     case JointCon::Chamber::kFlex:
         break;
