@@ -33,8 +33,8 @@
 #include "FilterParam.hpp"
 #include "CylinderParam.hpp"
 
-#define MPC_HEAD "Time,F_0,F_1,dF_0,dF_1,u_n,u_n1,u_n2,u_n3,u_n4,yn1,yn2,yn3,yn4,yn5,y_des1,y_des2,y_des3,y_des4,y_des5"
-#define MPC_TIME_HORIZON 5
+#define MPC_HEAD "Time,F_0,F_1,dF_0,dF_1,u_n,u_n1,u_n2,u_n3,u_n4,u_n5,u_n6,u_n7,u_n8,yn1,yn2,yn3,yn4,yn5,yn6,yn7,yn8,yn9,y_des1,y_des2,y_des3,y_des4,y_des5,y_des6,y_des7,y_des8,y_des9"
+#define MPC_TIME_HORIZON 9
 class MPC
 {
 private:
@@ -50,13 +50,9 @@ private:
     // const Eigen::Matrix<double,1,2> H_l;
     Eigen::Matrix<double, 2, 1> cur_F; // this will be useful if we want to estimate the flow rate
     Eigen::Matrix<double, 2, 1> cur_dF;
-    double u_n, u_n1, u_n2, u_n3, u_n4; // only u_n is used, but we should also record u_n1 and u_n2
-    Eigen::Matrix<double, 2, 1> x_n1;
-    Eigen::Matrix<double, 2, 1> x_n2;
-    Eigen::Matrix<double, 2, 1> x_n3;
-    Eigen::Matrix<double, 2, 1> x_n4;
-    Eigen::Matrix<double, 2, 1> x_n5;
-    double y_des1, y_des2, y_des3, y_des4, y_des5;
+    double u_n, u_n1, u_n2, u_n3, u_n4,u_n5,u_n6,u_n7,u_n8; // only u_n is used, but we should also record u_n1 and u_n2
+    Eigen::Matrix<double, 2, 1> x_n1,x_n2, x_n3, x_n4,x_n5,x_n6,x_n7,x_n8,x_n9;
+    double y_des1, y_des2, y_des3, y_des4, y_des5,y_des6,y_des7,y_des8,y_des9;
 
     Eigen::Matrix<double, 2, 1> UpdateF(const double *ph, const double *pl, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b);
     Eigen::Matrix<double, 2, 2> Update_dF_dxL_T(const double *ph, const double *pl, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b);
@@ -154,7 +150,7 @@ private:
     // double cur_force;
     // DigitalFilter<double,FilterParam::Filter20Hz_5::Order,1> vel_filter;
     // DigitalFilter<double,FilterParam::Filter20Hz_2::Order,1> force_filter;
-    Recorder<double, 19> mpc_rec;
+    Recorder<double, 31> mpc_rec;
 
 public:
     MPC(std::array<std::array<double, MPC_STATE_NUM>, 2> cl, std::array<std::array<double, MPC_STATE_NUM>, 2> ch, std::string file_name);
