@@ -324,10 +324,7 @@ int MPC::DutyCalculate(bool increase_pre, std::array<double, MPC_TIME_HORIZON> y
     c_int exit_flag = osqp_setup(&this->work, this->osqp_data.get(), this->osqp_settings.get());
     osqp_solve(this->work);
 
-    if (exit_flag == 1)
-    {
-        std::cout << "osqp success" << std::endl;
-    }
+  
 
     this->u_n = *(this->work->solution->x);
     this->u_n1 = *(this->work->solution->x + 1);
@@ -403,7 +400,7 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
             // increasing pressure
 
             ideal_duty = this->DutyCalculate(true, y_des, scale);
-            std::cout<<ideal_duty<<std::endl;
+            
         }
         else if ((p_des[0] < ps) & (ps > pt) & (p_des[0] > pt))
         {
