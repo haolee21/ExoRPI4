@@ -68,7 +68,10 @@ void Valves_hub::UpdateValve(){
         hub.valChanged_flag=true;
     }
     else if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kForceCon){
-        hub.left_knee_con.GetForceCon(hub.desired_force[(unsigned)Valves_hub::Joint::kLKne],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex], hub.PWM_Duty[(unsigned)PWM_ID::kLTank]);
+
+        std::array<double, MPC_TIME_HORIZON> des_force;
+        std::fill_n(des_force.begin(),des_force.size(),hub.desired_force[(unsigned)Valves_hub::Joint::kLKne]);
+        hub.left_knee_con.GetForceCon(des_force,hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex], hub.PWM_Duty[(unsigned)PWM_ID::kLTank]);
         hub.valChanged_flag=true;
     }
     else if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kImpCon){

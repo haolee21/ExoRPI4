@@ -38,7 +38,7 @@ SensorHub::SensorHub() //initialize member in list since Encoder has no default 
     ,PreRecOri("Pressure_ori","Time,LTankPre,LKneExtPre,Force,Pos,TankPre,LKneFlexPre,LAnkExtPre,na")
     , LHipS_Enc(Encoder_L::HIP1), LKneS_Enc(Encoder_L::KNEE), LAnkS_Enc(Encoder_L::ANK1), RHipS_Enc(Encoder_R::HIP1), RKneS_Enc(Encoder_R::KNEE), RAnkS_Enc(Encoder_R::ANK1),adc0(0)//,adc1(ADC(1)) //, LHipF_Enc(Encoder_L(1)), LAnkF_Enc(Encoder_L(4)), RHipF_Enc(Encoder_R(1)), RAnkF_Enc(Encoder_R(4))
     // ,filter_3_hz(FilterParam::Filter3Hz::a,FilterParam::Filter3Hz::b)
-    ,digital_filter(FilterParam::Filter15Hz_5::a,FilterParam::Filter15Hz_5::b)
+    ,digital_filter(FilterParam::Filter20Hz_5::a,FilterParam::Filter20Hz_5::b)
 {
 
     

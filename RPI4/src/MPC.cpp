@@ -53,7 +53,7 @@ void MPC::UpdateParamL(array<double, MPC_STATE_NUM> new_a, array<double, MPC_STA
     this->bl = new_b;
 }
 
-int MPC::DutyCalculate(bool increase_pre, std::array<float, MPC_TIME_HORIZON> y_des, double scale)
+int MPC::DutyCalculate(bool increase_pre, std::array<double, MPC_TIME_HORIZON> y_des, double scale)
 {
 
     this->y_des1 = y_des[0];
@@ -307,7 +307,7 @@ int MPC::DutyCalculate(bool increase_pre, std::array<float, MPC_TIME_HORIZON> y_
     c_float A_x[MPC_TIME_HORIZON] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
     c_int A_i[MPC_TIME_HORIZON] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     c_int A_p[MPC_TIME_HORIZON + 1] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    c_float l[MPC_TIME_HORIZON] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    c_float l[MPC_TIME_HORIZON] = {0.15, 0, 0, 0, 0, 0, 0, 0, 0};
     c_float u[MPC_TIME_HORIZON] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
     c_int n = MPC_TIME_HORIZON;
     c_int m = MPC_TIME_HORIZON;
@@ -366,14 +366,14 @@ int MPC::DutyCalculate(bool increase_pre, std::array<float, MPC_TIME_HORIZON> y_
     return (int)(this->u_n * 100 + 0.5);
 }
 
-int MPC::GetPreControl(const double &p_des, const double &ps, const double &pt, double scale)
+int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const double &ps, const double &pt, double scale)
 {
 
-    double p_diff = (p_des - ps); // we scaled the p_diff with the assumption that pressure will have the momentum to go
+    double p_diff = (p_des[0] - ps); // we scaled the p_diff with the assumption that pressure will have the momentum to go
 
-    if (std::abs(p_diff) > 320) // 640 is 2 psi
+    if (std::abs(p_diff) > 100) // 640 is 2 psi
     {                           // if desired pressure has 1 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
-
+        
         // double lb;
         // if(std::abs(pt-ps)<1310){ //if the difference is less than 10 psi, we can operate the valve with lower duty
         //     lb = 10.0;
@@ -387,23 +387,25 @@ int MPC::GetPreControl(const double &p_des, const double &ps, const double &pt, 
         // }
 
         // double lb = 20; //set the lower bound 20 duty
-        float p_des_scale = ((float)p_des - 3297.312) / 65536.0;
-        std::array<float, MPC_TIME_HORIZON> y_des{p_des_scale, p_des_scale, p_des_scale, p_des_scale, p_des_scale, p_des_scale, p_des_scale, p_des_scale, p_des_scale};
+        std::array<double, MPC_TIME_HORIZON> y_des;
+        for(int i=0;i<p_des.size();i++){
+            y_des[i]=(p_des[i] - 3297.312) / 65536.0;
+        }
         // std::cout<<"p_diff: "<<p_diff/65536<<std::endl;
-        this->UpdateHistory(ps, pt);
+        this->UpdateHistory(ps, pt,p_des[0]);
 
         // std::cout<<"current p_des scale: "<<p_des_scale<<std::endl;
         // std::cout<<"current p_cur scale: "<<this->p_set_his[MPC_TIME_HORIZON]<<std::endl;
 
         int ideal_duty = 0;
-        if ((p_des > ps) & (pt > ps) & (pt > p_des))
+        if ((p_des[0] > ps) & (pt > ps) & (pt > p_des[0]))
         {
             // increasing pressure
-            //  std::cout<<"increase\n";
 
             ideal_duty = this->DutyCalculate(true, y_des, scale);
+            std::cout<<ideal_duty<<std::endl;
         }
-        else if ((p_des < ps) & (ps > pt) & (p_des > pt))
+        else if ((p_des[0] < ps) & (ps > pt) & (p_des[0] > pt))
         {
             // decreasing pressure
             //  std::cout<<"decrease\n";
@@ -422,7 +424,7 @@ int MPC::GetPreControl(const double &p_des, const double &ps, const double &pt, 
         // std::cout << "control p_diff: " << (this->alpha.coeff(1, 0) + this->B.coeff(1, 0) * ideal_duty/100) * 65536 << std::endl;
         // std::cout << "des pdiff: " << p_diff << std::endl;
 
-        if (ideal_duty <= 15)
+        if (ideal_duty < 15)
         {
             return 0;
         }
@@ -468,11 +470,15 @@ void MPC::RecData()
           this->y_des1, this->y_des2, this->y_des3, this->y_des4, this->y_des5,this->y_des6,this->y_des7,this->y_des8,this->y_des9});
 }
 
-void MPC::UpdateHistory(double p_set, double p_tank)
+void MPC::UpdateHistory(double p_set, double p_tank,double p_des)
 {
     std::memset(this->p_tank_his.begin(), 0, this->p_tank_his.size());
     std::memset(this->p_set_his.begin(), 0, this->p_set_his.size());
     std::memset(this->u_his.begin(), 0, this->u_his.size());
+
+
+    double p_step = (p_des-p_set)/(double)MPC_TIME_HORIZON/65536.0;
+    // std::cout<<"p_step: "<<p_step<<std::endl;
 
     for (int i = 0; i < MPC_DELAY; i++)
     {
@@ -483,10 +489,19 @@ void MPC::UpdateHistory(double p_set, double p_tank)
 
     for (int i = 0; i < MPC_TIME_HORIZON; i++)
     {
-        this->p_tank_his[i + MPC_DELAY] = (p_tank - 3297.312) / 65536;
-        this->p_set_his[i + MPC_DELAY] = (p_set - 3297.312) / 65536;
+        this->p_tank_his[i + MPC_DELAY] = (p_tank - 3297.312) / 65536-p_step*i*0.58993; //This literally has no meaning but let's give it a try
+        this->p_set_his[i + MPC_DELAY] = (p_set - 3297.312) / 65536+p_step*i;
         this->u_his[i + MPC_DELAY] = MPC::kUBar; // use the lower bound first, in case the previous duty was 0
+
+
+        // this->p_tank_his[i + MPC_DELAY] = (p_tank - 3297.312) / 65536; //This literally has no meaning but let's give it a try
+        // this->p_set_his[i + MPC_DELAY] = (p_set - 3297.312) / 65536;
+        // this->u_his[i + MPC_DELAY] = MPC::kUBar; // use the lower bound first, in case the previous duty was 0
+
     }
+
+
+
 
     // std::cout<<"mem values: "<<this->p_tank_his[0]<<std::endl;
 }

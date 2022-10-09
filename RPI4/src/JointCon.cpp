@@ -20,20 +20,20 @@ JointCon::~JointCon()
 {
 }
 
-void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_flex, const double &p_tank, const double &p_main_tank, const u_int8_t &ext_duty, const u_int8_t &flex_duty, const u_int8_t &tank_duty, const double &pos)
+void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_rec, const double &p_tank, const double &p_main_tank, const u_int8_t &ext_duty, const u_int8_t &rec_duty, const u_int8_t &tank_duty, const double &pos)
 {
     this->ext_con.PushMeas(p_tank,p_joint_ext,ext_duty);
-    this->flex_con.PushMeas(p_joint_ext,p_joint_flex,flex_duty);
+    this->flex_con.PushMeas(p_joint_rec, p_joint_ext,rec_duty);
     this->tank_con.PushMeas(p_main_tank,p_tank,tank_duty);
     
     this->pre_tank = p_tank;
     this->pre_main_tank = p_main_tank;
     this->pos_diff = pos - this->pre_pos;
     this->pre_pos = pos;
-    this->pre_flex = p_joint_flex;
+    this->pre_rec = p_joint_rec;
     this->pre_ext = p_joint_ext;
     this->cur_pos = pos;
-    this->cur_max_spring_compress = (p_joint_ext * this->piston_area_ext - p_joint_flex * this->piston_area_flex) * 2.1547177056884764e-05 / this->spring_k; // unit in mm, piston area=0 for air reservoir
+    this->cur_max_spring_compress = (p_joint_ext * this->piston_area_ext ) * 2.1547177056884764e-05 / this->spring_k; // unit in mm, piston area=0 for air reservoir
     this->cur_delta_x = this->max_pos - pos;
 
     //calculate current volume
@@ -53,7 +53,7 @@ void JointCon::RecData(){
 }
 
 
-void JointCon::GetForceCon(const double des_force, u_int8_t &ext_duty, u_int8_t &flex_duty, u_int8_t &tank_duty)
+void JointCon::GetForceCon(const std::array<double,MPC_TIME_HORIZON> &des_force, u_int8_t &ext_duty, u_int8_t &flex_duty, u_int8_t &tank_duty)
 {
     /**
      * @brief Get the required duty cycle based on the commanded force, return in joint_duty and bal_duty
@@ -81,15 +81,23 @@ void JointCon::GetForceCon(const double des_force, u_int8_t &ext_duty, u_int8_t 
 
     // std::cout<<"desired force: "<<des_force<<std::endl;
     // std::cout<<"current force: "<<this->cur_force<<std::endl;
-    double des_pre = ((des_force + this->fric_coeff * this->pos_diff) / 2.1547177056884764e-05 + this->pre_flex * this->piston_area_flex) / this->piston_area_ext;
-    if(des_force>this->cur_force){
-        //the des_pre is definitely larger than pre_ext, otherwise des_force < this->cur_force
+    // std::cout<<"des pre: ";
+    std::array<double,MPC_TIME_HORIZON> des_pre;
+    for(int i=0;i<des_pre.size();i++){
+        des_pre[i]=((des_force[i] + this->fric_coeff * this->pos_diff) / 2.1547177056884764e-05) / this->piston_area_ext;
+        // std::cout<<des_pre[i]<<',';
+    }
+    // std::cout<<std::endl;
+    // std::cout<<"current pressure: "<<this->pre_ext<<std::endl;
 
+    if(des_force[0]>this->cur_force){
+        //the des_pre is definitely larger than pre_ext, otherwise des_force < this->cur_force
+        std::cout<<"increase pressure\n";
         //to charge the cylinder, we need to make sure the tank is > than des_pre
-        if(this->pre_tank<des_pre){
-            // std::cout<<"tank pressure too low\n";
+        if(this->pre_tank<des_pre[0]){
+            std::cout<<"tank pressure too low\n";
             tank_duty = this->tank_con.GetPreControl(des_pre, this->pre_tank, pre_main_tank, 1);
-            // std::cout<<"tank duty: "<<(int)tank_duty<<std::endl;
+            std::cout<<"tank duty: "<<(int)tank_duty<<std::endl;
         }
 
         //still charge the cylinder with whatever pressure in the tank
@@ -99,40 +107,34 @@ void JointCon::GetForceCon(const double des_force, u_int8_t &ext_duty, u_int8_t 
     else{
         //if the force is too high, we have 3 choices
         // 1. If des_pre > pre_tank: pump the air in the cylinder back to reservior
-        // 2. If des_pre < pre_tank, and 
-        if(des_pre<this->pre_tank){
+        // 2. If des_pre < pre_tank, and pre_set > pre_rec, pump the air to the recycle end
+        if(des_pre[0]<this->pre_tank){
             //we cannot recycle if the desired pressure is lower than the current tank pressure
-            double des_force_mN = (des_force + this->fric_coeff * this->pos_diff)*1000; //to make our life easier, we use mN to match kPa and mm^2
-            double p_ext_kpa = this->GetPre_KPa(this->pre_ext);
-            double p_flex_kpa = this->GetPre_KPa(this->pre_flex);
-            double c = (p_ext_kpa*this->piston_area_ext*this->L_ext+p_flex_kpa*this->piston_area_flex*this->L_flex);
+            // double des_force_mN = (des_force + this->fric_coeff * this->pos_diff)*1000; //to make our life easier, we use mN to match kPa and mm^2
+            // double p_ext_kpa = this->GetPre_KPa(this->pre_ext);
+
+            // double c = (p_ext_kpa*this->piston_area_ext*this->L_ext+p_flex_kpa*this->piston_area_flex*this->L_flex);
 
             
-            double des_p_ext_num = this->piston_area_ext*this->L_ext*des_force_mN/this->L_flex+2*this->piston_area_ext*this->L_ext*c/this->L_flex/this->L_flex+2*this->piston_area_ext*des_force_mN+2*this->piston_area_ext*c/this->L_flex;
-            double des_p_ext_den = 2*this->piston_area_ext*this->piston_area_ext*this->L_ext*this->L_ext/this->L_flex/this->L_flex+4*this->piston_area_ext*this->piston_area_ext*this->L_ext/this->L_flex+2*this->piston_area_ext*this->piston_area_ext;
-            double des_p_ext_kpa = des_p_ext_num/des_p_ext_den;
-            double des_p_flex_kpa = (c-des_p_ext_kpa*this->L_ext*this->piston_area_ext)/(this->piston_area_flex*this->L_flex);
+            // double des_p_ext_num = this->piston_area_ext*this->L_ext*des_force_mN/this->L_flex+2*this->piston_area_ext*this->L_ext*c/this->L_flex/this->L_flex+2*this->piston_area_ext*des_force_mN+2*this->piston_area_ext*c/this->L_flex;
+            // double des_p_ext_den = 2*this->piston_area_ext*this->piston_area_ext*this->L_ext*this->L_ext/this->L_flex/this->L_flex+4*this->piston_area_ext*this->piston_area_ext*this->L_ext/this->L_flex+2*this->piston_area_ext*this->piston_area_ext;
+            // double des_p_ext_kpa = des_p_ext_num/des_p_ext_den;
+            // double des_p_flex_kpa = (c-des_p_ext_kpa*this->L_ext*this->piston_area_ext)/(this->piston_area_flex*this->L_flex);
             
-            // std::cout<<"test: "<<(c-des_p_ext_kpa*this->L_ext*this->piston_area_ext)<<std::endl;
-            // std::cout<<"den: "<<this->piston_area_flex*this->L_flex<<std::endl;
-            // std::cout<<"ext len: "<<this->L_ext<<std::endl;
-            // std::cout<<"flex len: "<<this->L_flex<<std::endl;
-            // std::cout<<"const term: "<<c<<std::endl;
-            // std::cout<<"sub term: "<<des_p_ext_kpa*this->L_ext*this->piston_area_ext<<std::endl;
-            // //due to the way we program mpc, we only need p_flex_kpa's adc reading
-            double p_flex_adc = des_p_flex_kpa*46.41216+8000;
-            double p_ext_adc = des_p_ext_kpa*46.41216+8000;
+            // // //due to the way we program mpc, we only need p_flex_kpa's adc reading
+            // double p_flex_adc = des_p_flex_kpa*46.41216+8000;
+            // double p_ext_adc = des_p_ext_kpa*46.41216+8000;
             
 
             // double checking = des_p_ext_kpa*this->L_ext+des_p_flex_kpa*this->L_flex-p_ext_kpa*this->L_ext-p_flex_kpa*this->L_flex;
             // std::cout<<"checking: "<<checking<<std::endl;
 
-            flex_duty = this->flex_con.GetPreControl(p_flex_adc,this->pre_flex,this->pre_ext,1);
+            flex_duty = this->flex_con.GetPreControl(des_pre,this->pre_ext,this->pre_rec,this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
+
+            // flex_duty = this->flex_con.GetPreControl(p_flex_adc,this->pre_flex,this->pre_ext,1);
             // std::cout<<"flex duty: "<<(int)flex_duty<<std::endl;
             // std::cout<<"flex duty: "<<(int)flex_duty<<std::endl;//TODO: remove it later
-            if(flex_duty>100){
-                flex_duty=100;
-            }
+            
             ext_duty=0;
             tank_duty=0;
         }
@@ -211,7 +213,7 @@ double JointCon::GetExternalForce()
     if ((this->cur_delta_x - 4700) > this->cur_max_spring_compress / this->volume_slope_6in)
     { // It turned out the the spring start to compress earlier, the 4700 is an experimental value
 
-        return (this->pre_ext * this->piston_area_ext - this->pre_flex * this->piston_area_flex) * 2.1547177056884764e-05 - this->fric_coeff * this->pos_diff; // unit newton
+        return (this->pre_ext * this->piston_area_ext ) * 2.1547177056884764e-05 - this->fric_coeff * this->pos_diff; // unit newton
         // return (pre/65536*4.096-0.5)/4*200*0.31-0.001*this->pos_diff;
     }
     else
@@ -232,21 +234,33 @@ void JointCon::GetImpCon(const double des_imp, u_int8_t &ext_duty, u_int8_t &fle
     //        1. calculate desired force based on current position
     //        2. calculate desired pressure based on current velocity and desired force
     double des_force = des_imp * this->cur_delta_x*this->volume_slope_6in;
+    
     // std::cout<<"des_force: "<<des_force<<std::endl;
-    this->GetForceCon(des_force, ext_duty, flex_duty,tank_duty);
+    std::array<double, MPC_TIME_HORIZON> des_force_array;
+    for(int i=0;i<MPC_TIME_HORIZON;i++){
+        des_force_array[i] = des_force;
+        des_force *=1.05; //TODO: right now I just make it 5% more in the future, note that it will fail when the impedance is negative
+    }
+
+    
+    this->GetForceCon(des_force_array, ext_duty, flex_duty,tank_duty);
 }
 
 void JointCon::GetPreCon(const double des_pre, u_int8_t &duty, Chamber chamber)
 {
+    std::array<double,MPC_TIME_HORIZON> des_pre_array;
+    std::fill_n(des_pre_array.begin(),des_pre_array.size(),des_pre);
     switch (chamber)
     {
+        
     case JointCon::Chamber::kExt:
-        duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
+        
+        duty = this->ext_con.GetPreControl(des_pre_array, this->pre_ext, this->pre_tank, this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
         break;
     case JointCon::Chamber::kFlex:
         break;
     case JointCon::Chamber::kTank:
-        duty = this->tank_con.GetPreControl(des_pre, this->pre_tank, this->pre_main_tank, 1);
+        duty = this->tank_con.GetPreControl(des_pre_array, this->pre_tank, this->pre_main_tank, 1);
         break;
 
     default:

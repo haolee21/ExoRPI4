@@ -42,7 +42,7 @@ private:
 
     Eigen::Matrix<double, 2, 1> B;
     Eigen::Matrix<double, 2, 1> alpha;
-    int DutyCalculate(bool increase_pre, std::array<float, MPC_TIME_HORIZON> y_des, double scale);
+    int DutyCalculate(bool increase_pre, std::array<double, MPC_TIME_HORIZON> y_des, double scale);
     // parameter of OSQP
 
     const double kUBar = 0.15; // FIXME: test if making it not the lower bound improve the performance
@@ -50,9 +50,17 @@ private:
     // const Eigen::Matrix<double,1,2> H_l;
     Eigen::Matrix<double, 2, 1> cur_F; // this will be useful if we want to estimate the flow rate
     Eigen::Matrix<double, 2, 1> cur_dF;
-    double u_n, u_n1, u_n2, u_n3, u_n4,u_n5,u_n6,u_n7,u_n8; // only u_n is used, but we should also record u_n1 and u_n2
-    Eigen::Matrix<double, 2, 1> x_n1,x_n2, x_n3, x_n4,x_n5,x_n6,x_n7,x_n8,x_n9;
-    double y_des1, y_des2, y_des3, y_des4, y_des5,y_des6,y_des7,y_des8,y_des9;
+    double u_n, u_n1, u_n2, u_n3, u_n4, u_n5, u_n6, u_n7, u_n8; // only u_n is used, but we should also record u_n1 and u_n2
+    Eigen::Matrix<double, 2, 1> x_n1;
+    Eigen::Matrix<double, 2, 1> x_n2;
+    Eigen::Matrix<double, 2, 1> x_n3;
+    Eigen::Matrix<double, 2, 1> x_n4;
+    Eigen::Matrix<double, 2, 1> x_n5;
+    Eigen::Matrix<double, 2, 1> x_n6;
+    Eigen::Matrix<double, 2, 1> x_n7;
+    Eigen::Matrix<double, 2, 1> x_n8;
+    Eigen::Matrix<double, 2, 1> x_n9;
+    double y_des1, y_des2, y_des3, y_des4, y_des5, y_des6, y_des7, y_des8, y_des9;
 
     Eigen::Matrix<double, 2, 1> UpdateF(const double *ph, const double *pl, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b);
     Eigen::Matrix<double, 2, 2> Update_dF_dxL_T(const double *ph, const double *pl, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b);
@@ -91,9 +99,7 @@ private:
     Eigen::Matrix<double, 2, 2> Update_dF_dxH8_T(const double *ph, const double *pl, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b);
     Eigen::Matrix<double, 2, 1> Update_dF_du8_T(const double *ph, const double *pl, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b);
 
-        
-    Eigen::Matrix<double,2,1> Update_dF_du9_T(const double* ph,const double* pl,const double* u,const std::array<double,MPC_STATE_NUM>& a,const std::array<double,MPC_STATE_NUM> &b);
-
+    Eigen::Matrix<double, 2, 1> Update_dF_du9_T(const double *ph, const double *pl, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b);
 
     // Mem for previous measurements
     std::array<double, MPC_DELAY> p_tank_mem; // mem is just for storage, pop the oldest ones and put the newest one there, the order may be 34512
@@ -108,7 +114,7 @@ private:
     // std::array<double,MPC_DELAY> p_set_hat;
     // std::array<double,MPC_DELAY> u_hat;
     // void SortHistory();
-    void UpdateHistory(double p_set, double p_tank);
+    void UpdateHistory(double p_set, double p_tank, double p_des);
 
     unsigned meas_idx;
 
@@ -158,7 +164,7 @@ public:
     void UpdateParamH(std::array<double, MPC_STATE_NUM> new_param0, std::array<double, MPC_STATE_NUM> new_param1);
     void UpdateParamL(std::array<double, MPC_STATE_NUM> new_param0, std::array<double, MPC_STATE_NUM> new_param1);
 
-    int GetPreControl(const double &p_des, const double &p_cur, const double &p_tank, double scale); // It requires current pressure value because all the values storaged in the meme are scaled
+    int GetPreControl(const std::array<double, MPC_TIME_HORIZON> &p_des, const double &p_cur, const double &p_tank, double scale); // It requires current pressure value because all the values storaged in the meme are scaled
     void GetImpControl(const double &imp_des, const double &p_ext, const double &p_flex, const double &p_tank, const double &pos, double scale, int &joint_val_duty, int &joint_bal_duty, int &tank_duty);
     // Get values for recorder
 
