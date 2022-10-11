@@ -10,6 +10,12 @@ namespace FilterParam
         const std::array<double,Order+1> a = {1.        , -3.50778621,  4.64090241, -2.74265282,  0.61053481};
 
     }
+    namespace Filter5Hz_2
+    {
+        const int Order = 2;
+        const std::array<double,Order+1> b = {0.02008337, 0.04016673, 0.02008337};
+        const std::array<double,Order+1> a = {1.        , -1.56101808,  0.64135154};
+    }
     namespace Filter10Hz //It is actually 10 Hz, TODO: change it later
     {
         const int Order=2;

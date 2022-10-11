@@ -157,6 +157,7 @@ private:
     // DigitalFilter<double,FilterParam::Filter20Hz_5::Order,1> vel_filter;
     // DigitalFilter<double,FilterParam::Filter20Hz_2::Order,1> force_filter;
     Recorder<double, 31> mpc_rec;
+    
 
 public:
     MPC(std::array<std::array<double, MPC_STATE_NUM>, 2> cl, std::array<std::array<double, MPC_STATE_NUM>, 2> ch, std::string file_name);

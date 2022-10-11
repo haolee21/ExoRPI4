@@ -319,9 +319,9 @@ class MW(QMainWindow):
         self.discharge_thread.start()
         
     def discharge_process(self):
-        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXUT_PWM]=100
-        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXUT_PWM]=True
-        time.sleep(1)
+        # self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXUT_PWM]=100
+        # self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXUT_PWM]=True
+        # time.sleep(1)
         self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXT_PWM]=100
         self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXT_PWM]=True
         time.sleep(1)

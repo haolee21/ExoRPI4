@@ -29,7 +29,7 @@ namespace PneumaticParam
         MpcInitParam::kLKneCh,
         MpcInitParam::kLKneCl, //TODO: update it with the real param
         MpcInitParam::kLKneCh,
-        56739.5,
+        57619,
         0.0088964432, // 0.001 in psi,
         387.096,      // unit: mm^2 (0.6 in2)
         354.838       // unit: mm^2 (0.55 in2)
@@ -41,7 +41,7 @@ namespace PneumaticParam
         MpcInitParam::kLKneCh,
         MpcInitParam::kLKneCl, // TODO: update it with balance param
         MpcInitParam::kLKneCh,
-        56739.5,
+        57619,
         0.0088964432, // 0.001 in psi,
         387.096,      // unit: mm^2 (0.6 in2)
         354.838       // unit: mm^2 (0.55 in2)
@@ -58,7 +58,7 @@ namespace PneumaticParam
         MpcInitParam::kLKneCh,
         MpcInitParam::kLKneCl, // TODO: update it with balance param
         MpcInitParam::kLKneCh,
-        56739.5,
+        57619,
         0.0088964432, // 0.001 in psi,
         387.096,      // unit: mm^2 (0.6 in2)
         354.838       // unit: mm^2 (0.55 in2)
@@ -70,7 +70,7 @@ namespace PneumaticParam
         MpcInitParam::kLKneCh,
         MpcInitParam::kLKneCl, // TODO: update it with balance param
         MpcInitParam::kLKneCh,
-        56739.5,
+        57619,
         0.0088964432, // 0.001 in psi,
         387.096,      // unit: mm^2 (0.6 in2)
         354.838       // unit: mm^2 (0.55 in2)

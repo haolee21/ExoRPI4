@@ -30,7 +30,7 @@ public:
     void GetForceCon(const std::array<double,MPC_TIME_HORIZON> &des_force, u_int8_t& ext_duty, u_int8_t &flex_duty, u_int8_t &tank_duty);
     void GetImpCon(const double des_imp, u_int8_t& ext_duty, u_int8_t& flex_duty, u_int8_t& tank_duty);
     void GetPreCon(const double des_pre, u_int8_t &duty, Chamber chamber); // Pressure control
-    void PushMeas(const double &p_joint_ext, const double &p_joint_rec, const double &p_tank, const double &p_main_tank, const u_int8_t& joint_duty, const u_int8_t &rec_duty, const u_int8_t &tank_duty, const double &pos);
+    void PushMeas(const double &p_joint_ext,const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank, const u_int8_t& joint_duty, const u_int8_t &rec_duty, const u_int8_t &tank_duty, const double &pos);
     void RecData();
     void SetControlMode(ControlMode con_mode);
     const ControlMode GetControlMode();
@@ -61,12 +61,12 @@ private:
     const double volume_intercept_6in = 115.68133521647316; // unit: mm/adc(pos)
 
     // calculating current cylinder length, external force
-    double GetExternalForce(); // unit: newton
+    double GetExternalForce(double pre_ext, double pre_flex, double delta_x, double x_dot); // unit: newton
     double GetLenLinear_mm(double pos);
 
     // filter
     DigitalFilter<double, FilterParam::Filter20Hz_2::Order, 1> vel_filter;
-    DigitalFilter<double, FilterParam::Filter20Hz_2::Order, 1> force_filter;
+    DigitalFilter<double, FilterParam::Filter15Hz_5::Order, 1> force_filter;
 
 
     // std::unique_ptr<OSQPSettings> osqp_settings;
@@ -75,7 +75,9 @@ private:
 
     double GetPre_KPa(double pre_adc);
 
-    Recorder<double,5> joint_con_rec;
+    Recorder<double,6> joint_con_rec;
+
+   
 
 
 };

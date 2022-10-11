@@ -1,9 +1,10 @@
+#include <math.h>
 #include <osqp/osqp.h>
 #include "JointCon.hpp"
 JointCon::JointCon(PneumaticParam::CylinderParam ext_param,PneumaticParam::ReservoirParam reservoir_param,std::string joint_con_name)
     : ext_con(ext_param.cl_ext,ext_param.ch_ext,joint_con_name+"_ext"),flex_con(ext_param.cl_flex,ext_param.ch_flex,joint_con_name+"_flex"), tank_con(reservoir_param.cl,reservoir_param.ch,joint_con_name+"_tank"),
-      piston_area_ext(ext_param.piston_area_ext), piston_area_flex(ext_param.piston_area_flex), fric_coeff(ext_param.fri_coeff), max_pos(ext_param.max_pos), vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b),
-      joint_con_rec(joint_con_name,"Time,L_ext,L_flex,cur_force,max_spring_compress,delta_x")
+      piston_area_ext(ext_param.piston_area_ext), piston_area_flex(ext_param.piston_area_flex), fric_coeff(ext_param.fri_coeff), max_pos(ext_param.max_pos), vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter15Hz_5::a, FilterParam::Filter15Hz_5::b),
+      joint_con_rec(joint_con_name,"Time,L_ext,L_flex,cur_force,max_spring_compress,delta_x,x_dot")
 {
     this->max_len_mm = this->GetLenLinear_mm(this->max_pos);
 
@@ -20,7 +21,7 @@ JointCon::~JointCon()
 {
 }
 
-void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_rec, const double &p_tank, const double &p_main_tank, const u_int8_t &ext_duty, const u_int8_t &rec_duty, const u_int8_t &tank_duty, const double &pos)
+void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank, const u_int8_t &ext_duty, const u_int8_t &rec_duty, const u_int8_t &tank_duty, const double &pos)
 {
     this->ext_con.PushMeas(p_tank,p_joint_ext,ext_duty);
     this->flex_con.PushMeas(p_joint_rec, p_joint_ext,rec_duty);
@@ -28,12 +29,13 @@ void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_rec, co
     
     this->pre_tank = p_tank;
     this->pre_main_tank = p_main_tank;
-    this->pos_diff = pos - this->pre_pos;
+    this->pos_diff = this->vel_filter.GetFilteredMea(std::array<double,1>{pos - this->pre_pos})[0];
     this->pre_pos = pos;
     this->pre_rec = p_joint_rec;
     this->pre_ext = p_joint_ext;
     this->cur_pos = pos;
-    this->cur_max_spring_compress = (p_joint_ext * this->piston_area_ext ) * 2.1547177056884764e-05 / this->spring_k; // unit in mm, piston area=0 for air reservoir
+    // this->cur_max_spring_compress = ((p_joint_ext-0.5/4.096*65536) * this->piston_area_ext ) * 2.1547177056884764e-05 / this->spring_k; // unit in mm, piston area=0 for air reservoir
+    this->cur_max_spring_compress = (p_joint_ext* this->piston_area_ext-p_joint_flex*this->piston_area_flex) * 2.1547177056884764e-05 / this->spring_k; // unit in mm, piston area=0 for air reservoir
     this->cur_delta_x = this->max_pos - pos;
 
     //calculate current volume
@@ -42,9 +44,13 @@ void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_rec, co
     this->L_flex = this->max_len_mm-this->L_ext;
 
 
-    this->cur_force = this->GetExternalForce();
+    this->cur_force = this->force_filter.GetFilteredMea(std::array<double,1>{this->GetExternalForce(p_joint_ext,p_joint_flex,this->cur_delta_x,this->pos_diff)})[0];
 
-    this->joint_con_rec.PushData(std::array<double,5>{this->L_ext,this->L_flex,this->cur_force,this->cur_max_spring_compress,this->cur_delta_x});
+    this->joint_con_rec.PushData(std::array<double,6>{this->L_ext,this->L_flex,this->cur_force,this->cur_max_spring_compress,this->cur_delta_x,this->pos_diff});
+
+    
+
+
 }
 void JointCon::RecData(){
     this->ext_con.RecData();
@@ -84,25 +90,35 @@ void JointCon::GetForceCon(const std::array<double,MPC_TIME_HORIZON> &des_force,
     // std::cout<<"des pre: ";
     std::array<double,MPC_TIME_HORIZON> des_pre;
     for(int i=0;i<des_pre.size();i++){
-        des_pre[i]=((des_force[i] + this->fric_coeff * this->pos_diff) / 2.1547177056884764e-05) / this->piston_area_ext;
+        des_pre[i]=((des_force[i] + this->fric_coeff * this->pos_diff) / 2.1547177056884764e-05) / this->piston_area_ext+8000;
         // std::cout<<des_pre[i]<<',';
     }
     // std::cout<<std::endl;
     // std::cout<<"current pressure: "<<this->pre_ext<<std::endl;
-
+    // std::cout<<"force gap: "<<des_force[0]-this->cur_force<<std::endl;
     if(des_force[0]>this->cur_force){
         //the des_pre is definitely larger than pre_ext, otherwise des_force < this->cur_force
-        std::cout<<"increase pressure\n";
+        
         //to charge the cylinder, we need to make sure the tank is > than des_pre
         if(this->pre_tank<des_pre[0]){
-            std::cout<<"tank pressure too low\n";
+            std::cout<<"increase tank pressure\n";
             tank_duty = this->tank_con.GetPreControl(des_pre, this->pre_tank, pre_main_tank, 1);
-            std::cout<<"tank duty: "<<(int)tank_duty<<std::endl;
+            ext_duty=0;
         }
+        else{
+            std::cout<<"increase cylinder pressure\n";
+            //still charge the cylinder with whatever pressure in the tank
+            ext_duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
+            tank_duty=0;
 
-        //still charge the cylinder with whatever pressure in the tank
-        ext_duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
+            std::cout<<"desired duty: "<<((int)ext_duty)<<std::endl;
+            std::cout<<"desired pressure: "<<des_pre[0]<<std::endl;
+            std::cout<<"current pressure: "<<this->pre_ext<<std::endl;
+            std::cout<<"current tank pressure: "<<this->pre_tank<<std::endl;
+
+        }
         flex_duty=0;
+        
     }
     else{
         //if the force is too high, we have 3 choices
@@ -207,20 +223,29 @@ void JointCon::GetForceCon(const std::array<double,MPC_TIME_HORIZON> &des_force,
     // }
 }
 
-double JointCon::GetExternalForce()
+double JointCon::GetExternalForce(double pre_ext, double pre_flex, double delta_x, double x_dot)
 {
 
-    if ((this->cur_delta_x - 4700) > this->cur_max_spring_compress / this->volume_slope_6in)
-    { // It turned out the the spring start to compress earlier, the 4700 is an experimental value
+    // if ((delta_x - 4700) > this->cur_max_spring_compress / this->volume_slope_6in)
+    // { // It turned out the the spring start to compress earlier, the 4700 is an experimental value
 
-        return (this->pre_ext * this->piston_area_ext ) * 2.1547177056884764e-05 - this->fric_coeff * this->pos_diff; // unit newton
-        // return (pre/65536*4.096-0.5)/4*200*0.31-0.001*this->pos_diff;
-    }
-    else
-    {
-        return (this->cur_delta_x) * this->volume_slope_6in * this->spring_k; // unit: newton
-        // return (this->max_pos-x)*0.0006351973436310972*this->spring_k/25.4;
-    }
+    //     return (pre_ext* this->piston_area_ext-pre_flex*this->piston_area_flex) * 2.1547177056884764e-05 - this->fric_coeff * x_dot; // unit newton
+    //     // return (pre/65536*4.096-0.5)/4*200*0.31-0.001*this->pos_diff;
+    // }
+    // else
+    // {
+    //     return (delta_x) * this->volume_slope_6in * this->spring_k; // unit: newton
+    //     // return (this->max_pos-x)*0.0006351973436310972*this->spring_k/25.4;
+    // }
+
+    double delta_x_switch = delta_x - this->cur_max_spring_compress/this->volume_slope_6in; 
+    // It turned out the the spring start to compress earlier, the 4700 is an experimental value
+    double coeff_0 = 1/(1+exp(-1*delta_x_switch));
+    double coeff_1 = 1-coeff_0;
+
+    double f_0 = coeff_0*((pre_ext* this->piston_area_ext-pre_flex*this->piston_area_flex) * 2.1547177056884764e-05 - this->fric_coeff * x_dot);
+    double f_1 = coeff_1*(delta_x * this->volume_slope_6in * this->spring_k);
+    return f_0+f_1;
 }
 
 double JointCon::GetLenLinear_mm(double pos)
