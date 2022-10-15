@@ -368,7 +368,7 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
 
     double p_diff = (p_des[0] - ps); // we scaled the p_diff with the assumption that pressure will have the momentum to go
 
-    if (std::abs(p_diff) > 100) // 640 is 2 psi
+    if (std::abs(p_diff) > 320) // 640 is 2 psi
     {                           // if desired pressure has 1 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
         
         // double lb;
@@ -385,7 +385,7 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
 
         // double lb = 20; //set the lower bound 20 duty
         std::array<double, MPC_TIME_HORIZON> y_des;
-        for(int i=0;i<p_des.size();i++){
+        for(unsigned i=0;i<p_des.size();i++){
             y_des[i]=(p_des[i] - 3297.312) / 65536.0;
         }
         // std::cout<<"p_diff: "<<p_diff/65536<<std::endl;
@@ -410,7 +410,7 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
         }
         else
         {
-
+            this->cur_dF <<0,0;
             return 0;
         }
 

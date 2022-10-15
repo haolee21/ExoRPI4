@@ -60,6 +60,9 @@ private:
     const double volume_slope_6in = 0.0006351973436310972;  // FIXME: these are only used for linear calibrations
     const double volume_intercept_6in = 115.68133521647316; // unit: mm/adc(pos)
 
+
+    //Energy recycled based imp control
+    
     // calculating current cylinder length, external force
     double GetExternalForce(double pre_ext, double pre_flex, double delta_x, double x_dot); // unit: newton
     double GetLenLinear_mm(double pos);

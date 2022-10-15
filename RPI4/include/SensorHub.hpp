@@ -37,7 +37,7 @@ public:
 
     SensorHub(const SensorHub&) = delete; // prevent copy singleton
 
-
+    
     // data index
     // we use enum for encoder since the order can be determined by ourself (read ENC order)
     enum EncName{
