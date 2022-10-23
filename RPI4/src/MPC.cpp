@@ -307,7 +307,7 @@ int MPC::DutyCalculate(bool increase_pre, std::array<double, MPC_TIME_HORIZON> y
     c_float A_x[MPC_TIME_HORIZON] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
     c_int A_i[MPC_TIME_HORIZON] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     c_int A_p[MPC_TIME_HORIZON + 1] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    c_float l[MPC_TIME_HORIZON] = {0.15, 0, 0, 0, 0, 0, 0, 0, 0};
+    c_float l[MPC_TIME_HORIZON] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
     c_float u[MPC_TIME_HORIZON] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
     c_int n = MPC_TIME_HORIZON;
     c_int m = MPC_TIME_HORIZON;
@@ -370,7 +370,8 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
 
     if (std::abs(p_diff) > 320) // 640 is 2 psi
     {                           // if desired pressure has 1 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
-        
+        // std::cout<<"err is large: "<<p_diff<<std::endl;
+        // std::cout<<ps-pt<<std::endl;
         // double lb;
         // if(std::abs(pt-ps)<1310){ //if the difference is less than 10 psi, we can operate the valve with lower duty
         //     lb = 10.0;
@@ -395,17 +396,17 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
         // std::cout<<"current p_cur scale: "<<this->p_set_his[MPC_TIME_HORIZON]<<std::endl;
 
         int ideal_duty = 0;
-        if ((p_des[0] > ps) & (pt > ps) & (pt > p_des[0]))
+        if ((p_des[0] > ps) & (pt > ps+640))// & (pt > p_des[0]))   //Even the p_des is not feasible, as long as we can improve the current condition, we should still try
         {
             // increasing pressure
 
             ideal_duty = this->DutyCalculate(true, y_des, scale);
             
+            
         }
-        else if ((p_des[0] < ps) & (ps > pt) & (p_des[0] > pt))
+        else if ((p_des[0] < ps) & (ps > pt+640))// & (p_des[0] > pt))
         {
             // decreasing pressure
-            //  std::cout<<"decrease\n";
             ideal_duty = this->DutyCalculate(false, y_des, scale);
         }
         else

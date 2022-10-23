@@ -70,4 +70,13 @@ file(GLOB SRC_FILES
 add_executable(exo_o ${SRC_FILES})
 
 target_link_libraries(exo_o PRIVATE ${Boost_LIBRARIES} ${osqp_LIB}) 
+target_precompile_headers(exo_o 
+    PUBLIC
+        include/ADC.hpp
+        include/DigitalFilter.hpp
+        include/Encoder.hpp
+        include/Pin.hpp
+        include/Recorder.hpp
+        include/Teensy.hpp
+)
 

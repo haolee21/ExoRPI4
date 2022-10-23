@@ -3,11 +3,11 @@
 #include "JointCon.hpp"
 JointCon::JointCon(PneumaticParam::CylinderParam ext_param, PneumaticParam::ReservoirParam reservoir_param, std::string joint_con_name)
     : ext_con(ext_param.cl_ext, ext_param.ch_ext, joint_con_name + "_ext"), flex_con(ext_param.cl_flex, ext_param.ch_flex, joint_con_name + "_flex"), tank_con(reservoir_param.cl, reservoir_param.ch, joint_con_name + "_tank"),
-      piston_area_ext(ext_param.piston_area_ext), piston_area_flex(ext_param.piston_area_flex), fric_coeff(ext_param.fri_coeff), max_pos(ext_param.max_pos), vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter15Hz_5::a, FilterParam::Filter15Hz_5::b),
+      piston_area_ext(ext_param.piston_area_ext), piston_area_flex(ext_param.piston_area_flex), fric_coeff(ext_param.fri_coeff), max_pos(ext_param.max_pos), vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter30Hz_5::a, FilterParam::Filter30Hz_5::b),
       joint_con_rec(joint_con_name, "Time,L_ext,L_flex,cur_force,max_spring_compress,delta_x,x_dot")
 {
     this->max_len_mm = this->GetLenLinear_mm(this->max_pos);
-
+    this->imp_fsm_state = Imp_FSM::kCompress;
     // //setup osqp solver
     // this->osqp_data.reset(new OSQPData);
     // this->osqp_settings.reset(new OSQPSettings);
@@ -246,11 +246,39 @@ double JointCon::GetLenLinear_mm(double pos)
     return pos * this->volume_slope_6in + this->volume_intercept_6in;
 }
 
-void JointCon::GetImpCon(const double des_imp, u_int8_t &ext_duty, u_int8_t &rec_duty, u_int8_t &tank_duty)
+void JointCon::GetImpCon(double des_imp, u_int8_t &ext_duty, u_int8_t &rec_duty, u_int8_t &tank_duty)
 {
     // steps:
     //        1. calculate desired force based on current position
     //        2. calculate desired pressure based on current velocity and desired force
+
+    //check if we need to switch Imp_FSM
+   
+    if(this->imp_fsm_state == Imp_FSM::kCompress){
+        if(this->pos_diff>this->vel_th){
+            this->imp_fsm_state = Imp_FSM::kExtend;
+            this->imp_deflect_point = this->cur_pos;
+            // std::cout<<"extend\n";
+        }
+        
+    }
+    else{
+        if(this->pos_diff< -1*this->vel_th){
+            this->imp_fsm_state=Imp_FSM::kCompress;
+            // std::cout<<"compressed\n";
+        }
+    }
+
+    //if current Imp_FSM state is extension, change des_imp to kExtImp
+    // if(this->imp_fsm_state==Imp_FSM::kExtend){
+
+    //     des_imp = (this->max_pos-this->cur_pos)*des_imp+(this->cur_pos-this->imp_deflect_point)*this->kExtImp/(this->max_pos-this->imp_deflect_point);
+    //     // des_imp = this->kExtImp;
+    //     std::cout<<"ext imp: "<<des_imp<<std::endl;
+    // }
+    
+
+    
 
     double des_force = des_imp * this->cur_delta_x * this->volume_slope_6in;
     double des_force_step = des_imp*this->pos_diff*this->volume_slope_6in;

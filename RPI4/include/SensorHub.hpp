@@ -78,13 +78,9 @@ private:
 
     //Butterworth filter for ADC
     // DigitalFilter<double,FilterParam::Filter3Hz::Order,NUMPRE> filter_3_hz;
-    DigitalFilter<double,FilterParam::Filter20Hz_5::Order,NUMPRE> digital_filter;
-   
-    
+    DigitalFilter<double,FilterParam::Filter30Hz_5::Order,NUMPRE> digital_filter;
    
 
-    
-    
 
     
 

@@ -113,7 +113,7 @@ void* Timer::TimerTick(void*){
     /////////////////////////////////////////// TODO: testing loop period only
     // std::cout<<"Time diff: \n";
     // for(unsigned i=0;i<timeDiff_idx;i++){
-        // std::cout<<timeDiff[i]<<',';
+    //     std::cout<<timeDiff[i]<<',';
     // }
     ////////////////////////////////////////////
 
