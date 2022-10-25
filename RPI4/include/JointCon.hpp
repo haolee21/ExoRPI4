@@ -30,7 +30,7 @@ public:
     void GetForceCon(const std::array<double,MPC_TIME_HORIZON> &des_force, u_int8_t& ext_duty, u_int8_t &flex_duty, u_int8_t &tank_duty);
     void GetImpCon(double des_imp, u_int8_t& ext_duty, u_int8_t& flex_duty, u_int8_t& tank_duty);
     void GetPreCon(const double des_pre, u_int8_t &duty, Chamber chamber); // Pressure control
-    void PushMeas(const double &p_joint_ext,const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank, const u_int8_t& joint_duty, const u_int8_t &rec_duty, const u_int8_t &tank_duty, const double &pos);
+    void PushMeas(const double &p_joint_ext,const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank,const double &pos);
     void RecData();
     void SetControlMode(ControlMode con_mode);
     const ControlMode GetControlMode();

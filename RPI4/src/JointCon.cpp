@@ -3,7 +3,7 @@
 #include "JointCon.hpp"
 JointCon::JointCon(PneumaticParam::CylinderParam ext_param, PneumaticParam::ReservoirParam reservoir_param, std::string joint_con_name)
     : ext_con(ext_param.cl_ext, ext_param.ch_ext, joint_con_name + "_ext"), flex_con(ext_param.cl_flex, ext_param.ch_flex, joint_con_name + "_flex"), tank_con(reservoir_param.cl, reservoir_param.ch, joint_con_name + "_tank"),
-      piston_area_ext(ext_param.piston_area_ext), piston_area_flex(ext_param.piston_area_flex), fric_coeff(ext_param.fri_coeff), max_pos(ext_param.max_pos), vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter30Hz_5::a, FilterParam::Filter30Hz_5::b),
+      piston_area_ext(ext_param.piston_area_ext), piston_area_flex(ext_param.piston_area_flex), fric_coeff(ext_param.fri_coeff), max_pos(ext_param.max_pos), vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter15Hz_5::a, FilterParam::Filter15Hz_5::b),
       joint_con_rec(joint_con_name, "Time,L_ext,L_flex,cur_force,max_spring_compress,delta_x,x_dot")
 {
     this->max_len_mm = this->GetLenLinear_mm(this->max_pos);
@@ -20,11 +20,11 @@ JointCon::~JointCon()
 {
 }
 
-void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank, const u_int8_t &ext_duty, const u_int8_t &rec_duty, const u_int8_t &tank_duty, const double &pos)
+void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank, const double &pos)
 {
-    this->ext_con.PushMeas(p_tank, p_joint_ext, ext_duty);
-    this->flex_con.PushMeas(p_joint_rec, p_joint_ext, rec_duty);
-    this->tank_con.PushMeas(p_main_tank, p_tank, tank_duty);
+    this->ext_con.PushMeas(p_tank, p_joint_ext);
+    this->flex_con.PushMeas(p_joint_rec, p_joint_ext);
+    this->tank_con.PushMeas(p_main_tank, p_tank);
 
     this->pre_tank = p_tank;
     this->pre_main_tank = p_main_tank;
@@ -53,7 +53,7 @@ void JointCon::RecData()
     this->tank_con.RecData();
 }
 
-void JointCon::GetForceCon(const std::array<double, MPC_TIME_HORIZON> &des_force, u_int8_t &rec_duty, u_int8_t &flex_duty, u_int8_t &tank_duty)
+void JointCon::GetForceCon(const std::array<double, MPC_TIME_HORIZON> &des_force, u_int8_t &ext_duty, u_int8_t &flex_duty, u_int8_t &tank_duty)
 {
     /**
      * @brief Get the required duty cycle based on the commanded force, return in joint_duty and bal_duty
@@ -100,13 +100,13 @@ void JointCon::GetForceCon(const std::array<double, MPC_TIME_HORIZON> &des_force
         {
             // std::cout << "increase tank pressure\n";
             tank_duty = this->tank_con.GetPreControl(des_pre, this->pre_tank, pre_main_tank, 1);
-            rec_duty = 0;
+            ext_duty = 0;
         }
         else
         {
             // std::cout << "increase cylinder pressure\n";
             // still charge the cylinder with whatever pressure in the tank
-            rec_duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
+            ext_duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
             tank_duty = 0;
 
             // std::cout<<"desired force: "<<des_force[0]<<std::endl;
@@ -150,14 +150,14 @@ void JointCon::GetForceCon(const std::array<double, MPC_TIME_HORIZON> &des_force
             // std::cout<<"flex duty: "<<(int)flex_duty<<std::endl;
             // std::cout<<"flex duty: "<<(int)flex_duty<<std::endl;//TODO: remove it later
 
-            rec_duty = 0;
+            ext_duty = 0;
             tank_duty = 0;
         }
         else
         {
             // we can recycle the energy to the tank
             
-            rec_duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
+            ext_duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
             flex_duty = 0;
             tank_duty = 0;
         }
@@ -233,7 +233,7 @@ double JointCon::GetExternalForce(double pre_ext, double pre_flex, double delta_
 
     double delta_x_switch = delta_x - this->cur_max_spring_compress / this->volume_slope_6in;
     // It turned out the the spring start to compress earlier, the 4700 is an experimental value
-    double coeff_0 = 1 / (1 + exp(-1 * delta_x_switch));
+    double coeff_0 = 1 / (1 + exp(-0.1 * delta_x_switch));
     double coeff_1 = 1 - coeff_0;
 
     double f_0 = coeff_0 * ((pre_ext * this->piston_area_ext - pre_flex * this->piston_area_flex) * 2.1547177056884764e-05 - this->fric_coeff * x_dot);
@@ -283,7 +283,7 @@ void JointCon::GetImpCon(double des_imp, u_int8_t &ext_duty, u_int8_t &rec_duty,
     double des_force = des_imp * this->cur_delta_x * this->volume_slope_6in;
     double des_force_step = des_imp*this->pos_diff*this->volume_slope_6in;
 
-    // std::cout<<"des_force: "<<des_force<<std::endl;
+    
     std::array<double, MPC_TIME_HORIZON> des_force_array;
     for (int i = 0; i < MPC_TIME_HORIZON; i++)
     {

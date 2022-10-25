@@ -42,7 +42,7 @@ private:
 
     Eigen::Matrix<double, 2, 1> B;
     Eigen::Matrix<double, 2, 1> alpha;
-    int DutyCalculate(bool increase_pre, std::array<double, MPC_TIME_HORIZON> y_des, double scale);
+    double CalculateControl(bool increase_pre, std::array<double, MPC_TIME_HORIZON> y_des, double scale);
     // parameter of OSQP
 
     const double kUBar = 0.15; // FIXME: test if making it not the lower bound improve the performance
@@ -105,6 +105,7 @@ private:
     std::array<double, MPC_DELAY> p_tank_mem; // mem is just for storage, pop the oldest ones and put the newest one there, the order may be 34512
     std::array<double, MPC_DELAY> p_set_mem;
     std::array<double, MPC_DELAY> u_mem;
+    double cur_u; //     duty/100
 
     std::array<double, MPC_DELAY + MPC_TIME_HORIZON> p_tank_his;
     std::array<double, MPC_DELAY + MPC_TIME_HORIZON> p_set_his;
@@ -135,27 +136,13 @@ private:
     // cylinder volume
 
     // static const double kArea;//= 0.31*645.16; //mm^2
-    double phi_scale;
+    // double phi_scale;
 
-    const double volume_slope_6in = 0.0006351973436310972;  // FIXME: these are only used for linear calibrations
-    const double volume_intercept_6in = 115.68133521647316; // unit: mm/adc(pos)
+    // const double volume_slope_6in = 0.0006351973436310972;  // FIXME: these are only used for linear calibrations
+    // const double volume_intercept_6in = 115.68133521647316; // unit: mm/adc(pos)
 
-    const double spring_k = 55.4 * 0.0393701 * 4.44822;
-    // the unit here is N/mm
-    const double pre_offset = 0.5 / 4.096 * 65536;
-    // const double piston_area;
-    // double GetExternalForce(double p_ext,double p_flex,double x);
-    // double GetLenLinear_mm(double pos);
-    // piston friction compensation
-    // double pre_pos;
-    // double pos_diff;
-    // double cur_pos;
-    // double fric_coeff;
-
-    // double cur_max_spring_compress;
-    // double cur_force;
-    // DigitalFilter<double,FilterParam::Filter20Hz_5::Order,1> vel_filter;
-    // DigitalFilter<double,FilterParam::Filter20Hz_2::Order,1> force_filter;
+    // const double spring_k = 55.4 * 0.0393701 * 4.44822;
+    // const double pre_offset = 0.5 / 4.096 * 65536;
     Recorder<double, 31> mpc_rec;
     
 
@@ -169,7 +156,7 @@ public:
     void GetImpControl(const double &imp_des, const double &p_ext, const double &p_flex, const double &p_tank, const double &pos, double scale, int &joint_val_duty, int &joint_bal_duty, int &tank_duty);
     // Get values for recorder
 
-    void PushMeas(const double p_tank, const double p_set, const uint8_t duty);
+    void PushMeas(const double p_tank, const double p_set);
     void RecData();
 
     // double GetCylinderScale(double pre,double pos); //get the (cylinder length)/(max cylinder length)

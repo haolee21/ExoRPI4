@@ -23,7 +23,7 @@ MPC::MPC(std::array<std::array<double, MPC_STATE_NUM>, 2> cl, std::array<std::ar
     this->osqp_settings->alpha = 1.0;
     this->osqp_settings->verbose = false;
     this->osqp_settings->eps_abs = 0.000000001;
-    this->phi_scale = 1.0;
+    this->cur_u=0.15;
     // this->pre_pos = 0.0;
     this->meas_idx = 0;
 }
@@ -53,7 +53,7 @@ void MPC::UpdateParamL(array<double, MPC_STATE_NUM> new_a, array<double, MPC_STA
     this->bl = new_b;
 }
 
-int MPC::DutyCalculate(bool increase_pre, std::array<double, MPC_TIME_HORIZON> y_des, double scale)
+double MPC::CalculateControl(bool increase_pre, std::array<double, MPC_TIME_HORIZON> y_des, double scale)
 {
 
     this->y_des1 = y_des[0];
@@ -337,6 +337,7 @@ int MPC::DutyCalculate(bool increase_pre, std::array<double, MPC_TIME_HORIZON> y
     this->u_n8 = *(this->work->solution->x + 8);
 
     Eigen::Matrix<double, MPC_TIME_HORIZON, 1> u_vec;
+
     u_vec << this->u_n, this->u_n1, this->u_n2, this->u_n3, this->u_n4, this->u_n5, this->u_n6, this->u_n7, this->u_n8;
     // std::cout<<"u vec: "<<u_vec<<std::endl;
 
@@ -358,9 +359,11 @@ int MPC::DutyCalculate(bool increase_pre, std::array<double, MPC_TIME_HORIZON> y
     // auto err = y_des_vec-A_all-B_all*u_vec;
     // auto res_err2 = err.norm();
     // std::cout<<"real residual: "<<res_err2<<std::endl;
-
-    this->cur_dF = scale * this->UpdateF(p_h, p_l, this->u_his.begin(), *cur_a, *cur_b);
-    return (int)(this->u_n * 100 + 0.5);
+    // std::cout<<this->u_n<<std::endl;
+    // this->cur_dF = scale * this->UpdateF(p_h, p_l, this->u_his.begin(), *cur_a, *cur_b);
+    this->u_his[MPC_TIME_HORIZON] = this->u_n; //add the current duty to u_his for estimating gradient
+    return this->u_n;
+    // return (int)(this->u_n * 100 + 0.5);
 }
 
 int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const double &ps, const double &pt, double scale)
@@ -395,24 +398,27 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
         // std::cout<<"current p_des scale: "<<p_des_scale<<std::endl;
         // std::cout<<"current p_cur scale: "<<this->p_set_his[MPC_TIME_HORIZON]<<std::endl;
 
-        int ideal_duty = 0;
-        if ((p_des[0] > ps) & (pt > ps+640))// & (pt > p_des[0]))   //Even the p_des is not feasible, as long as we can improve the current condition, we should still try
+        double ideal_u = 0;
+        if ((p_des[0] > ps) & (pt > ps+320))// & (pt > p_des[0]))   //Even the p_des is not feasible, as long as we can improve the current condition, we should still try
         {
             // increasing pressure
 
-            ideal_duty = this->DutyCalculate(true, y_des, scale);
+            ideal_u = this->CalculateControl(true, y_des, scale);
+
+            this->cur_dF = this->UpdateF(this->p_tank_his.begin(),this->p_set_his.begin(),this->u_his.begin()+1,this->ah,this->bh);
             
             
         }
-        else if ((p_des[0] < ps) & (ps > pt+640))// & (p_des[0] > pt))
+        else if ((p_des[0] < ps) & (ps > pt+320))// & (p_des[0] > pt))
         {
             // decreasing pressure
-            ideal_duty = this->DutyCalculate(false, y_des, scale);
+            ideal_u = this->CalculateControl(false, y_des, scale);
+            this->cur_dF = this->UpdateF(this->p_set_his.begin(),this->p_tank_his.begin(),this->u_his.begin()+1,this->al,this->bl);
         }
         else
         {
-            this->cur_dF <<0,0;
-            return 0;
+            this->cur_dF =this->cur_dF*0.5;
+            ideal_u=0;
         }
 
         // std::cout<<"real p_diff: "<<this->Phi.coeff(1,0)*65536<<std::endl;
@@ -422,38 +428,44 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
         // std::cout << "control p_diff: " << (this->alpha.coeff(1, 0) + this->B.coeff(1, 0) * ideal_duty/100) * 65536 << std::endl;
         // std::cout << "des pdiff: " << p_diff << std::endl;
 
-        if (ideal_duty < 15)
+        if (ideal_u < 0.15)
         {
-            return 0;
+            this->cur_u = 0;
+            
         }
         // else if (ideal_duty < 15 && ideal_duty > 10)
         // {
         //     // return 0;
         //     return 15;
         // }
-        else if (ideal_duty > 100)
-            return 100;
+        else if (ideal_u > 1)
+            this->cur_u = 1;
         else
         {
-            return ideal_duty;
+            this->cur_u =ideal_u;
         }
     }
     else
     {
+        
         // this->cur_F << 0, 0;
-        this->cur_dF << 0, 0;
+        this->cur_dF =this->cur_dF*0.5;
         this->u_n = 0;
         this->u_n1 = 0;
         this->u_n2 = 0;
-        return 0;
+        this->cur_u =0;
     }
+   
+    return (int)(this->cur_u*100+0.5);
+
 }
 
-void MPC::PushMeas(const double p_tank, const double p_set, const uint8_t duty)
+void MPC::PushMeas(const double p_tank, const double p_set)
 {
+    
     this->p_tank_mem[this->meas_idx] = ((double)p_tank - 3297.312) / 65536.0; // the substraction is to remove the 0.5 V pressure sensor bias and add 1 atm to the equation
     this->p_set_mem[this->meas_idx] = ((double)p_set - 3297.312) / 65536.0;   // in the lasso regression, we have proved it increases the testing accuracy to stable 90% up
-    this->u_mem[this->meas_idx] = ((double)duty) / 100;
+    this->u_mem[this->meas_idx] = this->cur_u;
     this->meas_idx++;
     this->meas_idx %= MPC_DELAY;
 
@@ -504,62 +516,3 @@ void MPC::UpdateHistory(double p_set, double p_tank,double p_des)
     // std::cout<<"mem values: "<<this->p_tank_his[0]<<std::endl;
 }
 
-// double MPC::GetLenLinear_mm(double pos){ //TODO: this only fit linear case, need to do nonlinear equation when using it on the exoskeleton
-//     return pos*this->volume_slope_6in+this->volume_intercept_6in; //152.4 is 6 in cylinder max length
-//                                                                                //TODO: need to consider 5" cylinder
-//                                                                                //6.71 is just the offset of linear encoder
-// }
-
-// double MPC::GetExternalForce(double pre_ext,double pre_flex,double x){
-//     //return the external force in newton
-
-//     double cur_delta_x =this->max_pos-x;
-//     if((cur_delta_x-4700)>this->cur_max_spring_compress/this->volume_slope_6in){ //It turned out the the spring start to compress earlier, the 4700 is an experimental value
-
-//         return (pre_ext-pre_flex)*2.1547177056884764e-05*this->piston_area-this->fric_coeff*this->pos_diff; //unit newton
-//         // return (pre/65536*4.096-0.5)/4*200*0.31-0.001*this->pos_diff;
-//     }
-//     else{
-//         return (this->max_pos-x)*this->volume_slope_6in*this->spring_k;// unit: newton
-//         // return (this->max_pos-x)*0.0006351973436310972*this->spring_k/25.4;
-//     }
-
-// }
-
-// void MPC::SetCylinderMaxPos(){
-// this->max_pos = this->cur_pos;
-// }
-// double MPC::GetCylinderScale(double pre,double pos) //get the (cylinder length)/(max cylinder length)
-// {
-
-//     double cur_pos_mm = this->GetLenLinear_mm(pos);
-//     double cur_len = this->max_len_mm - cur_pos_mm-4700*this->volume_slope_6in;
-//     if(cur_len<this->cur_max_spring_compress){
-
-//         return (cur_pos_mm-this->cur_max_spring_compress)/this->max_len_mm;
-//     }
-//     else{
-//         return 1;
-//     }
-
-// }
-
-// void MPC::GetImpControl(const double& imp_des, const double& p_ext,const double& p_flex, const double& p_tank, const double& pos,double scale,int& joint_val_duty,int& joint_bal_duty,int& tank_duty){
-//     //the impedance controller will use the current velocity to estimate the displacement
-
-//     //steps:
-//     //       1. calculate desired force based on current position
-//     //       2. calculate desired pressure based on current velocity and desired force
-//     //       3. command desired pressure
-
-//     // if((this->pos_diff*this->volume_slope_6in<0.01)&&(this->pos_diff*this->volume_slope_6in>-0.01)) return 0; //if it does not move more than 0.5mm, no control
-
-//     double cur_delta_x = this->max_len_mm-this->GetLenLinear_mm(pos);
-//     double des_force = imp_des*cur_delta_x;
-//     double des_pre = (des_force+this->fric_coeff*this->pos_diff)/this->piston_area/2.1547177056884764e-05+8000;
-
-//     // double p_des = (imp_des*this->pos_diff*this->volume_slope_6in)/this->piston_area*4.641208782079999e+04+p_cur;  //N/mm2 * in2/lbf * 4/200 * 2^16/4.096
-
-//     joint_val_duty= this->GetPreControl(des_pre,p_ext,p_tank,scale);
-
-// }
