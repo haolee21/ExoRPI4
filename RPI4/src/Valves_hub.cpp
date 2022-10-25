@@ -188,3 +188,11 @@ std::array<bool,(unsigned)Valves_hub::Joint::kTotal>Valves_hub::GetControlCond()
     }
     return cur_cond;
 }
+
+void Valves_hub::SetJointPos(Valves_hub::Joint joint){
+    auto &valves_hub = Valves_hub::GetInstance();
+    auto &sensor_hub = SensorHub::GetInstance();
+    if(joint == Valves_hub::Joint::kLKne){
+        valves_hub.left_knee_con.SetKneeMaxPos(sensor_hub.GetPreData()[(unsigned)SensorHub::PreName::Pos]);
+    }
+}

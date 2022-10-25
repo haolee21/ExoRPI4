@@ -6,7 +6,7 @@ JointCon::JointCon(PneumaticParam::CylinderParam ext_param, PneumaticParam::Rese
       piston_area_ext(ext_param.piston_area_ext), piston_area_flex(ext_param.piston_area_flex), fric_coeff(ext_param.fri_coeff), max_pos(ext_param.max_pos), vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter15Hz_5::a, FilterParam::Filter15Hz_5::b),
       joint_con_rec(joint_con_name, "Time,L_ext,L_flex,cur_force,max_spring_compress,delta_x,x_dot")
 {
-    this->max_len_mm = this->GetLenLinear_mm(this->max_pos);
+    this->SetKneeMaxPos(ext_param.max_pos);
     this->imp_fsm_state = Imp_FSM::kCompress;
     // //setup osqp solver
     // this->osqp_data.reset(new OSQPData);
@@ -19,7 +19,11 @@ JointCon::JointCon(PneumaticParam::CylinderParam ext_param, PneumaticParam::Rese
 JointCon::~JointCon()
 {
 }
-
+void JointCon::SetKneeMaxPos(double max_pos_val){
+    this->max_pos = max_pos_val;
+    this->max_len_mm = this->GetLenLinear_mm(max_pos_val); //TODO: need to modify this function when integrating to the exo
+    // std::cout<<"max pos reset\n";
+}
 void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank, const double &pos)
 {
     this->ext_con.PushMeas(p_tank, p_joint_ext);

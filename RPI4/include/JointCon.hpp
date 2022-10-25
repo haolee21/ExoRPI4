@@ -34,6 +34,7 @@ public:
     void RecData();
     void SetControlMode(ControlMode con_mode);
     const ControlMode GetControlMode();
+    void SetKneeMaxPos(double max_pos_val);
     
 
 private:

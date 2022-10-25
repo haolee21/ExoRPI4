@@ -84,7 +84,8 @@ class UdpCmdPacket(Structure):
               ("des_force_flag",(c_bool)*NUM_JOINT),
               ("epoch_time_flag",c_bool),
               ("recorder_flag",c_bool),
-              ("con_on_off_flag",(c_bool)*NUM_JOINT)]
+              ("con_on_off_flag",(c_bool)*NUM_JOINT),
+              ("set_joint_pos_flag",(c_bool)*NUM_JOINT),]
     def __init__(self):
         self.pwm_duty_flag=(ctypes.c_bool*PWM_VAL_NUM)((False)*PWM_VAL_NUM)
         self.reset_enc_flag = (ctypes.c_bool*NUM_ENC)((False)*NUM_ENC)
@@ -94,3 +95,4 @@ class UdpCmdPacket(Structure):
         self.epoch_time_flag = False
         self.recorder_flag=False
         self.con_on_off_flag = (ctypes.c_bool*NUM_JOINT)((False)*NUM_JOINT)
+        self.set_joint_pos_flag = (ctypes.c_bool*NUM_JOINT)((False)*NUM_JOINT)

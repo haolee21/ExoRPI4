@@ -143,15 +143,16 @@ class MW(QMainWindow):
         #function checkbox
         self.btn_sendCmd = self.findChild(QPushButton,'btn_sendCmd')
         self.btn_sendCmd.clicked.connect(self.btn_sendCmd_clicked)
-        self.relLKne_task = self.findChild(QCheckBox,'checkBox_rel_LKne')
-        self.relRKne_task = self.findChild(QCheckBox,'checkBox_rel_RKne')
-        self.relLAnk_task = self.findChild(QCheckBox,'checkBox_rel_LAnk')
-        self.relRAnk_task = self.findChild(QCheckBox,'checkBox_rel_RAnk')
+        # self.relLKne_task = self.findChild(QCheckBox,'checkBox_rel_LKne')
+        # self.relRKne_task = self.findChild(QCheckBox,'checkBox_rel_RKne')
+        # self.relLAnk_task = self.findChild(QCheckBox,'checkBox_rel_LAnk')
+        # self.relRAnk_task = self.findChild(QCheckBox,'checkBox_rel_RAnk')
 
-        self.actLKne_task = self.findChild(QCheckBox,'checkBox_act_LKne')
-        self.actRKne_task = self.findChild(QCheckBox,'checkBox_act_RKne')
-        self.actLAnk_task = self.findChild(QCheckBox,'checkBox_act_LAnk')
-        self.actRAnk_task = self.findChild(QCheckBox,'checkBox_act_RAnk')
+        # self.actLKne_task = self.findChild(QCheckBox,'checkBox_act_LKne')
+        # self.actRKne_task = self.findChild(QCheckBox,'checkBox_act_RKne')
+        # self.actLAnk_task = self.findChild(QCheckBox,'checkBox_act_LAnk')
+        # self.actRAnk_task = self.findChild(QCheckBox,'checkBox_act_RAnk')
+        self.checkBox_setLKneMaxPos = self.findChild(QCheckBox,'checkBox_setLKneMaxPos')
 
         self.walkRec_task = self.findChild(QRadioButton,'radioButton_walkRec')
         self.walkRec_task.toggled.connect(self.radio_walkRec_checked)
@@ -219,6 +220,10 @@ class MW(QMainWindow):
         #     if self.actRAnk_task.isChecked():
         #         self.tcp_port.SendCmd('STR:ACT:RANK',2)
         # self.radio_walkRec_checked()
+
+        if self.checkBox_setLKneMaxPos.isChecked():
+            self.udp_port.udp_cmd_packet.set_joint_pos_flag[JOINT_LKNE]=True
+            self.checkBox_setLKneMaxPos.setChecked(False)
         pass
                 
         

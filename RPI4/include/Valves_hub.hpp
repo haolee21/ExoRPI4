@@ -104,7 +104,7 @@ public:
     //Force
     static void SetDesiredForce(Joint joint, double des_force);
 
-    
+    static void SetJointPos(Joint joint);
 
 private:
     Valves_hub();

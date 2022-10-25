@@ -26,14 +26,15 @@ struct UDP_CmdPacket{
     std::array<bool,(unsigned)Valves_hub::Joint::kTotal> con_on_off;
 
     //change flags
-    std::array<bool,PWM_VAL_NUM> pwm_duty_flag;
-    std::array<bool,SensorHub::NUMENC> reset_enc_flag;
-    std::array<bool,(unsigned)Valves_hub::Chamber::kTotal> des_pre_flag;
-    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> des_imp_flag;
-    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> des_force_flag;
-    bool epoch_time_flag;
-    bool recorder_flag;
-    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> con_on_off_flag;
+    std::array<bool,PWM_VAL_NUM> pwm_duty_flag{false};
+    std::array<bool,SensorHub::NUMENC> reset_enc_flag{false};
+    std::array<bool,(unsigned)Valves_hub::Chamber::kTotal> des_pre_flag{false};
+    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> des_imp_flag{false};
+    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> des_force_flag{false};
+    bool epoch_time_flag = false;
+    bool recorder_flag = false;
+    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> con_on_off_flag{false};
+    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> set_joint_pos{false};
 
     
 

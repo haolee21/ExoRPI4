@@ -399,7 +399,7 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
         // std::cout<<"current p_cur scale: "<<this->p_set_his[MPC_TIME_HORIZON]<<std::endl;
 
         double ideal_u = 0;
-        if ((p_des[0] > ps) & (pt > ps+320))// & (pt > p_des[0]))   //Even the p_des is not feasible, as long as we can improve the current condition, we should still try
+        if ((p_des[0] > ps) & (pt > ps))// & (pt > p_des[0]))   //Even the p_des is not feasible, as long as we can improve the current condition, we should still try
         {
             // increasing pressure
 
@@ -409,7 +409,7 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
             
             
         }
-        else if ((p_des[0] < ps) & (ps > pt+320))// & (p_des[0] > pt))
+        else if ((p_des[0] < ps) & (ps > pt))// & (p_des[0] > pt))
         {
             // decreasing pressure
             ideal_u = this->CalculateControl(false, y_des, scale);

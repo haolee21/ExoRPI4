@@ -360,5 +360,20 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
             Valves_hub::EnableCon(Valves_hub::Joint::kRAnk, JointCon::ControlMode::kNone);
         }
     }
-    //
+    // reset the max pos of each cylinder
+    if(this->CheckCmdSet(cmd_packet.set_joint_pos.begin(),cmd_packet.set_joint_pos.size())){
+        if(cmd_packet.set_joint_pos[(unsigned)Valves_hub::Joint::kLKne]){
+            Valves_hub::SetJointPos(Valves_hub::Joint::kLKne);
+        }
+        if(cmd_packet.set_joint_pos[(unsigned)Valves_hub::Joint::kLAnk]){
+            Valves_hub::SetJointPos(Valves_hub::Joint::kLAnk);
+        }
+        if(cmd_packet.set_joint_pos[(unsigned)Valves_hub::Joint::kRKne]){
+            Valves_hub::SetJointPos(Valves_hub::Joint::kRKne);
+        }
+        if(cmd_packet.set_joint_pos[(unsigned)Valves_hub::Joint::kRAnk]){
+            Valves_hub::SetJointPos(Valves_hub::Joint::kRAnk);
+        }
+    }
+
 }
