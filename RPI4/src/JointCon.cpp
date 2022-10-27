@@ -110,7 +110,7 @@ void JointCon::GetForceCon(const std::array<double, MPC_TIME_HORIZON> &des_force
         {
             // std::cout << "increase cylinder pressure\n";
             // still charge the cylinder with whatever pressure in the tank
-            ext_duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
+            ext_duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->max_len_mm/this->GetLenLinear_mm(this->cur_pos));
             tank_duty = 0;
 
             // std::cout<<"desired force: "<<des_force[0]<<std::endl;
@@ -148,7 +148,7 @@ void JointCon::GetForceCon(const std::array<double, MPC_TIME_HORIZON> &des_force
             // std::cout<<"checking: "<<checking<<std::endl;
             // std::cout<<"recycle to ankle:\n";
             // std::cout<<"pre_ext: "<<this->pre_ext<<", rec_tank pre: "<<this->pre_rec<<std::endl;
-            flex_duty = this->flex_con.GetPreControl(des_pre, this->pre_ext, this->pre_rec, this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
+            flex_duty = this->flex_con.GetPreControl(des_pre, this->pre_ext, this->pre_rec, this->max_len_mm/this->GetLenLinear_mm(this->cur_pos));
 
             // flex_duty = this->flex_con.GetPreControl(p_flex_adc,this->pre_flex,this->pre_ext,1);
             // std::cout<<"flex duty: "<<(int)flex_duty<<std::endl;
@@ -161,7 +161,7 @@ void JointCon::GetForceCon(const std::array<double, MPC_TIME_HORIZON> &des_force
         {
             // we can recycle the energy to the tank
             
-            ext_duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
+            ext_duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->max_len_mm/this->GetLenLinear_mm(this->cur_pos));
             flex_duty = 0;
             tank_duty = 0;
         }
@@ -307,7 +307,7 @@ void JointCon::GetPreCon(const double des_pre, u_int8_t &duty, Chamber chamber)
 
     case JointCon::Chamber::kExt:
 
-        duty = this->ext_con.GetPreControl(des_pre_array, this->pre_ext, this->pre_tank, this->GetLenLinear_mm(this->cur_pos) / this->max_len_mm);
+        duty = this->ext_con.GetPreControl(des_pre_array, this->pre_ext, this->pre_tank, this->max_len_mm/this->GetLenLinear_mm(this->cur_pos));
         break;
     case JointCon::Chamber::kFlex:
         break;
