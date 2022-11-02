@@ -25,6 +25,11 @@ struct UDP_CmdPacket{
     bool recorder;
     std::array<bool,(unsigned)Valves_hub::Joint::kTotal> con_on_off;
 
+    //impact absorbing 
+    std::array<double,(unsigned)Valves_hub::Joint::kTotal> init_force;
+    std::array<double,(unsigned)Valves_hub::Joint::kTotal> init_impact_imp;
+    std::array<double,(unsigned)Valves_hub::Joint::kTotal> restore_imp;
+
     //change flags
     std::array<bool,PWM_VAL_NUM> pwm_duty_flag{false};
     std::array<bool,SensorHub::NUMENC> reset_enc_flag{false};
@@ -35,6 +40,8 @@ struct UDP_CmdPacket{
     bool recorder_flag = false;
     std::array<bool,(unsigned)Valves_hub::Joint::kTotal> con_on_off_flag{false};
     std::array<bool,(unsigned)Valves_hub::Joint::kTotal> set_joint_pos{false};
+    
+    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> impact_absorb_flag{false};
 
     
 

@@ -66,6 +66,10 @@ private:
     std::array<double,(unsigned)Joint::kTotal> desired_imp{0};
     std::array<double,(unsigned)Joint::kTotal> desired_force{0};
 
+    //impact absorb
+    std::array<double,(unsigned)Joint::kTotal> init_force{0};
+    std::array<double,(unsigned)Joint::kTotal> init_imp{0};
+   
     
 
 public:
@@ -105,6 +109,9 @@ public:
     static void SetDesiredForce(Joint joint, double des_force);
 
     static void SetJointPos(Joint joint);
+
+    //Impact absorb
+    static void SetImpactAbsorb(Valves_hub::Joint joint,double init_force, double init_imp);
 
 private:
     Valves_hub();

@@ -78,6 +78,10 @@ void Valves_hub::UpdateValve(){
         hub.left_knee_con.GetImpCon(hub.desired_imp[(unsigned)Valves_hub::Joint::kLKne],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kLTank]);
         hub.valChanged_flag=true;
     }
+    else if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kImpactCon){
+        hub.left_knee_con.GetImpactCon(hub.init_force[(unsigned)Joint::kLKne],hub.init_imp[(unsigned)Joint::kLKne],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]);
+        hub.valChanged_flag=true;
+    }
     
     
     
@@ -195,4 +199,10 @@ void Valves_hub::SetJointPos(Valves_hub::Joint joint){
     if(joint == Valves_hub::Joint::kLKne){
         valves_hub.left_knee_con.SetKneeMaxPos(sensor_hub.GetPreData()[(unsigned)SensorHub::PreName::Pos]);
     }
+}
+
+void Valves_hub::SetImpactAbsorb(Valves_hub::Joint joint, double init_force, double init_imp){
+    auto &valves_hub = Valves_hub::GetInstance();
+    valves_hub.init_force[(unsigned)joint]=init_force;
+    valves_hub.init_imp[(unsigned)joint]=init_imp;
 }

@@ -306,6 +306,15 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
             Valves_hub::SetDesiredImp(Valves_hub::Joint::kRAnk, cmd_packet.des_imp[(unsigned)Valves_hub::Joint::kRAnk]);
         }
     }
+    //impact absorb control
+    if(this->CheckCmdSet(cmd_packet.impact_absorb_flag.begin(),cmd_packet.impact_absorb_flag.size())){
+        if(cmd_packet.impact_absorb_flag[(unsigned)Valves_hub::Joint::kLKne]){
+            
+            Valves_hub::SetImpactAbsorb(Valves_hub::Joint::kLKne,cmd_packet.init_force[(unsigned)Valves_hub::Joint::kLKne],cmd_packet.init_impact_imp[(unsigned)Valves_hub::Joint::kLKne]);
+            Valves_hub::EnableCon(Valves_hub::Joint::kLKne,JointCon::ControlMode::kImpactCon);
+        }
+    }
+
 
     // update robot's time
     if (cmd_packet.epoch_time_flag)

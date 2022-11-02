@@ -21,6 +21,7 @@ from PWM_TestWindow import *
 from ImpConWindow import *
 from PwmValueWindow import *
 from PressureConWindow import *
+from ImpactCon import *
 import math
 import time
 import datetime
@@ -58,6 +59,7 @@ class MW(QMainWindow):
         self.imp_con_window = ImpWindow(self)
         self.pwm_value_window = PwmValueWindow(self)
         self.pre_con_window = PressureConWindow(self)
+        self.impact_con_window = ImpactCon(self)
         # jointUpdateCB = lambda data:self.joint_plot_window.UpdateData(self,data)
         # preUpdateCB = lambda data:self.pressure_plot_window.UpdateData(self,data)
         # self.tcp_port.SetCallBack(jointUpdateCB,preUpdateCB)
@@ -88,6 +90,9 @@ class MW(QMainWindow):
 
         self.act_pre_con = self.findChild(QAction,'actionTest_Pressure_Control')
         self.act_pre_con.triggered.connect(self.pre_con_window.show)
+
+        self.act_impact_con = self.findChild(QAction,'action_ImpactAbsorb')
+        self.act_impact_con.triggered.connect(self.impact_con_window.show)
 
         # air reserivor 
         

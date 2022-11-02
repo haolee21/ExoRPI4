@@ -636,6 +636,7 @@
     <addaction name="act_testPWM_valves"/>
     <addaction name="actionTest_Pressure_Control"/>
     <addaction name="act_ImpCon"/>
+    <addaction name="action_ImpactAbsorb"/>
    </widget>
    <addaction name="menuConnection"/>
    <addaction name="menuGraphs"/>
@@ -686,6 +687,11 @@
   <action name="actionTest_Pressure_Control">
    <property name="text">
     <string>Test Pressure Control</string>
+   </property>
+  </action>
+  <action name="action_ImpactAbsorb">
+   <property name="text">
+    <string>Test Impact Absorb</string>
    </property>
   </action>
  </widget>
