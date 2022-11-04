@@ -25,11 +25,11 @@ void JointCon::SetKneeMaxPos(double max_pos_val)
     this->max_len_mm = this->GetLenLinear_mm(max_pos_val); // TODO: need to modify this function when integrating to the exo
     // std::cout<<"max pos reset\n";
 }
-void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank, const double &pos)
+void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank, const double &pos, const u_int8_t tank_duty, const u_int8_t knee_ext_duty, const u_int8_t knee_flex_duty, const u_int8_t knee_ank_duty, const u_int8_t ank_ext_duty)
 {
-    this->ext_con.PushMeas(p_tank, p_joint_ext);
-    this->flex_con.PushMeas(p_joint_rec, p_joint_ext);
-    this->tank_con.PushMeas(p_main_tank, p_tank);
+    this->ext_con.PushMeas(p_tank, p_joint_ext,knee_ext_duty);
+    this->flex_con.PushMeas(p_joint_rec, p_joint_ext,knee_ank_duty);
+    this->tank_con.PushMeas(p_main_tank, p_tank,tank_duty);
 
     this->pre_tank = p_tank;
     this->pre_main_tank = p_main_tank;
@@ -84,7 +84,7 @@ void JointCon::GetForceCon(const std::array<double, MPC_TIME_HORIZON> &des_force
      *    b. calculate joint_duty, set tank_duty=0, bal_duty=0
      */
 
-    std::cout<<"desired force: "<<des_force[0]<<std::endl;
+    // std::cout<<"desired force: "<<des_force[0]<<std::endl;
     // std::cout<<"current force: "<<this->cur_force<<std::endl;
     // std::cout<<"des pre: ";
     std::array<double, MPC_TIME_HORIZON> des_pre;
@@ -286,6 +286,8 @@ void JointCon::GetImpactCon(const double init_force, const double init_imp, u_in
 
     if (this->imp_fsm_state == Imp_FSM::kCompress)
     {
+        std::cout<<"init force: "<<init_force<<std::endl;
+        std::cout<<"current force: "<<this->cur_force<<std::endl;
         this->GetImpCon(init_imp, ext_duty, rec_duty, tank_duty, init_force);
     }
     else if (this->imp_fsm_state == Imp_FSM::kExtend)

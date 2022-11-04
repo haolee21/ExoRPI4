@@ -10,7 +10,8 @@ using namespace std;
 
 MPC::MPC(std::array<std::array<double, MPC_STATE_NUM>, 2> cl, std::array<std::array<double, MPC_STATE_NUM>, 2> ch, std::string file_name)
     : ah(ch[0]), bh(ch[1]), al(cl[0]), bl(cl[1]),
-      mpc_rec(file_name, MPC_HEAD)
+      mpc_rec(file_name, MPC_HEAD),
+      mpc_model_rec(file_name+std::string("_model"),MPC_MODEL_HEAD)
 
 {
     // this->max_pos = param.max_pos;
@@ -116,113 +117,113 @@ double MPC::CalculateControl(bool increase_pre, std::array<double, MPC_TIME_HORI
     
  
 
-    f_p1 = scale * this->UpdateF(p_h, p_l, this->u_his.begin() + 1, *cur_a, *cur_b) + F_offset;
-    f_p2 = scale * this->UpdateF(p_h + 1, p_l + 1, this->u_his.begin() + 2, *cur_a, *cur_b) + F_offset;
-    f_p3 = scale * this->UpdateF(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b) + F_offset;
-    f_p4 = scale * this->UpdateF(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b) + F_offset;
-    f_p5 = scale * this->UpdateF(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b) + F_offset;
-    f_p6 = scale * this->UpdateF(p_h + 5, p_l + 5, this->u_his.begin() + 6, *cur_a, *cur_b) + F_offset;
-    f_p7 = scale * this->UpdateF(p_h + 6, p_l + 6, this->u_his.begin() + 7, *cur_a, *cur_b) + F_offset;
-    f_p8 = scale * this->UpdateF(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b) + F_offset;
-    f_p9 = scale * this->UpdateF(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b) + F_offset;
+    f_p1 = scale * this->UpdateF(p_h, p_l, this->u_his.begin() , *cur_a, *cur_b) + F_offset;
+    f_p2 = scale * this->UpdateF(p_h + 1, p_l + 1, this->u_his.begin() + 1, *cur_a, *cur_b) + F_offset;
+    f_p3 = scale * this->UpdateF(p_h + 2, p_l + 2, this->u_his.begin() + 2, *cur_a, *cur_b) + F_offset;
+    f_p4 = scale * this->UpdateF(p_h + 3, p_l + 3, this->u_his.begin() + 3, *cur_a, *cur_b) + F_offset;
+    f_p5 = scale * this->UpdateF(p_h + 4, p_l + 4, this->u_his.begin() + 4, *cur_a, *cur_b) + F_offset;
+    f_p6 = scale * this->UpdateF(p_h + 5, p_l + 5, this->u_his.begin() + 5, *cur_a, *cur_b) + F_offset;
+    f_p7 = scale * this->UpdateF(p_h + 6, p_l + 6, this->u_his.begin() + 6, *cur_a, *cur_b) + F_offset;
+    f_p8 = scale * this->UpdateF(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b) + F_offset;
+    f_p9 = scale * this->UpdateF(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b) + F_offset;
 
-    df_dun_p1_T = scale * this->Update_dF_du_T(p_h, p_l, this->u_his.begin() + 1, *cur_a, *cur_b);
-    df_dun_p2_T = scale * this->Update_dF_du_T(p_h + 1, p_l + 1, this->u_his.begin() + 2, *cur_a, *cur_b);
-    df_dun_p3_T = scale * this->Update_dF_du_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
-    df_dun_p4_T = scale * this->Update_dF_du_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
-    df_dun_p5_T = scale * this->Update_dF_du_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
-    df_dun_p6_T = scale * this->Update_dF_du_T(p_h + 5, p_l + 5, this->u_his.begin() + 6, *cur_a, *cur_b);
-    df_dun_p7_T = scale * this->Update_dF_du_T(p_h + 6, p_l + 6, this->u_his.begin() + 7, *cur_a, *cur_b);
-    df_dun_p8_T = scale * this->Update_dF_du_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dun_p9_T = scale * this->Update_dF_du_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dun_p1_T = scale * this->Update_dF_du_T(p_h, p_l, this->u_his.begin() + 0, *cur_a, *cur_b);
+    df_dun_p2_T = scale * this->Update_dF_du_T(p_h + 1, p_l + 1, this->u_his.begin() + 1, *cur_a, *cur_b);
+    df_dun_p3_T = scale * this->Update_dF_du_T(p_h + 2, p_l + 2, this->u_his.begin() + 2, *cur_a, *cur_b);
+    df_dun_p4_T = scale * this->Update_dF_du_T(p_h + 3, p_l + 3, this->u_his.begin() + 3, *cur_a, *cur_b);
+    df_dun_p5_T = scale * this->Update_dF_du_T(p_h + 4, p_l + 4, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dun_p6_T = scale * this->Update_dF_du_T(p_h + 5, p_l + 5, this->u_his.begin() + 5, *cur_a, *cur_b);
+    df_dun_p7_T = scale * this->Update_dF_du_T(p_h + 6, p_l + 6, this->u_his.begin() + 6, *cur_a, *cur_b);
+    df_dun_p8_T = scale * this->Update_dF_du_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dun_p9_T = scale * this->Update_dF_du_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dun1_p2_T = scale * this->Update_dF_du1_T(p_h + 1, p_l + 1, this->u_his.begin() + 2, *cur_a, *cur_b);
-    df_dun1_p3_T = scale * this->Update_dF_du1_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
-    df_dun1_p4_T = scale * this->Update_dF_du1_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
-    df_dun1_p5_T = scale * this->Update_dF_du1_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
-    df_dun1_p6_T = scale * this->Update_dF_du1_T(p_h + 5, p_l + 5, this->u_his.begin() + 6, *cur_a, *cur_b);
-    df_dun1_p7_T = scale * this->Update_dF_du1_T(p_h + 6, p_l + 6, this->u_his.begin() + 7, *cur_a, *cur_b);
-    df_dun1_p8_T = scale * this->Update_dF_du1_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dun1_p9_T = scale * this->Update_dF_du1_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dun1_p2_T = scale * this->Update_dF_du1_T(p_h + 1, p_l + 1, this->u_his.begin() + 1, *cur_a, *cur_b);
+    df_dun1_p3_T = scale * this->Update_dF_du1_T(p_h + 2, p_l + 2, this->u_his.begin() + 2, *cur_a, *cur_b);
+    df_dun1_p4_T = scale * this->Update_dF_du1_T(p_h + 3, p_l + 3, this->u_his.begin() + 3, *cur_a, *cur_b);
+    df_dun1_p5_T = scale * this->Update_dF_du1_T(p_h + 4, p_l + 4, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dun1_p6_T = scale * this->Update_dF_du1_T(p_h + 5, p_l + 5, this->u_his.begin() + 5, *cur_a, *cur_b);
+    df_dun1_p7_T = scale * this->Update_dF_du1_T(p_h + 6, p_l + 6, this->u_his.begin() + 6, *cur_a, *cur_b);
+    df_dun1_p8_T = scale * this->Update_dF_du1_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dun1_p9_T = scale * this->Update_dF_du1_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dun2_p3_T = scale * this->Update_dF_du2_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
-    df_dun2_p4_T = scale * this->Update_dF_du2_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
-    df_dun2_p5_T = scale * this->Update_dF_du2_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
-    df_dun2_p6_T = scale * this->Update_dF_du2_T(p_h + 5, p_l + 5, this->u_his.begin() + 6, *cur_a, *cur_b);
-    df_dun2_p7_T = scale * this->Update_dF_du2_T(p_h + 6, p_l + 6, this->u_his.begin() + 7, *cur_a, *cur_b);
-    df_dun2_p8_T = scale * this->Update_dF_du2_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dun2_p9_T = scale * this->Update_dF_du2_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dun2_p3_T = scale * this->Update_dF_du2_T(p_h + 2, p_l + 2, this->u_his.begin() + 2, *cur_a, *cur_b);
+    df_dun2_p4_T = scale * this->Update_dF_du2_T(p_h + 3, p_l + 3, this->u_his.begin() + 3, *cur_a, *cur_b);
+    df_dun2_p5_T = scale * this->Update_dF_du2_T(p_h + 4, p_l + 4, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dun2_p6_T = scale * this->Update_dF_du2_T(p_h + 5, p_l + 5, this->u_his.begin() + 5, *cur_a, *cur_b);
+    df_dun2_p7_T = scale * this->Update_dF_du2_T(p_h + 6, p_l + 6, this->u_his.begin() + 6, *cur_a, *cur_b);
+    df_dun2_p8_T = scale * this->Update_dF_du2_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dun2_p9_T = scale * this->Update_dF_du2_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dun3_p4_T = scale * this->Update_dF_du3_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
-    df_dun3_p5_T = scale * this->Update_dF_du3_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
-    df_dun3_p6_T = scale * this->Update_dF_du3_T(p_h + 5, p_l + 5, this->u_his.begin() + 6, *cur_a, *cur_b);
-    df_dun3_p7_T = scale * this->Update_dF_du3_T(p_h + 6, p_l + 6, this->u_his.begin() + 7, *cur_a, *cur_b);
-    df_dun3_p8_T = scale * this->Update_dF_du3_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dun3_p9_T = scale * this->Update_dF_du3_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dun3_p4_T = scale * this->Update_dF_du3_T(p_h + 3, p_l + 3, this->u_his.begin() + 3, *cur_a, *cur_b);
+    df_dun3_p5_T = scale * this->Update_dF_du3_T(p_h + 4, p_l + 4, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dun3_p6_T = scale * this->Update_dF_du3_T(p_h + 5, p_l + 5, this->u_his.begin() + 5, *cur_a, *cur_b);
+    df_dun3_p7_T = scale * this->Update_dF_du3_T(p_h + 6, p_l + 6, this->u_his.begin() + 6, *cur_a, *cur_b);
+    df_dun3_p8_T = scale * this->Update_dF_du3_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dun3_p9_T = scale * this->Update_dF_du3_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dun4_p5_T = scale * this->Update_dF_du4_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
-    df_dun4_p6_T = scale * this->Update_dF_du4_T(p_h + 5, p_l + 5, this->u_his.begin() + 6, *cur_a, *cur_b);
-    df_dun4_p7_T = scale * this->Update_dF_du4_T(p_h + 6, p_l + 6, this->u_his.begin() + 7, *cur_a, *cur_b);
-    df_dun4_p8_T = scale * this->Update_dF_du4_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dun4_p9_T = scale * this->Update_dF_du4_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dun4_p5_T = scale * this->Update_dF_du4_T(p_h + 4, p_l + 4, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dun4_p6_T = scale * this->Update_dF_du4_T(p_h + 5, p_l + 5, this->u_his.begin() + 5, *cur_a, *cur_b);
+    df_dun4_p7_T = scale * this->Update_dF_du4_T(p_h + 6, p_l + 6, this->u_his.begin() + 6, *cur_a, *cur_b);
+    df_dun4_p8_T = scale * this->Update_dF_du4_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dun4_p9_T = scale * this->Update_dF_du4_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dun5_p6_T = scale * this->Update_dF_du5_T(p_h + 5, p_l + 5, this->u_his.begin() + 6, *cur_a, *cur_b);
-    df_dun5_p7_T = scale * this->Update_dF_du5_T(p_h + 6, p_l + 6, this->u_his.begin() + 7, *cur_a, *cur_b);
-    df_dun5_p8_T = scale * this->Update_dF_du5_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dun5_p9_T = scale * this->Update_dF_du5_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dun5_p6_T = scale * this->Update_dF_du5_T(p_h + 5, p_l + 5, this->u_his.begin() + 5, *cur_a, *cur_b);
+    df_dun5_p7_T = scale * this->Update_dF_du5_T(p_h + 6, p_l + 6, this->u_his.begin() + 6, *cur_a, *cur_b);
+    df_dun5_p8_T = scale * this->Update_dF_du5_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dun5_p9_T = scale * this->Update_dF_du5_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dun6_p7_T = scale * this->Update_dF_du6_T(p_h + 6, p_l + 6, this->u_his.begin() + 7, *cur_a, *cur_b);
-    df_dun6_p8_T = scale * this->Update_dF_du6_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dun6_p9_T = scale * this->Update_dF_du6_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dun6_p7_T = scale * this->Update_dF_du6_T(p_h + 6, p_l + 6, this->u_his.begin() + 6, *cur_a, *cur_b);
+    df_dun6_p8_T = scale * this->Update_dF_du6_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dun6_p9_T = scale * this->Update_dF_du6_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dun7_p8_T = scale * this->Update_dF_du7_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dun7_p9_T = scale * this->Update_dF_du7_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dun7_p8_T = scale * this->Update_dF_du7_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dun7_p9_T = scale * this->Update_dF_du7_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dun8_p9_T = scale * this->Update_dF_du8_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dun8_p9_T = scale * this->Update_dF_du8_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dxn_p2_T = scale * this->Update_dF_dxH_T(p_h + 1, p_l + 1, this->u_his.begin() + 2, *cur_a, *cur_b);
-    df_dxn_p3_T = scale * this->Update_dF_dxH_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
-    df_dxn_p4_T = scale * this->Update_dF_dxH_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
-    df_dxn_p5_T = scale * this->Update_dF_dxH_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
-    df_dxn_p6_T = scale * this->Update_dF_dxH_T(p_h + 5, p_l + 5, this->u_his.begin() + 6, *cur_a, *cur_b);
-    df_dxn_p7_T = scale * this->Update_dF_dxH_T(p_h + 6, p_l + 6, this->u_his.begin() + 7, *cur_a, *cur_b);
-    df_dxn_p8_T = scale * this->Update_dF_dxH_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dxn_p9_T = scale * this->Update_dF_dxH_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dxn_p2_T = scale * this->Update_dF_dxH_T(p_h + 1, p_l + 1, this->u_his.begin() + 1, *cur_a, *cur_b);
+    df_dxn_p3_T = scale * this->Update_dF_dxH_T(p_h + 2, p_l + 2, this->u_his.begin() + 2, *cur_a, *cur_b);
+    df_dxn_p4_T = scale * this->Update_dF_dxH_T(p_h + 3, p_l + 3, this->u_his.begin() + 3, *cur_a, *cur_b);
+    df_dxn_p5_T = scale * this->Update_dF_dxH_T(p_h + 4, p_l + 4, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dxn_p6_T = scale * this->Update_dF_dxH_T(p_h + 5, p_l + 5, this->u_his.begin() + 5, *cur_a, *cur_b);
+    df_dxn_p7_T = scale * this->Update_dF_dxH_T(p_h + 6, p_l + 6, this->u_his.begin() + 6, *cur_a, *cur_b);
+    df_dxn_p8_T = scale * this->Update_dF_dxH_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dxn_p9_T = scale * this->Update_dF_dxH_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dxn1_p3_T = scale * this->Update_dF_dxH1_T(p_h + 2, p_l + 2, this->u_his.begin() + 3, *cur_a, *cur_b);
-    df_dxn1_p4_T = scale * this->Update_dF_dxH1_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
-    df_dxn1_p5_T = scale * this->Update_dF_dxH1_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
-    df_dxn1_p6_T = scale * this->Update_dF_dxH1_T(p_h + 5, p_l + 5, this->u_his.begin() + 6, *cur_a, *cur_b);
-    df_dxn1_p7_T = scale * this->Update_dF_dxH1_T(p_h + 6, p_l + 6, this->u_his.begin() + 7, *cur_a, *cur_b);
-    df_dxn1_p8_T = scale * this->Update_dF_dxH1_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dxn1_p9_T = scale * this->Update_dF_dxH1_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dxn1_p3_T = scale * this->Update_dF_dxH1_T(p_h + 2, p_l + 2, this->u_his.begin() + 2, *cur_a, *cur_b);
+    df_dxn1_p4_T = scale * this->Update_dF_dxH1_T(p_h + 3, p_l + 3, this->u_his.begin() + 3, *cur_a, *cur_b);
+    df_dxn1_p5_T = scale * this->Update_dF_dxH1_T(p_h + 4, p_l + 4, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dxn1_p6_T = scale * this->Update_dF_dxH1_T(p_h + 5, p_l + 5, this->u_his.begin() + 5, *cur_a, *cur_b);
+    df_dxn1_p7_T = scale * this->Update_dF_dxH1_T(p_h + 6, p_l + 6, this->u_his.begin() + 6, *cur_a, *cur_b);
+    df_dxn1_p8_T = scale * this->Update_dF_dxH1_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dxn1_p9_T = scale * this->Update_dF_dxH1_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dxn2_p4_T = scale * this->Update_dF_dxH2_T(p_h + 3, p_l + 3, this->u_his.begin() + 4, *cur_a, *cur_b);
-    df_dxn2_p5_T = scale * this->Update_dF_dxH2_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
-    df_dxn2_p6_T = scale * this->Update_dF_dxH2_T(p_h + 5, p_l + 5, this->u_his.begin() + 6, *cur_a, *cur_b);
-    df_dxn2_p7_T = scale * this->Update_dF_dxH2_T(p_h + 6, p_l + 6, this->u_his.begin() + 7, *cur_a, *cur_b);
-    df_dxn2_p8_T = scale * this->Update_dF_dxH2_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dxn2_p9_T = scale * this->Update_dF_dxH2_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dxn2_p4_T = scale * this->Update_dF_dxH2_T(p_h + 3, p_l + 3, this->u_his.begin() + 3, *cur_a, *cur_b);
+    df_dxn2_p5_T = scale * this->Update_dF_dxH2_T(p_h + 4, p_l + 4, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dxn2_p6_T = scale * this->Update_dF_dxH2_T(p_h + 5, p_l + 5, this->u_his.begin() + 5, *cur_a, *cur_b);
+    df_dxn2_p7_T = scale * this->Update_dF_dxH2_T(p_h + 6, p_l + 6, this->u_his.begin() + 6, *cur_a, *cur_b);
+    df_dxn2_p8_T = scale * this->Update_dF_dxH2_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dxn2_p9_T = scale * this->Update_dF_dxH2_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dxn3_p5_T = scale * this->Update_dF_dxH3_T(p_h + 4, p_l + 4, this->u_his.begin() + 5, *cur_a, *cur_b);
-    df_dxn3_p6_T = scale * this->Update_dF_dxH3_T(p_h + 5, p_l + 5, this->u_his.begin() + 6, *cur_a, *cur_b);
-    df_dxn3_p7_T = scale * this->Update_dF_dxH3_T(p_h + 6, p_l + 6, this->u_his.begin() + 7, *cur_a, *cur_b);
-    df_dxn3_p8_T = scale * this->Update_dF_dxH3_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dxn3_p9_T = scale * this->Update_dF_dxH3_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dxn3_p5_T = scale * this->Update_dF_dxH3_T(p_h + 4, p_l + 4, this->u_his.begin() + 4, *cur_a, *cur_b);
+    df_dxn3_p6_T = scale * this->Update_dF_dxH3_T(p_h + 5, p_l + 5, this->u_his.begin() + 5, *cur_a, *cur_b);
+    df_dxn3_p7_T = scale * this->Update_dF_dxH3_T(p_h + 6, p_l + 6, this->u_his.begin() + 6, *cur_a, *cur_b);
+    df_dxn3_p8_T = scale * this->Update_dF_dxH3_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dxn3_p9_T = scale * this->Update_dF_dxH3_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dxn4_p6_T = scale * this->Update_dF_dxH4_T(p_h + 5, p_l + 5, this->u_his.begin() + 6, *cur_a, *cur_b);
-    df_dxn4_p7_T = scale * this->Update_dF_dxH4_T(p_h + 6, p_l + 6, this->u_his.begin() + 7, *cur_a, *cur_b);
-    df_dxn4_p8_T = scale * this->Update_dF_dxH4_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dxn4_p9_T = scale * this->Update_dF_dxH4_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dxn4_p6_T = scale * this->Update_dF_dxH4_T(p_h + 5, p_l + 5, this->u_his.begin() + 5, *cur_a, *cur_b);
+    df_dxn4_p7_T = scale * this->Update_dF_dxH4_T(p_h + 6, p_l + 6, this->u_his.begin() + 6, *cur_a, *cur_b);
+    df_dxn4_p8_T = scale * this->Update_dF_dxH4_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dxn4_p9_T = scale * this->Update_dF_dxH4_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dxn5_p7_T = scale * this->Update_dF_dxH5_T(p_h + 6, p_l + 6, this->u_his.begin() + 7, *cur_a, *cur_b);
-    df_dxn5_p8_T = scale * this->Update_dF_dxH5_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dxn5_p9_T = scale * this->Update_dF_dxH5_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dxn5_p7_T = scale * this->Update_dF_dxH5_T(p_h + 6, p_l + 6, this->u_his.begin() + 6, *cur_a, *cur_b);
+    df_dxn5_p8_T = scale * this->Update_dF_dxH5_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dxn5_p9_T = scale * this->Update_dF_dxH5_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dxn6_p8_T = scale * this->Update_dF_dxH6_T(p_h + 7, p_l + 7, this->u_his.begin() + 8, *cur_a, *cur_b);
-    df_dxn6_p9_T = scale * this->Update_dF_dxH6_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dxn6_p8_T = scale * this->Update_dF_dxH6_T(p_h + 7, p_l + 7, this->u_his.begin() + 7, *cur_a, *cur_b);
+    df_dxn6_p9_T = scale * this->Update_dF_dxH6_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
-    df_dxn7_p9_T = scale * this->Update_dF_dxH7_T(p_h + 8, p_l + 8, this->u_his.begin() + 9, *cur_a, *cur_b);
+    df_dxn7_p9_T = scale * this->Update_dF_dxH7_T(p_h + 8, p_l + 8, this->u_his.begin() + 8, *cur_a, *cur_b);
 
     Eigen::Matrix<double, 2, 1> x_bar;
     Eigen::Matrix<double, 2, 1> zero_col(0, 0);
@@ -460,12 +461,25 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
 
 }
 
-void MPC::PushMeas(const double p_tank, const double p_set)
+void MPC::PushMeas(const double p_tank, const double p_set,const u_int8_t duty)
 {
     
+    //we first need to calculate the gradient estimation from the nonlinear model,
+    this->u_mem[this->meas_idx] = ((double)duty)/100.0;
+    this->UpdateHistory(p_set, p_tank,p_set);
+    Eigen::Matrix<double,2,1> pre_dF;
+    if(p_tank>=p_set){
+        pre_dF = this->UpdateF(this->p_tank_his.begin(),this->p_set_his.begin(),this->u_his.begin(),this->ah,this->bh);
+    }
+    else{
+        pre_dF = this->UpdateF(this->p_set_his.begin(),this->p_tank_his.begin(),this->u_his.begin(),this->al,this->bl);
+    }
+    this->mpc_model_rec.PushData(std::array<double,2>{pre_dF.coeff(0),pre_dF.coeff(1)},1); //this is actually the rate of change in the previous time step
+
+
     this->p_tank_mem[this->meas_idx] = ((double)p_tank - 3297.312) / 65536.0; // the substraction is to remove the 0.5 V pressure sensor bias and add 1 atm to the equation
     this->p_set_mem[this->meas_idx] = ((double)p_set - 3297.312) / 65536.0;   // in the lasso regression, we have proved it increases the testing accuracy to stable 90% up
-    this->u_mem[this->meas_idx] = this->cur_u;
+    
     this->meas_idx++;
     this->meas_idx %= MPC_DELAY;
 
@@ -494,7 +508,7 @@ void MPC::UpdateHistory(double p_set, double p_tank,double p_des)
     {
         this->p_tank_his[i] = this->p_tank_mem[(this->meas_idx + i) % MPC_DELAY];
         this->p_set_his[i] = this->p_set_mem[(this->meas_idx + i) % MPC_DELAY];
-        this->u_his[i] = this->u_mem[(this->meas_idx + i) % MPC_DELAY];
+        this->u_his[i] = this->u_mem[(this->meas_idx + i+1) % MPC_DELAY];
     }
 
     for (int i = 0; i < MPC_TIME_HORIZON; i++)

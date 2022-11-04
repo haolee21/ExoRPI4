@@ -50,7 +50,9 @@ void Valves_hub::UpdateValve(){
     
     hub.left_knee_con.PushMeas(pre_data[(unsigned)SensorHub::PreName::LKneExt],pre_data[(unsigned)SensorHub::PreName::LKneFlex],pre_data[(unsigned)SensorHub::PreName::LAnkExt],
                                pre_data[(unsigned)SensorHub::PreName::LTank],pre_data[(unsigned)SensorHub::PreName::Tank],
-                               pre_data[(unsigned)SensorHub::PreName::Pos]);
+                               pre_data[(unsigned)SensorHub::PreName::Pos]
+                               ,hub.PWM_Duty[(unsigned)PWM_ID::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]
+                               ,hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]);
     
     
     if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kPreConExt){

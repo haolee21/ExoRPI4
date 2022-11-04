@@ -34,6 +34,8 @@
 #include "CylinderParam.hpp"
 
 #define MPC_HEAD "Time,F_0,F_1,dF_0,dF_1,u_n,u_n1,u_n2,u_n3,u_n4,u_n5,u_n6,u_n7,u_n8,yn1,yn2,yn3,yn4,yn5,yn6,yn7,yn8,yn9,y_des1,y_des2,y_des3,y_des4,y_des5,y_des6,y_des7,y_des8,y_des9"
+#define MPC_MODEL_HEAD "Time,dF_0,dF_1"
+// #define MPC_DATA_HEAD "Time,A1_0,A1_1,,A2_0,A2_1,A3_0,A3_1,A4_0,A4_1,A5_0,A5_1,A6_0,A6_1,A7_0,A7_1,A8_0,A8_1,A9_0,A9_1"
 #define MPC_TIME_HORIZON 9
 class MPC
 {
@@ -61,6 +63,7 @@ private:
     Eigen::Matrix<double, 2, 1> x_n8;
     Eigen::Matrix<double, 2, 1> x_n9;
     double y_des1, y_des2, y_des3, y_des4, y_des5, y_des6, y_des7, y_des8, y_des9;
+    std::array<double,MPC_TIME_HORIZON> y_des;
 
     Eigen::Matrix<double, 2, 1> UpdateF(const double *ph, const double *pl, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b);
     Eigen::Matrix<double, 2, 2> Update_dF_dxL_T(const double *ph, const double *pl, const double *u, const std::array<double, MPC_STATE_NUM> &a, const std::array<double, MPC_STATE_NUM> &b);
@@ -144,6 +147,7 @@ private:
     // const double spring_k = 55.4 * 0.0393701 * 4.44822;
     // const double pre_offset = 0.5 / 4.096 * 65536;
     Recorder<double, 31> mpc_rec;
+    Recorder<double,2> mpc_model_rec; //this recorder records the real gradient estimation from the nonlinear model
     
 
 public:
@@ -156,7 +160,7 @@ public:
     void GetImpControl(const double &imp_des, const double &p_ext, const double &p_flex, const double &p_tank, const double &pos, double scale, int &joint_val_duty, int &joint_bal_duty, int &tank_duty);
     // Get values for recorder
 
-    void PushMeas(const double p_tank, const double p_set);
+    void PushMeas(const double p_tank, const double p_set, const u_int8_t duty);
     void RecData();
 
     // double GetCylinderScale(double pre,double pos); //get the (cylinder length)/(max cylinder length)

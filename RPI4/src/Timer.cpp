@@ -38,7 +38,7 @@ void Timer::Sleep(struct timespec *ts){
 }
 int Timer::StartRT(){
     RT::Init();
-    Timer::GetInstance().timeStamp=0;
+    Timer::GetInstance().timeStamp=1;
     Timer::GetInstance().updateFlag = true;
     int ret = RT::StartThread(Timer::GetInstance().rt_thread,Timer::TimerTick,RT::RT_PRIORITY);
     return ret;

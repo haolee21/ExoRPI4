@@ -96,10 +96,10 @@ public:
 
     }
     
-    void PushData(const std::array<T,N> data){
+    void PushData(const std::array<T,N> data,int timer_offset=0){//timer offset is added if the rec value is not the current value, e.g., in MPC, gradient estimation requires control input, but we get the measurements at the beginning and get control at the end
 
         if(this->data_rec_flag){
-            (*(this->cur_rec_time))[this->dataIdx]=Timer::GetCurTime();
+            (*(this->cur_rec_time))[this->dataIdx]=Timer::GetCurTime()-timer_offset;
             (*(this->curData))[this->dataIdx++]=data;
             if(this->dataIdx==REC_MAX_LEN){
                 this->saveCSV_future.wait();
