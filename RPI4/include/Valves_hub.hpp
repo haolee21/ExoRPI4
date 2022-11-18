@@ -102,7 +102,7 @@ public:
     const static std::array<bool, (unsigned)Joint::kTotal> &GetJointCond();
 
     // Impdence control
-    static void SetDesiredImp(Valves_hub::Joint imp, double imp_val);
+    static void SetDesiredImp(Valves_hub::Joint imp, double imp_val,double init_force);
     static void SetCylnMaxPos(Joint joint);
 
     //Force

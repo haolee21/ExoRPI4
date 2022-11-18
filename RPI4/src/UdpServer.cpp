@@ -288,22 +288,23 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
         if (cmd_packet.des_imp_flag[(unsigned)Valves_hub::Joint::kLKne])
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kImpCon);
-            Valves_hub::SetDesiredImp(Valves_hub::Joint::kLKne, cmd_packet.des_imp[(unsigned)Valves_hub::Joint::kLKne]);
+            Valves_hub::SetDesiredImp(Valves_hub::Joint::kLKne, cmd_packet.des_imp[(unsigned)Valves_hub::Joint::kLKne],cmd_packet.init_force[(unsigned)Valves_hub::Joint::kLKne]);
+           
         }
         if (cmd_packet.des_imp_flag[(unsigned)Valves_hub::Joint::kLAnk])
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kLAnk, JointCon::ControlMode::kImpCon);
-            Valves_hub::SetDesiredImp(Valves_hub::Joint::kLAnk, cmd_packet.des_imp[(unsigned)Valves_hub::Joint::kLAnk]);
+            Valves_hub::SetDesiredImp(Valves_hub::Joint::kLAnk, cmd_packet.des_imp[(unsigned)Valves_hub::Joint::kLAnk],cmd_packet.init_force[(unsigned)Valves_hub::Joint::kLAnk]);
         }
         if (cmd_packet.des_imp_flag[(unsigned)Valves_hub::Joint::kRKne])
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kImpCon);
-            Valves_hub::SetDesiredImp(Valves_hub::Joint::kRKne, cmd_packet.des_imp[(unsigned)Valves_hub::Joint::kRKne]);
+            Valves_hub::SetDesiredImp(Valves_hub::Joint::kRKne, cmd_packet.des_imp[(unsigned)Valves_hub::Joint::kRKne],cmd_packet.init_force[(unsigned)Valves_hub::Joint::kRKne]);
         }
         if (cmd_packet.des_imp_flag[(unsigned)Valves_hub::Joint::kRAnk])
         {
             Valves_hub::EnableCon(Valves_hub::Joint::kRAnk, JointCon::ControlMode::kImpCon);
-            Valves_hub::SetDesiredImp(Valves_hub::Joint::kRAnk, cmd_packet.des_imp[(unsigned)Valves_hub::Joint::kRAnk]);
+            Valves_hub::SetDesiredImp(Valves_hub::Joint::kRAnk, cmd_packet.des_imp[(unsigned)Valves_hub::Joint::kRAnk],cmd_packet.init_force[(unsigned)Valves_hub::Joint::kRAnk]);
         }
     }
     //impact absorb control

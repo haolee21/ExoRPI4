@@ -76,8 +76,8 @@ void Valves_hub::UpdateValve(){
         hub.valChanged_flag=true;
     }
     else if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kImpCon){
-        // std::cout<<"do imp control\n";
-        hub.left_knee_con.GetImpCon(hub.desired_imp[(unsigned)Valves_hub::Joint::kLKne],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kLTank]);
+        
+        hub.left_knee_con.GetImpCon(hub.desired_imp[(unsigned)Valves_hub::Joint::kLKne],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kLTank],hub.init_force[(unsigned)Joint::kLKne]);
         hub.valChanged_flag=true;
     }
     else if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kImpactCon){
@@ -157,9 +157,12 @@ void Valves_hub::SetDesiredPre(Chamber chamber,double des_pre){
     hub.desired_pre[(unsigned)chamber] = des_pre;
 
 }
-void Valves_hub::SetDesiredImp(Valves_hub::Joint imp,double imp_val){ //TODO: finish it
+void Valves_hub::SetDesiredImp(Valves_hub::Joint imp,double imp_val,double init_force){ //TODO: finish it
     Valves_hub& hub = Valves_hub::GetInstance();
     hub.desired_imp[static_cast<unsigned>(imp)]=imp_val;
+    hub.init_force[(unsigned)imp]=init_force;
+
+    
     
 }
 void Valves_hub::SetDesiredForce(Valves_hub::Joint joint, double des_force){

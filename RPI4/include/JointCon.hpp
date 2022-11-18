@@ -31,7 +31,7 @@ public:
     void GetForceCon(const std::array<double,MPC_TIME_HORIZON> &des_force, u_int8_t& ext_duty, u_int8_t &flex_duty, u_int8_t &tank_duty);
     void GetImpCon(double des_imp, u_int8_t& ext_duty, u_int8_t& flex_duty, u_int8_t& tank_duty,double force_offset=0);
     void GetPreCon(const double des_pre, u_int8_t &duty, Chamber chamber); // Pressure control
-    void GetImpactCon(const double init_force,const double init_imp, u_int8_t &ext_duty, u_int8_t &rec_duty,u_int8_t &tank_duty,u_int8_t &flex_duty, u_int8_t &exhaust_duty);
+    void GetImpactCon(const double init_force, const double init_imp, u_int8_t &ext_duty, u_int8_t &rec_duty, u_int8_t &tank_duty, u_int8_t &flex_duty, u_int8_t &exhaust_duty);
     
 
     void PushMeas(const double &p_joint_ext,const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank,const double &pos,const u_int8_t tank_duty, const u_int8_t knee_ext_duty, const u_int8_t knee_flex_duty,const u_int8_t knee_ank_duty, const u_int8_t ank_ext_duty);
@@ -42,6 +42,7 @@ public:
     
 
 private:
+    const double kForceTol = 0.5; //if abs(force_err) < kFOrceTol, don't activate 
     MPC ext_con, flex_con, tank_con;
     ControlMode control_mode = ControlMode::kNone;
     double cur_pos = 0;
@@ -60,10 +61,12 @@ private:
     double pre_tank;
     double pre_main_tank;
     double cur_force;                                       // unit: N
+    double cur_pre_force;
     double des_force;
+    double des_ext_pre;
     double L_ext;                                      // unit: mm
     double L_flex;                                     // unit: mm
-    
+    double p_ext_rec_diff;
     const double volume_slope_6in = 0.0006351973436310972;  // FIXME: these are only used for linear calibrations
     const double volume_intercept_6in = 115.68133521647316; // unit: mm/adc(pos)
 
@@ -79,10 +82,10 @@ private:
     //logic:  velocity< -v_th, => MODE: kCompress
     //        velocity> +v_th => MODE: kExtend
     enum class Imp_FSM{
-        kCompress,kExtend,kFree
+        kLoadPrep,kCompress_inc,kCompress_dec,kExtend,kFree
     };
     Imp_FSM imp_fsm_state;
-    double vel_th = 500;
+    double vel_th = 300;
     // const double kExtImp=2; //   N/mm
     // double imp_deflect_point;
     double recover_imp;
@@ -94,12 +97,15 @@ private:
 
     // filter
     DigitalFilter<double, FilterParam::Filter20Hz_2::Order, 1> vel_filter;
-    DigitalFilter<double, FilterParam::Filter30Hz_5::Order, 1> force_filter;
+    DigitalFilter<double, FilterParam::Filter5Hz_2::Order, 1> force_filter;
+    DigitalFilter<double,FilterParam::Filter5Hz_2::Order,1> force_pre_filter;
+
+    DigitalFilter<double,FilterParam::Filter20Hz_2::Order,1> p_ext_rec_diff_filter;
 
 
     double GetPre_KPa(double pre_adc);
 
-    Recorder<double,7> joint_con_rec;
+    Recorder<double,9> joint_con_rec;
 
    
 

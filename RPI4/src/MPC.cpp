@@ -282,8 +282,11 @@ double MPC::CalculateControl(bool increase_pre, std::array<double, MPC_TIME_HORI
     B_all << H * B1, H * B2, H * B3, H * B4, H * B5, H * B6, H * B7, H * B8, H * B9;
     Eigen::Matrix<double, MPC_TIME_HORIZON, 1> y_des_vec;
     y_des_vec << y_des[0], y_des[1], y_des[2], y_des[3], y_des[4], y_des[5], y_des[6], y_des[7], y_des[8];
-    Eigen::Matrix<double, MPC_TIME_HORIZON, MPC_TIME_HORIZON> P_mat = B_all.transpose() * B_all;
-    Eigen::Matrix<double, 1, MPC_TIME_HORIZON> q_mat = -1 * y_des_vec.transpose() * B_all + A_all.transpose() * B_all;
+
+    Eigen::DiagonalMatrix<double,MPC_TIME_HORIZON> w_mat{5,1,1,1,1,1,1,1,1};
+
+    Eigen::Matrix<double, MPC_TIME_HORIZON, MPC_TIME_HORIZON> P_mat = B_all.transpose() *w_mat* B_all;
+    Eigen::Matrix<double, 1, MPC_TIME_HORIZON> q_mat = -1 * y_des_vec.transpose() *w_mat* B_all + A_all.transpose() *w_mat* B_all;
 
     // std::cout<<"pmat: "<<P_mat<<std::endl;
     // std::cout<<"qmat: "<<q_mat<<std::endl;
@@ -304,14 +307,14 @@ double MPC::CalculateControl(bool increase_pre, std::array<double, MPC_TIME_HORI
     c_int P_nnz = (MPC_TIME_HORIZON + 1) * MPC_TIME_HORIZON / 2;
     c_float q[MPC_TIME_HORIZON] = {q_mat.coeff(0, 0), q_mat.coeff(0, 1), q_mat.coeff(0, 2), q_mat.coeff(0, 3), q_mat.coeff(0, 4), q_mat.coeff(0, 5), q_mat.coeff(0, 6), q_mat.coeff(0, 7), q_mat.coeff(0, 8)};
 
-    c_int A_nnz = MPC_TIME_HORIZON;
-    c_float A_x[MPC_TIME_HORIZON] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-    c_int A_i[MPC_TIME_HORIZON] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    c_int A_p[MPC_TIME_HORIZON + 1] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    c_float l[MPC_TIME_HORIZON] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-    c_float u[MPC_TIME_HORIZON] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+    c_int A_nnz = MPC_TIME_HORIZON+2;
+    c_float A_x[MPC_TIME_HORIZON+2] = {1, 1, 1, 1, 1, 1, 1, 1, 1,1,-1};
+    c_int A_i[MPC_TIME_HORIZON+2] = {0,9, 1, 2, 3, 4, 5, 6, 7, 8,9};
+    c_int A_p[MPC_TIME_HORIZON + 3] = {0,  2, 3, 4, 5, 6, 7, 8, 9,11};
+    c_float l[MPC_TIME_HORIZON+1] = {0, 0, 0, 0, 0, 0, 0, 0, 0,0};
+    c_float u[MPC_TIME_HORIZON+1] = {1, 1, 1, 1, 1, 1, 1, 1, 1,1};
     c_int n = MPC_TIME_HORIZON;
-    c_int m = MPC_TIME_HORIZON;
+    c_int m = MPC_TIME_HORIZON+1;
     // populate the data
     this->osqp_data->n = n;
     this->osqp_data->m = m;

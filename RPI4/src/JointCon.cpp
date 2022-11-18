@@ -3,11 +3,12 @@
 #include "JointCon.hpp"
 JointCon::JointCon(PneumaticParam::CylinderParam ext_param, PneumaticParam::ReservoirParam reservoir_param, std::string joint_con_name)
     : ext_con(ext_param.cl_ext, ext_param.ch_ext, joint_con_name + "_ext"), flex_con(ext_param.cl_flex, ext_param.ch_flex, joint_con_name + "_flex"), tank_con(reservoir_param.cl, reservoir_param.ch, joint_con_name + "_tank"),
-      piston_area_ext(ext_param.piston_area_ext), piston_area_flex(ext_param.piston_area_flex), fric_coeff(ext_param.fri_coeff), max_pos(ext_param.max_pos), vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter15Hz_5::a, FilterParam::Filter15Hz_5::b),
-      joint_con_rec(joint_con_name, "Time,L_ext,L_flex,cur_force,max_spring_compress,delta_x,x_dot,des_force")
+      piston_area_ext(ext_param.piston_area_ext), piston_area_flex(ext_param.piston_area_flex), fric_coeff(ext_param.fri_coeff), max_pos(ext_param.max_pos), vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b),force_pre_filter(FilterParam::Filter5Hz_2::a,FilterParam::Filter5Hz_2::b),
+      p_ext_rec_diff_filter(FilterParam::Filter20Hz_2::a,FilterParam::Filter20Hz_2::b),
+      joint_con_rec(joint_con_name, "Time,L_ext,L_flex,cur_force,max_spring_compress,delta_x,x_dot,des_force,pre_force,des_ext_pre")
 {
     this->SetKneeMaxPos(ext_param.max_pos);
-    this->imp_fsm_state = Imp_FSM::kCompress;
+    this->imp_fsm_state = Imp_FSM::kLoadPrep;
     // //setup osqp solver
     // this->osqp_data.reset(new OSQPData);
     // this->osqp_settings.reset(new OSQPSettings);
@@ -27,9 +28,9 @@ void JointCon::SetKneeMaxPos(double max_pos_val)
 }
 void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank, const double &pos, const u_int8_t tank_duty, const u_int8_t knee_ext_duty, const u_int8_t knee_flex_duty, const u_int8_t knee_ank_duty, const u_int8_t ank_ext_duty)
 {
-    this->ext_con.PushMeas(p_tank, p_joint_ext,knee_ext_duty);
-    this->flex_con.PushMeas(p_joint_rec, p_joint_ext,knee_ank_duty);
-    this->tank_con.PushMeas(p_main_tank, p_tank,tank_duty);
+    this->ext_con.PushMeas(p_tank, p_joint_ext, knee_ext_duty);
+    this->flex_con.PushMeas(p_joint_rec, p_joint_ext, knee_ank_duty);
+    this->tank_con.PushMeas(p_main_tank, p_tank, tank_duty);
 
     this->pre_tank = p_tank;
     this->pre_main_tank = p_main_tank;
@@ -48,8 +49,11 @@ void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_flex, c
     this->L_flex = this->max_len_mm - this->L_ext;
 
     this->cur_force = this->force_filter.GetFilteredMea(std::array<double, 1>{this->GetExternalForce(p_joint_ext, p_joint_flex, this->cur_delta_x, this->pos_diff)})[0];
+    this->cur_pre_force = this->force_pre_filter.GetFilteredMea(std::array<double,1>{(p_joint_ext * this->piston_area_ext - p_joint_flex * this->piston_area_flex) * 2.1547177056884764e-05 - this->fric_coeff * this->pos_diff})[0];
+    this->p_ext_rec_diff = this->p_ext_rec_diff_filter.GetFilteredMea(std::array<double,1>{p_joint_ext-p_joint_rec})[0];
 
-    this->joint_con_rec.PushData(std::array<double, 7>{this->L_ext, this->L_flex, this->cur_force, this->cur_max_spring_compress, this->cur_delta_x, this->pos_diff,this->des_force});
+
+    this->joint_con_rec.PushData(std::array<double, 9>{this->L_ext, this->L_flex, this->cur_force, this->cur_max_spring_compress, this->cur_delta_x, this->pos_diff, this->des_force,this->cur_pre_force,this->des_ext_pre});
 }
 void JointCon::RecData()
 {
@@ -58,7 +62,7 @@ void JointCon::RecData()
     this->tank_con.RecData();
 }
 
-void JointCon::GetForceCon(const std::array<double, MPC_TIME_HORIZON> &des_force, u_int8_t &ext_duty, u_int8_t &flex_duty, u_int8_t &tank_duty)
+void JointCon::GetForceCon(const std::array<double, MPC_TIME_HORIZON> &des_force, u_int8_t &ext_duty, u_int8_t &rec_duty, u_int8_t &tank_duty)
 {
     /**
      * @brief Get the required duty cycle based on the commanded force, return in joint_duty and bal_duty
@@ -91,62 +95,83 @@ void JointCon::GetForceCon(const std::array<double, MPC_TIME_HORIZON> &des_force
     for (unsigned i = 0; i < des_pre.size(); i++)
     {
         des_pre[i] = ((des_force[i] + this->fric_coeff * this->pos_diff) / 2.1547177056884764e-05) / this->piston_area_ext + 8000;
+        // des_pre[i] = ((des_force[i]) / 2.1547177056884764e-05) / this->piston_area_ext + 8000;
         // std::cout<<des_pre[i]<<',';
     }
     this->des_force = des_force[0];
+    this->des_ext_pre = des_pre[0];
     // std::cout<<std::endl;
     // std::cout<<"current pressure: "<<this->pre_ext<<std::endl;
     // std::cout<<"force gap: "<<des_force[0]-this->cur_force<<std::endl;
-    if ((des_force[0] > this->cur_force) && (this->cur_force > 0))
+    if (std::abs(des_force[0] - this->cur_force) > JointCon::kForceTol)
     {
-        // the des_pre is definitely larger than pre_ext, otherwise des_force < this->cur_force
 
-        // to charge the cylinder, we need to make sure the tank is > than des_pre
-        if (this->pre_tank < des_pre[0])
+        if ((des_force[0] > this->cur_force) && (this->cur_force > 0))
         {
-            // std::cout << "increase tank pressure\n";
-            tank_duty = this->tank_con.GetPreControl(des_pre, this->pre_tank, pre_main_tank, 1);
-            ext_duty = 0;
+            // the des_pre is definitely larger than pre_ext, otherwise des_force < this->cur_force
+
+            // to charge the cylinder, we need to make sure the tank is > than des_pre
+            if (this->pre_tank < des_pre[0])
+            {
+                // std::cout << "increase tank pressure\n";
+                // std::cout<<"ltank pre: "<<this->pre_tank<<", des pre: "<<des_pre[0]<<std::endl;
+                tank_duty = this->tank_con.GetPreControl(des_pre, this->pre_tank, pre_main_tank, 1);
+                ext_duty = 0;
+            }
+            else
+            {
+                // std::cout << "increase cylinder pressure\n";
+                // still charge the cylinder with whatever pressure in the tank
+                ext_duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->max_len_mm / this->GetLenLinear_mm(this->cur_pos));
+                tank_duty = 0;
+
+                // std::cout<<"desired force: "<<des_force[0]<<std::endl;
+                // std::cout<<"current force: "<<this->cur_force<<std::endl;
+                // std::cout << "desired duty: " << ((int)rec_duty) << std::endl;
+                // std::cout << "desired pressure: " << des_pre[0] << std::endl;
+                // std::cout << "current pressure: " << this->pre_ext << std::endl;
+                // std::cout << "current tank pressure: " << this->pre_tank << std::endl;
+            }
+            rec_duty = 0;
         }
         else
         {
-            // std::cout << "increase cylinder pressure\n";
-            // still charge the cylinder with whatever pressure in the tank
-            ext_duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->max_len_mm / this->GetLenLinear_mm(this->cur_pos));
-            tank_duty = 0;
-
+            // std::cout<<"pre force: "<<this->cur_pre_force<<std::endl;
             // std::cout<<"desired force: "<<des_force[0]<<std::endl;
-            // std::cout<<"current force: "<<this->cur_force<<std::endl;
-            // std::cout << "desired duty: " << ((int)rec_duty) << std::endl;
-            // std::cout << "desired pressure: " << des_pre[0] << std::endl;
-            // std::cout << "current pressure: " << this->pre_ext << std::endl;
-            // std::cout << "current tank pressure: " << this->pre_tank << std::endl;
+            // if the force is too high, we have 3 choices
+            //  1. If pre_ext > pre_tank: pump the air in the cylinder back to reservior
+            //  2. If pre_ext > pre_rec, pump the air to the recycle end
+            if (this->pre_ext < this->pre_tank)
+            {
+                if(this->p_ext_rec_diff>160){
+                    rec_duty = this->flex_con.GetPreControl(des_pre, this->pre_ext, this->pre_rec, this->max_len_mm / this->GetLenLinear_mm(this->cur_pos));
+                    // rec_duty = this->flex_con.GetPreControl(des_pre, this->pre_ext, this->pre_rec, 0.6);
+                    // std::cout<<"recycle to rec cylinder\n";
+                }
+                else{
+                    rec_duty=0;
+                    // std::cout<<"recycle cylinder pressure is too high\n";
+                }
+                ext_duty = 0;
+                tank_duty = 0;
+            }
+            else
+            {
+                // we can recycle the energy to the tank
+                // std::cout<<"recycle to ltank\n";
+                ext_duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->max_len_mm / this->GetLenLinear_mm(this->cur_pos));
+                rec_duty = 0;
+                tank_duty = 0;
+            }
         }
-        flex_duty = 0;
     }
     else
     {
-        // if the force is too high, we have 3 choices
-        //  1. If pre_ext > pre_tank: pump the air in the cylinder back to reservior
-        //  2. If pre_ext > pre_rec, pump the air to the recycle end
-        if (this->pre_ext < this->pre_tank)
-        {
-            
-            flex_duty = this->flex_con.GetPreControl(des_pre, this->pre_ext, this->pre_rec, this->max_len_mm / this->GetLenLinear_mm(this->cur_pos));
-            ext_duty = 0;
-            tank_duty = 0;
-        }
-        else
-        {
-            // we can recycle the energy to the tank
-
-            ext_duty = this->ext_con.GetPreControl(des_pre, this->pre_ext, this->pre_tank, this->max_len_mm / this->GetLenLinear_mm(this->cur_pos));
-            flex_duty = 0;
-            tank_duty = 0;
-        }
+        // std::cout<<"force is close enough\n";
+        ext_duty = 0;
+        rec_duty = 0;
+        tank_duty = 0;
     }
-
-
 }
 
 double JointCon::GetExternalForce(double pre_ext, double pre_flex, double delta_x, double x_dot)
@@ -170,7 +195,7 @@ double JointCon::GetExternalForce(double pre_ext, double pre_flex, double delta_
     double coeff_1 = 1 - coeff_0;
 
     double f_0 = coeff_0 * ((pre_ext * this->piston_area_ext - pre_flex * this->piston_area_flex) * 2.1547177056884764e-05 - this->fric_coeff * x_dot);
-    double f_1 = coeff_1 * (delta_x * this->volume_slope_6in * this->spring_k);
+    double f_1 = coeff_1 * (delta_x * this->volume_slope_6in * this->spring_k-this->fric_coeff*x_dot);
     return f_0 + f_1;
 }
 
@@ -187,32 +212,6 @@ void JointCon::GetImpCon(double des_imp, u_int8_t &ext_duty, u_int8_t &rec_duty,
 
     // check if we need to switch Imp_FSM
 
-    if (this->imp_fsm_state == Imp_FSM::kCompress)
-    {
-        if (this->pos_diff > this->vel_th)
-        {
-            this->imp_fsm_state = Imp_FSM::kExtend;
-            // this->imp_deflect_point = this->cur_pos;
-            // std::cout<<"extend\n";
-        }
-    }
-    else
-    {
-        if (this->pos_diff < -1 * this->vel_th)
-        {
-            this->imp_fsm_state = Imp_FSM::kCompress;
-            // std::cout<<"compressed\n";
-        }
-    }
-
-    // if current Imp_FSM state is extension, change des_imp to kExtImp
-    //  if(this->imp_fsm_state==Imp_FSM::kExtend){
-
-    //     des_imp = (this->max_pos-this->cur_pos)*des_imp+(this->cur_pos-this->imp_deflect_point)*this->kExtImp/(this->max_pos-this->imp_deflect_point);
-    //     // des_imp = this->kExtImp;
-    //     std::cout<<"ext imp: "<<des_imp<<std::endl;
-    // }
-
     double des_force = des_imp * this->cur_delta_x * this->volume_slope_6in;
     double des_force_step = des_imp * this->pos_diff * this->volume_slope_6in;
 
@@ -220,9 +219,9 @@ void JointCon::GetImpCon(double des_imp, u_int8_t &ext_duty, u_int8_t &rec_duty,
     for (int i = 0; i < MPC_TIME_HORIZON; i++)
     {
         des_force_array[i] = des_force + force_offset;
-        des_force += des_force_step; // TODO: right now I just make it 5% more in the future, note that it will fail when the impedance is negative
+        des_force -= des_force_step; // TODO: right now I just make it 5% more in the future, note that it will fail when the impedance is negative
     }
-
+    
     this->GetForceCon(des_force_array, ext_duty, rec_duty, tank_duty);
 }
 
@@ -262,44 +261,101 @@ double JointCon::GetPre_KPa(double pre_adc)
     return (pre_adc / 65536 * 4.096 - 0.5) * 50 * 6.89476;
 }
 
-void JointCon::GetImpactCon(const double init_force, const double init_imp, u_int8_t &ext_duty, u_int8_t &rec_duty, u_int8_t &tank_duty,u_int8_t &flex_duty, u_int8_t &exhaust_duty)
+void JointCon::GetImpactCon(const double init_force, const double init_imp, u_int8_t &ext_duty, u_int8_t &rec_duty, u_int8_t &tank_duty, u_int8_t &flex_duty, u_int8_t &exhaust_duty)
 {
-    flex_duty=0;
-    exhaust_duty=0;
-    if (this->imp_fsm_state == Imp_FSM::kCompress)
+   
+    flex_duty = 0;
+    exhaust_duty = 0;
+    
+    switch (this->imp_fsm_state)
     {
+
+    case Imp_FSM::kCompress_inc:
+        std::cout<<"fsm: compress inc\n";
+        if (this->L_flex > 5)
+        {
+            this->imp_fsm_state = Imp_FSM::kCompress_dec;
+            std::cout << "switch to compress dec\n";
+        }
+
+        break;
+    case Imp_FSM::kCompress_dec:
+        std::cout<<"fsm: compress dec\n";
         if (this->pos_diff > this->vel_th)
         {
             this->imp_fsm_state = Imp_FSM::kExtend;
-            this->recover_imp = this->cur_force/this->cur_delta_x/this->volume_slope_6in;
-            std::cout<<"switch to extend\n";
+            this->recover_imp = (this->cur_force-init_force) / this->L_flex;
+            std::cout << "switch to extend\n";
         }
-    }
-    else if (this->imp_fsm_state == Imp_FSM::kExtend)
-    {
-        if (this->pos_diff < 0)
+
+        break;
+    case Imp_FSM::kExtend:
+        std::cout<<"fsm: extend\n";
+        if(std::abs(this->pos_diff)<this->vel_th){
+            this->imp_fsm_state=Imp_FSM::kLoadPrep;
+            std::cout<<"switch to load prep\n";
+        }
+        break;
+    case Imp_FSM::kLoadPrep:
+        std::cout<<"fsm: load prep\n";
+        // if(this->pos_diff<-this->vel_th){
+        //     this->imp_fsm_state = Imp_FSM::kCompress;
+        //     std::cout<<"switch to compress\n";
+        // }
+        if (this->cur_force >= init_force)
         {
-            this->imp_fsm_state = Imp_FSM::kCompress;
-            std::cout<<"switch to compress\n";
+            this->imp_fsm_state = Imp_FSM::kCompress_inc;
+            std::cout << "switch to compress inc\n";
         }
+        break;
+    default:
+        break;
     }
 
-    if (this->imp_fsm_state == Imp_FSM::kCompress)
+    if (this->imp_fsm_state == Imp_FSM::kLoadPrep)
     {
-        std::cout<<"init force: "<<init_force<<std::endl;
-        std::cout<<"current force: "<<this->cur_force<<std::endl;
+        double des_pre = (init_force / 2.1547177056884764e-05) / this->piston_area_ext + 8000;
+        this->GetPreCon(des_pre, ext_duty, Chamber::kExt);
+        rec_duty = 0;
+        tank_duty = 0;
+        flex_duty = 0;
+    }
+
+    else if (this->imp_fsm_state == Imp_FSM::kCompress_inc)
+    {
+        // std::cout << "init force: " << init_force << std::endl;
+        // std::cout << "current force: " << this->cur_force << std::endl;
         this->GetImpCon(init_imp, ext_duty, rec_duty, tank_duty, init_force);
+        flex_duty = 0;
+        std::cout << "rec duty: " << (int)rec_duty << std::endl;
+    }
+    else if (this->imp_fsm_state == Imp_FSM::kCompress_dec)
+    {
+        this->GetImpCon(-init_imp, ext_duty, rec_duty, tank_duty, init_force);
+        flex_duty = 0;
+        std::cout<<"rec duty: " << (int)rec_duty<<std::endl;
     }
     else if (this->imp_fsm_state == Imp_FSM::kExtend)
     {
         // double rec_imp = this->cur_force / this->cur_delta_x;
-        this->GetImpCon(this->recover_imp, ext_duty, rec_duty, tank_duty);
+        // this->GetImpCon(this->recover_imp, ext_duty, rec_duty, tank_duty);
+        ext_duty = 0;
+        
+        tank_duty = 0;
+        flex_duty = 0;
+        if(this->pre_rec-this->pre_ext>200){
+            rec_duty=100;
+        }
+        else{
+            rec_duty=0;
+        }
     }
-    else if(this->imp_fsm_state==Imp_FSM::kFree){
-        ext_duty=0;
-        rec_duty=0;
-        tank_duty=0;
-        flex_duty=100;
-        exhaust_duty=100;
+    else if (this->imp_fsm_state == Imp_FSM::kFree)
+    {
+        ext_duty = 0;
+        rec_duty = 0;
+        tank_duty = 0;
+        flex_duty = 100;
+        exhaust_duty = 100;
     }
 }

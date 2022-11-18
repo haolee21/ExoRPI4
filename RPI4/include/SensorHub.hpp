@@ -45,7 +45,7 @@ public:
         RHipS,RKneS,RAnkS//RHipF,RAnkF
     };
     enum class PreName{ //The order of this enum must follow the order on the pcb board
-        LTank,LKneExt,Force,Pos,Tank,LKneFlex,LAnkExt //TODO: check it whenever you reconnect the pressure sensors
+        LTank,LKneExt,Force,Na0,Tank,LKneFlex,LAnkExt,Pos //TODO: check it whenever you reconnect the pressure sensors
     };
     // Pressure sensor index need to be assigned since it is determine by ADC channels
     
