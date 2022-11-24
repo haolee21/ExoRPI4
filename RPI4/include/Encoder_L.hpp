@@ -14,9 +14,9 @@ private:
     static const Pin CEB_pin;
     static const Pin CEC_pin;
     virtual void _setCE();
-    virtual void Lock();
-    virtual void Unlock();
-    static std::mutex lock;
+    // virtual void Lock();
+    // virtual void Unlock();
+    // static std::mutex lock;
 
 public:
     Encoder_L(uint8_t pinId);

@@ -14,7 +14,7 @@ Encoder::Encoder(uint8_t pinId,int spi_num)
     this->fd = open(spi_port.c_str(), O_RDWR);
     unsigned int speed = 1000000;
     // unsigned speed = 500000;
-
+    this->reset_encoder=false;
 
     auto mode = SPI_MODE_0;
     ret = ioctl(this->fd, SPI_IOC_WR_MODE, &mode);
@@ -105,7 +105,14 @@ void Encoder::_initCE(uint8_t pinId)
 
 void Encoder::SetZero()
 {
-    this->Lock();
+    // this->Lock();
+    
+    // this->Unlock();
+    this->reset_encoder=true;
+}
+
+void Encoder::_SetZero()
+{
     this->_setCE();
 
     this->txBuf[0] = 0x70;
@@ -117,8 +124,8 @@ void Encoder::SetZero()
         this->txBuf[0]=0x00;
         this->_spiTxRx(1);
     }
+    this->reset_encoder=false;
     cout<<"done set zero\n";
-    this->Unlock();
 }
 char Encoder::_spiTxRx(unsigned int len)
 {
@@ -135,22 +142,36 @@ char Encoder::_spiTxRx(unsigned int len)
 
 int Encoder::ReadPos()
 {
-    this->Lock();
+    // this->Lock();
     //preset the CE pins
     // auto start = chrono::high_resolution_clock::now();
+
+    if(this->reset_encoder){
+        this->_SetZero();
+    }
+
+
+
     this->_setCE();
     
     //send read_pos
     this->txBuf[0] = 0x10;
     this->_spiTxRx(1);
     // this->txBuf[0]=0x00;
-    while (this->rxBuf[0] != 0x10)
-    {
-        // usleep(20);
-        this->_spiTxRx(1);
-        
-    }
     
+    // while (this->rxBuf[0] != 0x10)
+    // {
+    //     // usleep(20);
+    //     this->_spiTxRx(1);
+    
+    // }
+    if(this->rxBuf[0]!=0x10){
+        return (int)(this->MSB << 8) + (int)this->LSB;
+        //this is to avoid tasks pile up
+        //when reset encoder, there might be up to 1 ms latency, the threads will pile up
+        //however, the encoder value during reset is not important, we should just use the old value instead
+    }
+
     // usleep(20);
     // The encoder has issues reading two bytes consecutively, you will have to send one byte per time.    
     this->txBuf[0] = 0x00;
@@ -164,7 +185,7 @@ int Encoder::ReadPos()
     // auto elapsed = chrono::high_resolution_clock::now() - start;
     // long long dur_time = chrono::duration_cast<chrono::microseconds>(elapsed).count();
     // cout << "time: " << dur_time << endl;
-    this->Unlock();
+    // this->Unlock();
     return (int)(this->MSB << 8) + (int)this->LSB;
    
 }
