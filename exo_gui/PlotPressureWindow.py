@@ -158,15 +158,15 @@ class PlotPressureWindow(QWidget):
         # TODO: use the correct unit and data
 
         self.r_tank_data.popleft()
-        self.r_tank_data.append(data[TANK_ADC]*0.003125-25)
+        self.r_tank_data.append(data[RTANK_ADC]*0.003125-25)
         self.right_tank_line.setData(self.r_tank_data)
         
         self.r_kne_ext_data.popleft()
-        self.r_kne_ext_data.append(data[FORCE_ADC])
+        self.r_kne_ext_data.append(data[RKNE_EXT_ADC])
         self.right_knee_ext_line.setData(self.r_kne_ext_data)
         
         self.r_kne_flex_data.popleft()
-        self.r_kne_flex_data.append(data[POS_ADC])
+        self.r_kne_flex_data.append(data[RKNE_FLEX_ADC])
         self.right_knee_flex_line.setData(self.r_kne_flex_data)
 
         # self.l_ank_ext_data.popleft()

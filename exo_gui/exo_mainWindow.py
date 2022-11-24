@@ -27,7 +27,7 @@ import time
 import datetime
 import threading
 DATALEN=120
-SAMPT = 40
+SAMPT = 20
 # SAMPT = 400
 class SystemData:
     def __init__(self):

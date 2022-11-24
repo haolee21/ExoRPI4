@@ -86,11 +86,14 @@ class UdpClient:
             data_recv = self.udp_data_socket.recvfrom(ctypes.sizeof(UdpDataPacket))
             if(len(data_recv[0])==ctypes.sizeof(UdpDataPacket)):
                 self.disconnect_count=0
+                
                 udp_data_packet = UdpDataPacket.from_buffer_copy(data_recv[0])
-
+            
                 self.updateJoint(udp_data_packet.enc_data)
+                
                 self.updatePre(udp_data_packet.pre_data1)
-                self.updateTank(udp_data_packet.pre_data1[4]) 
+                
+                self.updateTank(udp_data_packet.pre_data1[0]) 
                 self.recBtnUpdate(udp_data_packet.rec_status)
                 self.pwm_lcd_update(udp_data_packet.pwm_duty)
                 

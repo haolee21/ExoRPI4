@@ -4,7 +4,6 @@
 #include "SensorHub.hpp"
 #include "Teensy.hpp"
 #include "Timer.hpp"
-#include "SensorHub.hpp"
 #include "Recorder.hpp"
 #include "JointCon.hpp"
 #include "MPC.hpp"
@@ -12,25 +11,25 @@
 enum class PWM_ID //sync with the real connection on the PCB
 {
 
-    kLTank = PCB_VAL_9,
-    kLKneExt = PCB_VAL_10,
-    kLKneFlex = PCB_VAL_11,
-    kLKneAnk = PCB_VAL_12,
-    kLKneExut = PCB_VAL_13,
-    kLAnkExt = PCB_VAL_14,
-    kLAnkExut= PCB_VAL_15,
-    NA1 = PCB_VAL_16,
-    kRTank = PCB_VAL_1,
-    kRKneExt = PCB_VAL_2,
-    kRKneFlex = PCB_VAL_3,
-    kRKneAnk = PCB_VAL_4,
-    kRKneExut = PCB_VAL_5,
-    kRAnkExt = PCB_VAL_6,
-    kRAnkExut= PCB_VAL_7,
-    NA5 = PCB_VAL_8,
+    kLKneExut=PCB_VAL_1,
+    kLTank=PCB_VAL_2,
+    kRTank=PCB_VAL_3,
+    kLKneExt=PCB_VAL_4,
+    kLAnkFlex=PCB_VAL_5,
+    kLKneAnk=PCB_VAL_6,
+    kLAnkExt=PCB_VAL_7,
+    kRKneExut=PCB_VAL_8,
+    kLKneFlex=PCB_VAL_9,
+    kRAnkFlex=PCB_VAL_10,
+    kRAnkExt=PCB_VAL_11,
+    kLAnkExut=PCB_VAL_12,
+    kRKneAnk=PCB_VAL_13,
+    kRKneExt=PCB_VAL_14,
+    kRKneFlex=PCB_VAL_15,
+    kRAnkExut=PCB_VAL_16,
     
 };
-#define PWM_HEADER "TIME,LTANK_PWM,LKNE_EXT_PWM,LKNE_FLEX_PWM,LKNE_ANK_PWM,LKNE_EXUT_PWM,LANK_EXT_PWM,LANK_EXUT_PWM,NA1_PWM,RTANK_PWM,RKNE_EXT_PWM,RKEN_FLEX_PWM,RKNE_ANK_PWM,RKNE_EXUT_PWM,RANK_EXT_PWM,RANK_EXUT_PWM,NA5_PWM"
+#define PWM_HEADER "TIME,LKNE_EXUT_PWM,LTANK_PWM,RTANK_PWM,LKNE_EXT_PWM,LANK_FLEX_PWM,LKNE_ANK_PWM,LANK_EXT_PWM,RKNE_EXUT_PWM,LKNE_FLEX_PWM,RANK_FLEX_PWM,RANK_EXT_PWM,LANK_EXUT_PWM,RKNE_ANK_PWM,RKNE_EXT_PWM,RKNE_FLEX_PWM,RANK_EXUT_PWM"
                  
 class Valves_hub
 {

@@ -113,7 +113,7 @@ void Encoder::SetZero()
 
     while (rxBuf[0] != 0x80)
     {
-        usleep(20);
+        // usleep(5);
         this->txBuf[0]=0x00;
         this->_spiTxRx(1);
     }

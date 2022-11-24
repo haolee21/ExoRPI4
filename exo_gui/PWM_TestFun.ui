@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>661</width>
-    <height>643</height>
+    <height>767</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -77,6 +77,21 @@
          </property>
          <property name="text">
           <string>Left Ankle Ext PWM Duty</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_23">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Left Ankle Flex PWM Duty</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -189,6 +204,21 @@
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="label_26">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Right Ankle Flex PWM Duty</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label_12">
          <property name="font">
           <font>
@@ -293,6 +323,16 @@
         </widget>
        </item>
        <item>
+        <widget class="QLineEdit" name="lineEdit_LAnkFlexDuty">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLineEdit" name="lineEdit_LKneAnkDuty">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -369,6 +409,16 @@
           <font>
            <pointsize>12</pointsize>
           </font>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_RAnkFlexDuty">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
@@ -453,6 +503,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="label_24">
+         <property name="text">
+          <string>%</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label_29">
          <property name="font">
           <font>
@@ -519,6 +576,13 @@
            <pointsize>12</pointsize>
           </font>
          </property>
+         <property name="text">
+          <string>%</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_33">
          <property name="text">
           <string>%</string>
          </property>
@@ -628,6 +692,19 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="btn_LAnkFlexDuty_start">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Start</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="btn_LKneAnkDuty_start">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -707,6 +784,19 @@
        </item>
        <item>
         <widget class="QPushButton" name="btn_RAnkExtDuty_start">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Start</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btn_RAnkFlexDuty_start">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -814,6 +904,19 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="btn_LAnkFlexDuty_stop">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Stop</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="btn_LKneAnkDuty_stop">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -893,6 +996,19 @@
        </item>
        <item>
         <widget class="QPushButton" name="btn_RAnkExtDuty_stop">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Stop</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btn_RAnkFlexDuty_stop">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>

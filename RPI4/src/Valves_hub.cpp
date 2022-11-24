@@ -47,12 +47,12 @@ void Valves_hub::UpdateValve(){
 
     //MPC check
     const std::array<double,SensorHub::NUMPRE>& pre_data = SensorHub::GetPreData(); //use ref to avoid copy
-    
-    hub.left_knee_con.PushMeas(pre_data[(unsigned)SensorHub::PreName::LKneExt],pre_data[(unsigned)SensorHub::PreName::LKneFlex],pre_data[(unsigned)SensorHub::PreName::LAnkExt],
-                               pre_data[(unsigned)SensorHub::PreName::LTank],pre_data[(unsigned)SensorHub::PreName::Tank],
-                               pre_data[(unsigned)SensorHub::PreName::Pos]
-                               ,hub.PWM_Duty[(unsigned)PWM_ID::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]
-                               ,hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]);
+    //TODO: fix this recording    
+    // hub.left_knee_con.PushMeas(pre_data[(unsigned)SensorHub::PreName::LKneExt],pre_data[(unsigned)SensorHub::PreName::LKneFlex],pre_data[(unsigned)SensorHub::PreName::LAnkExt],
+    //                            pre_data[(unsigned)SensorHub::PreName::LTank],pre_data[(unsigned)SensorHub::PreName::Tank],
+    //                            pre_data[(unsigned)SensorHub::PreName::Pos]
+    //                            ,hub.PWM_Duty[(unsigned)PWM_ID::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]
+    //                            ,hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]);
     
     
     if(hub.left_knee_con.GetControlMode()==JointCon::ControlMode::kPreConExt){
@@ -95,7 +95,9 @@ void Valves_hub::UpdateValve(){
                 hub.PWM_Duty[i]=100;
             else if (hub.PWM_Duty[i]<0)
                 hub.PWM_Duty[i]=0;
+            
         }
+     
 
         std::array<char,TeensyI2C::CMDLEN> cmd;
 
@@ -201,9 +203,10 @@ std::array<bool,(unsigned)Valves_hub::Joint::kTotal>Valves_hub::GetControlCond()
 void Valves_hub::SetJointPos(Valves_hub::Joint joint){
     auto &valves_hub = Valves_hub::GetInstance();
     auto &sensor_hub = SensorHub::GetInstance();
-    if(joint == Valves_hub::Joint::kLKne){
-        valves_hub.left_knee_con.SetKneeMaxPos(sensor_hub.GetPreData()[(unsigned)SensorHub::PreName::Pos]);
-    }
+    //TODO: fix this
+    // if(joint == Valves_hub::Joint::kLKne){
+    //     valves_hub.left_knee_con.SetKneeMaxPos(sensor_hub.GetPreData()[(unsigned)SensorHub::PreName::Pos]);
+    // }
 }
 
 void Valves_hub::SetImpactAbsorb(Valves_hub::Joint joint, double init_force, double init_imp){
