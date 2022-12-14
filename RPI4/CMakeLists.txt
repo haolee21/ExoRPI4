@@ -7,8 +7,12 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 set(Boost_INCLUDE_DIR /home/lowlimb/tools/ARM/boost_1_75_0)
 set(Boost_LIBRARY_DIR /home/lowlimb/tools/ARM/boost_1_75_0/stage/lib)
 
-# #setup osqp library
-# set(OSQP_)
+# include eigen
+set(EIGEN_INCLUDE_DIR /home/lowlimb/tools/eigen/eigen-master)
+
+# include osqp
+set(osqp_INCLUDE_DIRS /home/lowlimb/tools/ARM/osqp/include)
+set(osqp_LIBRARIES /home/lowlimb/tools/ARM/osqp/lib)
 
 set(CMAKE_C_COMPILER arm-linux-gnueabihf-gcc)
 set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
@@ -16,8 +20,8 @@ set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
 set(Boost_USE_STATIC_LIBS ON)
 
 
-set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -o3 -pthread -lrt -o3") #you can set with add_definitions("-Wall -std=c+11, etc")
-set(CMAKE_C_FLAGS   "-std=c++17 -Wall -o3 -pthread -lrt -o3")
+set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -pthread -lrt -O3") #you can set with add_definitions("-Wall -std=c+11, etc")
+set(CMAKE_C_FLAGS   "-std=c++17 -Wall -pthread -lrt -O3")
 
 # Search for programs only in the build host directories
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
@@ -27,9 +31,9 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 set(Include_DIR include)
-set(BASE_DIR /home/lowlimb/cdrive/UCLA/lab/Exoskeleton/Controller/ExoRPI4)
-find_package(Boost 1.74.0 COMPONENTS serialization date_time filesystem REQUIRED)
-#set(Eigen_INCLUDE_DIR /home/pi/Lib/eigen-eigen-323c052e1731)
+set(COMMON_DIR ../RPI_Teensy)
+find_package(Boost 1.75.0 COMPONENTS serialization date_time filesystem REQUIRED)
+find_library(osqp_LIB osqp ${osqp_LIBRARIES})
 
 
 
@@ -39,31 +43,40 @@ find_package(Boost 1.74.0 COMPONENTS serialization date_time filesystem REQUIRED
 
 include_directories(
     ${Include_DIR}
-    src
+    # src
     ${Boost_INCLUDE_DIR}
-    ${BASE_DIR}
-    #${Eigen_INCLUDE_DIR}
-
+    ${COMMON_DIR}
+    ${EIGEN_INCLUDE_DIR}
+    ${osqp_INCLUDE_DIRS}
     
 )
-file(GLOB HEAD_FILES 
-    ${Include_DIR}/*.h 
-    ${Include_DIR}/*.hpp
-    ${BASE_DIR}/*.h)
-add_library(
-    lib STATIC
-    ${HEAD_FILES}
+# file(GLOB HEAD_FILES 
+#     ${Include_DIR}/*.h 
+#     ${Include_DIR}/*.hpp
+#     ${COMMON_DIR}/*.h)
+# add_library(
+#     llexo STATIC
+#     ${HEAD_FILES}
     
-)
+# )
 
-message(STATUS ${BASE_DIR})
-set_target_properties(lib PROPERTIES LINKER_LANGUAGE CXX)
+# message(STATUS ${BASE_DIR})
+# set_target_properties(llexo PROPERTIES LINKER_LANGUAGE CXX)
 # link_directories(${Boost_LIBRARY_DIR}) #unnecessary 
-enable_testing()
+
 file(GLOB SRC_FILES 
-    ${Include_DIR}/*.cpp
+    # ${Include_DIR}/*.cpp
     src/*.cpp)
 add_executable(exo_o ${SRC_FILES})
 
-target_link_libraries(exo_o PRIVATE ${Boost_LIBRARIES}) 
+target_link_libraries(exo_o PRIVATE ${Boost_LIBRARIES} ${osqp_LIB}) 
+target_precompile_headers(exo_o 
+    PUBLIC
+        include/ADC.hpp
+        include/DigitalFilter.hpp
+        include/Encoder.hpp
+        include/Pin.hpp
+        include/Recorder.hpp
+        include/Teensy.hpp
+)
 

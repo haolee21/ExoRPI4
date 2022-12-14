@@ -1,3 +1,4 @@
+
 #include "Timer.hpp"
 bool Timer::dataRec_flag=false; //it has to be false defautly, will be a const ref to all class that use
 std::string Timer::filePath="";
@@ -38,7 +39,7 @@ void Timer::Sleep(struct timespec *ts){
 }
 int Timer::StartRT(){
     RT::Init();
-    Timer::GetInstance().timeStamp=0;
+    Timer::GetInstance().timeStamp=1;
     Timer::GetInstance().updateFlag = true;
     int ret = RT::StartThread(Timer::GetInstance().rt_thread,Timer::TimerTick,RT::RT_PRIORITY);
     return ret;
@@ -55,10 +56,12 @@ void* Timer::TimerTick(void*){
     long int interval = SAMPT*USEC;
 
     //////////////////////////////////////////////////////////
+    #ifdef TEST_INTERVAL
     unsigned timeDiff_idx=0; //TODO: testing loop period only, should be commented in final version
-    std::array<float,120*1000> timeDiff; //can only run around 120 sec
+    std::array<double,TOT_RUN_TIME*1000+1000> timeDiff; //can only run around 100 sec
     auto t_start=std::chrono::high_resolution_clock::now();
     auto t_end = std::chrono::high_resolution_clock::now();
+    #endif
     ///////////////////////////////////////////////////////////
     //TODO: Need to add init sequence here
     //we cannot add 
@@ -79,9 +82,11 @@ void* Timer::TimerTick(void*){
         Timer::Sleep(&t);
 
         ///////////////////////////////////////////////// TODO: testing loop period only
+        #ifdef TEST_INTERVAL
         t_end = std::chrono::high_resolution_clock::now();
-        timeDiff[timeDiff_idx++]=std::chrono::duration<float,std::micro>(t_end-t_start).count();
+        timeDiff[timeDiff_idx++]=std::chrono::duration<double,std::micro>(t_end-t_start).count();
         t_start = t_end;
+        #endif
         /////////////////////////////////////////////////
 
 
@@ -111,10 +116,12 @@ void* Timer::TimerTick(void*){
         timer.timeStamp++;
     }
     /////////////////////////////////////////// TODO: testing loop period only
+    #ifdef TEST_INTERVAL
     std::cout<<"Time diff: \n";
     for(unsigned i=0;i<timeDiff_idx;i++){
         std::cout<<timeDiff[i]<<',';
     }
+    #endif
     ////////////////////////////////////////////
 
     
@@ -167,6 +174,9 @@ bool Timer::StartRec(){
         fs::create_directory(filePath);
         Timer::filePath = filePath;
         Timer::dataRec_flag = true;
+
+        //reset the timeStamp
+        Timer::GetInstance().timeStamp=0;
         return true;
     }
 }

@@ -7,7 +7,8 @@
 #define CONS_A_LEN 4
 #define X_LEN 2
 #define NUM_OF_CONS 3
-#include "osqp/osqp.h"
+#define A_MAT_LEN 50
+#include <osqp/osqp.h>
 #include <memory>
 #include <array>
 #include <iostream>
@@ -17,12 +18,17 @@ class MPC
     //The library required is OSQP, which is written in C, thus, the Class is defined in c-style
 private:
     
+    // std::unique_ptr<OSQPWorkspace> work;
+    std::unique_ptr<OSQPSettings> settings;
+    std::unique_ptr<OSQPData> data;
+    // std::unique_ptr<OSQPWorkspace> work;
     OSQPWorkspace *work;
-    OSQPSettings  *settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
-    OSQPData      *data     = (OSQPData *)c_malloc(sizeof(OSQPData));
+    // OSQPSettings  *settings;// = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
+    // OSQPData      *data;//    = (OSQPData *)c_malloc(sizeof(OSQPData));
 
     
     c_int exitflag = 0;
+
 
 public:
     MPC(/* args */);
@@ -34,17 +40,26 @@ public:
     void UpdateConsBound(std::array<float,CONS_BOUND_LEN> up, std::array<float,CONS_BOUND_LEN> low);
     void UpdateConsMat(std::array<float,CONS_A_LEN>);
 
+    //MPC Controller function
+    void UpdateAMatVal(std::array<float,A_MAT_LEN>);
+    void SetDutyLimit(float up,float low);
+    
+
+
 };
 
 MPC::MPC(/* args */)
 {
+    this->data.reset(new OSQPData);
+    this->settings.reset(new OSQPSettings);
+
     std::cout<<"sizeof OSQP data"<<sizeof(OSQPData)<<std::endl;
     //some initial values
     c_float P_x[3] = {4.0, 1.0, 2.0, };
     c_int P_nnz = 3;
     c_int P_i[3] = {0, 0, 1, };
     c_int P_p[3] = {0, 1, 3, };
-    c_float q[2] = {1.0, 1.0, };
+    c_float q[2] = {1.0, 0, };
     c_float A_x[4] = {1.0, 1.0, 1.0, 1.0, };
     c_int A_nnz = 4;
     c_int A_i[4] = {0, 1, 0, 2, };
@@ -65,21 +80,21 @@ MPC::MPC(/* args */)
     }
         // Define solver settings as default
     if (this->settings) {
-        osqp_set_default_settings(this->settings);
+        osqp_set_default_settings(this->settings.get());
         this->settings->alpha = 1.0; // Change alpha parameter
     }
-    this->exitflag = osqp_setup(&this->work, this->data, this->settings);
+    this->exitflag = osqp_setup(&this->work, this->data.get(), this->settings.get());
 }
 
 MPC::~MPC()
 {
     osqp_cleanup(this->work);
-    if (this->data) {
-        if (this->data->A) c_free(this->data->A);
-        if (this->data->P) c_free(this->data->P);
-        c_free(this->data);
-    }
-    if (this->settings) c_free(this->settings);
+    // if (this->data) {
+    //     if (this->data->A) c_free(this->data->A);
+    //     if (this->data->P) c_free(this->data->P);
+    //     c_free(this->data);
+    // }
+    // if (this->settings) c_free(this->settings);
 
 }
 

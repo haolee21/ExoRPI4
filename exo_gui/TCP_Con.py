@@ -1,19 +1,25 @@
 import socket 
 import multiprocessing as mp
+import struct
 import threading as th
 import time
 import numpy as np
 from PyQt5 import QtCore
 import pdb
+from threading import Lock
 CMD_LEN = 2
-JOINT_DATA_LEN=12
-PRE_DATA_LEN=10
+ENC_NUM = 6
+PRE_NUM = 8
+DOUBLE_SIZE = 8
+JOINT_DATA_LEN=ENC_NUM*DOUBLE_SIZE
+PRE_DATA_LEN= PRE_NUM*DOUBLE_SIZE
+MPC_LEN=4
 class TCP:
     port =1234
-    ip_address='192.168.0.110'
+    ip_address='192.168.0.104'
     def __init__(self):
         self.flag = False
-        
+        self.lock = Lock()
         
         
 
@@ -39,12 +45,13 @@ class TCP:
         # except:
         #     print('sock connecting failed')
         return self.flag
-    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback,recBtnUpdate):
+    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback,recBtnUpdate,mpcCondUpdate):
         self.updateJoint = updateJointFun
         self.updatePre = updatePreFun
         self.updateTank = updateTankFun
         self.disConCcallback = disConCallback
         self.recBtnUpdate = recBtnUpdate
+        self.mpcCondUpdate = mpcCondUpdate
         
     def Disconnect(self):
         if self.flag:
@@ -68,16 +75,22 @@ class TCP:
             #     print('package incomplete')
             #     print(len(receive))
             # else:
+
             self.updateJoint(receive[:JOINT_DATA_LEN]) 
-            self.updatePre(receive[JOINT_DATA_LEN:-2])
-            self.updateTank(int.from_bytes(receive[-2:],'little'))
+            self.updatePre(receive[JOINT_DATA_LEN:JOINT_DATA_LEN+PRE_DATA_LEN])
+            self.updateTank(struct.unpack("d",receive[JOINT_DATA_LEN+4*DOUBLE_SIZE:JOINT_DATA_LEN+5*DOUBLE_SIZE])[0])
+            # self.updateTank(int.from_bytes(receive[JOINT_DATA_LEN+4*DOUBLE_SIZE:JOINT_DATA_LEN+5*DOUBLE_SIZE],'little'))
 
             # rec_flag = int.from_bytes(self.SendCmd('REQ:REC:DATA',1,print_response=False),'little')
             rec_flag = int(self.SendCmd('REQ:REC:DATA',1,print_response=False).decode())
             # continuous checking if rec has already started
-            
 
             self.recBtnUpdate(rec_flag)
+
+            mpc_flag = self.SendCmd('REQ:CONT:MPC',MPC_LEN,print_response=False)
+            # # print('mpc recv flag: ',(mpc_flag[0:2] and [False,True]))
+            self.mpcCondUpdate(mpc_flag)
+            
 
             
         else:
@@ -85,26 +98,27 @@ class TCP:
             self.disConCcallback()
             
     def SendCmd(self,cmd,byte_to_read,print_response=True):
-        cmd = cmd+'\n'
-        response = b''
-        try:
-            with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
+        with self.lock:
+            cmd = cmd+'\n'
+            response = b''
+            try:
+                with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
                 
-                s.connect((self.ip_address,self.port))
+                    s.connect((self.ip_address,self.port))
                 
-                s.sendall(cmd.encode())
+                    s.sendall(cmd.encode())
 
-                # s.settimeout(0.1)
-                response = s.recv(byte_to_read)
+                    # s.settimeout(0.1)
+                    response = s.recv(byte_to_read)
                 
                 
                 
                 # response = response[:-1]
                 
 
-        except:
-            print('TCP:Failed\n')
-            self.flag=False
+            except:
+                print('TCP:Failed\n')
+                self.flag=False
             
             
 
@@ -118,8 +132,8 @@ class TCP:
         # response = self.s.recv(byte_to_read+1)#include \n
     
         # response = response[:-1]
-        if print_response:
-            print('Send: '+cmd[:-1].ljust(25)+'Response: '+response.decode())
+            if print_response:
+                print('Send: '+cmd[:-1].ljust(25)+'Response: '+response.decode())
         return response
 
     def Update_test(self):
@@ -135,4 +149,11 @@ class TCP:
         # pdb.set_trace()
         self.updateJoint(receive[:JOINT_DATA_LEN]) 
         self.updatePre(receive[JOINT_DATA_LEN:-2])
+
+def TextToFloat(text):
+    try:
+        res = float(text)
+    except:
+        res=0
+    return res
         

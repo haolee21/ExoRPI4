@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>795</width>
-    <height>714</height>
+    <height>696</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>550</y>
+      <y>540</y>
       <width>191</width>
       <height>51</height>
      </rect>
@@ -137,24 +137,10 @@
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="checkBox_rel_LKne">
-        <property name="text">
-         <string>Release LKnee</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0">
-       <widget class="QCheckBox" name="checkBox_act_LKne">
+       <widget class="QCheckBox" name="checkBox_setLKneMaxPos">
         <property name="text">
-         <string>Act LKnee</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="checkBox_rel_LAnk">
-        <property name="text">
-         <string>Release LAnk</string>
+         <string>Set LKnee Max Pos</string>
         </property>
        </widget>
       </item>
@@ -190,6 +176,20 @@
        <widget class="QCheckBox" name="checkBox_rel_RKne">
         <property name="text">
          <string>Release RKnee</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="checkBox_rel_LAnk">
+        <property name="text">
+         <string>Release LAnk</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="checkBox_rel_LKne">
+        <property name="text">
+         <string>Release LKnee</string>
         </property>
        </widget>
       </item>
@@ -231,7 +231,7 @@
     <property name="geometry">
      <rect>
       <x>380</x>
-      <y>500</y>
+      <y>420</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -251,7 +251,7 @@
       <x>380</x>
       <y>20</y>
       <width>361</width>
-      <height>451</height>
+      <height>381</height>
      </rect>
     </property>
    </widget>
@@ -259,7 +259,7 @@
     <property name="geometry">
      <rect>
       <x>500</x>
-      <y>500</y>
+      <y>420</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -277,7 +277,7 @@
     <property name="geometry">
      <rect>
       <x>620</x>
-      <y>500</y>
+      <y>420</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -295,7 +295,7 @@
     <property name="geometry">
      <rect>
       <x>380</x>
-      <y>550</y>
+      <y>470</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -313,7 +313,7 @@
     <property name="geometry">
      <rect>
       <x>500</x>
-      <y>550</y>
+      <y>470</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -331,7 +331,7 @@
     <property name="geometry">
      <rect>
       <x>620</x>
-      <y>550</y>
+      <y>470</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -345,12 +345,12 @@
      <string>Reset RAnkle</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_dischargeAllAir">
+   <widget class="QPushButton" name="btn_discharge">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>610</y>
-      <width>131</width>
+      <x>190</x>
+      <y>600</y>
+      <width>71</width>
       <height>41</height>
      </rect>
     </property>
@@ -414,36 +414,190 @@
       <string>REC Start Time</string>
      </property>
     </widget>
-    <widget class="QLCDNumber" name="lcdNumber">
+    <widget class="QLabel" name="label_startTime">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>26</x>
        <y>60</y>
-       <width>64</width>
-       <height>23</height>
+       <width>161</width>
+       <height>20</height>
       </rect>
      </property>
-    </widget>
-    <widget class="QLCDNumber" name="lcdNumber_2">
-     <property name="geometry">
-      <rect>
-       <x>70</x>
-       <y>60</y>
-       <width>64</width>
-       <height>23</height>
-      </rect>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="textInteractionFlags">
+      <set>Qt::TextSelectableByMouse</set>
      </property>
     </widget>
-    <widget class="QLCDNumber" name="lcdNumber_3">
-     <property name="geometry">
-      <rect>
-       <x>140</x>
-       <y>60</y>
-       <width>64</width>
-       <height>23</height>
-      </rect>
-     </property>
-    </widget>
+   </widget>
+   <widget class="QLCDNumber" name="lcd_TankPre">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>600</y>
+      <width>151</width>
+      <height>41</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_4">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>530</y>
+      <width>291</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Controllers</string>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,1" columnstretch="1,2,1,2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="LED_LKnee">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap>off_led.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_4">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>LKnee</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="LED_RKnee">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap>off_led.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLabel" name="RKnee_LED">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>RKnee</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="LED_LAnk">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap>off_led.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="LED_LAnk_2">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>LAnk</string>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="LED_RAnk">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap>off_led.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QLabel" name="RKnee_LED_2">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>RAnk</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QPushButton" name="btn_lock">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>600</y>
+      <width>71</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Lock</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -452,7 +606,7 @@
      <x>0</x>
      <y>0</y>
      <width>795</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuConnection">
@@ -471,7 +625,7 @@
    </widget>
    <widget class="QMenu" name="menuTask_Settings">
     <property name="title">
-     <string>Task Settings</string>
+     <string>Robot Settings</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuAction">
@@ -480,6 +634,9 @@
     </property>
     <addaction name="actionTest_SW_Valves"/>
     <addaction name="act_testPWM_valves"/>
+    <addaction name="actionTest_Pressure_Control"/>
+    <addaction name="act_ImpCon"/>
+    <addaction name="action_ImpactAbsorb"/>
    </widget>
    <addaction name="menuConnection"/>
    <addaction name="menuGraphs"/>
@@ -515,6 +672,26 @@
   <action name="actionPWM_Duty">
    <property name="text">
     <string>PWM Duty</string>
+   </property>
+  </action>
+  <action name="actionTest_MPC">
+   <property name="text">
+    <string>Test MPC</string>
+   </property>
+  </action>
+  <action name="act_ImpCon">
+   <property name="text">
+    <string>Test Impedance Control</string>
+   </property>
+  </action>
+  <action name="actionTest_Pressure_Control">
+   <property name="text">
+    <string>Test Pressure Control</string>
+   </property>
+  </action>
+  <action name="action_ImpactAbsorb">
+   <property name="text">
+    <string>Test Impact Absorb</string>
    </property>
   </action>
  </widget>

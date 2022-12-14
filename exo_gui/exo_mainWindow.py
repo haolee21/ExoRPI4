@@ -1,22 +1,34 @@
-from PyQt5.QtWidgets import QAction, QApplication, QCheckBox, QLabel, QLineEdit, QMainWindow,QPushButton, QRadioButton,QWidget,QProgressBar
-from PyQt5 import uic,QtCore
 
+from pickle import TRUE
+from PyQt5.QtWidgets import QAction, QApplication, QCheckBox, QLabel, QLineEdit, QMainWindow,QPushButton, QRadioButton,QWidget,QProgressBar
+from PyQt5.QtWidgets import QLCDNumber
+from PyQt5 import uic,QtCore
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import QThread
 
 import pyqtgraph as pg
 from pyqtgraph import GraphicsLayoutWidget
 
 import numpy as np
-from TCP_Con import TCP
+# from TCP_Con import TCP
+from UdpClient import *
 import pdb
 from collections import deque
 from ConnectionWindow import *
 from PlotJointWindow import *
 from PlotPressureWindow import *
 from PWM_TestWindow import *
+from ImpConWindow import *
+from PwmValueWindow import *
+from PressureConWindow import *
+from ImpactCon import *
 import math
 import time
+import datetime
+import threading
 DATALEN=120
-SAMPT = 40
+SAMPT = 20
+# SAMPT = 400
 class SystemData:
     def __init__(self):
         self.ip_address='127.0.0.1'
@@ -34,24 +46,28 @@ class MW(QMainWindow):
         uic.loadUi('exo_gui_mw.ui',self)
         self.setWindowTitle('Bionics LLExo')
 
-        self.tcp_port = TCP()
+        # self.tcp_port = TCP()
+        self.udp_port = UdpClient()
+
         self.dataLen=DATALEN
-        self.max_pressure=80.0 #max pressure is 80 psi
+        self.max_pressure=100.0 #max pressure is 80 psi
         #init all windows, otherwise all data will be lost when we close it
         self.con_window = ConnectionWindow(self)
         self.joint_plot_window = PlotJointWindow(self)
         self.pressure_plot_window=PlotPressureWindow(self)
         self.pwm_test_window = PWM_TestWindow(self)
-       
-        
+        self.imp_con_window = ImpWindow(self)
+        self.pwm_value_window = PwmValueWindow(self)
+        self.pre_con_window = PressureConWindow(self)
+        self.impact_con_window = ImpactCon(self)
         # jointUpdateCB = lambda data:self.joint_plot_window.UpdateData(self,data)
         # preUpdateCB = lambda data:self.pressure_plot_window.UpdateData(self,data)
         # self.tcp_port.SetCallBack(jointUpdateCB,preUpdateCB)
-        self.tcp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn)
+        self.udp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn,self.UpdateMPC_LED,self.pwm_value_window.UpdateLCD)
         # TCP/IP connection
         
         self.cur_ip = self.findChild(QLabel,'cur_ip_label')
-        self.cur_ip.setText(self.tcp_port.ip_address+':'+str(self.tcp_port.port))
+        self.cur_ip.setText(self.udp_port.ip_address)
         self.btn_connect = self.findChild(QPushButton,'btn_connect')
         self.btn_connect.clicked.connect(self.btn_connect_clicked)
         
@@ -66,14 +82,33 @@ class MW(QMainWindow):
         self.act_pwm_test =self.findChild(QAction,'act_testPWM_valves')
         self.act_pwm_test.triggered.connect(self.open_pwm_test)
 
+        self.act_imp_con = self.findChild(QAction,'act_ImpCon')
+        self.act_imp_con.triggered.connect(self.imp_con_window.show)
+
+        self.act_pwm_disp = self.findChild(QAction,'actionPWM_Duty')
+        self.act_pwm_disp.triggered.connect(self.pwm_value_window.show)
+
+        self.act_pre_con = self.findChild(QAction,'actionTest_Pressure_Control')
+        self.act_pre_con.triggered.connect(self.pre_con_window.show)
+
+        self.act_impact_con = self.findChild(QAction,'action_ImpactAbsorb')
+        self.act_impact_con.triggered.connect(self.impact_con_window.show)
+
         # air reserivor 
         
         self.air_volume = self.findChild(QProgressBar,'air_volumn')
-        
+        self.tank_pre = self.findChild(QLCDNumber,'lcd_TankPre')
+        self.tank_pre.setDigitCount(5)
         # connection setting
         self.value = 0
-        
 
+        # exhaust 
+        self.btn_discharge = self.findChild(QPushButton,'btn_discharge')
+        self.btn_lock = self.findChild(QPushButton,'btn_lock')
+        self.btn_discharge.clicked.connect(self.btn_discharge_clicked)
+        self.btn_lock.clicked.connect(self.btn_lock_clicked)
+        self.discharge_thread = None 
+        
         # create exo plot
         self.numJoint=6
         self.model_plot_widget = self.findChild(GraphicsLayoutWidget,'exo_rt_plot')
@@ -113,15 +148,16 @@ class MW(QMainWindow):
         #function checkbox
         self.btn_sendCmd = self.findChild(QPushButton,'btn_sendCmd')
         self.btn_sendCmd.clicked.connect(self.btn_sendCmd_clicked)
-        self.relLKne_task = self.findChild(QCheckBox,'checkBox_rel_LKne')
-        self.relRKne_task = self.findChild(QCheckBox,'checkBox_rel_RKne')
-        self.relLAnk_task = self.findChild(QCheckBox,'checkBox_rel_LAnk')
-        self.relRAnk_task = self.findChild(QCheckBox,'checkBox_rel_RAnk')
+        # self.relLKne_task = self.findChild(QCheckBox,'checkBox_rel_LKne')
+        # self.relRKne_task = self.findChild(QCheckBox,'checkBox_rel_RKne')
+        # self.relLAnk_task = self.findChild(QCheckBox,'checkBox_rel_LAnk')
+        # self.relRAnk_task = self.findChild(QCheckBox,'checkBox_rel_RAnk')
 
-        self.actLKne_task = self.findChild(QCheckBox,'checkBox_act_LKne')
-        self.actRKne_task = self.findChild(QCheckBox,'checkBox_act_RKne')
-        self.actLAnk_task = self.findChild(QCheckBox,'checkBox_act_LAnk')
-        self.actRAnk_task = self.findChild(QCheckBox,'checkBox_act_RAnk')
+        # self.actLKne_task = self.findChild(QCheckBox,'checkBox_act_LKne')
+        # self.actRKne_task = self.findChild(QCheckBox,'checkBox_act_RKne')
+        # self.actLAnk_task = self.findChild(QCheckBox,'checkBox_act_LAnk')
+        # self.actRAnk_task = self.findChild(QCheckBox,'checkBox_act_RAnk')
+        self.checkBox_setLKneMaxPos = self.findChild(QCheckBox,'checkBox_setLKneMaxPos')
 
         self.walkRec_task = self.findChild(QRadioButton,'radioButton_walkRec')
         self.walkRec_task.toggled.connect(self.radio_walkRec_checked)
@@ -133,6 +169,27 @@ class MW(QMainWindow):
         self.btn_syncTime.clicked.connect(self.btn_updateTime_clicked)
         self.rec_flag = False
 
+        self.label_startTime = self.findChild(QLabel,'label_startTime')
+
+
+        # set MPC condition display
+        self.off_led = QPixmap('off_led.png')
+        self.on_led = QPixmap('on_led.png')
+        self.led_mpc_lknee = self.findChild(QLabel,'LED_LKnee')
+        self.led_mpc_rknee = self.findChild(QLabel,'LED_RKnee')
+        self.led_mpc_lank = self.findChild(QLabel,'LED_LAnk')
+        self.led_mpc_rank = self.findChild(QLabel,'LED_RAnk')
+        
+
+
+        self.led_mpc_lknee.setPixmap(self.off_led)
+        self.led_mpc_rknee.setPixmap(self.off_led)
+        self.led_mpc_lank.setPixmap(self.off_led)
+        self.led_mpc_rank.setPixmap(self.off_led)
+
+        self.old_mpc_cond = [False]*4
+        
+        
 
         self.show()
     def radio_walkRec_checked(self):
@@ -147,37 +204,42 @@ class MW(QMainWindow):
         self.actRAnk_task.setChecked(False)
 
     def btn_sendCmd_clicked(self):
-        if self.walkRec_task.isChecked():
-            self.tcp_port.SendCmd('STR:REC:ALL',2)
-            self.walkRec_task.setChecked(False)
-        else:
-            if self.relLKne_task.isChecked():
-                self.tcp_port.SendCmd('STR:REL:LKNE',2)
-            if self.relRKne_task.isChecked():
-                self.tcp_port.SendCmd('STR:REL:RKNE',2)
-            if self.relLAnk_task.isChecked():
-                self.tcp_port.SendCmd('STR:REL:LANK',2)
-            if self.relRAnk_task.isChecked():
-                self.tcp_port.SendCmd('STR:REL:RANK',2)
-            if self.actLKne_task.isChecked():
-                self.tcp_port.SendCmd('STR:ACT:LKNE',2)
-            if self.actRKne_task.isChecked():
-                self.tcp_port.SendCmd('STR:ACT:RKNE',2)
-            if self.actLAnk_task.isChecked():
-                self.tcp_port.SendCmd('STR:ACT:LANK',2)
-            if self.actRAnk_task.isChecked():
-                self.tcp_port.SendCmd('STR:ACT:RANK',2)
-        self.radio_walkRec_checked()
+        # if self.walkRec_task.isChecked():
+        #     self.tcp_port.SendCmd('STR:REC:ALL',2)
+        #     self.walkRec_task.setChecked(False)
+        # else:
+        #     if self.relLKne_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:REL:LKNE',2)
+        #     if self.relRKne_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:REL:RKNE',2)
+        #     if self.relLAnk_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:REL:LANK',2)
+        #     if self.relRAnk_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:REL:RANK',2)
+        #     if self.actLKne_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:ACT:LKNE',2)
+        #     if self.actRKne_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:ACT:RKNE',2)
+        #     if self.actLAnk_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:ACT:LANK',2)
+        #     if self.actRAnk_task.isChecked():
+        #         self.tcp_port.SendCmd('STR:ACT:RANK',2)
+        # self.radio_walkRec_checked()
+
+        if self.checkBox_setLKneMaxPos.isChecked():
+            self.udp_port.udp_cmd_packet.set_joint_pos_flag[JOINT_LKNE]=True
+            self.checkBox_setLKneMaxPos.setChecked(False)
+        pass
                 
         
         
     def btn_connect_clicked(self):
         
-        if not self.tcp_port.flag:
-            if self.tcp_port.Connect():
+        if not self.udp_port.flag:
+            if self.udp_port.Connect():
                 self.btn_connect.setText('Disconnect')
                 self.timer = QtCore.QTimer()
-                self.timer.timeout.connect(self.tcp_port.DataUpdate)
+                self.timer.timeout.connect(self.udp_port.ReqData)
                 self.timer.start(SAMPT)
 
                
@@ -186,21 +248,26 @@ class MW(QMainWindow):
                 
         else:
             self.timer.stop()
-            print('Disconnect   ',self.tcp_port.SendCmd('CON:STOP',2).decode())
-            self.tcp_port.Disconnect()
+            # self.tcp_port.SendCmd('SET:STOP:TCP:1',2,True)
+            self.udp_port.Disconnect()
             self.btn_connect.setText('Connect')
     def btn_updateTime_clicked(self):
-        self.tcp_port.SendCmd('CAL:TIME:EPOCH:'+str(time.time()),1,True)
+        self.udp_port.udp_cmd_packet.epoch_time_data = time.time()
+        self.udp_port.udp_cmd_packet.epoch_time_flag = True
     def btn_rec_start_clicked(self):
         if(not self.rec_flag):
             # when clicked, start the recording
             self.btn_updateTime_clicked()
-            self.tcp_port.SendCmd('SET:REC:DATA:1',1)
+            self.udp_port.udp_cmd_packet.recorder_data=True
+            self.udp_port.udp_cmd_packet.recorder_flag=True
             self.rec_flag=True
             self.btn_rec_start.setText('REC End')
+            curTime = datetime.datetime.fromtimestamp(time.time())
+            self.label_startTime.setText("%04d-" %(curTime.year) + "%02d%02d-" %(curTime.month,curTime.day) + "%02d%02d-" %(curTime.hour,curTime.minute)+"%02d" %(curTime.second))
         else:
             # when clicked, end the recording
-            self.tcp_port.SendCmd('SET:REC:DATA:0',0)
+            self.udp_port.udp_cmd_packet.recorder_data=False
+            self.udp_port.udp_cmd_packet.recorder_flag = True
             self.rec_flag=False
             self.btn_rec_start.setText('REC Start')
     def update_rec_btn(self,flag_read):
@@ -213,16 +280,18 @@ class MW(QMainWindow):
         elif self.rec_flag == True and flag_read == False:
             self.rec_flag=False
             self.btn_rec_start.setText('Rec Start')
-        
+     
         
 
 
     def found_disconnect(self):
         self.timer.stop()
-        self.tcp_port.Disconnect()
+        self.udp_port.Disconnect()
         self.btn_connect.setText('Connect')
     def update_air_volume(self,volume):
-        cur_pre = volume*0.0037147-25
+        
+        cur_pre = volume*0.003125-25
+        self.tank_pre.display(cur_pre)
         if cur_pre>self.max_pressure:
             cur_pre=self.max_pressure
         self.air_volume.setValue(int(cur_pre/self.max_pressure*100))
@@ -236,23 +305,59 @@ class MW(QMainWindow):
         self.pwm_test_window.show()
         
     def btn_resetLHipS_clicked(self):
-        self.tcp_port.SendCmd('CAL:ENC:LHIP_S',1,True)
+        self.udp_port.udp_cmd_packet.reset_enc_flag[ENC_LHIP_S]=True
     def btn_resetLKneS_clicked(self):
-        self.tcp_port.SendCmd('CAL:ENC:LKNE_S',1,True)
+        self.udp_port.udp_cmd_packet.reset_enc_flag[ENC_LKNE_S]=True
     def btn_resetLAnkS_clicked(self):
-        self.tcp_port.SendCmd('CAL:ENC:LANK_S',1,True)
+        self.udp_port.udp_cmd_packet.reset_enc_flag[ENC_LANK_S]=True
     def btn_resetRHipS_clicked(self):
-        self.tcp_port.SendCmd('CAL:ENC:RHIP_S',1,True)
+        self.udp_port.udp_cmd_packet.reset_enc_flag[ENC_RHIP_S]=True
     def btn_resetRKneS_clicked(self):
-        self.tcp_port.SendCmd('CAL:ENC:RKNE_S',1,True)
+        self.udp_port.udp_cmd_packet.reset_enc_flag[ENC_RKNE_S]=True
     def btn_resetRAnkS_clicked(self):
-        self.tcp_port.SendCmd('CAL:ENC:RANK_S',1,True)
+        self.udp_port.udp_cmd_packet.reset_enc_flag[ENC_RANK_S]=True
 
 
 
-    def btn_dischargeAll_clicked(self):
-        ret = self.tcp_port.SendCmd('STR:REL:ALL',2)
-        print('Discharge all air  ',ret.decode())
+    def btn_discharge_clicked(self):
+        #add sleep to avoid high instant current
+        # the power supply cannot output that much current 
+        if self.discharge_thread:
+            if self.discharge_thread.is_alive():
+                self.discharge_thread.join()
+        self.discharge_thread= threading.Thread(target=self.discharge_process)
+        self.discharge_thread.start()
+        
+    def discharge_process(self):
+        # self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXUT_PWM]=100
+        # self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXUT_PWM]=True
+        # time.sleep(1)
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXT_PWM]=100
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXT_PWM]=True
+        time.sleep(1)
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_FLEX_PWM]=100
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_FLEX_PWM]=True
+        time.sleep(1)
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_ANK_PWM]=100
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_ANK_PWM]=True
+         
+    def btn_lock_clicked(self):
+        if self.discharge_thread.is_alive():
+            self.discharge_thread.join()
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXUT_PWM]=0
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXUT_PWM]=True
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXT_PWM]=0
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXT_PWM]=True
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_FLEX_PWM]=0
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_FLEX_PWM]=True
+        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_ANK_PWM]=0
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_ANK_PWM]=True
+
+
+            
+
+        
+
 
     def get_exo_model(self):
         #data format = [LHip,LKne,LAnk,RHip,RKne,RAnk]
@@ -281,6 +386,29 @@ class MW(QMainWindow):
         self.left_leg_line.setData([0.0]+xpos[0:3],[0.0]+ypos[0:3])
         self.right_leg_line.setData([0.0]+xpos[4:],[0.0]+ypos[4:])
 
+
+    def UpdateMPC_LED(self,led_cond):
+        if(self.old_mpc_cond[0]^led_cond[0]):
+            if(led_cond[0]):
+                self.led_mpc_lknee.setPixmap(self.on_led)
+            else:
+                self.led_mpc_lknee.setPixmap(self.off_led)
+        if(self.old_mpc_cond[1]^led_cond[1]):
+            if(led_cond[1]):
+                self.led_mpc_lank.setPixmap(self.on_led)
+            else:
+                self.led_mpc_lank.setPixmap(self.off_led)    
+        if(self.old_mpc_cond[2]^led_cond[2]):
+            if(led_cond[2]):
+                self.led_mpc_rknee.setPixmap(self.on_led)
+            else:
+                self.led_mpc_rknee.setPixmap(self.off_led)
+        if(self.old_mpc_cond[3]^led_cond[3]):
+            if(led_cond[3]):
+                self.led_mpc_rank.setPixmap(self.on_led)
+            else:
+                self.led_mpc_rank.setPixmap(self.off_led)
+        self.old_mpc_cond = led_cond
     
 
 sysData = SystemData()

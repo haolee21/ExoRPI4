@@ -26,19 +26,12 @@ public:
     ~ADC();
     
 
-    static const uint8_t SEN1= 1;
-    static const uint8_t SEN2= 2;
-    static const uint8_t SEN3= 3;
-    static const uint8_t SEN4= 4;
-    static const uint8_t SEN5= 5;
-    static const uint8_t SEN6= 6;
-    static const uint8_t SEN7= 7;
-    static const uint8_t SEN8= 0;
-    static const uint8_t DATALEN=8;
-    const std::array<u_int16_t,DATALEN>& ReadData();
+    
+    static const uint8_t kDataLen=8;
+    const std::array<double,kDataLen>& ReadData();
 private:
     // int *data;
-    std::array<u_int16_t,8> data;
+    std::array<double,8> data;
     void startConv();
 
 
@@ -54,8 +47,8 @@ private:
 
     char ch_list[8];
 
-    char rxBuf[100];
-    char txBuf[100];
+    char rxBuf[30];
+    char txBuf[30];
 
 
 };

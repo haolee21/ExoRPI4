@@ -14,8 +14,8 @@
 #include <vector>
 #include <sched.h>
 
-#define PRE_ALLOCATION_SIZE (2*100 * 1024 * 1024) /* 200MB pagefault free buffer */
-#define MY_STACK_SIZE (2*1024 * 1024)              /* 2MB for each thread. */
+#define PRE_ALLOCATION_SIZE (5*100 * 1024 * 1024) /* 200MB pagefault free buffer */
+#define MY_STACK_SIZE (5*1024 * 1024)              /* 2MB for each thread. */
 class RT
 //this is the RT class for Preempt-RT kernel, it is a singleton class because I don't think one system can have two stable RT thread
 //The class only starts the pthread, making sure enough memory is assigned

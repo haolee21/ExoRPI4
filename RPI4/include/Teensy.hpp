@@ -16,7 +16,7 @@ public:
 
     TeensyI2C(int i2c_idx);
     ~TeensyI2C();
-    const static int CMDLEN=PWM_VAL_NUM+SW_VAL_NUM;
+    const static int CMDLEN=PWM_VAL_NUM;
     void WriteCmd(const std::array<char,TeensyI2C::CMDLEN>&cmd);
 private:
     int fd;

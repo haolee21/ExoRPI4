@@ -1,13 +1,15 @@
 #ifndef TIMER_HPP
 #define TIMER_HPP
+
+// #define TEST_INTERVAL
 #include<time.h>
 #define NSEC_PER_SEC (1000000000) // The number of nsecs per sec.
 #define NSEC 1
 #define USEC (1000 * NSEC)
 #define MSEC (1000 * USEC)
 #define SEC (1000 * MSEC)
-#define SAMPT 1000  //sampling period in uS, make sure 
-
+#define SAMPT 10000  //sampling period in uS, make sure 
+#define TOT_RUN_TIME 60
 #include <functional>
 #include <pthread.h>
 #include "RT.hpp"
