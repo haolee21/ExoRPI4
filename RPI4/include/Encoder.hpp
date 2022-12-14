@@ -34,6 +34,9 @@ protected:
     
     void _SetZero();
     bool reset_encoder;
+    bool reset_not_done;
+
+    // std::chrono::time_point<std::chrono::high_resolution_clock> old_time;
     
 public:
     Encoder(uint8_t pinId,int spi_num); //spi_num has to be int

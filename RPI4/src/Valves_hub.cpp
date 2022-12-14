@@ -88,15 +88,16 @@ void Valves_hub::UpdateValve(){
     
     
     if(hub.valChanged_flag){
-        
+        // std::cout<<"duty: ";
         //check all pwm duty are below 100
         for(int i=0;i<TeensyI2C::CMDLEN;i++){
             if(hub.PWM_Duty[i]>100)
                 hub.PWM_Duty[i]=100;
             else if (hub.PWM_Duty[i]<0)
                 hub.PWM_Duty[i]=0;
-            
+            // std::cout<<(int)hub.PWM_Duty[i]<<',';
         }
+        // std::cout<<std::endl;
      
 
         std::array<char,TeensyI2C::CMDLEN> cmd;

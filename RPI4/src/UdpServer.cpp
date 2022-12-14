@@ -83,6 +83,7 @@ bool UdpServer::CheckCmdSet(bool *array, int array_len)
 }
 void UdpServer::ServerProcess()
 {
+    auto old_time = std::chrono::high_resolution_clock::now();
     while (true)
     {
         UDP_CmdPacket cmd_packet;
@@ -91,9 +92,12 @@ void UdpServer::ServerProcess()
             UDP_DataPacket data_packet;
             this->GetDataPacket(data_packet);
             this->Send((char *)&data_packet, sizeof data_packet);
-
+            
+            auto cur_time = std::chrono::high_resolution_clock::now();
+            auto elapsed = cur_time-old_time;
+            long long dur_time = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+            old_time =cur_time;
             // handle the commands
-
             this->ProcessCmd(cmd_packet);
         }
     }

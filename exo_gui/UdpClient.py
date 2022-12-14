@@ -93,7 +93,7 @@ class UdpClient:
                 
                 self.updatePre(udp_data_packet.pre_data1)
                 
-                self.updateTank(udp_data_packet.pre_data1[0]) 
+                self.updateTank(udp_data_packet.pre_data1[TANK_ADC]) 
                 self.recBtnUpdate(udp_data_packet.rec_status)
                 self.pwm_lcd_update(udp_data_packet.pwm_duty)
                 

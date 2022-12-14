@@ -4,40 +4,20 @@
 #include <bitset>
 #include <sstream>
 using namespace std;
-const Pin ADC::conv = Pin(23,Pin::IO_TYPE::Output);
-const Pin ADC::reset = Pin(22,Pin::IO_TYPE::Output);
-const Pin ADC::eoc = Pin(24,Pin::IO_TYPE::Input);
+const Pin ADC::conv = Pin(23, Pin::IO_TYPE::Output);
+const Pin ADC::reset = Pin(22, Pin::IO_TYPE::Output);
+const Pin ADC::eoc = Pin(24, Pin::IO_TYPE::Input);
 ADC::ADC(short adc_idx)
 {
-    //initialize the channel list
-    // for some weird reason,
-    this->ch_list[0] = 0b00000000;
-    this->ch_list[1] = 0b00010000;
-    this->ch_list[2] = 0b00100000;
-    this->ch_list[3] = 0b00110000;
-    this->ch_list[4] = 0b01000000;
-    this->ch_list[5] = 0b01010000;
-    this->ch_list[6] = 0b01100000;
-    this->ch_list[7] = 0b01110000;
 
-    ADC::conv.On();
+    ADC::conv.On(); // start conversion is low-triggered
 
-    ADC::reset.On();
+    ADC::reset.On(); // reset is also low-triggered, since both adc shares the same reset, set it high to avoid resetting another adc
 
-    //reset the adc
-    ADC::reset.Off();
-
-    usleep(5);
-    ADC::reset.On();
-
-    usleep(5);
-    //end reset
-
-    usleep(1000);
     stringstream ss;
-    ss<<adc_idx;
-    string spi_port="/dev/spidev1."+ss.str();
-    cout<<"port: "<<spi_port<<endl;
+    ss << adc_idx;
+    string spi_port = "/dev/spidev1." + ss.str();
+    cout << "port: " << spi_port << endl;
     this->fd = open(spi_port.c_str(), O_RDWR);
     std::cout << "spi port" << fd << std::endl;
     if (this->fd < 0)
@@ -63,6 +43,7 @@ ADC::ADC(short adc_idx)
         std::cout << "cannot set bits per work\n";
 
     static uint32_t speed = 20000000;
+    // static uint32_t speed = 40000000;
     ret = ioctl(this->fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
     if (ret < 0)
         std::cout << "cannot set write speed\n";
@@ -87,15 +68,19 @@ ADC::~ADC()
 
 void ADC::init_ADC()
 {
-    //configure ADC
-    //set ADC select channel 0
-    this->txBuf[0] = 0b00000000;
-    this->_spiTxRx(1);
+    // configure ADC
 
-    //set manual channel select
+    // TODO: fix this, for some reason it never works
+    // set ADC select channel 0
+    //  this->txBuf[0] = 0b00000000;
+    //  this->_spiTxRx(1);
+
+    // set CFR, enable auto channel, tag mode, basically the default mode. Can be achieved by just reset both adc, yet leave the liberty to set CFR here for future use
     this->txBuf[0] = 0b11101110;
     this->txBuf[1] = 0b11111111;
     this->_spiTxRx(2);
+
+    // read CFR settings
     this->txBuf[0] = 0b11000000;
     this->txBuf[1] = 0b00000000;
     this->_spiTxRx(2);
@@ -108,35 +93,35 @@ void ADC::init_ADC()
 char ADC::_spiTxRx(unsigned int len)
 {
 
-    struct spi_ioc_transfer spi[len];
+    struct spi_ioc_transfer spi[1];
 
-    memset(&spi, 0, sizeof(spi)); //I seriously cannot understand this line.......
+    memset(&spi, 0, sizeof(spi)); // I seriously cannot understand this line.......
 
     spi->tx_buf = (unsigned long)this->txBuf;
     spi->rx_buf = (unsigned long)this->rxBuf;
     spi->len = len;
 
-    return ioctl(this->fd, SPI_IOC_MESSAGE(1), spi);
+    return ioctl(this->fd, SPI_IOC_MESSAGE(1), spi); // I am not 100% sure why SPI_IOC_MESSAGE(1) works even if I send out two bytes.....
 
-    //since we have already assign rxData to spi.rx_buf, it will directly writes to it
+    // since we have already assign rxData to spi.rx_buf, it will directly writes to it
 }
 
-const std::array<double,8>& ADC::ReadData(){
+const std::array<double, 8> &ADC::ReadData()
+{
+    this->txBuf[0] = 0b11010000;
+    this->txBuf[1] = 0b00000000;
+    this->txBuf[2] = 0b00000000;
+
     for (int i = 0; i < 8; i++)
     {
-        // this->txBuf[0] = this->ch_list[0];
-        this->txBuf[0] = 0b11010000;
-        this->txBuf[1] = 0b11010000;
-        
+
+        ADC::conv.Off(); //conversion starts at falling edge, the duration needed is 40ns, which is shorter than sending 3 bytes from MOSI 
+
+        this->_spiTxRx(3);
         ADC::conv.On();
-  
-
-        this->_spiTxRx(2);
-        ADC::conv.Off();
- 
-
-        this->data[i] = (short)this->rxBuf[1] + ((short)this->rxBuf[0] << 8);
+        int tag = (int)this->rxBuf[2] >> 5;
+        this->data[tag] = (short)this->rxBuf[1] + ((short)this->rxBuf[0] << 8);
     }
-    return this->data;
 
+    return this->data;
 }

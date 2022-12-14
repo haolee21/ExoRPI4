@@ -36,7 +36,7 @@ SensorHub::SensorHub() //initialize member in list since Encoder has no default 
     , REncRecorder("EncodersR","Time,RHipS,RKneS,RAnkS")
     ,PreRecorder("Pressure","Time,LTankPre,LKneExtPre,Force,Pos,TankPre,LKneFlexPre,LAnkExtPre,na")
     ,PreRecOri("Pressure_ori","Time,LTankPre,LKneExtPre,Force,Pos,TankPre,LKneFlexPre,LAnkExtPre,na")
-    , LHipS_Enc(Encoder_L::HIP1), LKneS_Enc(Encoder_L::KNEE), LAnkS_Enc(Encoder_L::ANK1), RHipS_Enc(Encoder_R::HIP1), RKneS_Enc(Encoder_R::KNEE), RAnkS_Enc(Encoder_R::ANK1),adc0(0)//,adc1(ADC(1)) //, LHipF_Enc(Encoder_L(1)), LAnkF_Enc(Encoder_L(4)), RHipF_Enc(Encoder_R(1)), RAnkF_Enc(Encoder_R(4))
+    , LHipS_Enc(Encoder_L::HIP1), LKneS_Enc(Encoder_L::KNEE), LAnkS_Enc(Encoder_L::ANK1), RHipS_Enc(Encoder_R::HIP1), RKneS_Enc(Encoder_R::KNEE), RAnkS_Enc(Encoder_R::ANK1),adc0(0),adc1(1) //, LHipF_Enc(Encoder_L(1)), LAnkF_Enc(Encoder_L(4)), RHipF_Enc(Encoder_R(1)), RAnkF_Enc(Encoder_R(4))
     // ,filter_3_hz(FilterParam::Filter3Hz::a,FilterParam::Filter3Hz::b)
     ,digital_filter(FilterParam::Filter20Hz_2::a,FilterParam::Filter20Hz_2::b)
 {
@@ -82,12 +82,14 @@ void SensorHub::ResetEncImpl(SensorHub::EncName EncName)
 void SensorHub::UpdateLEnc()
 {
     SensorHub &senHub = SensorHub::GetInstance();
-    // senHub.EncData[SensorHub::LHipS] = senHub.LHipS_Enc.ReadPos();   //TODO: add robustness to ReadPos() when encoder is offline
-    // senHub.EncData[SensorHub::LKneS] = senHub.LKneS_Enc.ReadPos();   //TODO: read the correct encoder when encoders connected
-    // senHub.EncData[SensorHub::LAnkS] = senHub.LAnkS_Enc.ReadPos();
+    senHub.EncData[SensorHub::LHipS] = senHub.LHipS_Enc.ReadPos();   //TODO: add robustness to ReadPos() when encoder is offline
+    senHub.EncData[SensorHub::LKneS] = senHub.LKneS_Enc.ReadPos();   //TODO: read the correct encoder when encoders connected
+    senHub.EncData[SensorHub::LAnkS] = senHub.LAnkS_Enc.ReadPos();
     std::array<double,NUMENC/2> curMea{senHub.EncData[SensorHub::LHipS],senHub.EncData[SensorHub::LKneS],senHub.EncData[SensorHub::LAnkS]};
-    
+    // std::cout<<senHub.EncData[SensorHub::LHipS]<<std::endl;
     senHub.LEncRecorder.PushData(curMea);
+    // std::cout<<"read\n";
+    // std::cout<<senHub.EncData[SensorHub::LHipS]<<std::endl;
     // senHub.EncData[SensorHub::LHipF] = senHub.LAnkS_Enc.ReadPos();
     // senHub.EncData[SensorHub::LAnkF] = senHub.LAnkS_Enc.ReadPos();    
 }
@@ -98,6 +100,7 @@ void SensorHub::UpdateREnc()
     // senHub.EncData[SensorHub::RHipF]=senHub.RKneS_Enc.ReadPos();
     senHub.EncData[SensorHub::RKneS]=senHub.RKneS_Enc.ReadPos();
     senHub.EncData[SensorHub::RAnkS]=senHub.RAnkS_Enc.ReadPos();
+    // std::cout<<senHub.EncData[SensorHub::RAnkS]<<std::endl;
     // senHub.EncData[SensorHub::RAnkF]=senHub.RKneS_Enc.ReadPos();
     std::array<double,NUMENC/2> curMea{senHub.EncData[SensorHub::RHipS],senHub.EncData[SensorHub::RKneS],senHub.EncData[SensorHub::RAnkS]};
     senHub.REncRecorder.PushData(curMea);
@@ -105,33 +108,33 @@ void SensorHub::UpdateREnc()
 void SensorHub::UpdatePre()
 {
     SensorHub & senHub = SensorHub::GetInstance();
-    const std::array<double,8> &data = senHub.adc0.ReadData();
+    std::array<double,NUMPRE> avg_mea{0};
+   
+    for(int i=0;i<SensorHub::kAdcAvgWindow;i++){
+        const std::array<double,8> &data = senHub.adc0.ReadData();
+        const std::array<double,8> &data2 = senHub.adc1.ReadData();
+        std::array<double,NUMPRE> cur_mea;
+        std::memcpy(cur_mea.begin(),data.begin(),sizeof(double)*ADC::kDataLen);
+        std::memcpy(cur_mea.begin()+8,data2.begin(),sizeof(double)*ADC::kDataLen);
 
-    
+        for(int i2=0;i2<NUMPRE;i2++){
+            avg_mea[i2] = avg_mea[i2]+cur_mea[i2]/SensorHub::kAdcAvgWindow;
+        }
 
-    std::array<double,NUMPRE> cur_mea;
-    cur_mea[0]=data[ADC::SEN0];
-    cur_mea[1]=data[ADC::SEN1];
-    cur_mea[2]=data[ADC::SEN2];
-    cur_mea[3]=data[ADC::SEN3];
-    cur_mea[4]=data[ADC::SEN4];
-    cur_mea[5]=data[ADC::SEN5];
-    cur_mea[6]=data[ADC::SEN6];
-    cur_mea[7]=data[ADC::SEN7];
-
-    // for(int i=0;i<8;i++)
-    //     std::cout<<cur_mea[i]<<',';
-    // std::cout<<"\n";
-    
+    }
+    // for(int i=0;i<NUMPRE;i++){
+    //     std::cout<<avg_mea[i]<<',';
+    // }
+    // std::cout<<std::endl;
     
     // senHub.PreData = senHub.filter_3_hz.GetFilteredMea(cur_mea);
-    senHub.PreData = senHub.digital_filter.GetFilteredMea(cur_mea);
+    senHub.PreData = senHub.digital_filter.GetFilteredMea(avg_mea);
 
 
     senHub.PreRecorder.PushData(senHub.PreData);
 
     //rec data before filtering
-    senHub.PreRecOri.PushData(cur_mea);
+    senHub.PreRecOri.PushData(avg_mea);
 
    
 

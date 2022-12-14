@@ -1,3 +1,4 @@
+
 #include "Timer.hpp"
 #include "SensorHub.hpp"
 #include <iostream>
@@ -38,15 +39,19 @@ int main()
 
     clock_gettime(CLOCK_MONOTONIC, &t);
     
-   
+    #ifdef TEST_INTERVAL
+    int run_count=0;
+    #endif
 
     while(true)
     {
         t.tv_nsec+=interval;
         Timer::Sleep(&t);
-        // if(run_count>TOT_RUN_TIME)
-        //     break;
-        // run_count++;
+        #ifdef TEST_INTERVAL
+        if(run_count>TOT_RUN_TIME)
+            break;
+        run_count++;
+        #endif
 
     }
 

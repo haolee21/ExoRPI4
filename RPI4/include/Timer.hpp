@@ -1,5 +1,7 @@
 #ifndef TIMER_HPP
 #define TIMER_HPP
+
+// #define TEST_INTERVAL
 #include<time.h>
 #define NSEC_PER_SEC (1000000000) // The number of nsecs per sec.
 #define NSEC 1

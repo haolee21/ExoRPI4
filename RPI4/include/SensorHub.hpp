@@ -21,11 +21,15 @@ class SensorHub
 // this is a singleton class since it is directly link to the hardware, 
 // config will not change unless I modify the hardware
 {
+private:
+static const unsigned kPreSen1=0,kPreSen2=1,kPreSen3=2,kPreSen4=3,kPreSen5=4,kPreSen6=5,kPreSen7=6,kPreSen8=7;
+static const unsigned kPreSen9=8,kPreSen10=9,kPreSen11=10,kPreSen12=11,kPreSen13=12,kPreSen14=13,kPreSen15=14,kPreSen16=15;
+
 public:
     
     ~SensorHub();
     const static int NUMENC = 6;    
-    const static int NUMPRE = 8; //always 8 since ADC has 8 channels
+    const static int NUMPRE = 16; //always 8 since ADC has 8 channels
     
     const double ENC_DEN = 4096.0;
     const double PRE_DEN = 65536;
@@ -45,7 +49,16 @@ public:
         RHipS,RKneS,RAnkS//RHipF,RAnkF
     };
     enum class PreName{ //The order of this enum must follow the order on the pcb board
-        Tank,RLTank,LTank,LKneExt,LAnkExt,RKneExt,RAnkExt,na //TODO: check it whenever you reconnect the pressure sensors
+        
+        Tank = kPreSen14,
+        RLTank = kPreSen9,
+        LTank = kPreSen12,
+        LKneFLex=kPreSen10,
+        RKneFlex = kPreSen11,
+        RKneExt = kPreSen16,
+        RAnkExt = kPreSen15,
+        LKneExt = kPreSen2,
+        LAnkExt = kPreSen1, //TODO: check it whenever you reconnect the pressure sensors
     };
     // Pressure sensor index need to be assigned since it is determine by ADC channels
     
@@ -74,7 +87,8 @@ private:
     void ResetEncImpl(SensorHub::EncName);//the reset function is implement so I can avoid using a lot of SensorHub::Encorder since it is a member function
 
     // ADC 
-    ADC adc0;
+    ADC adc0,adc1;
+    static const int kAdcAvgWindow=10;
 
     //Butterworth filter for ADC
     // DigitalFilter<double,FilterParam::Filter3Hz::Order,NUMPRE> filter_3_hz;

@@ -1,3 +1,4 @@
+
 #include "Timer.hpp"
 bool Timer::dataRec_flag=false; //it has to be false defautly, will be a const ref to all class that use
 std::string Timer::filePath="";
@@ -55,10 +56,12 @@ void* Timer::TimerTick(void*){
     long int interval = SAMPT*USEC;
 
     //////////////////////////////////////////////////////////
-    // unsigned timeDiff_idx=0; //TODO: testing loop period only, should be commented in final version
-    // std::array<double,TOT_RUN_TIME*1000+1000> timeDiff; //can only run around 100 sec
-    // auto t_start=std::chrono::high_resolution_clock::now();
-    // auto t_end = std::chrono::high_resolution_clock::now();
+    #ifdef TEST_INTERVAL
+    unsigned timeDiff_idx=0; //TODO: testing loop period only, should be commented in final version
+    std::array<double,TOT_RUN_TIME*1000+1000> timeDiff; //can only run around 100 sec
+    auto t_start=std::chrono::high_resolution_clock::now();
+    auto t_end = std::chrono::high_resolution_clock::now();
+    #endif
     ///////////////////////////////////////////////////////////
     //TODO: Need to add init sequence here
     //we cannot add 
@@ -79,9 +82,11 @@ void* Timer::TimerTick(void*){
         Timer::Sleep(&t);
 
         ///////////////////////////////////////////////// TODO: testing loop period only
-        // t_end = std::chrono::high_resolution_clock::now();
-        // timeDiff[timeDiff_idx++]=std::chrono::duration<double,std::micro>(t_end-t_start).count();
-        // t_start = t_end;
+        #ifdef TEST_INTERVAL
+        t_end = std::chrono::high_resolution_clock::now();
+        timeDiff[timeDiff_idx++]=std::chrono::duration<double,std::micro>(t_end-t_start).count();
+        t_start = t_end;
+        #endif
         /////////////////////////////////////////////////
 
 
@@ -111,10 +116,12 @@ void* Timer::TimerTick(void*){
         timer.timeStamp++;
     }
     /////////////////////////////////////////// TODO: testing loop period only
-    // std::cout<<"Time diff: \n";
-    // for(unsigned i=0;i<timeDiff_idx;i++){
-    //     std::cout<<timeDiff[i]<<',';
-    // }
+    #ifdef TEST_INTERVAL
+    std::cout<<"Time diff: \n";
+    for(unsigned i=0;i<timeDiff_idx;i++){
+        std::cout<<timeDiff[i]<<',';
+    }
+    #endif
     ////////////////////////////////////////////
 
     
