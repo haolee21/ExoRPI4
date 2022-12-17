@@ -82,10 +82,20 @@ void SensorHub::ResetEncImpl(SensorHub::EncName EncName)
 void SensorHub::UpdateLEnc()
 {
     SensorHub &senHub = SensorHub::GetInstance();
-    senHub.EncData[SensorHub::LHipS] = senHub.LHipS_Enc.ReadPos();   //TODO: add robustness to ReadPos() when encoder is offline
-    senHub.EncData[SensorHub::LKneS] = senHub.LKneS_Enc.ReadPos();   //TODO: read the correct encoder when encoders connected
-    senHub.EncData[SensorHub::LAnkS] = senHub.LAnkS_Enc.ReadPos();
+    int hip_s_pos = senHub.LHipS_Enc.ReadPos();
+    int kne_s_pos = senHub.LKneS_Enc.ReadPos();
+    int ank_s_pos = senHub.LAnkS_Enc.ReadPos();
+    if(hip_s_pos>2048){
+        hip_s_pos = hip_s_pos%2048-2048;
+    }
+    if(ank_s_pos>2048){
+        ank_s_pos = ank_s_pos%2048-2048;
+    }
+    senHub.EncData[SensorHub::LHipS] = -1*hip_s_pos/4096.0*360; 
+    senHub.EncData[SensorHub::LKneS] = kne_s_pos/4096.0*360;
+    senHub.EncData[SensorHub::LAnkS] = -1*ank_s_pos/4096.0*360;
     std::array<double,NUMENC/2> curMea{senHub.EncData[SensorHub::LHipS],senHub.EncData[SensorHub::LKneS],senHub.EncData[SensorHub::LAnkS]};
+    // std::cout<<senHub.EncData[SensorHub::LHipS]<<','<<senHub.EncData[SensorHub::LKneS]<<','<<senHub.EncData[SensorHub::LAnkS]<<std::endl;
     // std::cout<<senHub.EncData[SensorHub::LHipS]<<std::endl;
     senHub.LEncRecorder.PushData(curMea);
     // std::cout<<"read\n";
@@ -96,12 +106,26 @@ void SensorHub::UpdateLEnc()
 void SensorHub::UpdateREnc()
 {
     SensorHub &senHub = SensorHub::GetInstance();
-    senHub.EncData[SensorHub::RHipS]=senHub.RHipS_Enc.ReadPos();   ////TODO: read the correct encoder when encoders connected
+    int hip_s_pos = senHub.RHipS_Enc.ReadPos();
+    int kne_s_pos = senHub.RKneS_Enc.ReadPos();
+    int ank_s_pos = senHub.RAnkS_Enc.ReadPos();
+    int ank_s_pos_ori = ank_s_pos;
+
+    if(hip_s_pos>2048){
+        hip_s_pos = hip_s_pos%2048-2048;
+    }
+    if(ank_s_pos>2048){
+        ank_s_pos = ank_s_pos%2048-2048;
+    }
+
+    senHub.EncData[SensorHub::RHipS]=hip_s_pos/4096.0*360;   ////TODO: read the correct encoder when encoders connected
     // senHub.EncData[SensorHub::RHipF]=senHub.RKneS_Enc.ReadPos();
-    senHub.EncData[SensorHub::RKneS]=senHub.RKneS_Enc.ReadPos();
-    senHub.EncData[SensorHub::RAnkS]=senHub.RAnkS_Enc.ReadPos();
-    // std::cout<<senHub.EncData[SensorHub::RAnkS]<<std::endl;
+    senHub.EncData[SensorHub::RKneS]=kne_s_pos/4096.0*360;
+    senHub.EncData[SensorHub::RAnkS]=ank_s_pos/4096.0*360;
+    // std::cout<<ank_s_pos_ori<<std::endl;
     // senHub.EncData[SensorHub::RAnkF]=senHub.RKneS_Enc.ReadPos();
+    // std::cout<<senHub.EncData[SensorHub::RKneS]<<std::endl;
+    std::cout<<senHub.EncData[SensorHub::RHipS]<<','<<senHub.EncData[SensorHub::RKneS]<<','<<senHub.EncData[SensorHub::RAnkS]<<std::endl;
     std::array<double,NUMENC/2> curMea{senHub.EncData[SensorHub::RHipS],senHub.EncData[SensorHub::RKneS],senHub.EncData[SensorHub::RAnkS]};
     senHub.REncRecorder.PushData(curMea);
 }

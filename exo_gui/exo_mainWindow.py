@@ -118,6 +118,7 @@ class MW(QMainWindow):
         self.model_plot.hideAxis('left')
         self.model_plot.setYRange(-65,50)
         self.model_plot.setXRange(-50,50)
+        self.model_plot.addLegend()
         self.rtplot_data=[10.0,-10.0,0,10.0,-10.0,0]
         
         self.thigh_len=100*0.245 #these constants are just normal human length ratio*100
@@ -362,24 +363,25 @@ class MW(QMainWindow):
     def get_exo_model(self):
         #data format = [LHip,LKne,LAnk,RHip,RKne,RAnk]
         
-        lkne = [self.thigh_len*math.sin(math.radians(self.rtplot_data[0])),-self.thigh_len*math.cos(math.radians(self.rtplot_data[0]))]
-        lank = [self.tibia_len*math.sin(math.radians(self.rtplot_data[0]+self.rtplot_data[1])),-self.tibia_len*math.cos(math.radians(self.rtplot_data[0]+self.rtplot_data[1]))]
-        ltoe = [self.foot_len*math.sin(math.radians(self.rtplot_data[0]+self.rtplot_data[1]+self.rtplot_data[2]-90)),self.foot_len*math.cos(math.radians(self.rtplot_data[0]+self.rtplot_data[1]+self.rtplot_data[2]-90))]
+        lkne = [-self.thigh_len*math.sin(math.radians(self.rtplot_data[ENC_LHIP_S])),-self.thigh_len*math.cos(math.radians(self.rtplot_data[ENC_LHIP_S]))]
+        lank = [-self.tibia_len*math.sin(math.radians(self.rtplot_data[ENC_LHIP_S]+self.rtplot_data[ENC_LKNE_S])),-self.tibia_len*math.cos(math.radians(self.rtplot_data[ENC_LHIP_S]+self.rtplot_data[ENC_LKNE_S]))]
+        ltoe = [-self.foot_len*math.sin(math.radians(self.rtplot_data[ENC_LHIP_S]+self.rtplot_data[ENC_LKNE_S]+self.rtplot_data[ENC_LANK_S]+90)),-self.foot_len*math.cos(math.radians(self.rtplot_data[ENC_LHIP_S]+self.rtplot_data[ENC_LKNE_S]+self.rtplot_data[ENC_LANK_S]+90))]
         head = [0,self.torso_len]
-        rkne = [self.thigh_len*math.sin(math.radians(self.rtplot_data[3])),-self.thigh_len*math.cos(math.radians(self.rtplot_data[3]))]
-        rank = [self.tibia_len*math.sin(math.radians(self.rtplot_data[3]+self.rtplot_data[4])),-self.tibia_len*math.cos(math.radians(self.rtplot_data[3]+self.rtplot_data[4]))]
-        rtoe = [self.foot_len*math.sin(math.radians(self.rtplot_data[3]+self.rtplot_data[4]+self.rtplot_data[5]-90)),self.foot_len*math.cos(math.radians(self.rtplot_data[3]+self.rtplot_data[4]+self.rtplot_data[5]-90))]
+        rkne = [-self.thigh_len*math.sin(math.radians(self.rtplot_data[ENC_RHIP_S])),-self.thigh_len*math.cos(math.radians(self.rtplot_data[ENC_RHIP_S]))]
+        rank = [-self.tibia_len*math.sin(math.radians(self.rtplot_data[ENC_RHIP_S]+self.rtplot_data[ENC_RKNE_S])),-self.tibia_len*math.cos(math.radians(self.rtplot_data[ENC_RHIP_S]+self.rtplot_data[ENC_RKNE_S]))]
+        rtoe = [-self.foot_len*math.sin(math.radians(self.rtplot_data[ENC_RHIP_S]+self.rtplot_data[ENC_RKNE_S]+self.rtplot_data[ENC_RANK_S]+90)),-self.foot_len*math.cos(math.radians(self.rtplot_data[ENC_RHIP_S]+self.rtplot_data[ENC_RKNE_S]+self.rtplot_data[ENC_RANK_S]+90))]
         xpos=[lkne[0],lkne[0]+lank[0],lkne[0]+lank[0]+ltoe[0],head[0],rkne[0],rkne[0]+rank[0],rkne[0]+rank[0]+rtoe[0]]
         ypos=[lkne[1],lkne[1]+lank[1],lkne[1]+lank[1]+ltoe[1],head[1],rkne[1],rkne[1]+rank[1],rkne[1]+rank[1]+rtoe[1]]
         
         
         return xpos,ypos
     def init_exo_model(self,xpos,ypos):
-        torso_line = self.model_plot.plot([0.0]+[xpos[3]],[0.0]+[ypos[3]],pen=pg.mkPen('g',width=5),symbol='o')
-        self.left_leg_line = self.model_plot.plot([0.0]+xpos[0:3],[0.0]+ypos[0:3],pen=pg.mkPen('r',width=5),symbol='o')
-        self.right_leg_line=self.model_plot.plot([0.0]+xpos[4:],[0.0]+ypos[4:],pen=pg.mkPen('b',width=5),symbol='o')
-        self.left_leg_line.setSymbolSize(20)
-        self.right_leg_line.setSymbolSize(20)
+        torso_line = self.model_plot.plot([0.0]+[xpos[3]],[0.0]+[ypos[3]],pen=pg.mkPen('g',width=5),symbol='o',name='torso')
+        self.left_leg_line = self.model_plot.plot([0.0]+xpos[0:3],[0.0]+ypos[0:3],pen=pg.mkPen('r',width=5),symbol='o',name='left')
+        self.right_leg_line=self.model_plot.plot([0.0]+xpos[4:],[0.0]+ypos[4:],pen=pg.mkPen('b',width=5),symbol='o',name='right')
+        self.left_leg_line.setSymbolSize(10)
+        self.right_leg_line.setSymbolSize(10)
+
         
     def update_exo_model(self):
         xpos,ypos=self.get_exo_model()
