@@ -31,7 +31,7 @@ class UdpClient:
         
         
 
-    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback,recBtnUpdate,conCondUpdate,pwm_lcd_update):
+    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback,recBtnUpdate,conCondUpdate,pwm_lcd_update,calibWindowUpdate):
         self.updateJoint = updateJointFun
         self.updatePre = updatePreFun
         self.updateTank = updateTankFun
@@ -39,6 +39,7 @@ class UdpClient:
         self.recBtnUpdate = recBtnUpdate
         self.conCondUpdate = conCondUpdate
         self.pwm_lcd_update = pwm_lcd_update
+        self.calib_window_update = calibWindowUpdate
     
     def SetIP_Port(self,address,tx_port,rx_port):
         self.ip_address=address
@@ -96,6 +97,8 @@ class UdpClient:
                 self.updateTank(udp_data_packet.pre_data1[TANK_ADC]) 
                 self.recBtnUpdate(udp_data_packet.rec_status)
                 self.pwm_lcd_update(udp_data_packet.pwm_duty)
+
+                self.calib_window_update(udp_data_packet.enc_data)
                 
                 
         except:
@@ -103,18 +106,7 @@ class UdpClient:
             if(self.disconnect_count>100):
                 self.disConCcallback()
 
-def TextToFloat(text):
-    try:
-        res = float(text)
-    except:
-        res=0
-    return res
-def TextToInt(text):
-    try:
-        res = int(text)
-    except:
-        res=0
-    return res
+
 
 
 

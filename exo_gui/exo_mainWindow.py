@@ -22,6 +22,8 @@ from ImpConWindow import *
 from PwmValueWindow import *
 from PressureConWindow import *
 from ImpactCon import *
+from CylinderCalibrationWindow import *
+
 import math
 import time
 import datetime
@@ -60,10 +62,11 @@ class MW(QMainWindow):
         self.pwm_value_window = PwmValueWindow(self)
         self.pre_con_window = PressureConWindow(self)
         self.impact_con_window = ImpactCon(self)
+        self.cylinder_calib_window = CylnCalibWindow(self)
         # jointUpdateCB = lambda data:self.joint_plot_window.UpdateData(self,data)
         # preUpdateCB = lambda data:self.pressure_plot_window.UpdateData(self,data)
         # self.tcp_port.SetCallBack(jointUpdateCB,preUpdateCB)
-        self.udp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn,self.UpdateMPC_LED,self.pwm_value_window.UpdateLCD)
+        self.udp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn,self.UpdateMPC_LED,self.pwm_value_window.UpdateLCD,self.cylinder_calib_window.UpdateReading)
         # TCP/IP connection
         
         self.cur_ip = self.findChild(QLabel,'cur_ip_label')
@@ -93,6 +96,9 @@ class MW(QMainWindow):
 
         self.act_impact_con = self.findChild(QAction,'action_ImpactAbsorb')
         self.act_impact_con.triggered.connect(self.impact_con_window.show)
+        
+        self.act_cylinder_calib = self.findChild(QAction,'actionCylinder_Length')
+        self.act_cylinder_calib.triggered.connect(self.cylinder_calib_window.show)
 
         # air reserivor 
         

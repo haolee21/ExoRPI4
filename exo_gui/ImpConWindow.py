@@ -7,6 +7,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
 from functools import partial
 # from TCP_Con import TextToFloat
+from Common import *
 from UdpClient import *
 class ImpWindow(QWidget):
     def __init__(self, parent= None):

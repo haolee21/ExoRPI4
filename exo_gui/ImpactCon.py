@@ -1,4 +1,4 @@
-from re import T
+# from re import T
 from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget,QLabel,QLineEdit,QPushButton
 from PyQt5.QtGui import QPalette
@@ -6,7 +6,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
 from functools import partial
 from UdpClient import *
-
+from Common import *
 class ImpactCon(QWidget):
     def __init__(self,parent=None):
         super().__init__()
