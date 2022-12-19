@@ -125,7 +125,7 @@ void SensorHub::UpdateREnc()
     // std::cout<<ank_s_pos_ori<<std::endl;
     // senHub.EncData[SensorHub::RAnkF]=senHub.RKneS_Enc.ReadPos();
     // std::cout<<senHub.EncData[SensorHub::RKneS]<<std::endl;
-    std::cout<<senHub.EncData[SensorHub::RHipS]<<','<<senHub.EncData[SensorHub::RKneS]<<','<<senHub.EncData[SensorHub::RAnkS]<<std::endl;
+    // std::cout<<senHub.EncData[SensorHub::RHipS]<<','<<senHub.EncData[SensorHub::RKneS]<<','<<senHub.EncData[SensorHub::RAnkS]<<std::endl;
     std::array<double,NUMENC/2> curMea{senHub.EncData[SensorHub::RHipS],senHub.EncData[SensorHub::RKneS],senHub.EncData[SensorHub::RAnkS]};
     senHub.REncRecorder.PushData(curMea);
 }

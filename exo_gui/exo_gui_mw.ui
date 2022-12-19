@@ -627,6 +627,7 @@
     <property name="title">
      <string>Robot Settings</string>
     </property>
+    <addaction name="actionCylinder_Length"/>
    </widget>
    <widget class="QMenu" name="menuAction">
     <property name="title">
@@ -692,6 +693,11 @@
   <action name="action_ImpactAbsorb">
    <property name="text">
     <string>Test Impact Absorb</string>
+   </property>
+  </action>
+  <action name="actionCylinder_Length">
+   <property name="text">
+    <string>Cylinder Length</string>
    </property>
   </action>
  </widget>

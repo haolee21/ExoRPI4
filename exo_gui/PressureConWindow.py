@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget,QLabel,QLineEdit,QPushButton
 from functools import partial
 # from TCP_Con import TCP, TextToFloat
 from UdpClient import *
-from UdpClient import UdpClient
+from Common import *
 class PressureConWindow(QWidget):
     def __init__(self,parent=None):
         super().__init__()
