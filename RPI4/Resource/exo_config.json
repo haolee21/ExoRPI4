@@ -1,0 +1,52 @@
+{
+    "Name":"Physical Parameter",
+    "ConfigVersion": "Ver. 0.1",
+    "CylnEqn": {
+        "LeftKnee": [
+            1,
+            1
+        ],
+        "LeftAnkle": [
+            1,
+            1
+        ],
+        "RightKnee": [
+            1,
+            1
+        ],
+        "RightAnkle": [
+            1,
+            1
+        ]
+    },
+    "PisonArea_mm2": {
+        "LeftKnee": [
+            387.096,
+            354.838
+        ],
+        "LeftAnkle": [
+            387.096,
+            354.838
+        ],
+        "RightKnee": [
+            387.096,
+            354.838
+        ],
+        "RightAnkle": [
+            387.096,
+            354.838
+        ]
+    },
+    "CylinderLen_mm": {
+        "LeftKnee": 127,
+        "LeftAnkle": 127,
+        "RightKnee": 127,
+        "RightAnkle": 127
+    },
+    "FrictionCoeff": {
+        "LeftKnee": 0.0133446648,
+        "LeftAnkle": 0.0133446648,
+        "RightKnee": 0.0133446648,
+        "RightAnkle": 0.0133446648
+    }
+}

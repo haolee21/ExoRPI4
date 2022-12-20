@@ -215,3 +215,8 @@ void Valves_hub::SetImpactAbsorb(Valves_hub::Joint joint, double init_force, dou
     valves_hub.init_force[(unsigned)joint]=init_force;
     valves_hub.init_imp[(unsigned)joint]=init_imp;
 }
+
+void Valves_hub::UpdateParams(const ExoConfig::SystemParam &sys_param){
+    auto &valves_hub = Valves_hub::GetInstance();
+    
+}
