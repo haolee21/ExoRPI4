@@ -14,6 +14,9 @@ set(EIGEN_INCLUDE_DIR /home/lowlimb/tools/eigen/eigen-master)
 set(osqp_INCLUDE_DIRS /home/lowlimb/tools/ARM/osqp/include)
 set(osqp_LIBRARIES /home/lowlimb/tools/ARM/osqp/lib)
 
+# include nlohmann (json lib)
+set(JSON_INCLUDE_DIRS /home/lowlimb/tools/ARM/nlohmann)
+
 set(CMAKE_C_COMPILER arm-linux-gnueabihf-gcc)
 set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
 
@@ -48,6 +51,7 @@ include_directories(
     ${COMMON_DIR}
     ${EIGEN_INCLUDE_DIR}
     ${osqp_INCLUDE_DIRS}
+    ${JSON_INCLUDE_DIRS}
     
 )
 # file(GLOB HEAD_FILES 
@@ -78,5 +82,6 @@ target_precompile_headers(exo_o
         include/Pin.hpp
         include/Recorder.hpp
         include/Teensy.hpp
+        ${JSON_INCLUDE_DIRS}/json.hpp
 )
 

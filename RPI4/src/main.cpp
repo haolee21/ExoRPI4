@@ -11,6 +11,8 @@
 #include <boost/filesystem/path.hpp>
 #include <iomanip>
 
+#include "ExoConfig.hpp"
+
 
 int main()
 {   
@@ -19,6 +21,11 @@ int main()
     struct timespec t;
     long int interval = 1*SEC;
 
+    ExoConfig::SystemParam exo_config;
+    auto config_file = ExoConfig::LoadJson("mpc_config.json");
+    ExoConfig::LoadConfigFile(config_file,exo_config,ExoConfig::ConfigType::MPC);
+    auto exo_config_file = ExoConfig::LoadJson("exo_config.json");
+    ExoConfig::LoadConfigFile(exo_config_file,exo_config,ExoConfig::ConfigType::Phy);
 
     // TCP_server tcp_server;//it needs to connect to a client in order to sync the time when boot
     //Whenever you want to use it, please sync the time of the system first
@@ -32,7 +39,6 @@ int main()
     Timer::Add_senCallback(SensorHub::UpdateREnc);
     Timer::Add_senCallback(SensorHub::UpdatePre);
     Timer::Add_conCallback(Valves_hub::UpdateValve);
-    
     Timer::StartRT();
     
     

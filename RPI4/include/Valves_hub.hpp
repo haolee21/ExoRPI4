@@ -7,7 +7,7 @@
 #include "Recorder.hpp"
 #include "JointCon.hpp"
 #include "MPC.hpp"
-
+#include "ExoConfig.hpp"
 enum class PWM_ID //sync with the real connection on the PCB
 {
 
@@ -111,6 +111,9 @@ public:
 
     //Impact absorb
     static void SetImpactAbsorb(Valves_hub::Joint joint,double init_force, double init_imp);
+
+    // Update MPC parameters
+    static void UpdateParams(const ExoConfig::SystemParam &sys_param);
 
 private:
     Valves_hub();

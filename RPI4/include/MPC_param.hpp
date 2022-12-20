@@ -1,8 +1,8 @@
 #ifndef MPC_PARAM_HPP
 #define MPC_PARAM_HPP
-#define MPC_STATE_NUM 125
-#define MPC_DELAY 25
+
 #include <array>
+#include "ExoConfig.hpp"
 namespace MpcInitParam
 {
     //cl parameters are for model that decrease the pressure 
