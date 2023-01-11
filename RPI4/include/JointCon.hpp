@@ -3,72 +3,109 @@
 #include <array>
 #include <osqp/osqp.h>
 #include "MPC.hpp"
+#include "SensorHub.hpp"
 #include "DigitalFilter.hpp"
 #include "CylinderParam.hpp"
 #include "Recorder.hpp"
+#include "ExoConfig.hpp"
 class JointCon
 {
 public:
-    JointCon(PneumaticParam::CylinderParam cyln_param, PneumaticParam::ReservoirParam reservoir_param,std::string joint_con_name);
+    JointCon(ExoConfig::MPC_Params knee_ext_params, ExoConfig::MPC_Params knee_flex_params, ExoConfig::MPC_Params ank_ext_params, ExoConfig::MPC_Params kne_ank_params,
+    ExoConfig::MPC_Params tank_params, ExoConfig::CylnPhyParams knee_cyln_params,ExoConfig::CylnPhyParams ank_cyln_params, std::string joint_con_name);
     ~JointCon();
-    enum class Chamber
-    {
-        kExt,
-        kFlex,
-        kTank
-    };
-    enum class ControlMode
+
+
+    enum class ConMode
     {
         kNone,
-        kPreConExt,
-        kPreConFlex,
-        kPreConTank,
+        kPreCon,
         kForceCon,
-        kImpCon,
-        kImpactCon,
+        kImpCon
     };
-
-    void GetForceCon(const std::array<double,MPC_TIME_HORIZON> &des_force, u_int8_t& ext_duty, u_int8_t &flex_duty, u_int8_t &tank_duty);
-    void GetImpCon(double des_imp, u_int8_t& ext_duty, u_int8_t& flex_duty, u_int8_t& tank_duty,double force_offset=0);
-    void GetPreCon(const double des_pre, u_int8_t &duty, Chamber chamber); // Pressure control
-    void GetImpactCon(const double init_force, const double init_imp, u_int8_t &ext_duty, u_int8_t &rec_duty, u_int8_t &tank_duty, u_int8_t &flex_duty, u_int8_t &exhaust_duty);
+    enum class PreCon
+    {
+        kSubTank,
+        kKneExt,
+        kAnkPlant,
+        kKneFlex,
+        kAnkDorsi,
+        kTotal
+    };
+    enum class ForceCon
+    {
+        kKneExt,
+        kAnkPlant,
+        kTotal
+    };
+    enum class ForceRedType //two ways to reduce the force output
+    {
+        kRec,
+        kBalance
+    };
     
+    static const unsigned  kNumOfChambers = 3;
 
-    void PushMeas(const double &p_joint_ext,const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank,const double &pos,const u_int8_t tank_duty, const u_int8_t knee_ext_duty, const u_int8_t knee_flex_duty,const u_int8_t knee_ank_duty, const u_int8_t ank_ext_duty);
+    // void SetControlMode(ControlMode con_mode);
+    void SetControl(ConMode con_mode,PreCon pre_con_type,double des_pre);
+    void SetControl(ConMode con_mode, ForceCon force_con_type,ForceRedType force_red_type,double cmd_value);
+    void SetControl(ConMode con_mode,ForceCon force_con_type,ForceRedType force_red_type,double cmd_val1,double cmd_val2);
+    void ResetControl();
+    const ConMode GetControlMode();
+    const PreCon GetPreConMode();
+    const ForceCon GetForceImpConMode();
+    const ForceRedType GetForceImpRedMode();
+
+    void GetPreCon(u_int8_t &duty, PreCon pre_con);
+    
+    void GetForceCon(u_int8_t &charge_duty,u_int8_t &rec_duty,u_int8_t &balance_duty, u_int8_t &tank_duty, ForceCon force_con_type,ForceRedType force_red_type);
+    // void GetImpCon(double des_imp, u_int8_t& ext_duty, u_int8_t& flex_duty, u_int8_t& tank_duty,ControlMode con_mode,double force_offset=0);
+    void GetImpCon(u_int8_t&charge_duty,u_int8_t&rec_duty,u_int8_t &balance_duty,u_int8_t&tank_duty,ForceCon force_con_type,ForceRedType force_red_type);
+    
+    void PushMeas(const double &p_knee_ext,const double &p_knee_flex,const double &p_ank_ext, const double &p_sub_tank,const double &p_main_tank,const double &knee_angle,const double &ankle_angle,const u_int8_t knee_ext_duty,const u_int8_t knee_flex_duty,const u_int8_t ank_ext_duty, const u_int8_t knee_ank_duty,const u_int8_t tank_duty);
+    // void PushMeas(const double &p_joint_ext,const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank,const double &pos,const u_int8_t tank_duty, const u_int8_t knee_ext_duty, const u_int8_t knee_flex_duty,const u_int8_t knee_ank_duty, const u_int8_t ank_ext_duty);
     void RecData();
-    void SetControlMode(ControlMode con_mode);
-    const ControlMode GetControlMode();
-    void SetKneeMaxPos(double max_pos_val);
+    
+    // const ControlMode GetControlMode();
+    // void SetKneeMaxPos(double max_pos_val);
     
 
 private:
-    const double kForceTol = 0.5; //if abs(force_err) < kFOrceTol, don't activate 
-    MPC ext_con, flex_con, tank_con;
-    ControlMode control_mode = ControlMode::kNone;
-    double cur_pos = 0;
-    double pre_pos = 0;
-    double pos_diff = 0;
-    const double spring_k = 55.4 * 0.0393701 * 4.44822; // unit: N/mm
-    double cur_max_spring_compress;
-    const double piston_area_ext;
-    const double piston_area_flex;
-    double fric_coeff;
-    double max_pos;
-    double max_len_mm;
-    double cur_delta_x; // the difference between max_pos - cur_x
-    double pre_ext;
-    double pre_rec;
-    double pre_tank;
-    double pre_main_tank;
-    double cur_force;                                       // unit: N
+    const double kForceTol = 0.5; //if abs(force_err) < kForceTol, don't activate 
+    // MPC ext_con, flex_con, tank_con;
+    MPC knee_ext_con,knee_flex_con,ank_ext_con,knee_ank_con,tank_con;
+    ExoConfig::CylnPhyParams knee_cyln_params,ank_cyln_params;
+
+    ConMode con_mode = ConMode::kNone;
+    PreCon pre_con_type;
+    ForceCon force_con_type;
+    ForceRedType force_red_type;
+
+    std::array<double,(unsigned)PreCon::kTotal> cmd_pre;
+    std::array<std::array<double,MPC_TIME_HORIZON>,(unsigned)ForceCon::kTotal> cmd_force;
+    std::array<double,(unsigned)ForceCon::kTotal> cmd_imp;
+    std::array<double,(unsigned)ForceCon::kTotal> cmd_init_force;
+
+    double cur_knee_ang,cur_ankle_ang;
+    double knee_pos_diff,ank_pos_diff; //difference in position, if the joint is translational: dx, if the joint is revolute, dq
+    double knee_cyln_ext_len,knee_cyln_shrk_len,ank_cyln_ext_len,ank_cyln_shrk_len;  //ext: extend, shrk: shrink, unit: mm
+    double knee_moment_arm,ankle_moment_arm;
+    double knee_cyln_len_diff, ank_cyln_len_diff; //for calculating frction
+    double knee_len_ext_old,ank_len_ext_old;
+    // const double spring_k = 55.4 * 0.0393701 * 4.44822; // unit: N/mm
+    double max_knee_spring_compress,max_ank_spring_compress;
+
+    double cur_knee_force, cur_ank_force; //unit: N
+    
+    double p_knee_ext,p_knee_flex,p_ank_ext,p_sub_tank,p_main_tank;
+    
     double cur_pre_force;
     double des_force;
     double des_ext_pre;
-    double L_ext;                                      // unit: mm
-    double L_flex;                                     // unit: mm
+
     double p_ext_rec_diff;
-    const double volume_slope_6in = 0.0006351973436310972;  // FIXME: these are only used for linear calibrations
-    const double volume_intercept_6in = 115.68133521647316; // unit: mm/adc(pos)
+    // const double volume_slope_6in = 0.0006351973436310972;  // FIXME: these are only used for linear calibrations
+    // const double volume_intercept_6in = 115.68133521647316; // unit: mm/adc(pos)
 
 
     //Energy recycled based imp control
@@ -92,12 +129,13 @@ private:
 
     
     // calculating current cylinder length, external force
-    double GetExternalForce(double pre_ext, double pre_flex, double delta_x, double x_dot); // unit: newton
-    double GetLenLinear_mm(double pos);
+    double GetExternalForce(double pre_ext, double pre_flex, double delta_x, double x_dot,ExoConfig::CylnPhyParams cyln_params); // unit: newton
+    
+    // double GetLenLinear_mm(double pos);
 
     // filter
-    DigitalFilter<double, FilterParam::Filter20Hz_2::Order, 1> vel_filter;
-    DigitalFilter<double, FilterParam::Filter5Hz_2::Order, 1> force_filter;
+    DigitalFilter<double, FilterParam::Filter20Hz_2::Order, 2> vel_filter;
+    DigitalFilter<double, FilterParam::Filter5Hz_2::Order, 2> force_filter;
     DigitalFilter<double,FilterParam::Filter5Hz_2::Order,1> force_pre_filter;
 
     DigitalFilter<double,FilterParam::Filter20Hz_2::Order,1> p_ext_rec_diff_filter;

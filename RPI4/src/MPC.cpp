@@ -8,8 +8,8 @@ using namespace std;
 
 // const double MPC::kArea =  0.31*645.16f;  //unit: mm^2
 
-MPC::MPC(std::array<std::array<double, MPC_STATE_NUM>, 2> cl, std::array<std::array<double, MPC_STATE_NUM>, 2> ch, std::string file_name)
-    : ah(ch[0]), bh(ch[1]), al(cl[0]), bl(cl[1]),
+MPC::MPC(ExoConfig::MPC_Params _mpc_params,std::string file_name)
+    : mpc_params(_mpc_params),ah(_mpc_params.ch[0]), bh(_mpc_params.ch[1]), al(_mpc_params.cl[0]), bl(_mpc_params.cl[1]),
       mpc_rec(file_name, MPC_HEAD),
       mpc_model_rec(file_name+std::string("_model"),MPC_MODEL_HEAD)
 
@@ -42,16 +42,15 @@ MPC::~MPC()
         c_free(this->osqp_data.get());
     }
 }
-void MPC::UpdateParamH(array<double, MPC_STATE_NUM> new_a, array<double, MPC_STATE_NUM> new_b)
-{
 
-    this->ah = new_a;
-    this->bh = new_b;
+double MPC::GetMpcCalibLen(){
+    return this->mpc_params.cali_chamber_len;
 }
-void MPC::UpdateParamL(array<double, MPC_STATE_NUM> new_a, array<double, MPC_STATE_NUM> new_b)
-{
-    this->al = new_a;
-    this->bl = new_b;
+void MPC::UpdateParam(ExoConfig::MPC_Params new_params){
+    this->ah = new_params.ch[0];
+    this->bh = new_params.ch[1];
+    this->al = new_params.cl[0];
+    this->bl = new_params.cl[1];
 }
 
 double MPC::CalculateControl(bool increase_pre, std::array<double, MPC_TIME_HORIZON> y_des, double scale)
@@ -464,7 +463,7 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
 
 }
 
-void MPC::PushMeas(const double p_tank, const double p_set,const u_int8_t duty)
+void MPC::UpdateMeas(double p_set,double p_tank,u_int8_t duty)
 {
     
     //we first need to calculate the gradient estimation from the nonlinear model,

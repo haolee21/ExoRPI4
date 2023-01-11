@@ -59,8 +59,8 @@ void UdpServer::GetDataPacket(UDP_DataPacket &return_packet)
     const std::array<u_int8_t, PWM_VAL_NUM> &pwm_duty = Valves_hub::GetDuty();
     std::copy(pwm_duty.begin(), pwm_duty.end(), return_packet.pwm_duty.begin());
 
-    const std::array<bool, (unsigned)Valves_hub::Joint::kTotal> controller_cond = Valves_hub::GetControlCond();
-    std::copy(controller_cond.begin(), controller_cond.end(), return_packet.con_status.begin());
+    // const std::array<bool, (unsigned)Valves_hub::Joint::kTotal> controller_cond = Valves_hub::GetControlCond();
+    // std::copy(controller_cond.begin(), controller_cond.end(), return_packet.con_status.begin());
 
     return_packet.recorder = Timer::GetDataRec_flag();
 }
@@ -92,11 +92,11 @@ void UdpServer::ServerProcess()
             UDP_DataPacket data_packet;
             this->GetDataPacket(data_packet);
             this->Send((char *)&data_packet, sizeof data_packet);
-            
+
             auto cur_time = std::chrono::high_resolution_clock::now();
-            auto elapsed = cur_time-old_time;
+            auto elapsed = cur_time - old_time;
             long long dur_time = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-            old_time =cur_time;
+            old_time = cur_time;
             // handle the commands
             this->ProcessCmd(cmd_packet);
         }
@@ -142,193 +142,175 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
         //  force control, impedance control, pressure control are turned off by setting duty to 0
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kLTank])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLTank], PWM_ID::kLTank);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLTank], PWM_ID::kLTank, Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
         }
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kLKneExt])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLKneExt], PWM_ID::kLKneExt);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLKneExt], PWM_ID::kLKneExt, Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
         }
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kLKneFlex])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLKneFlex], PWM_ID::kLKneFlex);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLKneFlex], PWM_ID::kLKneFlex, Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
         }
 
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kLKneAnk])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kNone);
-            Valves_hub::EnableCon(Valves_hub::Joint::kLAnk, JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLKneAnk], PWM_ID::kLKneAnk);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLKneAnk], PWM_ID::kLKneAnk, Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
         }
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kLKneExut])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLKneExut], PWM_ID::kLKneExut);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLKneExut], PWM_ID::kLKneExut, Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
         }
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kLAnkExut])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLAnk, JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLAnkExut], PWM_ID::kLAnkExut);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLAnkExut], PWM_ID::kLAnkExut, Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
         }
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kLAnkExt])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLAnk, JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLAnkExt], PWM_ID::kLAnkExt);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLAnkExt], PWM_ID::kLAnkExt, Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
         }
-        if(cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kLAnkFlex])
+        if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kLAnkFlex])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLAnk,JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLAnkFlex],PWM_ID::kLAnkFlex);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLAnkFlex], PWM_ID::kLAnkFlex, Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
         }
 
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kRTank])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRTank], PWM_ID::kRTank);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRTank], PWM_ID::kRTank, Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kRKneExt])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRKneExt], PWM_ID::kRKneExt);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRKneExt], PWM_ID::kRKneExt, Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kRKneFlex])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRKneFlex], PWM_ID::kRKneFlex);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRKneFlex], PWM_ID::kRKneFlex, Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kRKneAnk])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kNone);
-            Valves_hub::EnableCon(Valves_hub::Joint::kRAnk, JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRKneAnk], PWM_ID::kRKneAnk);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRKneAnk], PWM_ID::kRKneAnk, Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kRKneExut])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRKneExut], PWM_ID::kRKneExut);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRKneExut], PWM_ID::kRKneExut, Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kRAnkExut])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRAnk, JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRAnkExut], PWM_ID::kRAnkExut);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRAnkExut], PWM_ID::kRAnkExut, Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kRAnkExt])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRAnk, JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRAnkExt], PWM_ID::kRAnkExt);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRAnkExt], PWM_ID::kRAnkExt, Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
-        if(cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kRAnkFlex])
+        if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kRAnkFlex])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRAnk,JointCon::ControlMode::kNone);
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRAnkFlex],PWM_ID::kRAnkFlex);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRAnkFlex], PWM_ID::kRAnkFlex, Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
     }
     if (this->CheckCmdSet(cmd_packet.des_pre_flag.begin(), cmd_packet.des_pre_flag.size()))
     {
 
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kLTank])
+        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * 2 + (unsigned)JointCon::PreCon::kSubTank])
         {
-
-            Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kPreConTank);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kLTank, cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kLTank] * 320 + 8000);
+            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * 2 + (unsigned)JointCon::PreCon::kSubTank] * 320 + 8000, // psi to adc value
+                                  Valves_hub::KneeAnkPair::kLeftKneeRightAnk, JointCon::PreCon::kSubTank);
         }
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kLKneExt])
+        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * 2 + (unsigned)JointCon::PreCon::kKneExt])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kPreConExt);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kLKneExt, cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kLKneExt] * 320 + 8000);
+            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * 2 + (unsigned)JointCon::PreCon::kKneExt] * 320 + 8000,
+                                  Valves_hub::KneeAnkPair::kLeftKneeRightAnk, JointCon::PreCon::kKneExt);
         }
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kLKneFlex])
+        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * 2 + (unsigned)JointCon::PreCon::kKneFlex])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kPreConFlex);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kLKneFlex, cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kLKneFlex] * 320 + 8000);
+            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * 2 + (unsigned)JointCon::PreCon::kKneFlex] * 320 + 8000,
+                                  Valves_hub::KneeAnkPair::kLeftKneeRightAnk, JointCon::PreCon::kKneFlex);
         }
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kLAnkExt])
+        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * 2 + (unsigned)JointCon::PreCon::kAnkPlant])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLAnk, JointCon::ControlMode::kPreConExt);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kLAnkExt, cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kLAnkExt] * 320 + 8000);
+            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * 2 + (unsigned)JointCon::PreCon::kAnkPlant] * 320 + 8000,
+                                  Valves_hub::KneeAnkPair::kLeftKneeRightAnk, JointCon::PreCon::kAnkPlant);
         }
-
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kRTank])
+        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk * 2 + (unsigned)JointCon::PreCon::kSubTank])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kPreConTank);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kRTank, cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kRTank] * 320 + 8000);
+            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk * 2 + (unsigned)JointCon::PreCon::kSubTank] * 320 + 8000,
+                                  Valves_hub::KneeAnkPair::kRightKneeLeftAnk, JointCon::PreCon::kSubTank);
         }
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kRKneExt])
+        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk * 2 + (unsigned)JointCon::PreCon::kKneExt])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kPreConExt);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kRKneExt, cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kRKneExt] * 320 + 8000);
+            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk * 2 + (unsigned)JointCon::PreCon::kKneExt] * 320 + 8000,
+                                  Valves_hub::KneeAnkPair::kRightKneeLeftAnk, JointCon::PreCon::kKneExt);
         }
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kRKneFlex])
+        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*2+(unsigned)JointCon::PreCon::kKneFlex])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kPreConFlex);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kRKneFlex, cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kRKneFlex] * 320 + 8000);
+            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*2+(unsigned)JointCon::PreCon::kKneFlex]*320+8000,
+                                 Valves_hub::KneeAnkPair::kRightKneeLeftAnk, JointCon::PreCon::kKneFlex);
         }
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::Chamber::kRAnkExt])
+        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*2+(unsigned)JointCon::PreCon::kAnkPlant])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRAnk, JointCon::ControlMode::kPreConExt);
-            Valves_hub::SetDesiredPre(Valves_hub::Chamber::kRAnkExt, cmd_packet.des_pre[(unsigned)Valves_hub::Chamber::kRAnkExt] * 320 + 8000);
+            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*2+(unsigned)JointCon::PreCon::kAnkPlant]*320+8000,
+                                 Valves_hub::KneeAnkPair::kRightKneeLeftAnk, JointCon::PreCon::kAnkPlant);
         }
     }
 
     // force control
     if (this->CheckCmdSet(cmd_packet.des_force_flag.begin(), cmd_packet.des_force_flag.size()))
     {
-        if (cmd_packet.des_force_flag[(unsigned)Valves_hub::Joint::kLKne])
+        if (cmd_packet.des_force_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk*2+(unsigned)JointCon::ForceCon::kKneExt])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kForceCon);
-            Valves_hub::SetDesiredForce(Valves_hub::Joint::kLKne, cmd_packet.des_force[(unsigned)Valves_hub::Joint::kLKne]);
+            Valves_hub::EnableCon(cmd_packet.des_force[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk*2+(unsigned)JointCon::ForceCon::kKneExt],
+                                    Valves_hub::KneeAnkPair::kLeftKneeRightAnk, JointCon::ForceCon::kKneExt,JointCon::ForceRedType::kRec);
         }
-        if (cmd_packet.des_force_flag[(unsigned)Valves_hub::Joint::kLAnk])
+        if (cmd_packet.des_force_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk*2+(unsigned)JointCon::ForceCon::kAnkPlant])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLAnk, JointCon::ControlMode::kForceCon);
-            Valves_hub::SetDesiredForce(Valves_hub::Joint::kLAnk, cmd_packet.des_force[(unsigned)Valves_hub::Joint::kLAnk]);
+            Valves_hub::EnableCon(cmd_packet.des_force[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk*2+(unsigned)JointCon::ForceCon::kAnkPlant],
+             Valves_hub::KneeAnkPair::kLeftKneeRightAnk, JointCon::ForceCon::kAnkPlant,JointCon::ForceRedType::kBalance);
         }
-        if (cmd_packet.des_force_flag[(unsigned)Valves_hub::Joint::kRKne])
+        if (cmd_packet.des_force_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*2+(unsigned)JointCon::ForceCon::kKneExt])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kForceCon);
-            Valves_hub::SetDesiredForce(Valves_hub::Joint::kRKne, cmd_packet.des_force[(unsigned)Valves_hub::Joint::kRKne]);
+            Valves_hub::EnableCon(cmd_packet.des_force[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*2+(unsigned)JointCon::ForceCon::kKneExt],
+              Valves_hub::KneeAnkPair::kRightKneeLeftAnk, JointCon::ForceCon::kKneExt,JointCon::ForceRedType::kRec);
         }
-        if (cmd_packet.des_force_flag[(unsigned)Valves_hub::Joint::kRAnk])
+        if (cmd_packet.des_force_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*2+(unsigned)JointCon::ForceCon::kAnkPlant])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRAnk, JointCon::ControlMode::kForceCon);
-            Valves_hub::SetDesiredForce(Valves_hub::Joint::kRAnk, cmd_packet.des_force[(unsigned)Valves_hub::Joint::kRAnk]);
+            Valves_hub::EnableCon(cmd_packet.des_force[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*2+(unsigned)JointCon::ForceCon::kAnkPlant],
+             Valves_hub::KneeAnkPair::kRightKneeLeftAnk, JointCon::ForceCon::kAnkPlant,JointCon::ForceRedType::kBalance);
         }
     }
     // impedance control
     if (this->CheckCmdSet(cmd_packet.des_imp_flag.begin(), cmd_packet.des_imp_flag.size()))
     {
-        if (cmd_packet.des_imp_flag[(unsigned)Valves_hub::Joint::kLKne])
+        if (cmd_packet.des_imp_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk*2+(unsigned)JointCon::ForceCon::kKneExt])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kImpCon);
-            Valves_hub::SetDesiredImp(Valves_hub::Joint::kLKne, cmd_packet.des_imp[(unsigned)Valves_hub::Joint::kLKne], cmd_packet.init_force[(unsigned)Valves_hub::Joint::kLKne]);
+            Valves_hub::EnableCon(cmd_packet.des_imp[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk*2+(unsigned)JointCon::ForceCon::kKneExt],
+                                  cmd_packet.init_force[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk*2+(unsigned)JointCon::ForceCon::kKneExt],
+                                  Valves_hub::KneeAnkPair::kLeftKneeRightAnk,JointCon::ForceCon::kKneExt,JointCon::ForceRedType::kRec);
         }
-        if (cmd_packet.des_imp_flag[(unsigned)Valves_hub::Joint::kLAnk])
+        else if (cmd_packet.des_imp_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk*2+(unsigned)JointCon::ForceCon::kAnkPlant])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLAnk, JointCon::ControlMode::kImpCon);
-            Valves_hub::SetDesiredImp(Valves_hub::Joint::kLAnk, cmd_packet.des_imp[(unsigned)Valves_hub::Joint::kLAnk], cmd_packet.init_force[(unsigned)Valves_hub::Joint::kLAnk]);
+            Valves_hub::EnableCon(cmd_packet.des_imp[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk*2+(unsigned)JointCon::ForceCon::kAnkPlant],
+                                  cmd_packet.init_force[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk*2+(unsigned)JointCon::ForceCon::kAnkPlant],
+                                  Valves_hub::KneeAnkPair::kLeftKneeRightAnk,JointCon::ForceCon::kAnkPlant,JointCon::ForceRedType::kBalance);
         }
-        if (cmd_packet.des_imp_flag[(unsigned)Valves_hub::Joint::kRKne])
+        else if (cmd_packet.des_imp_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*2+(unsigned)JointCon::ForceCon::kKneExt])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kImpCon);
-            Valves_hub::SetDesiredImp(Valves_hub::Joint::kRKne, cmd_packet.des_imp[(unsigned)Valves_hub::Joint::kRKne], cmd_packet.init_force[(unsigned)Valves_hub::Joint::kRKne]);
+            Valves_hub::EnableCon(cmd_packet.des_imp[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*2+(unsigned)JointCon::ForceCon::kKneExt],
+                                  Valves_hub::KneeAnkPair::kRightKneeLeftAnk, JointCon::ForceCon::kKneExt,JointCon::ForceRedType::kRec);
         }
-        if (cmd_packet.des_imp_flag[(unsigned)Valves_hub::Joint::kRAnk])
+        else if (cmd_packet.des_imp_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*2+(unsigned)JointCon::ForceCon::kAnkPlant])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRAnk, JointCon::ControlMode::kImpCon);
-            Valves_hub::SetDesiredImp(Valves_hub::Joint::kRAnk, cmd_packet.des_imp[(unsigned)Valves_hub::Joint::kRAnk], cmd_packet.init_force[(unsigned)Valves_hub::Joint::kRAnk]);
+            Valves_hub::EnableCon(cmd_packet.des_imp[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*2+(unsigned)JointCon::ForceCon::kAnkPlant],
+                                 Valves_hub::KneeAnkPair::kRightKneeLeftAnk, JointCon::ForceCon::kAnkPlant,JointCon::ForceRedType::kBalance);
         }
     }
     // impact absorb control
     if (this->CheckCmdSet(cmd_packet.impact_absorb_flag.begin(), cmd_packet.impact_absorb_flag.size()))
     {
-        if (cmd_packet.impact_absorb_flag[(unsigned)Valves_hub::Joint::kLKne])
-        {
+        // if (cmd_packet.impact_absorb_flag[(unsigned)Valves_hub::Joint::kLKne])
+        // {
 
-            Valves_hub::SetImpactAbsorb(Valves_hub::Joint::kLKne, cmd_packet.init_force[(unsigned)Valves_hub::Joint::kLKne], cmd_packet.init_impact_imp[(unsigned)Valves_hub::Joint::kLKne]);
-            Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kImpactCon);
-        }
+        //     Valves_hub::SetImpactAbsorb(Valves_hub::Joint::kLKne, cmd_packet.init_force[(unsigned)Valves_hub::Joint::kLKne], cmd_packet.init_impact_imp[(unsigned)Valves_hub::Joint::kLKne]);
+        //     Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kImpactCon);
+        // }
     }
 
     // update robot's time
@@ -365,43 +347,35 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
     if (this->CheckCmdSet(cmd_packet.con_on_off_flag.begin(), cmd_packet.con_on_off_flag.size()))
     {
 
-        if (!cmd_packet.con_on_off[(unsigned)Valves_hub::Joint::kLKne])
+        if (!cmd_packet.con_on_off[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk])
         {
-
-            Valves_hub::EnableCon(Valves_hub::Joint::kLKne, JointCon::ControlMode::kNone);
+            Valves_hub::ResetCon(Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
         }
 
-        if (!cmd_packet.con_on_off[(unsigned)Valves_hub::Joint::kLAnk])
+        else if (!cmd_packet.con_on_off[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk])
         {
-            Valves_hub::EnableCon(Valves_hub::Joint::kLAnk, JointCon::ControlMode::kNone);
+            Valves_hub::ResetCon(Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
-        if (!cmd_packet.con_on_off[(unsigned)Valves_hub::Joint::kRKne])
-        {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRKne, JointCon::ControlMode::kNone);
-        }
-        if (!cmd_packet.con_on_off[(unsigned)Valves_hub::Joint::kRAnk])
-        {
-            Valves_hub::EnableCon(Valves_hub::Joint::kRAnk, JointCon::ControlMode::kNone);
-        }
+
     }
     // reset the max pos of each cylinder
     if (this->CheckCmdSet(cmd_packet.set_joint_pos.begin(), cmd_packet.set_joint_pos.size()))
     {
-        if (cmd_packet.set_joint_pos[(unsigned)Valves_hub::Joint::kLKne])
-        {
-            Valves_hub::SetJointPos(Valves_hub::Joint::kLKne);
-        }
-        if (cmd_packet.set_joint_pos[(unsigned)Valves_hub::Joint::kLAnk])
-        {
-            Valves_hub::SetJointPos(Valves_hub::Joint::kLAnk);
-        }
-        if (cmd_packet.set_joint_pos[(unsigned)Valves_hub::Joint::kRKne])
-        {
-            Valves_hub::SetJointPos(Valves_hub::Joint::kRKne);
-        }
-        if (cmd_packet.set_joint_pos[(unsigned)Valves_hub::Joint::kRAnk])
-        {
-            Valves_hub::SetJointPos(Valves_hub::Joint::kRAnk);
-        }
+        // if (cmd_packet.set_joint_pos[(unsigned)Valves_hub::Joint::kLKne])
+        // {
+        //     Valves_hub::SetJointPos(Valves_hub::Joint::kLKne);
+        // }
+        // if (cmd_packet.set_joint_pos[(unsigned)Valves_hub::Joint::kLAnk])
+        // {
+        //     Valves_hub::SetJointPos(Valves_hub::Joint::kLAnk);
+        // }
+        // if (cmd_packet.set_joint_pos[(unsigned)Valves_hub::Joint::kRKne])
+        // {
+        //     Valves_hub::SetJointPos(Valves_hub::Joint::kRKne);
+        // }
+        // if (cmd_packet.set_joint_pos[(unsigned)Valves_hub::Joint::kRAnk])
+        // {
+        //     Valves_hub::SetJointPos(Valves_hub::Joint::kRAnk);
+        // }
     }
 }

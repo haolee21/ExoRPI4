@@ -13,35 +13,37 @@ struct UDP_DataPacket
     std::array<u_int8_t,PWM_VAL_NUM> pwm_duty;
     std::array<double,SensorHub::NUMENC> enc_data;
     std::array<double,SensorHub::NUMPRE> pre_data1;
-    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> con_status;
+    std::array<bool,(unsigned)Valves_hub::KneeAnkPair::kTotal> con_status;
     bool recorder;
 };
 struct UDP_CmdPacket{
     std::array<u_int8_t,PWM_VAL_NUM> pwm_duty;
-    std::array<double,(unsigned)Valves_hub::Chamber::kTotal> des_pre;
-    std::array<double,(unsigned)Valves_hub::Joint::kTotal> des_imp;
-    std::array<double,(unsigned)Valves_hub::Joint::kTotal> des_force;
+    std::array<double,(unsigned)JointCon::PreCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_pre;
+    std::array<double,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_imp;
+    std::array<double,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_force;
+    // std::array<bool,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> force_red_rec; //true if recycle, 
     double epoch_time;
     bool recorder;
-    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> con_on_off;
+    std::array<bool,(unsigned)Valves_hub::KneeAnkPair::kTotal> con_on_off;
 
     //impact absorbing 
-    std::array<double,(unsigned)Valves_hub::Joint::kTotal> init_force;
-    std::array<double,(unsigned)Valves_hub::Joint::kTotal> init_impact_imp;
-    std::array<double,(unsigned)Valves_hub::Joint::kTotal> restore_imp;
+    std::array<double,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> init_force;
+    std::array<double,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> init_impact_imp;
+    std::array<double,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> restore_imp;
 
     //change flags
     std::array<bool,PWM_VAL_NUM> pwm_duty_flag{false};
     std::array<bool,SensorHub::NUMENC> reset_enc_flag{false};
-    std::array<bool,(unsigned)Valves_hub::Chamber::kTotal> des_pre_flag{false};
-    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> des_imp_flag{false};
-    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> des_force_flag{false};
+    std::array<bool,(unsigned)JointCon::PreCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_pre_flag{false};
+    std::array<bool,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_imp_flag{false};
+    std::array<bool,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_force_flag{false};
     bool epoch_time_flag = false;
     bool recorder_flag = false;
-    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> con_on_off_flag{false};
-    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> set_joint_pos{false};
+    std::array<bool,(unsigned)Valves_hub::KneeAnkPair::kTotal> con_on_off_flag{false};
+
+    std::array<bool,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> set_joint_pos{false};
     
-    std::array<bool,(unsigned)Valves_hub::Joint::kTotal> impact_absorb_flag{false};
+    std::array<bool,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> impact_absorb_flag{false};
 
     
 

@@ -32,6 +32,7 @@
 #include "DigitalFilter.hpp"
 #include "FilterParam.hpp"
 #include "CylinderParam.hpp"
+#include "ExoConfig.hpp"
 
 #define MPC_HEAD "Time,F_0,F_1,dF_0,dF_1,u_n,u_n1,u_n2,u_n3,u_n4,u_n5,u_n6,u_n7,u_n8,yn1,yn2,yn3,yn4,yn5,yn6,yn7,yn8,yn9,y_des1,y_des2,y_des3,y_des4,y_des5,y_des6,y_des7,y_des8,y_des9"
 #define MPC_MODEL_HEAD "Time,dF_0,dF_1"
@@ -151,16 +152,17 @@ private:
     
 
 public:
-    MPC(std::array<std::array<double, MPC_STATE_NUM>, 2> cl, std::array<std::array<double, MPC_STATE_NUM>, 2> ch, std::string file_name);
+    MPC(ExoConfig::MPC_Params mpc_params,std::string file_name);
     ~MPC();
-    void UpdateParamH(std::array<double, MPC_STATE_NUM> new_param0, std::array<double, MPC_STATE_NUM> new_param1);
-    void UpdateParamL(std::array<double, MPC_STATE_NUM> new_param0, std::array<double, MPC_STATE_NUM> new_param1);
 
+    ExoConfig::MPC_Params mpc_params;
+    double GetMpcCalibLen(); //get the chamber length when calculating the mpc parameters
+    void UpdateParam(ExoConfig::MPC_Params new_params);
     int GetPreControl(const std::array<double, MPC_TIME_HORIZON> &p_des, const double &p_cur, const double &p_tank, double scale); // It requires current pressure value because all the values storaged in the meme are scaled
     void GetImpControl(const double &imp_des, const double &p_ext, const double &p_flex, const double &p_tank, const double &pos, double scale, int &joint_val_duty, int &joint_bal_duty, int &tank_duty);
     // Get values for recorder
 
-    void PushMeas(const double p_tank, const double p_set, const u_int8_t duty);
+    void UpdateMeas(double,double,u_int8_t);
     void RecData();
 
     // double GetCylinderScale(double pre,double pos); //get the (cylinder length)/(max cylinder length)

@@ -34,20 +34,20 @@ class ImpWindow(QWidget):
         self.lineEdit_rank_initF = self.findChild(QLineEdit,'lineEdit_rank_initF')
         
         self.lineEdit_lkne_imp.textChanged.connect(partial(self.TextChange,self.lineEdit_lkne_imp,self.lineEdit_lkne_initF))
-        self.btn_lkne_set.clicked.connect(partial(self.ImpSet,self.lineEdit_lkne_imp,self.lineEdit_lkne_initF,JOINT_LKNE))
-        self.btn_lkne_stop.clicked.connect(partial(self.ImpStop,JOINT_LKNE))
+        self.btn_lkne_set.clicked.connect(partial(self.ImpSet,self.lineEdit_lkne_imp,self.lineEdit_lkne_initF,LKRA*2+FORCE_CON_KNE_EXT))
+        self.btn_lkne_stop.clicked.connect(partial(self.ImpStop,LKRA*2+FORCE_CON_KNE_EXT))
 
         self.lineEdit_lank_imp.textChanged.connect(partial(self.TextChange,self.lineEdit_lank_imp,self.lineEdit_lank_initF))
-        self.btn_lank_set.clicked.connect(partial(self.ImpSet,self.lineEdit_lank_imp,self.lineEdit_lank_initF,JOINT_LANK))
-        self.btn_lank_stop.clicked.connect(partial(self.ImpStop,JOINT_LANK))
+        self.btn_lank_set.clicked.connect(partial(self.ImpSet,self.lineEdit_lank_imp,self.lineEdit_lank_initF,RKLA*2+FORCE_CON_ANK_PLANT))
+        self.btn_lank_stop.clicked.connect(partial(self.ImpStop,RKLA*2+FORCE_CON_ANK_PLANT))
 
         self.lineEdit_rkne_imp.textChanged.connect(partial(self.TextChange,self.lineEdit_rkne_imp,self.lineEdit_rkne_initF))
-        self.btn_rkne_set.clicked.connect(partial(self.ImpSet,self.lineEdit_rkne_imp,self.lineEdit_rkne_initF, JOINT_RKNE))
-        self.btn_rkne_stop.clicked.connect(partial(self.ImpStop,JOINT_RKNE))
+        self.btn_rkne_set.clicked.connect(partial(self.ImpSet,self.lineEdit_rkne_imp,self.lineEdit_rkne_initF,RKLA*2+FORCE_CON_KNE_EXT))
+        self.btn_rkne_stop.clicked.connect(partial(self.ImpStop,RKLA*2+FORCE_CON_KNE_EXT))
 
         self.lineEdit_rank_imp.textChanged.connect(partial(self.TextChange,self.lineEdit_rank_imp,self.lineEdit_rank_initF))
-        self.btn_rank_set.clicked.connect(partial(self.ImpSet,self.lineEdit_rank_imp,self.lineEdit_rank_initF, JOINT_RANK))
-        self.btn_rank_stop.clicked.connect(partial(self.ImpStop,JOINT_RANK))
+        self.btn_rank_set.clicked.connect(partial(self.ImpSet,self.lineEdit_rank_imp,self.lineEdit_rank_initF,LKRA*2+FORCE_CON_ANK_PLANT))
+        self.btn_rank_stop.clicked.connect(partial(self.ImpStop,LKRA*2+FORCE_CON_ANK_PLANT))
        
 
     def TextChange(self,line_edit_imp,line_edit_initF):

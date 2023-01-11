@@ -73,19 +73,19 @@ class CylnCalibWindow(QDialog):
         if self.radio_lknee.isChecked():
             joint_angle=180-enc_data[ENC_LKNE_S]
             self.lcd_verify_ang.display(joint_angle)
-            self.lcd_verify_length.display(self.beta0_lkne-self.beta1_lkne*joint_angle)
+            self.lcd_verify_length.display(self.beta0_lkne-self.beta1_lkne*math.cos(math.radians(joint_angle)))
         elif self.radio_lank.isChecked():
             joint_angle=enc_data[ENC_LANK_S]+90
             self.lcd_verify_ang.display(joint_angle)
-            self.lcd_verify_length.display(self.beta0_lank-self.beta1_lank*joint_angle)
+            self.lcd_verify_length.display(self.beta0_lank-self.beta1_lank*math.cos(math.radians(joint_angle)))
         elif self.radio_rknee.isChecked():
             joint_angle=180-enc_data[ENC_RKNE_S]
             self.lcd_verify_ang.display(joint_angle)
-            self.lcd_verify_length.display(self.beta0_rkne-self.beta1_rkne*joint_angle)
+            self.lcd_verify_length.display(self.beta0_rkne-self.beta1_rkne*math.cos(math.radians(joint_angle)))
         elif self.radio_rank.isChecked():
             joint_angle=enc_data[ENC_RANK_S]+90
             self.lcd_verify_ang.display(joint_angle)
-            self.lcd_verify_length.display(self.beta0_rank-self.beta1_rank*joint_angle)
+            self.lcd_verify_length.display(self.beta0_rank-self.beta1_rank*math.cos(math.radians(joint_angle)))
         self.UpdateJointLCD(joint_angle)
     def UpdateJointLCD(self,joint_val):
         if self.radio_joint1.isChecked() & self.joint_angle_update[0]:
