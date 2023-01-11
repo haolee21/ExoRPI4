@@ -48,7 +48,7 @@ public:
         LHipS,LKneS,LAnkS,//,LHipF,LAnkF
         RHipS,RKneS,RAnkS//RHipF,RAnkF
     };
-    enum class PreName{ //The order of this enum must follow the order on the pcb board
+    enum class AdcName{ //The order of this enum must follow the order on the pcb board
         
         Tank = kPreSen14,
         RLTank = kPreSen9,

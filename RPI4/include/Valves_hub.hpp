@@ -34,40 +34,22 @@ enum class PWM_ID //sync with the real connection on the PCB
 class Valves_hub
 {
 public:
-    enum class Joint //use for force control, impedance control
-    {
-        kLKne,
-        kLAnk,
-        kRKne,
-        kRAnk,
+    enum class KneeAnkPair{
+        kLeftKneeRightAnk,
+        kRightKneeLeftAnk,
         kTotal
-    };
-    enum class Chamber{ //use for pressure control
-        kLKneExt,
-        kLKneFlex,
-        kLAnkExt,
-        kLTank,
-        kRKneExt,
-        kRKneFlex,
-        kRAnkExt,
-        kRTank,
-        kAtoms, //exhaust 
-        kTotal
-
     };
 
 private:
     // MPC Pressure control
     // MPC LTankCon, LKneCon;
 
-    JointCon left_knee_con, right_knee_con, left_ankle_con, right_ankle_con;
-    std::array<double,(unsigned)Chamber::kTotal> desired_pre{0};
-    std::array<double,(unsigned)Joint::kTotal> desired_imp{0};
-    std::array<double,(unsigned)Joint::kTotal> desired_force{0};
-
-    //impact absorb
-    std::array<double,(unsigned)Joint::kTotal> init_force{0};
-    std::array<double,(unsigned)Joint::kTotal> init_imp{0};
+    JointCon lkra_con, rkla_con; //left-knee-right-ankle, left-knee-right-ankle
+    std::array<double,(unsigned)Valves_hub::KneeAnkPair::kTotal*JointCon::kNumOfChambers> desired_pre{0};
+    std::array<double,(unsigned)Valves_hub::KneeAnkPair::kTotal*JointCon::kNumOfChambers> desired_imp{0};
+    std::array<double,(unsigned)Valves_hub::KneeAnkPair::kTotal*2> desired_force{0}; //subtanks has no force control
+    std::array<double,(unsigned)Valves_hub::KneeAnkPair::kTotal*2> init_force{0};
+    
    
     
 
@@ -82,35 +64,38 @@ public:
     static void UpdateValve();
     ~Valves_hub();
 
-    static void SetDuty(uint8_t duty, PWM_ID id);
-    static void SetDuty(const std::array<uint8_t, PWM_VAL_NUM> duty);
+    static void SetDuty(u_int8_t duty, PWM_ID id,KneeAnkPair knee_ank_pair);
+    static void SetDuty(const std::array<u_int8_t, PWM_VAL_NUM> duty);
 
     // TCP_server read valve condition
-    const static std::array<uint8_t, PWM_VAL_NUM> &GetDuty();
+    const static std::array<u_int8_t, PWM_VAL_NUM> &GetDuty();
 
     // Basic control function
     static void ReleasePre();
 
     //Control
-    static std::array<bool,(unsigned)Joint::kTotal> GetControlCond();
-    static void EnableCon(Joint joint,JointCon::ControlMode mode);
+    // static std::array<bool,(unsigned)Joint::kTotal> GetControlCond();
+    static void ResetCon(KneeAnkPair joint);
+    static void EnableCon(double des_pre,Valves_hub::KneeAnkPair knee_ank_pair,JointCon::PreCon pre_con);
+    static void EnableCon(double des_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon force_con_type, JointCon::ForceRedType force_red_type);
+    static void EnableCon(double des_imp, double init_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon imp_con_type, JointCon::ForceRedType force_red_type);
     //Pressure control
     
     
-    static void SetDesiredPre(Chamber chamber, double des_pre);
-    const static std::array<bool, (unsigned)Joint::kTotal> &GetJointCond();
+    // static void SetDesiredPre(Chamber chamber, double des_pre);
+    // const static std::array<bool, (unsigned)Joint::kTotal> &GetJointCond();
 
     // Impdence control
-    static void SetDesiredImp(Valves_hub::Joint imp, double imp_val,double init_force);
-    static void SetCylnMaxPos(Joint joint);
+    // static void SetDesiredImp(Valves_hub::Joint imp, double imp_val,double init_force);
+    // static void SetCylnMaxPos(Joint joint);
 
     //Force
-    static void SetDesiredForce(Joint joint, double des_force);
+    // static void SetDesiredForce(Joint joint, double des_force);
 
-    static void SetJointPos(Joint joint);
+    // static void SetJointPos(Joint joint);
 
     //Impact absorb
-    static void SetImpactAbsorb(Valves_hub::Joint joint,double init_force, double init_imp);
+    // static void SetImpactAbsorb(Valves_hub::Joint joint,double init_force, double init_imp);
 
     // Update MPC parameters
     static void UpdateParams(const ExoConfig::SystemParam &sys_param);

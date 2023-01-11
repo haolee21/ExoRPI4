@@ -1,25 +1,29 @@
 {
-    "Name":"Physical Parameter",
+    "Name": "Physical Parameter",
     "ConfigVersion": "Ver. 0.1",
     "CylnEqn": {
         "LeftKnee": [
             1,
-            1
+            1,
+            0
         ],
         "LeftAnkle": [
             1,
-            1
+            1,
+            0
         ],
         "RightKnee": [
             1,
-            1
+            1,
+            0
         ],
         "RightAnkle": [
             1,
-            1
+            1,
+            0
         ]
     },
-    "PisonArea_mm2": {
+    "PistonArea_mm2": {
         "LeftKnee": [
             387.096,
             354.838
@@ -37,16 +41,34 @@
             354.838
         ]
     },
-    "CylinderLen_mm": {
+    "SpringConst": {
+        "LeftKnee": 9.7020,
+        "LeftAnkle": 9.7020,
+        "RightKnee": 9.7020,
+        "RightAnkle": 9.7020
+    },
+    "CylnChamberMaxLen": {
         "LeftKnee": 127,
         "LeftAnkle": 127,
         "RightKnee": 127,
         "RightAnkle": 127
     },
+    "CylnMaxMechLen": {
+        "LeftKnee": 20,
+        "LeftAnkle": 20,
+        "RightKnee": 20,
+        "RightAnkle": 20
+    },
     "FrictionCoeff": {
-        "LeftKnee": 0.0133446648,
-        "LeftAnkle": 0.0133446648,
-        "RightKnee": 0.0133446648,
-        "RightAnkle": 0.0133446648
+        "LeftKnee": 14.0058,
+        "LeftAnkle": 14.0058,
+        "RightKnee": 14.0058,
+        "RightAnkle": 14.0058
+    },
+    "NeutralPos": {
+        "LeftKnee": 0,
+        "LeftAnkle": 0,
+        "RightKnee": 0,
+        "RightAnkle": 0
     }
 }
