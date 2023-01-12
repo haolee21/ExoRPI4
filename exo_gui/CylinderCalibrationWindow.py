@@ -34,6 +34,9 @@ class CylnCalibWindow(QDialog):
         self.lcd_verify_ang = self.findChild(QLCDNumber,'lcd_verify_angle')
         self.lcd_verify_length = self.findChild(QLCDNumber,'lcd_verify_length')
 
+        self.btn_update_exo = self.findChild(QPushButton,'btn_update_exo')
+        self.btn_update_exo.clicked.connect(self.UpdateExo)
+
         self.beta0_lkne = 0 #TODO: load the data from exo
         self.beta1_lkne = 0
         self.beta0_lank = 0
@@ -88,12 +91,17 @@ class CylnCalibWindow(QDialog):
             self.lcd_verify_length.display(self.beta0_rank-self.beta1_rank*math.cos(math.radians(joint_angle)))
         self.UpdateJointLCD(joint_angle)
     def UpdateJointLCD(self,joint_val):
+
         if self.radio_joint1.isChecked() & self.joint_angle_update[0]:
+            print("update joint 1")
             self.lcd_ang_1.display(joint_val)
         elif self.radio_joint2.isChecked() & self.joint_angle_update[1]:
+            print("update joint 2")
             self.lcd_ang_2.display(joint_val)
-        elif self.radio_joint3_isChecked() & self.joint_angle_update[2]:
+        elif self.radio_joint3.isChecked() & self.joint_angle_update[2]:  
+            print("update joint 3")
             self.lcd_ang_3.display(joint_val)
+        
     def Joint1Select(self):
         if self.radio_joint_lock:
             self.radio_joint_lock = False
@@ -154,4 +162,5 @@ class CylnCalibWindow(QDialog):
         self.btn_set_l2.setText('Set')
         self.btn_set_l3.setText('Set')
 
-
+    def UpdateExo(self):
+        print("do nothing now")
