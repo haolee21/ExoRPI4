@@ -8,6 +8,7 @@ Valves_hub::Valves_hub()
       pwmRecorder("PWM", PWM_HEADER), // TODO: use correct valve names, perhaps adding it in shared file with Teensy
       teensyValveCon(1)
 {
+    std::cout<<"Valve_hub construct\n";
     // Do not set any valve condition here, it will crash
     // I believe the reason is because TeensyI2C is not created yet
     // I guess the behavior of initialization list is different from I thought
@@ -36,7 +37,6 @@ void Valves_hub::UpdateValve()
 {
 
     Valves_hub &hub = Valves_hub::GetInstance();
-
     // MPC check
     const std::array<double, SensorHub::NUMPRE> &pre_data = SensorHub::GetPreData(); // use ref to avoid copy
     // TODO: fix this recording
@@ -45,7 +45,7 @@ void Valves_hub::UpdateValve()
     //                             pre_data[(unsigned)SensorHub::AdcName::Pos]
     //                             ,hub.PWM_Duty[(unsigned)PWM_ID::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]
     //                             ,hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]);
-
+    
     auto lkra_con_mode = hub.lkra_con.GetControlMode();
     if (lkra_con_mode == JointCon::ConMode::kPreCon)
     {

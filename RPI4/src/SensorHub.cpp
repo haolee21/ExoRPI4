@@ -109,7 +109,7 @@ void SensorHub::UpdateREnc()
     int hip_s_pos = senHub.RHipS_Enc.ReadPos();
     int kne_s_pos = senHub.RKneS_Enc.ReadPos();
     int ank_s_pos = senHub.RAnkS_Enc.ReadPos();
-    int ank_s_pos_ori = ank_s_pos;
+    // int ank_s_pos_ori = ank_s_pos;
 
     if(hip_s_pos>2048){
         hip_s_pos = hip_s_pos%2048-2048;
@@ -117,15 +117,18 @@ void SensorHub::UpdateREnc()
     if(ank_s_pos>2048){
         ank_s_pos = ank_s_pos%2048-2048;
     }
-
+    // std::cout<<"rhip: "<<hip_s_pos<<std::endl;
+    // std::cout<<"rkne: "<<kne_s_pos<<std::endl;
+    // std::cout<<"rank: "<<ank_s_pos<<std::endl;
+    // // std::cout<<"rkne: "<<kne_s_pos<<std::endl;
     senHub.EncData[SensorHub::RHipS]=hip_s_pos/4096.0*360;   ////TODO: read the correct encoder when encoders connected
-    // senHub.EncData[SensorHub::RHipF]=senHub.RKneS_Enc.ReadPos();
+    // // senHub.EncData[SensorHub::RHipF]=senHub.RKneS_Enc.ReadPos();
     senHub.EncData[SensorHub::RKneS]=kne_s_pos/4096.0*360;
     senHub.EncData[SensorHub::RAnkS]=ank_s_pos/4096.0*360;
-    // std::cout<<ank_s_pos_ori<<std::endl;
-    // senHub.EncData[SensorHub::RAnkF]=senHub.RKneS_Enc.ReadPos();
-    // std::cout<<senHub.EncData[SensorHub::RKneS]<<std::endl;
-    // std::cout<<senHub.EncData[SensorHub::RHipS]<<','<<senHub.EncData[SensorHub::RKneS]<<','<<senHub.EncData[SensorHub::RAnkS]<<std::endl;
+    // // std::cout<<ank_s_pos_ori<<std::endl;
+    // // senHub.EncData[SensorHub::RAnkF]=senHub.RKneS_Enc.ReadPos();
+    // // std::cout<<senHub.EncData[SensorHub::RKneS]<<std::endl;
+    // // std::cout<<senHub.EncData[SensorHub::RHipS]<<','<<senHub.EncData[SensorHub::RKneS]<<','<<senHub.EncData[SensorHub::RAnkS]<<std::endl;
     std::array<double,NUMENC/2> curMea{senHub.EncData[SensorHub::RHipS],senHub.EncData[SensorHub::RKneS],senHub.EncData[SensorHub::RAnkS]};
     senHub.REncRecorder.PushData(curMea);
 }

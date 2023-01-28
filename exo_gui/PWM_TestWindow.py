@@ -8,8 +8,8 @@ from Common import *
 class PWM_TestWindow(QWidget):
     def __init__(self,parent=None):
         super().__init__()
-        self.parent =parent
-        uic.loadUi('PWM_TestFun.ui',self)
+        self.parent = parent
+        uic.loadUi('UI/PWM_TestFun.ui',self)
         self.btn_LKneExtDuty_start = self.findChild(QPushButton,'btn_LKneExtDuty_start')
         self.btn_LKneFlexDuty_start=self.findChild(QPushButton,'btn_LKneFlexDuty_start')
         self.btn_LAnkExtDuty_start = self.findChild(QPushButton,'btn_LAnkExtDuty_start')

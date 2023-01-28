@@ -12,8 +12,8 @@ from ExoDataStruct import *
 class PlotPressureWindow(QWidget):
     def __init__(self,parent=None):
         super().__init__()
-        self.parent =parent
-        uic.loadUi('two_col_graph.ui',self)
+        self.parent = parent
+        uic.loadUi('UI/two_col_graph.ui',self)
         self.left_plot_widget = self.findChild(GraphicsLayoutWidget,'left_graphicsView')
         self.left_plot_widget.setBackground('w')
 
@@ -68,7 +68,6 @@ class PlotPressureWindow(QWidget):
 
         self.right_plot_widget = self.findChild(GraphicsLayoutWidget,'right_graphicsView')
         self.right_plot_widget.setBackground('w')
-        # self.right_kneePre_plot.setYRange(-30,self.parent.max_pressure) #TODO: change the unit back to psi when fully integrated
         self.right_tank_plot = self.right_plot_widget.addPlot(colspan=1,title='Right Tank Pressure')
         self.right_tank_plot.setYRange(-1,self.parent.max_pressure)
         self.right_tank_plot.setLabel('left','Pressure (psi)')
@@ -119,17 +118,17 @@ class PlotPressureWindow(QWidget):
 
 
         # init data
-        self.l_tank_data = deque([0.0]*parent.dataLen)
-        self.l_kne_ext_data = deque([0.0]*parent.dataLen)
-        self.l_kne_flex_data = deque([0.0]*parent.dataLen)
-        self.l_ank_ext_data = deque([0.0]*parent.dataLen)
-        self.l_ank_flex_data = deque([0.0]*parent.dataLen)
+        self.l_tank_data = deque([0.0]*self.parent.dataLen)
+        self.l_kne_ext_data = deque([0.0]*self.parent.dataLen)
+        self.l_kne_flex_data = deque([0.0]*self.parent.dataLen)
+        self.l_ank_ext_data = deque([0.0]*self.parent.dataLen)
+        self.l_ank_flex_data = deque([0.0]*self.parent.dataLen)
 
-        self.r_tank_data = deque([0.0]*parent.dataLen)
-        self.r_kne_ext_data = deque([0.0]*parent.dataLen)
-        self.r_kne_flex_data = deque([0.0]*parent.dataLen)
-        self.r_ank_ext_data = deque([0.0]*parent.dataLen)
-        self.r_ank_flex_data = deque([0.0]*parent.dataLen)
+        self.r_tank_data = deque([0.0]*self.parent.dataLen)
+        self.r_kne_ext_data = deque([0.0]*self.parent.dataLen)
+        self.r_kne_flex_data = deque([0.0]*self.parent.dataLen)
+        self.r_ank_ext_data = deque([0.0]*self.parent.dataLen)
+        self.r_ank_flex_data = deque([0.0]*self.parent.dataLen)
 
 
     def UpdateData(self,data):
@@ -155,7 +154,7 @@ class PlotPressureWindow(QWidget):
         # self.left_ankle_flex_line.setData(self.l_ank_flex_data)
 
         #right, 
-        # TODO: use the correct unit and data
+        
 
         self.r_tank_data.popleft()
         self.r_tank_data.append(data[RTANK_ADC]*0.003125-25)

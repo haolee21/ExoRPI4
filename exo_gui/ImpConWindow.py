@@ -1,7 +1,7 @@
 from pickle import FALSE
 from socketserver import UDPServer
 from PyQt5 import uic
-from PyQt5.QtWidgets import QWidget,QLabel,QLineEdit,QPushButton
+from PyQt5.QtWidgets import QWidget,QLabel,QLineEdit,QPushButton,QDialog
 from PyQt5.QtGui import QPalette
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
@@ -9,11 +9,11 @@ from functools import partial
 # from TCP_Con import TextToFloat
 from Common import *
 from UdpClient import *
-class ImpWindow(QWidget):
+class ImpWindow(QDialog):
     def __init__(self, parent= None):
-        super().__init__()
-        self.parent = parent
-        uic.loadUi("Imp_window.ui",self)
+        super().__init__(parent)
+        self.setWindowFlags(Qt.Window)
+        uic.loadUi("UI/Imp_window.ui",self)
         self.btn_lkne_set = self.findChild(QPushButton,'btn_lkne_set')
         self.btn_lkne_stop = self.findChild(QPushButton,'btn_lkne_stop')
         self.btn_lank_set = self.findChild(QPushButton,'btn_lank_set')
@@ -61,12 +61,12 @@ class ImpWindow(QWidget):
         line_edit_imp.setPalette(palette)
         line_edit_initF.setPalette(palette)
 
-        self.parent.udp_port.udp_cmd_packet.des_imp_data[joint_idx]=TextToFloat(line_edit_imp.text())
-        self.parent.udp_port.udp_cmd_packet.init_force[joint_idx] = TextToFloat(line_edit_initF.text())
-        self.parent.udp_port.udp_cmd_packet.des_imp_flag[joint_idx]=True
+        self.parent().udp_port.udp_cmd_packet.des_imp_data[joint_idx]=TextToFloat(line_edit_imp.text())
+        self.parent().udp_port.udp_cmd_packet.init_force[joint_idx] = TextToFloat(line_edit_initF.text())
+        self.parent().udp_port.udp_cmd_packet.des_imp_flag[joint_idx]=True
     def ImpStop(self,joint_idx):
         
-        self.parent.udp_port.udp_cmd_packet.con_on_off_data[joint_idx]=False
-        self.parent.udp_port.udp_cmd_packet.con_on_off_flag[joint_idx]=True
-        # self.parent.udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx]=0
-        # self.parent.udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx]=True
+        self.parent().udp_port.udp_cmd_packet.con_on_off_data[joint_idx]=False
+        self.parent().udp_port.udp_cmd_packet.con_on_off_flag[joint_idx]=True
+        # self.parent().udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx]=0
+        # self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx]=True

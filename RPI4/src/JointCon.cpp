@@ -85,7 +85,7 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     this->max_ank_spring_compress = this->cur_ank_force / this->ank_cyln_params.spring_const;
 
     double knee_tot_len = this->knee_cyln_params.cyln_eqn[0] - this->knee_cyln_params.cyln_eqn[1] * cos((180 - knee_angle - this->knee_cyln_params.cyln_eqn[2]) / 180 * M_PI); // the cylinder is calculated by assuming knee angle =180 at full extension
-    double ank_tot_len = this->ank_cyln_params.cyln_eqn[0] - this->ank_cyln_params.cyln_eqn[1] * cos((ankle_angle + 90 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI);
+    double ank_tot_len = this->ank_cyln_params.cyln_eqn[0] - this->ank_cyln_params.cyln_eqn[1] * cos((ankle_angle + 180 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI);
 
     this->knee_cyln_ext_len = knee_tot_len - this->knee_cyln_params.mech_max_len + this->max_knee_spring_compress;
     this->ank_cyln_ext_len = ank_tot_len - this->ank_cyln_params.mech_max_len + this->max_ank_spring_compress;
@@ -99,7 +99,7 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
 
     // calculate moment arm
     this->knee_moment_arm = 0.5 * this->knee_cyln_params.cyln_eqn[1] * sin((180 - knee_angle - this->knee_cyln_params.cyln_eqn[2]) / 180 * M_PI) / knee_tot_len;
-    this->ankle_moment_arm = 0.5 * this->ank_cyln_params.cyln_eqn[1] * sin((ankle_angle + 90 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI);
+    this->ankle_moment_arm = 0.5 * this->ank_cyln_params.cyln_eqn[1] * sin((ankle_angle + 180 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI) / ank_tot_len;
 
     // record old data
 
@@ -392,3 +392,5 @@ double JointCon::GetPre_KPa(double pre_adc)
 {
     return (pre_adc / 65536 * 4.096 - 0.5) * 50 * 6.89476;
 }
+
+
