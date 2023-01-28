@@ -5,7 +5,8 @@ from ExoDataStruct import *
 class PwmValueWindow(QWidget):
     def __init__(self,parent=None):
         super().__init__()
-        uic.loadUi('PWM_value_window.ui',self)
+        self.parent = parent
+        uic.loadUi('UI/PWM_value_window.ui',self)
         self.lcd_ltank = self.findChild(QLCDNumber,'lcd_ltank')
         self.lcd_lkne_ext = self.findChild(QLCDNumber,'lcd_lkne_ext')
         self.lcd_lkne_flex = self.findChild(QLCDNumber,'lcd_lkne_flex')

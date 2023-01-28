@@ -42,6 +42,15 @@ json ExoConfig::LoadJson(std::string file_name)
 
     
 }
+void ExoConfig::LoadPhyParam(std::string name,CylnPhyParams& phy_param,const nlohmann::json &config_file){
+    phy_param.cyln_eqn = LoadJsonArray<double,3>(config_file[name],"CylnEqn");
+    phy_param.chamber_max_len = config_file[name]["CylnChamberMaxLen"];
+    phy_param.mech_max_len = config_file[name]["CylnMaxMechLen"];
+    phy_param.fri_coeff = config_file[name]["FrictionCoeff"];
+    phy_param.piston_area = LoadJsonArray<double,2>(config_file[name],"PistonArea_mm2");
+    phy_param.spring_const = config_file[name]["SpringConst"];
+    phy_param.neutral_pos = config_file[name]["NeutralPos"];
+}
 void ExoConfig::LoadMPC_param(const nlohmann::json &config_file,MPC_Params &mpc_params,std::string name){
     mpc_params.ch[0]= LoadJsonArray<double, MPC_STATE_NUM>(config_file[name]["ch"], "a");
     mpc_params.ch[1] = LoadJsonArray<double, MPC_STATE_NUM>(config_file[name]["ch"], "b");
@@ -49,10 +58,16 @@ void ExoConfig::LoadMPC_param(const nlohmann::json &config_file,MPC_Params &mpc_
     mpc_params.cl[1] = LoadJsonArray<double, MPC_STATE_NUM>(config_file[name]["cl"], "b");
     mpc_params.cali_chamber_len = config_file[name]["calib_len"];
 }
-void ExoConfig::LoadConfigFile(const json &config_file, SystemParam &sys_param, ConfigType config_type)
+void ExoConfig::LoadConfigFile(const json &config_file,ExoConfig::SystemParam &sys_param,  ExoConfig::ConfigType config_type)
 {
-    if (config_type == ConfigType::MPC)
+    
+    // ExoConfig::SystemParam &sys_param = std::ref(ExoConfig::GetInstance().sys_param);
+    // auto sys_param = ExoConfig::SystemParam();
+
+
+    if (config_type ==ExoConfig::ConfigType::MPC)
     {
+        std::cout<<"Load MPC Config\n";
         ExoConfig::LoadMPC_param(config_file,sys_param.left_tank_subtank,"LTankSubtank");
         ExoConfig::LoadMPC_param(config_file,sys_param.left_subtank_knee,"LTankKnee");
         ExoConfig::LoadMPC_param(config_file,sys_param.left_subtank_ank,"LTankAnk");
@@ -70,61 +85,30 @@ void ExoConfig::LoadConfigFile(const json &config_file, SystemParam &sys_param, 
 
         std::cout << "size: " << config_file["LTankSubtank"]["ch"]["a"].size() << std::endl;
     }
-    else if(config_type==ConfigType::Phy){
+    else if(config_type==ExoConfig::ConfigType::Phy){
         //cylinder length equation
-        sys_param.left_knee_phy.cyln_eqn = LoadJsonArray<double,3>(config_file["CylnEqn"],"LeftKnee");
-        sys_param.left_ankle_phy.cyln_eqn = LoadJsonArray<double,3>(config_file["CylnEqn"],"LeftAnkle");
-        sys_param.right_knee_phy.cyln_eqn = LoadJsonArray<double,3>(config_file["CylnEqn"],"RightKnee");
-        sys_param.right_ankle_phy.cyln_eqn = LoadJsonArray<double,3>(config_file["CylnEqn"],"RightAnkle");
-
-        //Max cylinder chamber length
-        sys_param.left_knee_phy.chamber_max_len = config_file["CylnChamberMaxLen"]["LeftKnee"];
-        sys_param.left_ankle_phy.chamber_max_len = config_file["CylnChamberMaxLen"]["LeftAnkle"];
-        sys_param.right_knee_phy.chamber_max_len = config_file["CylnChamberMaxLen"]["RightKnee"];
-        sys_param.right_ankle_phy.chamber_max_len = config_file["CylnChamberMaxLen"]["RightAnkle"];
-        
-        // Mech max length (spring+etc)
-        sys_param.left_knee_phy.mech_max_len = config_file["CylnMaxMechLen"]["LeftKnee"];
-        sys_param.left_ankle_phy.mech_max_len = config_file["CylnMaxMechLen"]["LeftAnkle"];
-        sys_param.right_knee_phy.mech_max_len = config_file["CylnMaxMechLen"]["RightKnee"];
-        sys_param.right_ankle_phy.mech_max_len = config_file["CylnMaxMechLen"]["RightAnkle"];
-        
-
-        //Friction coeff
-        sys_param.left_knee_phy.fri_coeff = config_file["FrictionCoeff"]["LeftKnee"];
-        sys_param.left_ankle_phy.fri_coeff = config_file["FrictionCoeff"]["LeftAnkle"];
-        sys_param.right_knee_phy.fri_coeff = config_file["FrictionCoeff"]["RightKnee"];
-        sys_param.right_ankle_phy.fri_coeff = config_file["FrictionCoeff"]["RightAnkle"];
-        
-        //Piston area
-        sys_param.left_knee_phy.piston_area = LoadJsonArray<double,2>(config_file["PistonArea_mm2"],"LeftKnee");
-        sys_param.left_ankle_phy.piston_area = LoadJsonArray<double,2>(config_file["PistonArea_mm2"],"LeftAnkle");
-        sys_param.right_knee_phy.piston_area = LoadJsonArray<double,2>(config_file["PistonArea_mm2"],"RightKnee");
-        sys_param.right_ankle_phy.piston_area = LoadJsonArray<double,2>(config_file["PistonArea_mm2"],"RightAnkle");
-        std::cout<<"done loading cylinder length\n";
-        //Spring constant
-        sys_param.left_knee_phy.spring_const = config_file["SpringConst"]["LeftKnee"];
-        sys_param.left_ankle_phy.spring_const = config_file["SpringConst"]["LeftAnkle"];
-        sys_param.right_knee_phy.spring_const = config_file["SpringConst"]["RightKnee"];
-        sys_param.right_ankle_phy.spring_const = config_file["SpringConst"]["RightAnkle"];
-        //Neutral position, at these points, impedance =0
-        sys_param.left_knee_phy.neutral_pos = config_file["NeutralPos"]["LeftKnee"];
-        sys_param.left_ankle_phy.neutral_pos = config_file["NeutralPos"]["LeftAnkle"];
-        sys_param.right_knee_phy.neutral_pos = config_file["NeutralPos"]["RightKnee"];
-        sys_param.right_ankle_phy.neutral_pos = config_file["NeutralPos"]["RightAnkle"];
+        std::cout<<"Load Phy Config\n";
+        ExoConfig::LoadPhyParam("LeftKnee",sys_param.left_knee_phy,config_file);
+        ExoConfig::LoadPhyParam("LeftAnkle",sys_param.left_ankle_phy,config_file);
+        ExoConfig::LoadPhyParam("RightKnee",sys_param.right_knee_phy,config_file);
+        ExoConfig::LoadPhyParam("RightAnkle",sys_param.right_ankle_phy,config_file);
     }
-    std::cout << config_file["Name"] <<"  "<< config_file["ConfigVersion"] << std::endl;
+    else{
+        std::cout<<"ExoConfig type wrong\n";
+    }
+    
+    // std::cout << config_file["Name"] <<"  "<< config_file["ConfigVersion"] << std::endl;
     std::cout << "done loading\n";
 }
 ExoConfig::ExoConfig()
 {
     //load default config files
-    
-    auto config_file = ExoConfig::LoadJson("mpc_config.json");
-    ExoConfig::LoadConfigFile(config_file,this->sys_param,ExoConfig::ConfigType::MPC);
+    std::cout<<"begin config file loading\n";
     auto exo_config_file = ExoConfig::LoadJson("exo_config.json");
-    ExoConfig::LoadConfigFile(exo_config_file,this->sys_param,ExoConfig::ConfigType::Phy);
-
+    ExoConfig::LoadConfigFile(exo_config_file,this->sys_param,  ExoConfig::ConfigType::Phy);
+    std::cout<<"end config file loading\n";
+    auto config_file = ExoConfig::LoadJson("mpc_config.json");
+    ExoConfig::LoadConfigFile(config_file,this->sys_param, ExoConfig::ConfigType::MPC);
 }
 ExoConfig::~ExoConfig()
 {

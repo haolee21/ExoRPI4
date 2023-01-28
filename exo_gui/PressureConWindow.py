@@ -1,14 +1,15 @@
 from PyQt5 import uic
-from PyQt5.QtWidgets import QWidget,QLabel,QLineEdit,QPushButton
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QLineEdit,QPushButton,QDialog
 from functools import partial
 # from TCP_Con import TCP, TextToFloat
 from UdpClient import *
 from Common import *
-class PressureConWindow(QWidget):
+class PressureConWindow(QDialog):
     def __init__(self,parent=None):
-        super().__init__()
-        self.parent =parent
-        uic.loadUi('PressureCon_window.ui',self)
+        super().__init__(parent)
+        self.setWindowFlags(Qt.Window) # if you don't set it, it will not show up in alt-tab (for QDialog)
+        uic.loadUi('UI/PressureCon_window.ui',self)
 
 
         self.LKneExt_pre=self.findChild(QLineEdit,'lineEdit_LKneExtPre')
@@ -67,8 +68,8 @@ class PressureConWindow(QWidget):
 
 
     def PreStartClicked(self,chamber_idx,pre_lineEdit):
-        self.parent.udp_port.udp_cmd_packet.des_pre_data[chamber_idx]=TextToFloat(pre_lineEdit.text())
-        self.parent.udp_port.udp_cmd_packet.des_pre_flag[chamber_idx]=True
+        self.parent().udp_port.udp_cmd_packet.des_pre_data[chamber_idx]=TextToFloat(pre_lineEdit.text())
+        self.parent().udp_port.udp_cmd_packet.des_pre_flag[chamber_idx]=True
     def DutyStopClicked(self,chamber_idx):
-        self.parent.udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx]=0
-        self.parent.udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx]=True
+        self.parent().udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx]=0
+        self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx]=True

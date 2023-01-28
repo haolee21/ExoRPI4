@@ -23,6 +23,7 @@ from PwmValueWindow import *
 from PressureConWindow import *
 from ImpactCon import *
 from CylinderCalibrationWindow import *
+from ConfigLoader import *
 
 import math
 import time
@@ -45,7 +46,7 @@ class MW(QMainWindow):
         self.app = QApplication([])
         self.systemInfo = _systemInfo
         super().__init__()
-        uic.loadUi('exo_gui_mw.ui',self)
+        uic.loadUi('UI/exo_gui_mw.ui',self)
         self.setWindowTitle('Bionics LLExo')
 
         # self.tcp_port = TCP()
@@ -54,6 +55,7 @@ class MW(QMainWindow):
         self.dataLen=DATALEN
         self.max_pressure=100.0 #max pressure is 80 psi
         #init all windows, otherwise all data will be lost when we close it
+        self.config_loader = ConfigLoader()
         self.con_window = ConnectionWindow(self)
         self.joint_plot_window = PlotJointWindow(self)
         self.pressure_plot_window=PlotPressureWindow(self)
@@ -63,6 +65,8 @@ class MW(QMainWindow):
         self.pre_con_window = PressureConWindow(self)
         self.impact_con_window = ImpactCon(self)
         self.cylinder_calib_window = CylnCalibWindow(self)
+
+        
         # jointUpdateCB = lambda data:self.joint_plot_window.UpdateData(self,data)
         # preUpdateCB = lambda data:self.pressure_plot_window.UpdateData(self,data)
         # self.tcp_port.SetCallBack(jointUpdateCB,preUpdateCB)
@@ -180,8 +184,8 @@ class MW(QMainWindow):
 
 
         # set MPC condition display
-        self.off_led = QPixmap('off_led.png')
-        self.on_led = QPixmap('on_led.png')
+        self.off_led = QPixmap('Resource/off_led.png')
+        self.on_led = QPixmap('Resource/on_led.png')
         self.led_mpc_lknee = self.findChild(QLabel,'LED_LKnee')
         self.led_mpc_rknee = self.findChild(QLabel,'LED_RKnee')
         self.led_mpc_lank = self.findChild(QLabel,'LED_LAnk')

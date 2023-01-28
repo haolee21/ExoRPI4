@@ -1,9 +1,9 @@
 import math
-
+import pdb
 '''Calibrating the equation for Cylinder_length(joint_angle)'''
 # it is defined as l = beta0+beta*angle
 def GetJointLenEqn(theta_list,l_list):
-    if(len(theta_list)!=l_list):
+    if(len(theta_list)!=len(l_list)):
         print('theta and l have different length')
         return -1
     if(len(theta_list)!=3):
@@ -15,7 +15,6 @@ def GetJointLenEqn(theta_list,l_list):
     theta1=math.radians(theta_list[0])
     theta2=math.radians(theta_list[1])
     theta3=math.radians(theta_list[2])
-
     k1 = (l2**2-l1**2)/(l3**2-l2**2)
     k2 = (l3**2-l1**2)/(l3**2-l2**2)
     p1 = k1*math.sin((theta1-theta3)/2)
@@ -29,15 +28,15 @@ def GetJointLenEqn(theta_list,l_list):
     alpha1 = theta1-alpha
     alpha2 = theta2-alpha
     alpha3 = theta3-alpha
-    beta1_0 = (l2^2-l1^2)/(math.cos(alpha1)-math.cos(alpha2))
-    beta1_1 = (l3^2-l2^2)/(math.cos(alpha2)-math.cos(alpha3))
+    beta1_0 = (l2**2-l1**2)/(math.cos(alpha1)-math.cos(alpha2))
+    beta1_1 = (l3**2-l2**2)/(math.cos(alpha2)-math.cos(alpha3))
     beta1 = (beta1_0+beta1_1)/2
     
-    beta0_0 = beta1*math.cos(alpha1)+l1^2
-    beta0_1 = beta1*math.cos(alpha2)+l2^2
-    beta0_2 = beta1*math.cos(alpha3)+l3^2
+    beta0_0 = beta1*math.cos(alpha1)+l1**2
+    beta0_1 = beta1*math.cos(alpha2)+l2**2
+    beta0_2 = beta1*math.cos(alpha3)+l3**2
 
     beta0 = (beta0_0+beta0_1+beta0_2)/3
 
-    return beta0,beta1/math.pi*180 #transform it back to degrees
+    return beta0,beta1,alpha/math.pi*180 #transform it back to degrees
 

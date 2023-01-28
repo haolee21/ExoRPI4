@@ -64,7 +64,8 @@ public:
     };
 
     static nlohmann::json LoadJson(std::string file_name);
-    static void LoadConfigFile(const nlohmann::json &file, SystemParam &sys_param, ConfigType config_type);
+    static void LoadConfigFile(const nlohmann::json &file,ExoConfig::SystemParam &sys_param, ConfigType config_type);
+    //Since LoadConfigFile will be called in the constructor, I cannot call GetInstance() inside it
     // void SaveConfigFile(std::string file_name);
     ExoConfig(const ExoConfig &)=delete;
     static ExoConfig &GetInstance();
@@ -74,7 +75,7 @@ private:
     ExoConfig();
     SystemParam sys_param;
     static void LoadMPC_param(const nlohmann::json &config_file,MPC_Params &mpc_params,std::string name);
-
+    static void LoadPhyParam(std::string cyln_name,CylnPhyParams& phy_param,const nlohmann::json &config_file);
 };
 
 #endif

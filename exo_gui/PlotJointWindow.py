@@ -9,10 +9,10 @@ from ExoDataStruct import *
 
 from TCP_Con import DOUBLE_SIZE
 class PlotJointWindow(QWidget):
-    def __init__(self,parent=None):
+    def __init__(self,parent=None):  #FIXME: QWidget does not have parent........... only QDialog has, that is why we need to create parent in this weird way....
         super().__init__()
-        uic.loadUi('two_col_graph.ui',self)
         self.parent = parent
+        uic.loadUi('UI/two_col_graph.ui',self)
         self.left_plot_widget = self.findChild(GraphicsLayoutWidget,'left_graphicsView')
         self.left_plot_widget.setBackground('w')
 
@@ -65,17 +65,17 @@ class PlotJointWindow(QWidget):
         self.setWindowTitle('Joint Angles')
 
         # init data
-        self.l_hipData= deque([0.0]*parent.dataLen)
+        self.l_hipData= deque([0.0]*self.parent.dataLen)
         self.left_hip_line.setData(self.l_hipData)
-        self.l_kneeData = deque([0.0]*parent.dataLen)
+        self.l_kneeData = deque([0.0]*self.parent.dataLen)
         self.left_knee_line.setData(self.l_kneeData)
-        self.l_ankData = deque([0.0]*parent.dataLen)
+        self.l_ankData = deque([0.0]*self.parent.dataLen)
         self.left_ankle_line.setData(self.l_ankData)
-        self.r_hipData = deque([0.0]*parent.dataLen)
+        self.r_hipData = deque([0.0]*self.parent.dataLen)
         self.right_hip_line.setData(self.r_hipData)
-        self.r_kneeData = deque([0.0]*parent.dataLen)
+        self.r_kneeData = deque([0.0]*self.parent.dataLen)
         self.right_knee_line.setData(self.r_kneeData)
-        self.r_ankData = deque([0.0]*parent.dataLen)
+        self.r_ankData = deque([0.0]*self.parent.dataLen)
         self.right_ankle_line.setData(self.r_ankData)
         
     def UpdateData(self,data):
