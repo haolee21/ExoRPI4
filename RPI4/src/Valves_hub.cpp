@@ -58,7 +58,6 @@ void Valves_hub::UpdateValve()
             hub.lkra_con.GetPreCon(hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex], pre_con_mode);
             break;
         case JointCon::PreCon::kSubTank:
-            // std::cout<<"call pressure control\n";
             hub.lkra_con.GetPreCon(hub.PWM_Duty[(unsigned)PWM_ID::kLTank], pre_con_mode);
             break;
         default:

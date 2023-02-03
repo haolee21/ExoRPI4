@@ -67,6 +67,9 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     this->knee_ank_con.UpdateMeas(p_knee_ext, p_ank_ext, knee_ank_duty);
     this->tank_con.UpdateMeas(p_main_tank, p_sub_tank, tank_duty);
 
+    this->p_knee_ext = p_knee_ext;
+    this->p_ank_ext = p_ank_ext;
+    this->p_knee_flex = p_knee_flex;
     this->p_sub_tank = p_sub_tank;
     this->p_main_tank = p_main_tank;
     this->cur_knee_ang = knee_angle;
@@ -375,6 +378,7 @@ void JointCon::GetPreCon(u_int8_t &duty, JointCon::PreCon pre_con_mode)
     {
 
     case JointCon::PreCon::kKneExt:
+        
         duty = this->knee_ext_con.GetPreControl(des_pre_array, this->p_knee_ext, this->p_sub_tank, this->knee_cyln_params.chamber_max_len / this->knee_cyln_ext_len);
         break;
     case JointCon::PreCon::kSubTank:

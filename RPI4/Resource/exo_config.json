@@ -16,8 +16,8 @@
         "NeutralPos": 0
     },
     "LeftAnkle": {
-        "CylnMaxMechLen": 20,
-        "CylnChamberMaxLen": 127,
+        "CylnMaxMechLen": 419.18,
+        "CylnChamberMaxLen": 152.4,
         "FrictionCoeff": 14.0058,
         "PistonArea_mm2": [
             387.096,
@@ -32,7 +32,7 @@
         "NeutralPos": 0
     },
     "RightKnee": {
-        "CylnMaxMechLen": 20,
+        "CylnMaxMechLen": 462.5,
         "CylnChamberMaxLen": 152.4,
         "FrictionCoeff": 14.0058,
         "PistonArea_mm2": [
@@ -48,8 +48,8 @@
         "NeutralPos": 0
     },
     "RightAnkle": {
-        "CylnMaxMechLen": 20,
-        "CylnChamberMaxLen": 127,
+        "CylnMaxMechLen": 419.18,
+        "CylnChamberMaxLen": 152.4,
         "FrictionCoeff": 14.0058,
         "PistonArea_mm2": [
             387.096,
