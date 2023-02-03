@@ -18,7 +18,7 @@ public:
     {
         std::array<std::array<double, MPC_STATE_NUM>, 2> ch;
         std::array<std::array<double, MPC_STATE_NUM>, 2> cl;
-        double cali_chamber_len; //unit: mm, the length of the chamber during static calibration
+        double cali_chamber_len=1; //unit: mm, the length of the chamber during static calibration
     };
     struct CylnPhyParams
     {
@@ -37,16 +37,16 @@ public:
         MPC_Params left_tank_subtank;
         MPC_Params left_subtank_knee;
         MPC_Params left_subtank_ank;
-        MPC_Params left_knee_ank;
-        MPC_Params left_knee_ext_flex;
-        MPC_Params left_ank_ext_flex;
+        MPC_Params left_knee_right_ank;
+        // MPC_Params left_knee_ext_flex;
+        // MPC_Params left_ank_pla_flex;
 
         MPC_Params right_tank_subtank;
         MPC_Params right_subtank_knee;
         MPC_Params right_subtank_ank;
-        MPC_Params right_knee_ank;
-        MPC_Params right_knee_ext_flex;
-        MPC_Params right_ank_ext_flex;
+        MPC_Params right_knee_left_ank;
+        // MPC_Params right_knee_ext_flex;
+        // MPC_Params right_ank_pla_flex;
         
         // MPC_Param left_ank_ext;
         // MPC_Param lk_ra_ext; // left knee to right ankle

@@ -16,6 +16,7 @@
 #include "DigitalFilter.hpp"
 
 #define DEG (360.0f/4096.0f)
+#define ADC_NAME "Time"
 
 class SensorHub
 // this is a singleton class since it is directly link to the hardware, 
@@ -37,7 +38,7 @@ public:
     static SensorHub& GetInstance();
     static const std::array<double,NUMENC>& GetEncData(); //I did not use lock here since they will be read-only arrays
     static const std::array<double,NUMPRE>& GetPreData(); //While data may not be sync, but it will be the most recent one
-    static const std::array<double,NUMPRE>& GetPreFiltered(); //get the filtered pressure reading
+    // static const std::array<double,NUMPRE>& GetPreFiltered(); //get the filtered pressure reading
 
     SensorHub(const SensorHub&) = delete; // prevent copy singleton
 
@@ -60,6 +61,8 @@ public:
         LKneExt = kPreSen2,
         LAnkExt = kPreSen1, //TODO: check it whenever you reconnect the pressure sensors
     };
+    const std::string kAdc_Header = "Time,LAnkExt,LKneExt,na,na,na,na,na,na,RLTank,LKneFlex,RKneFlex,LTank,na,Tank,RAnkExt,RKneExt";
+    
     // Pressure sensor index need to be assigned since it is determine by ADC channels
     
 

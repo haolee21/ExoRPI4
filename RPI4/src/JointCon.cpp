@@ -3,10 +3,11 @@
 
 #include "JointCon.hpp"
 
-JointCon::JointCon(ExoConfig::MPC_Params knee_ext_params, ExoConfig::MPC_Params knee_flex_params, ExoConfig::MPC_Params ank_ext_params, ExoConfig::MPC_Params knee_ank_params,
+JointCon::JointCon(ExoConfig::MPC_Params knee_ext_params, ExoConfig::MPC_Params ank_ext_params, ExoConfig::MPC_Params knee_ank_params,
                    ExoConfig::MPC_Params tank_params, ExoConfig::CylnPhyParams knee_cyln_params, ExoConfig::CylnPhyParams ank_cyln_params, std::string joint_con_name)
     : knee_ext_con(knee_ext_params, joint_con_name + "_knee_ext"),
-      knee_flex_con(knee_flex_params, joint_con_name + "_knee_flex"), ank_ext_con(ank_ext_params, joint_con_name + "_ank_ext"), knee_ank_con(knee_ank_params, joint_con_name + "_knee_ank"), tank_con(tank_params, joint_con_name + "_tank"),
+      //knee_flex_con(knee_flex_params, joint_con_name + "_knee_flex"),
+      ank_ext_con(ank_ext_params, joint_con_name + "_ank_ext"), knee_ank_con(knee_ank_params, joint_con_name + "_knee_ank"), tank_con(tank_params, joint_con_name + "_tank"),
       knee_cyln_params(knee_cyln_params), ank_cyln_params(ank_cyln_params),
       vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b), force_pre_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b),
       p_ext_rec_diff_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b),
@@ -61,7 +62,7 @@ void JointCon::ResetControl(){
 void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, const double &p_ank_ext, const double &p_sub_tank, const double &p_main_tank, const double &knee_angle, const double &ankle_angle, const u_int8_t knee_ext_duty, const u_int8_t knee_flex_duty, const u_int8_t ank_ext_duty, const u_int8_t knee_ank_duty, const u_int8_t tank_duty)
 {
     this->knee_ext_con.UpdateMeas(p_sub_tank, p_knee_ext, knee_ext_duty);
-    this->knee_flex_con.UpdateMeas(p_knee_ext, p_knee_flex, knee_flex_duty);
+    // this->knee_flex_con.UpdateMeas(p_knee_ext, p_knee_flex, knee_flex_duty);
     this->ank_ext_con.UpdateMeas(p_sub_tank, p_ank_ext, ank_ext_duty);
     this->knee_ank_con.UpdateMeas(p_knee_ext, p_ank_ext, knee_ank_duty);
     this->tank_con.UpdateMeas(p_main_tank, p_sub_tank, tank_duty);
@@ -84,11 +85,20 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     this->max_knee_spring_compress = this->cur_knee_force / this->knee_cyln_params.spring_const; // unit in mm, piston area=0 for air reservoir
     this->max_ank_spring_compress = this->cur_ank_force / this->ank_cyln_params.spring_const;
 
-    double knee_tot_len = this->knee_cyln_params.cyln_eqn[0] - this->knee_cyln_params.cyln_eqn[1] * cos((180 - knee_angle - this->knee_cyln_params.cyln_eqn[2]) / 180 * M_PI); // the cylinder is calculated by assuming knee angle =180 at full extension
-    double ank_tot_len = this->ank_cyln_params.cyln_eqn[0] - this->ank_cyln_params.cyln_eqn[1] * cos((ankle_angle + 180 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI);
+    double knee_tot_len = sqrt(this->knee_cyln_params.cyln_eqn[0] - this->knee_cyln_params.cyln_eqn[1] * cos((180 - knee_angle - this->knee_cyln_params.cyln_eqn[2]) / 180 * M_PI)); // the cylinder is calculated by assuming knee angle =180 at full extension
+    double ank_tot_len = sqrt(this->ank_cyln_params.cyln_eqn[0] - this->ank_cyln_params.cyln_eqn[1] * cos((ankle_angle + 180 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI));
 
-    this->knee_cyln_ext_len = knee_tot_len - this->knee_cyln_params.mech_max_len + this->max_knee_spring_compress;
-    this->ank_cyln_ext_len = ank_tot_len - this->ank_cyln_params.mech_max_len + this->max_ank_spring_compress;
+    // std::cout<<"knee angle: "<<knee_angle<<std::endl;
+   
+
+    this->knee_cyln_ext_len = this->knee_cyln_params.chamber_max_len - this->knee_cyln_params.mech_max_len+knee_tot_len - this->max_knee_spring_compress;
+    // this->knee_cyln_ext_len = knee_tot_len - this->knee_cyln_params.mech_max_len + this->max_knee_spring_compress;
+    // this->ank_cyln_ext_len = ank_tot_len - this->ank_cyln_params.mech_max_len + this->max_ank_spring_compress;
+
+    this->ank_cyln_ext_len = this->ank_cyln_params.chamber_max_len - this->ank_cyln_params.mech_max_len+ank_tot_len-this->max_ank_spring_compress;
+
+   
+
 
     this->knee_cyln_shrk_len = this->knee_cyln_params.chamber_max_len - this->knee_cyln_ext_len;
     this->ank_cyln_shrk_len = this->ank_cyln_params.chamber_max_len - this->ank_cyln_ext_len;
@@ -101,6 +111,7 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     this->knee_moment_arm = 0.5 * this->knee_cyln_params.cyln_eqn[1] * sin((180 - knee_angle - this->knee_cyln_params.cyln_eqn[2]) / 180 * M_PI) / knee_tot_len;
     this->ankle_moment_arm = 0.5 * this->ank_cyln_params.cyln_eqn[1] * sin((ankle_angle + 180 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI) / ank_tot_len;
 
+    
     // record old data
 
     // TODO: add recorder
@@ -112,9 +123,10 @@ void JointCon::RecData()
 {
 
     this->knee_ext_con.RecData();
-    this->knee_flex_con.RecData();
+    // this->knee_flex_con.RecData();
     this->ank_ext_con.RecData();
     this->knee_ank_con.RecData();
+    this->tank_con.RecData();
 }
 /**
  * @brief Get the required duty cycle based on the commanded force, return in joint_duty and bal_duty
@@ -363,7 +375,7 @@ void JointCon::GetPreCon(u_int8_t &duty, JointCon::PreCon pre_con_mode)
     {
 
     case JointCon::PreCon::kKneExt:
-        duty = this->knee_ext_con.GetPreControl(des_pre_array, this->p_knee_ext, this->p_sub_tank, this->knee_ext_con.GetMpcCalibLen() / this->knee_cyln_ext_len);
+        duty = this->knee_ext_con.GetPreControl(des_pre_array, this->p_knee_ext, this->p_sub_tank, this->knee_cyln_params.chamber_max_len / this->knee_cyln_ext_len);
         break;
     case JointCon::PreCon::kSubTank:
         duty = this->tank_con.GetPreControl(des_pre_array, this->p_sub_tank, this->p_main_tank, 1);

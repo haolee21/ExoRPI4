@@ -11,7 +11,7 @@
 class JointCon
 {
 public:
-    JointCon(ExoConfig::MPC_Params knee_ext_params, ExoConfig::MPC_Params knee_flex_params, ExoConfig::MPC_Params ank_ext_params, ExoConfig::MPC_Params kne_ank_params,
+    JointCon(ExoConfig::MPC_Params knee_ext_params, ExoConfig::MPC_Params ank_ext_params, ExoConfig::MPC_Params kne_ank_params,
     ExoConfig::MPC_Params tank_params, ExoConfig::CylnPhyParams knee_cyln_params,ExoConfig::CylnPhyParams ank_cyln_params, std::string joint_con_name);
     ~JointCon();
 
@@ -73,7 +73,7 @@ public:
 private:
     const double kForceTol = 0.5; //if abs(force_err) < kForceTol, don't activate 
     // MPC ext_con, flex_con, tank_con;
-    MPC knee_ext_con,knee_flex_con,ank_ext_con,knee_ank_con,tank_con;
+    MPC knee_ext_con,ank_ext_con,knee_ank_con,tank_con;//knee_flex_con
     ExoConfig::CylnPhyParams knee_cyln_params,ank_cyln_params;
 
     ConMode con_mode = ConMode::kNone;

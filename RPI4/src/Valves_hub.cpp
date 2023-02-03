@@ -1,9 +1,9 @@
 #include "Valves_hub.hpp"
 #include "MPC_param.hpp"
 Valves_hub::Valves_hub()
-    : lkra_con(ExoConfig::GetConfig().left_subtank_knee, ExoConfig::GetConfig().left_knee_ext_flex, ExoConfig::GetConfig().left_subtank_ank, ExoConfig::GetConfig().left_knee_ank,
+    : lkra_con(ExoConfig::GetConfig().left_subtank_knee, ExoConfig::GetConfig().left_subtank_ank, ExoConfig::GetConfig().left_knee_right_ank,
                ExoConfig::GetConfig().left_tank_subtank, ExoConfig::GetConfig().left_knee_phy, ExoConfig::GetConfig().left_ankle_phy, "lkra"),
-      rkla_con(ExoConfig::GetConfig().right_subtank_knee, ExoConfig::GetConfig().right_knee_ext_flex, ExoConfig::GetConfig().right_subtank_ank, ExoConfig::GetConfig().right_knee_ank,
+      rkla_con(ExoConfig::GetConfig().right_subtank_knee, ExoConfig::GetConfig().right_subtank_ank, ExoConfig::GetConfig().right_knee_left_ank,
                ExoConfig::GetConfig().right_tank_subtank, ExoConfig::GetConfig().right_knee_phy, ExoConfig::GetConfig().right_ankle_phy, "rkla"),
       pwmRecorder("PWM", PWM_HEADER), // TODO: use correct valve names, perhaps adding it in shared file with Teensy
       teensyValveCon(1)
@@ -39,17 +39,14 @@ void Valves_hub::UpdateValve()
     Valves_hub &hub = Valves_hub::GetInstance();
     // MPC check
     const std::array<double, SensorHub::NUMPRE> &pre_data = SensorHub::GetPreData(); // use ref to avoid copy
+    const std::array<double, SensorHub::NUMENC> &enc_data = SensorHub::GetEncData();
     // TODO: fix this recording
-    //  hub.left_knee_con.PushMeas(pre_data[(unsigned)SensorHub::AdcName::LKneExt],pre_data[(unsigned)SensorHub::AdcName::LKneFlex],pre_data[(unsigned)SensorHub::AdcName::LAnkExt],
-    //                             pre_data[(unsigned)SensorHub::AdcName::LTank],pre_data[(unsigned)SensorHub::AdcName::Tank],
-    //                             pre_data[(unsigned)SensorHub::AdcName::Pos]
-    //                             ,hub.PWM_Duty[(unsigned)PWM_ID::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]
-    //                             ,hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]);
+    hub.lkra_con.PushMeas(pre_data[(unsigned)SensorHub::AdcName::LKneExt],pre_data[(unsigned)SensorHub::AdcName::LKneFLex],pre_data[(unsigned)SensorHub::AdcName::LAnkExt],pre_data[(unsigned)SensorHub::AdcName::LTank],pre_data[(unsigned)SensorHub::AdcName::Tank],
+    enc_data[SensorHub::EncName::LKneS],enc_data[SensorHub::EncName::LAnkS],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kLTank]);
     
     auto lkra_con_mode = hub.lkra_con.GetControlMode();
     if (lkra_con_mode == JointCon::ConMode::kPreCon)
     {
-
         auto pre_con_mode = hub.lkra_con.GetPreConMode();
         hub.valChanged_flag = true;
         switch (pre_con_mode)
@@ -61,6 +58,7 @@ void Valves_hub::UpdateValve()
             hub.lkra_con.GetPreCon(hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex], pre_con_mode);
             break;
         case JointCon::PreCon::kSubTank:
+            // std::cout<<"call pressure control\n";
             hub.lkra_con.GetPreCon(hub.PWM_Duty[(unsigned)PWM_ID::kLTank], pre_con_mode);
             break;
         default:

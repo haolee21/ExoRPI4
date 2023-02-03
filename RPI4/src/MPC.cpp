@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "MPC.hpp"
-#include "MPC_param.hpp"
+// #include "MPC_param.hpp"
 
 using namespace std;
 
@@ -307,13 +307,30 @@ double MPC::CalculateControl(bool increase_pre, std::array<double, MPC_TIME_HORI
     c_float q[MPC_TIME_HORIZON] = {q_mat.coeff(0, 0), q_mat.coeff(0, 1), q_mat.coeff(0, 2), q_mat.coeff(0, 3), q_mat.coeff(0, 4), q_mat.coeff(0, 5), q_mat.coeff(0, 6), q_mat.coeff(0, 7), q_mat.coeff(0, 8)};
 
     c_int A_nnz = MPC_TIME_HORIZON+2;
-    c_float A_x[MPC_TIME_HORIZON+2] = {1, 1, 1, 1, 1, 1, 1, 1, 1,1,-1};
-    c_int A_i[MPC_TIME_HORIZON+2] = {0,9, 1, 2, 3, 4, 5, 6, 7, 8,9};
-    c_int A_p[MPC_TIME_HORIZON + 3] = {0,  2, 3, 4, 5, 6, 7, 8, 9,11};
-    c_float l[MPC_TIME_HORIZON+1] = {0, 0, 0, 0, 0, 0, 0, 0, 0,0};
-    c_float u[MPC_TIME_HORIZON+1] = {1, 1, 1, 1, 1, 1, 1, 1, 1,1};
+    c_float A_x[MPC_TIME_HORIZON+16] = {1, 1,
+                                       1, -1, 1,
+                                       1, -1, 1,
+                                       1, -1 ,1,
+                                       1, -1, 1,
+                                       1, -1, 1,
+                                       1, -1, 1,
+                                       1, -1, 1,
+                                       1, -1};
+
+    c_int A_i[MPC_TIME_HORIZON+16] = {0, 9,
+                                     1, 9, 10,
+                                     2, 10,11,
+                                     3, 11,12,
+                                     4, 12,13,
+                                     5, 13,14,
+                                     6, 14,15,
+                                     7, 15,16,
+                                     8, 16};
+    c_int A_p[MPC_TIME_HORIZON + 1] = {0,  2, 5, 8, 11,14,17,20,23,25};
+    c_float l[MPC_TIME_HORIZON+8] = {0.15, 0, 0, 0, 0, 0, 0, 0, 0,0,0,0,0,0,0,0,0};
+    c_float u[MPC_TIME_HORIZON+8] = {1, 1, 1, 1, 1, 1, 1, 1, 1,1,1,1,1,1,1,1,1};
     c_int n = MPC_TIME_HORIZON;
-    c_int m = MPC_TIME_HORIZON+1;
+    c_int m = MPC_TIME_HORIZON+8;
     // populate the data
     this->osqp_data->n = n;
     this->osqp_data->m = m;
@@ -342,7 +359,7 @@ double MPC::CalculateControl(bool increase_pre, std::array<double, MPC_TIME_HORI
     Eigen::Matrix<double, MPC_TIME_HORIZON, 1> u_vec;
 
     u_vec << this->u_n, this->u_n1, this->u_n2, this->u_n3, this->u_n4, this->u_n5, this->u_n6, this->u_n7, this->u_n8;
-    // std::cout<<"u vec: "<<u_vec<<std::endl;
+
 
     this->x_n1 = A1 + B1 * u_vec;
     this->x_n2 = A2 + B2 * u_vec;
@@ -374,7 +391,7 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
 
     double p_diff = (p_des[0] - ps); // we scaled the p_diff with the assumption that pressure will have the momentum to go
 
-    if (std::abs(p_diff) > 320) // 640 is 2 psi
+    if (std::abs(p_diff) > 100) // 640 is 2 psi
     {                           // if desired pressure has 1 psi difference, Caution: calculate the diff does not need to consider the 0.5V dc bias
         // std::cout<<"err is large: "<<p_diff<<std::endl;
         // std::cout<<ps-pt<<std::endl;
@@ -420,7 +437,7 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
         }
         else
         {
-            this->cur_dF =this->cur_dF*0.5;
+            this->cur_dF =this->cur_dF*0.5; //FIXME: why 0.5???
             ideal_u=0;
         }
 
@@ -458,7 +475,6 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
         this->u_n2 = 0;
         this->cur_u =0;
     }
-   
     return (int)(this->cur_u*100+0.5);
 
 }
@@ -489,6 +505,7 @@ void MPC::UpdateMeas(double p_set,double p_tank,u_int8_t duty)
 }
 void MPC::RecData()
 {
+   
     this->mpc_rec.PushData(
         std::array<double, 31>{this->cur_F.coeff(0, 0), this->cur_F.coeff(1, 0), this->cur_dF.coeff(0, 0), this->cur_dF.coeff(1, 0),
          this->u_n, this->u_n1, this->u_n2, this->u_n3, this->u_n4,this->u_n5,this->u_n6,this->u_n7,this->u_n8,
@@ -501,7 +518,6 @@ void MPC::UpdateHistory(double p_set, double p_tank,double p_des)
     std::memset(this->p_tank_his.begin(), 0, this->p_tank_his.size());
     std::memset(this->p_set_his.begin(), 0, this->p_set_his.size());
     std::memset(this->u_his.begin(), 0, this->u_his.size());
-
 
     double p_step = (p_des-p_set)/(double)MPC_TIME_HORIZON/65536.0;
     // std::cout<<"p_step: "<<p_step<<std::endl;
