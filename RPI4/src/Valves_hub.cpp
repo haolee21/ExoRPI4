@@ -1,10 +1,10 @@
 #include "Valves_hub.hpp"
 #include "MPC_param.hpp"
 Valves_hub::Valves_hub()
-    : lkra_con(ExoConfig::GetConfig().left_subtank_knee, ExoConfig::GetConfig().left_subtank_ank, ExoConfig::GetConfig().left_knee_right_ank,
-               ExoConfig::GetConfig().left_tank_subtank, ExoConfig::GetConfig().left_knee_phy, ExoConfig::GetConfig().left_ankle_phy, "lkra"),
-      rkla_con(ExoConfig::GetConfig().right_subtank_knee, ExoConfig::GetConfig().right_subtank_ank, ExoConfig::GetConfig().right_knee_left_ank,
-               ExoConfig::GetConfig().right_tank_subtank, ExoConfig::GetConfig().right_knee_phy, ExoConfig::GetConfig().right_ankle_phy, "rkla"),
+    : lkra_con(ExoConfig::GetConfig().left_subtank_knee, ExoConfig::GetConfig().left_subtank_right_ank, ExoConfig::GetConfig().left_knee_right_ank,
+               ExoConfig::GetConfig().left_tank_subtank, ExoConfig::GetConfig().left_knee_phy, ExoConfig::GetConfig().right_ankle_phy, "lkra"),
+      rkla_con(ExoConfig::GetConfig().right_subtank_knee, ExoConfig::GetConfig().right_subtank_left_ank, ExoConfig::GetConfig().right_knee_left_ank,
+               ExoConfig::GetConfig().right_tank_subtank, ExoConfig::GetConfig().right_knee_phy, ExoConfig::GetConfig().left_ankle_phy, "rkla"),
       pwmRecorder("PWM", PWM_HEADER), // TODO: use correct valve names, perhaps adding it in shared file with Teensy
       teensyValveCon(1)
 {
@@ -36,14 +36,19 @@ Valves_hub &Valves_hub::GetInstance()
 void Valves_hub::UpdateValve()
 {
 
-    Valves_hub &hub = Valves_hub::GetInstance();
+Valves_hub &hub = Valves_hub::GetInstance();
     // MPC check
     const std::array<double, SensorHub::NUMPRE> &pre_data = SensorHub::GetPreData(); // use ref to avoid copy
     const std::array<double, SensorHub::NUMENC> &enc_data = SensorHub::GetEncData();
     // TODO: fix this recording
-    hub.lkra_con.PushMeas(pre_data[(unsigned)SensorHub::AdcName::LKneExt],pre_data[(unsigned)SensorHub::AdcName::LKneFLex],pre_data[(unsigned)SensorHub::AdcName::LAnkExt],pre_data[(unsigned)SensorHub::AdcName::LTank],pre_data[(unsigned)SensorHub::AdcName::Tank],
-    enc_data[SensorHub::EncName::LKneS],enc_data[SensorHub::EncName::LAnkS],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kLTank]);
+    hub.lkra_con.PushMeas(pre_data[(unsigned)SensorHub::AdcName::LKneExt],pre_data[(unsigned)SensorHub::AdcName::LKneFLex],pre_data[(unsigned)SensorHub::AdcName::RAnkExt],pre_data[(unsigned)SensorHub::AdcName::LTank],pre_data[(unsigned)SensorHub::AdcName::Tank],
+    enc_data[SensorHub::EncName::LKneS],enc_data[SensorHub::EncName::RAnkS],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kLTank]);
     
+    hub.rkla_con.PushMeas(pre_data[(unsigned)SensorHub::AdcName::RKneExt],pre_data[(unsigned)SensorHub::AdcName::RKneFlex],pre_data[(unsigned)SensorHub::AdcName::LAnkExt],pre_data[(unsigned)SensorHub::AdcName::RTank],pre_data[(unsigned)SensorHub::AdcName::Tank],
+    enc_data[SensorHub::EncName::RKneS],enc_data[SensorHub::EncName::LAnkS],hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kRTank]);
+
+
+
     auto lkra_con_mode = hub.lkra_con.GetControlMode();
     if (lkra_con_mode == JointCon::ConMode::kPreCon)
     {
@@ -53,6 +58,9 @@ void Valves_hub::UpdateValve()
         {
         case JointCon::PreCon::kKneExt:
             hub.lkra_con.GetPreCon(hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt], pre_con_mode);
+            break;
+        case JointCon::PreCon::kAnkPlant:
+            hub.lkra_con.GetPreCon(hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt],pre_con_mode);
             break;
         case JointCon::PreCon::kKneFlex:
             hub.lkra_con.GetPreCon(hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex], pre_con_mode);

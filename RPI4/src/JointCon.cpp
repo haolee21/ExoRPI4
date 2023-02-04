@@ -378,8 +378,11 @@ void JointCon::GetPreCon(u_int8_t &duty, JointCon::PreCon pre_con_mode)
     {
 
     case JointCon::PreCon::kKneExt:
-        
         duty = this->knee_ext_con.GetPreControl(des_pre_array, this->p_knee_ext, this->p_sub_tank, this->knee_cyln_params.chamber_max_len / this->knee_cyln_ext_len);
+        break;
+    case JointCon::PreCon::kAnkPlant:
+        std::cout<<this->ank_cyln_params.chamber_max_len / this->ank_cyln_shrk_len<<std::endl;
+        duty = this->ank_ext_con.GetPreControl(des_pre_array, this->p_ank_ext, this->p_sub_tank, this->ank_cyln_params.chamber_max_len / this->ank_cyln_shrk_len);
         break;
     case JointCon::PreCon::kSubTank:
         duty = this->tank_con.GetPreControl(des_pre_array, this->p_sub_tank, this->p_main_tank, 1);

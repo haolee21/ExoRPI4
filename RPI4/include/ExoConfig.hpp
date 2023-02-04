@@ -36,14 +36,14 @@ public:
         // MPC controller parameters
         MPC_Params left_tank_subtank;
         MPC_Params left_subtank_knee;
-        MPC_Params left_subtank_ank;
+        MPC_Params left_subtank_right_ank;
         MPC_Params left_knee_right_ank;
         // MPC_Params left_knee_ext_flex;
         // MPC_Params left_ank_pla_flex;
 
         MPC_Params right_tank_subtank;
         MPC_Params right_subtank_knee;
-        MPC_Params right_subtank_ank;
+        MPC_Params right_subtank_left_ank;
         MPC_Params right_knee_left_ank;
         // MPC_Params right_knee_ext_flex;
         // MPC_Params right_ank_pla_flex;

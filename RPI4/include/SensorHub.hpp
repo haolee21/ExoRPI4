@@ -52,7 +52,7 @@ public:
     enum class AdcName{ //The order of this enum must follow the order on the pcb board
         
         Tank = kPreSen14,
-        RLTank = kPreSen9,
+        RTank = kPreSen9,
         LTank = kPreSen12,
         LKneFLex=kPreSen10,
         RKneFlex = kPreSen11,

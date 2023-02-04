@@ -70,7 +70,7 @@ void ExoConfig::LoadConfigFile(const json &config_file,ExoConfig::SystemParam &s
         std::cout<<"Load MPC Config\n";
         ExoConfig::LoadMPC_param(config_file,sys_param.left_tank_subtank,"LTankSubtank");
         ExoConfig::LoadMPC_param(config_file,sys_param.left_subtank_knee,"LTankKne");
-        ExoConfig::LoadMPC_param(config_file,sys_param.left_subtank_ank,"LTankAnk");
+        ExoConfig::LoadMPC_param(config_file,sys_param.left_subtank_right_ank,"LTankRAnk");
         ExoConfig::LoadMPC_param(config_file,sys_param.left_knee_right_ank,"LKneRAnk");
         // ExoConfig::LoadMPC_param(config_file,sys_param.left_knee_ext_flex,"LKneeExtFlex");
         // ExoConfig::LoadMPC_param(config_file,sys_param.left_ank_pla_flex,"LTankAnk");
@@ -78,7 +78,7 @@ void ExoConfig::LoadConfigFile(const json &config_file,ExoConfig::SystemParam &s
         
         ExoConfig::LoadMPC_param(config_file,sys_param.right_tank_subtank,"RTankSubtank");
         ExoConfig::LoadMPC_param(config_file,sys_param.right_subtank_knee,"RTankKne");
-        ExoConfig::LoadMPC_param(config_file,sys_param.right_subtank_ank,"RTankAnk");
+        ExoConfig::LoadMPC_param(config_file,sys_param.right_subtank_left_ank,"RTankLAnk");
         ExoConfig::LoadMPC_param(config_file,sys_param.right_knee_left_ank,"RKneLAnk");
         // ExoConfig::LoadMPC_param(config_file,sys_param.right_knee_ext_flex,"RKneeExtFlex");
         // ExoConfig::LoadMPC_param(config_file,sys_param.right_ank_pla_flex,"RTankAnk");
