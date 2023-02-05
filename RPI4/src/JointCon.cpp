@@ -6,7 +6,7 @@
 JointCon::JointCon(ExoConfig::MPC_Params knee_ext_params, ExoConfig::MPC_Params ank_ext_params, ExoConfig::MPC_Params knee_ank_params,
                    ExoConfig::MPC_Params tank_params, ExoConfig::CylnPhyParams knee_cyln_params, ExoConfig::CylnPhyParams ank_cyln_params, std::string joint_con_name)
     : knee_ext_con(knee_ext_params, joint_con_name + "_knee_ext"),
-      //knee_flex_con(knee_flex_params, joint_con_name + "_knee_flex"),
+      // knee_flex_con(knee_flex_params, joint_con_name + "_knee_flex"),
       ank_ext_con(ank_ext_params, joint_con_name + "_ank_ext"), knee_ank_con(knee_ank_params, joint_con_name + "_knee_ank"), tank_con(tank_params, joint_con_name + "_tank"),
       knee_cyln_params(knee_cyln_params), ank_cyln_params(ank_cyln_params),
       vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b), force_pre_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b),
@@ -34,23 +34,24 @@ void JointCon::SetControl(JointCon::ConMode _con_mode, PreCon _pre_con_type, dou
 }
 void JointCon::SetControl(ConMode _con_mode, ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_force)
 {
-    std::array<double,MPC_TIME_HORIZON> cmd_force_array;
-    
-    std::fill_n(cmd_force_array.begin(), cmd_force_array.size(), cmd_force);
-    this->cmd_force[(unsigned)_force_con_type]=cmd_force_array;
-    this->con_mode = _con_mode;
-    this->force_con_type = _force_con_type;
-    this->force_red_type = _force_red_type;
-}
-void JointCon::SetControl(ConMode _con_mode, ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_imp, double cmd_init_force){
-    this->cmd_init_force[(unsigned)_force_con_type]=cmd_init_force;
-    this->cmd_imp[(unsigned)_force_con_type]=cmd_imp;
-    this->con_mode = _con_mode;
-    this->force_con_type = _force_con_type;
-    this->force_red_type = _force_red_type;
+    std::array<double, MPC_TIME_HORIZON> cmd_force_array;
 
+    std::fill_n(cmd_force_array.begin(), cmd_force_array.size(), cmd_force);
+    this->cmd_force[(unsigned)_force_con_type] = cmd_force_array;
+    this->con_mode = _con_mode;
+    this->force_con_type = _force_con_type;
+    this->force_red_type = _force_red_type;
 }
-void JointCon::ResetControl(){
+void JointCon::SetControl(ConMode _con_mode, ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_imp, double cmd_init_force)
+{
+    this->cmd_init_force[(unsigned)_force_con_type] = cmd_init_force;
+    this->cmd_imp[(unsigned)_force_con_type] = cmd_imp;
+    this->con_mode = _con_mode;
+    this->force_con_type = _force_con_type;
+    this->force_red_type = _force_red_type;
+}
+void JointCon::ResetControl()
+{
     this->con_mode = ConMode::kNone;
 }
 // void JointCon::SetKneeMaxPos(double max_pos_val)
@@ -92,16 +93,12 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     double ank_tot_len = sqrt(this->ank_cyln_params.cyln_eqn[0] - this->ank_cyln_params.cyln_eqn[1] * cos((ankle_angle + 180 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI));
 
     // std::cout<<"knee angle: "<<knee_angle<<std::endl;
-   
 
-    this->knee_cyln_ext_len = this->knee_cyln_params.chamber_max_len - this->knee_cyln_params.mech_max_len+knee_tot_len - this->max_knee_spring_compress;
+    this->knee_cyln_ext_len = this->knee_cyln_params.chamber_max_len - this->knee_cyln_params.mech_max_len + knee_tot_len - this->max_knee_spring_compress;
     // this->knee_cyln_ext_len = knee_tot_len - this->knee_cyln_params.mech_max_len + this->max_knee_spring_compress;
     // this->ank_cyln_ext_len = ank_tot_len - this->ank_cyln_params.mech_max_len + this->max_ank_spring_compress;
 
-    this->ank_cyln_ext_len = this->ank_cyln_params.chamber_max_len - this->ank_cyln_params.mech_max_len+ank_tot_len-this->max_ank_spring_compress;
-
-   
-
+    this->ank_cyln_ext_len = this->ank_cyln_params.chamber_max_len - this->ank_cyln_params.mech_max_len + ank_tot_len - this->max_ank_spring_compress;
 
     this->knee_cyln_shrk_len = this->knee_cyln_params.chamber_max_len - this->knee_cyln_ext_len;
     this->ank_cyln_shrk_len = this->ank_cyln_params.chamber_max_len - this->ank_cyln_ext_len;
@@ -114,7 +111,6 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     this->knee_moment_arm = 0.5 * this->knee_cyln_params.cyln_eqn[1] * sin((180 - knee_angle - this->knee_cyln_params.cyln_eqn[2]) / 180 * M_PI) / knee_tot_len;
     this->ankle_moment_arm = 0.5 * this->ank_cyln_params.cyln_eqn[1] * sin((ankle_angle + 180 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI) / ank_tot_len;
 
-    
     // record old data
 
     // TODO: add recorder
@@ -188,8 +184,9 @@ void JointCon::GetForceCon(u_int8_t &charge_duty, u_int8_t &rec_duty, u_int8_t &
         p_act = &this->p_ank_ext;
         p_rec = &this->p_knee_ext;
     }
-    else{
-        std::cerr<<"cannot find force type"<<std::endl;
+    else
+    {
+        std::cerr << "cannot find force type" << std::endl;
         return;
     }
 
@@ -334,8 +331,9 @@ void JointCon::GetImpCon(u_int8_t &charge_duty, u_int8_t &rec_duty, u_int8_t &ba
         des_force = des_imp * (this->cur_ankle_ang - this->ank_cyln_params.neutral_pos);
         des_force_step = des_imp * this->ank_pos_diff;
     }
-    else{
-        std::cerr<<"Incorrect force type (Impedance control)"<<std::endl;
+    else
+    {
+        std::cerr << "Incorrect force type (Impedance control)" << std::endl;
         return;
     }
 
@@ -345,8 +343,8 @@ void JointCon::GetImpCon(u_int8_t &charge_duty, u_int8_t &rec_duty, u_int8_t &ba
         des_force_array[i] = des_force + force_offset;
         des_force -= des_force_step; // TODO: right now I just make it 5% more in the future, note that it will fail when the impedance is negative
     }
-    this->cmd_force[(unsigned)force_con_type]=des_force_array;
-    
+    this->cmd_force[(unsigned)force_con_type] = des_force_array;
+
     this->GetForceCon(charge_duty, rec_duty, balance_duty, tank_duty, force_con_type, force_red_type);
 }
 
@@ -396,13 +394,16 @@ const JointCon::ConMode JointCon::GetControlMode()
 {
     return this->con_mode;
 }
-const JointCon::PreCon JointCon::GetPreConMode(){
+const JointCon::PreCon JointCon::GetPreConMode()
+{
     return this->pre_con_type;
 }
-const JointCon::ForceCon JointCon::GetForceImpConMode(){
+const JointCon::ForceCon JointCon::GetForceImpConMode()
+{
     return this->force_con_type;
 }
-const JointCon::ForceRedType JointCon::GetForceImpRedMode(){
+const JointCon::ForceRedType JointCon::GetForceImpRedMode()
+{
     return this->force_red_type;
 }
 
@@ -411,27 +412,59 @@ double JointCon::GetPre_KPa(double pre_adc)
     return (pre_adc / 65536 * 4.096 - 0.5) * 50 * 6.89476;
 }
 
-bool JointCon::GetValveDuty(u_int8_t &knee_ext_duty,u_int8_t &knee_flex_duty, u_int8_t &ank_pla_duty, u_int8_t &sub_tank_duty,u_int8_t &knee_ank_duty){
-    
-    if(this->con_mode==ConMode::kPreCon){
+bool JointCon::GetValveDuty(u_int8_t &knee_ext_duty, u_int8_t &knee_flex_duty, u_int8_t &ank_pla_duty, u_int8_t &ank_dor_duty, u_int8_t &sub_tank_duty, u_int8_t &knee_ank_duty)
+{
+
+    if (this->con_mode == ConMode::kPreCon)
+    {
         switch (this->pre_con_type)
         {
         case PreCon::kKneExt:
             this->GetPreCon(knee_ext_duty, this->pre_con_type);
             break;
         case PreCon::kAnkPlant:
-            this->GetPreCon(ank_pla_duty,this->pre_con_type);
+            this->GetPreCon(ank_pla_duty, this->pre_con_type);
             break;
         case PreCon::kSubTank:
-            this->GetPreCon(sub_tank_duty,this->pre_con_type);
+            this->GetPreCon(sub_tank_duty, this->pre_con_type);
             break;
         default:
-            break;
+            return false;
         }
         return true;
     }
+    else if (this->con_mode == ConMode::kForceCon)
+    {
+        switch (this->force_con_type)
+        {
+        case ForceCon::kKneExt:
+            this->GetForceCon(knee_ext_duty, knee_ank_duty, knee_flex_duty, sub_tank_duty, this->force_con_type, this->force_red_type);
+            break;
+        case ForceCon::kAnkPlant:
+            this->GetForceCon(ank_pla_duty, knee_ank_duty, ank_dor_duty, sub_tank_duty, this->force_con_type, this->force_red_type);
+            break;
+
+        default:
+            return false;
+        }
+        return true;
+    }
+
+    else if(this->con_mode==ConMode::kImpCon)
+    {
+        switch (this->force_con_type)
+        {
+        case ForceCon::kKneExt:
+            this->GetImpCon(knee_ext_duty,knee_ank_duty,ank_dor_duty,sub_tank_duty, this->force_con_type,this->force_red_type);
+            break;
+        case ForceCon::kAnkPlant:
+            this->GetImpCon(ank_pla_duty,knee_ank_duty,ank_dor_duty,sub_tank_duty,this->force_con_type,this->force_red_type);
+            break;
+        default:
+            return false;
+        }
+        return true;
+    }
+
     return false;
-
-
 }
-

@@ -50,28 +50,28 @@ Valves_hub &hub = Valves_hub::GetInstance();
     enc_data[SensorHub::EncName::RKneS],enc_data[SensorHub::EncName::LAnkS],hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kRTank]);
 
 
-    hub.valChanged_flag = hub.valChanged_flag || hub.lkra_con.GetValveDuty(hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk]);
-    hub.valChanged_flag = hub.valChanged_flag || hub.rkla_con.GetValveDuty(hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kRTank],hub.PWM_Duty[(unsigned)PWM_ID::kRKneAnk]);
+    hub.valChanged_flag = hub.valChanged_flag || hub.lkra_con.GetValveDuty(hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk]);
+    hub.valChanged_flag = hub.valChanged_flag || hub.rkla_con.GetValveDuty(hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex],hub.PWM_Duty[(unsigned)PWM_ID::kRTank],hub.PWM_Duty[(unsigned)PWM_ID::kRKneAnk]);
 
 
     auto lkra_con_mode = hub.lkra_con.GetControlMode();
 
-    if (lkra_con_mode == JointCon::ConMode::kForceCon)
-    {
-        auto force_con_mode = hub.lkra_con.GetForceImpConMode();
-        auto force_red_mode = hub.lkra_con.GetForceImpRedMode();
-        hub.valChanged_flag = true;
-        switch (force_con_mode)
-        {
-        case JointCon::ForceCon::kKneExt:
-            hub.lkra_con.GetForceCon(hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt], hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk], hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex], hub.PWM_Duty[(unsigned)PWM_ID::kLTank], force_con_mode, force_red_mode);
-            break;
-        default:
-            break;
-        }
-    }
+    // if (lkra_con_mode == JointCon::ConMode::kForceCon)
+    // {
+    //     auto force_con_mode = hub.lkra_con.GetForceImpConMode();
+    //     auto force_red_mode = hub.lkra_con.GetForceImpRedMode();
+    //     hub.valChanged_flag = true;
+    //     switch (force_con_mode)
+    //     {
+    //     case JointCon::ForceCon::kKneExt:
+    //         hub.lkra_con.GetForceCon(hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt], hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk], hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex], hub.PWM_Duty[(unsigned)PWM_ID::kLTank], force_con_mode, force_red_mode);
+    //         break;
+    //     default:
+    //         break;
+    //     }
+    // }
 
-    else if (lkra_con_mode == JointCon::ConMode::kImpCon)
+    if (lkra_con_mode == JointCon::ConMode::kImpCon)
     {
         auto imp_con_mode = hub.lkra_con.GetForceImpConMode();
         auto imp_red_mode = hub.lkra_con.GetForceImpRedMode();

@@ -67,7 +67,7 @@ public:
     void RecData();
     
 
-    bool GetValveDuty(u_int8_t &knee_ext_duty,u_int8_t &knee_flex_duty, u_int8_t &ank_pla_duty, u_int8_t &sub_tank_duty,u_int8_t &knee_ank_duty);
+    bool GetValveDuty(u_int8_t &knee_ext_duty,u_int8_t &knee_flex_duty, u_int8_t &ank_pla_duty,u_int8_t &ank_dor_duty, u_int8_t &sub_tank_duty,u_int8_t &knee_ank_duty);
     // const ControlMode GetControlMode();
     // void SetKneeMaxPos(double max_pos_val);
     
