@@ -381,7 +381,6 @@ void JointCon::GetPreCon(u_int8_t &duty, JointCon::PreCon pre_con_mode)
         duty = this->knee_ext_con.GetPreControl(des_pre_array, this->p_knee_ext, this->p_sub_tank, this->knee_cyln_params.chamber_max_len / this->knee_cyln_ext_len);
         break;
     case JointCon::PreCon::kAnkPlant:
-        std::cout<<this->ank_cyln_params.chamber_max_len / this->ank_cyln_shrk_len<<std::endl;
         duty = this->ank_ext_con.GetPreControl(des_pre_array, this->p_ank_ext, this->p_sub_tank, this->ank_cyln_params.chamber_max_len / this->ank_cyln_shrk_len);
         break;
     case JointCon::PreCon::kSubTank:
@@ -412,4 +411,27 @@ double JointCon::GetPre_KPa(double pre_adc)
     return (pre_adc / 65536 * 4.096 - 0.5) * 50 * 6.89476;
 }
 
+bool JointCon::GetValveDuty(u_int8_t &knee_ext_duty,u_int8_t &knee_flex_duty, u_int8_t &ank_pla_duty, u_int8_t &sub_tank_duty,u_int8_t &knee_ank_duty){
+    
+    if(this->con_mode==ConMode::kPreCon){
+        switch (this->pre_con_type)
+        {
+        case PreCon::kKneExt:
+            this->GetPreCon(knee_ext_duty, this->pre_con_type);
+            break;
+        case PreCon::kAnkPlant:
+            this->GetPreCon(ank_pla_duty,this->pre_con_type);
+            break;
+        case PreCon::kSubTank:
+            this->GetPreCon(sub_tank_duty,this->pre_con_type);
+            break;
+        default:
+            break;
+        }
+        return true;
+    }
+    return false;
+
+
+}
 

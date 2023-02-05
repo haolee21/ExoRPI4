@@ -66,6 +66,8 @@ public:
     // void PushMeas(const double &p_joint_ext,const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank,const double &pos,const u_int8_t tank_duty, const u_int8_t knee_ext_duty, const u_int8_t knee_flex_duty,const u_int8_t knee_ank_duty, const u_int8_t ank_ext_duty);
     void RecData();
     
+
+    bool GetValveDuty(u_int8_t &knee_ext_duty,u_int8_t &knee_flex_duty, u_int8_t &ank_pla_duty, u_int8_t &sub_tank_duty,u_int8_t &knee_ank_duty);
     // const ControlMode GetControlMode();
     // void SetKneeMaxPos(double max_pos_val);
     

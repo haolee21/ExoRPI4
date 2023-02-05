@@ -38,6 +38,8 @@ void Valves_hub::UpdateValve()
 
 Valves_hub &hub = Valves_hub::GetInstance();
     // MPC check
+
+
     const std::array<double, SensorHub::NUMPRE> &pre_data = SensorHub::GetPreData(); // use ref to avoid copy
     const std::array<double, SensorHub::NUMENC> &enc_data = SensorHub::GetEncData();
     // TODO: fix this recording
@@ -48,31 +50,13 @@ Valves_hub &hub = Valves_hub::GetInstance();
     enc_data[SensorHub::EncName::RKneS],enc_data[SensorHub::EncName::LAnkS],hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kRTank]);
 
 
+    hub.valChanged_flag = hub.valChanged_flag || hub.lkra_con.GetValveDuty(hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk]);
+    hub.valChanged_flag = hub.valChanged_flag || hub.rkla_con.GetValveDuty(hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kRTank],hub.PWM_Duty[(unsigned)PWM_ID::kRKneAnk]);
+
 
     auto lkra_con_mode = hub.lkra_con.GetControlMode();
-    if (lkra_con_mode == JointCon::ConMode::kPreCon)
-    {
-        auto pre_con_mode = hub.lkra_con.GetPreConMode();
-        hub.valChanged_flag = true;
-        switch (pre_con_mode)
-        {
-        case JointCon::PreCon::kKneExt:
-            hub.lkra_con.GetPreCon(hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt], pre_con_mode);
-            break;
-        case JointCon::PreCon::kAnkPlant:
-            hub.lkra_con.GetPreCon(hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt],pre_con_mode);
-            break;
-        case JointCon::PreCon::kKneFlex:
-            hub.lkra_con.GetPreCon(hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex], pre_con_mode);
-            break;
-        case JointCon::PreCon::kSubTank:
-            hub.lkra_con.GetPreCon(hub.PWM_Duty[(unsigned)PWM_ID::kLTank], pre_con_mode);
-            break;
-        default:
-            break;
-        }
-    }
-    else if (lkra_con_mode == JointCon::ConMode::kForceCon)
+
+    if (lkra_con_mode == JointCon::ConMode::kForceCon)
     {
         auto force_con_mode = hub.lkra_con.GetForceImpConMode();
         auto force_red_mode = hub.lkra_con.GetForceImpRedMode();
@@ -158,20 +142,23 @@ void Valves_hub::ResetCon(KneeAnkPair joint)
 
 void Valves_hub::EnableCon(double des_pre, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::PreCon pre_con)
 {
+    
     JointCon *knee_ank_con;
     switch (knee_ank_pair)
     {
     case Valves_hub::KneeAnkPair::kLeftKneeRightAnk:
+        
         knee_ank_con = &Valves_hub::GetInstance().lkra_con;
         break;
     case Valves_hub::KneeAnkPair::kRightKneeLeftAnk:
+        
         knee_ank_con = &Valves_hub::GetInstance().rkla_con;
         break;
     default:
         return;
     }
     // auto &knee_ank_con = (knee_ank_pair == Valves_hub::KneeAnkPair::kLeftKneeRightAnk) ? hub.lkra_con : hub.rkla_con; //This may cause problems if one day I have more than two knee_ank pairs
-
+    
     knee_ank_con->SetControl(JointCon::ConMode::kPreCon, pre_con, des_pre);
 
 }
