@@ -8,6 +8,7 @@
 #include "CylinderParam.hpp"
 #include "Recorder.hpp"
 #include "ExoConfig.hpp"
+#include "FSM.hpp"
 class JointCon
 {
 public:
@@ -147,6 +148,7 @@ private:
 
     Recorder<double,9> joint_con_rec;
 
+   
    
 
 

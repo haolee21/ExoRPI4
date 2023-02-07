@@ -1,5 +1,6 @@
 #include "Valves_hub.hpp"
 #include "MPC_param.hpp"
+#include "FSM.hpp"
 Valves_hub::Valves_hub()
     : lkra_con(ExoConfig::GetConfig().left_subtank_knee, ExoConfig::GetConfig().left_subtank_right_ank, ExoConfig::GetConfig().left_knee_right_ank,
                ExoConfig::GetConfig().left_tank_subtank, ExoConfig::GetConfig().left_knee_phy, ExoConfig::GetConfig().right_ankle_phy, "lkra"),
@@ -48,6 +49,32 @@ Valves_hub &hub = Valves_hub::GetInstance();
     
     hub.rkla_con.PushMeas(pre_data[(unsigned)SensorHub::AdcName::RKneExt],pre_data[(unsigned)SensorHub::AdcName::RKneFlex],pre_data[(unsigned)SensorHub::AdcName::LAnkExt],pre_data[(unsigned)SensorHub::AdcName::RTank],pre_data[(unsigned)SensorHub::AdcName::Tank],
     enc_data[SensorHub::EncName::RKneS],enc_data[SensorHub::EncName::LAnkS],hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneAnk],hub.PWM_Duty[(unsigned)PWM_ID::kRTank]);
+
+    FSM::PushMeas((unsigned)enc_data[SensorHub::EncName::LHipS],enc_data[(unsigned)SensorHub::EncName::LKneS],enc_data[(unsigned)SensorHub::EncName::LAnkS],enc_data[(unsigned)SensorHub::EncName::RHipS],enc_data[(unsigned)SensorHub::EncName::RKneS],enc_data[(unsigned)SensorHub::EncName::RAnkS]);
+    if(FSM::GetFSM_State()==FSM::State::kLeftLoadRightPush){
+        //TODO: enable lkra knee impedance control with energy recycle
+        //TODO: not sure what rkla should do, maybe right knee should fixed its position
+    }
+    else if(FSM::GetFSM_State()==FSM::State::kLeftStandRightSwing){
+        //TODO: maybe enable rkla impedance control with energy recycle from left ankle to right knee
+        //lkra, connect left knee with right ankle (right ankle has residual pressure for ankle push-off)
+
+        hub.lkra_con.ResetControl();
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
+    }
+    else if(FSM::GetFSM_State()==FSM::State::kLeftStandRightPrep){
+        
+        hub.lkra_con.ResetControl();
+    }
+
+
+
+
+
+
+
 
 
     hub.valChanged_flag = hub.valChanged_flag || hub.lkra_con.GetValveDuty(hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kLKneAnk]);
@@ -142,6 +169,7 @@ void Valves_hub::ResetCon(KneeAnkPair joint)
 
 void Valves_hub::EnableCon(double des_pre, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::PreCon pre_con)
 {
+    FSM::TurnOffFSM();
     
     JointCon *knee_ank_con;
     switch (knee_ank_pair)
@@ -164,6 +192,7 @@ void Valves_hub::EnableCon(double des_pre, Valves_hub::KneeAnkPair knee_ank_pair
 }
 void Valves_hub::EnableCon(double des_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon force_con_type, JointCon::ForceRedType force_red_type)
 {
+    FSM::TurnOffFSM();
     JointCon *knee_ank_con;
     switch (knee_ank_pair)
     {
@@ -180,6 +209,7 @@ void Valves_hub::EnableCon(double des_force, Valves_hub::KneeAnkPair knee_ank_pa
 
 }
 void Valves_hub::EnableCon(double des_imp, double init_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon imp_con_type, JointCon::ForceRedType force_red_type){
+    FSM::TurnOffFSM();
     JointCon *knee_ank_con;
     switch (knee_ank_pair)
     {

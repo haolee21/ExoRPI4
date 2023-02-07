@@ -71,6 +71,7 @@ include_directories(
 file(GLOB SRC_FILES 
     # ${Include_DIR}/*.cpp
     src/*.cpp)
+message(STATUS ${SRC_FILES})
 add_executable(exo_o ${SRC_FILES})
 
 target_link_libraries(exo_o PRIVATE ${Boost_LIBRARIES} ${osqp_LIB}) 

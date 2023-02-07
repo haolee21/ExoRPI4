@@ -111,11 +111,21 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     this->knee_moment_arm = 0.5 * this->knee_cyln_params.cyln_eqn[1] * sin((180 - knee_angle - this->knee_cyln_params.cyln_eqn[2]) / 180 * M_PI) / knee_tot_len;
     this->ankle_moment_arm = 0.5 * this->ank_cyln_params.cyln_eqn[1] * sin((ankle_angle + 180 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI) / ank_tot_len;
 
+
+    //get fsm state
+    
+
+
+
+
     // record old data
 
     // TODO: add recorder
     this->knee_len_ext_old = this->knee_cyln_ext_len;
     this->ank_len_ext_old = this->ank_cyln_ext_len;
+
+
+    
 }
 
 void JointCon::RecData()
