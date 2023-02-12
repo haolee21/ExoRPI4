@@ -138,9 +138,9 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="2" column="0">
-       <widget class="QCheckBox" name="checkBox_setLKneMaxPos">
+       <widget class="QCheckBox" name="checkBox_setExoNeutralPos">
         <property name="text">
-         <string>Set LKnee Max Pos</string>
+         <string>Set Neutral Pos</string>
         </property>
        </widget>
       </item>
@@ -152,9 +152,9 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QCheckBox" name="checkBox_actLAnk">
+       <widget class="QCheckBox" name="checkBox_fsm_left_start">
         <property name="text">
-         <string>Act LAnk</string>
+         <string>FSM Left Start</string>
         </property>
        </widget>
       </item>
@@ -166,9 +166,9 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QCheckBox" name="checkBox_actRAnk">
+       <widget class="QCheckBox" name="checkBox_fsm_right_start">
         <property name="text">
-         <string>Act RAnk</string>
+         <string>FSM Right Start</string>
         </property>
        </widget>
       </item>
@@ -228,6 +228,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="btn_resetLHip">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>380</x>
@@ -256,6 +259,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="btn_resetLKne">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>500</x>
@@ -274,6 +280,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="btn_resetLAnk">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>620</x>
@@ -292,6 +301,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="btn_resetRHip">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>380</x>
@@ -310,6 +322,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="btn_resetRKne">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>500</x>
@@ -328,6 +343,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="btn_resetRAnk">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>620</x>
@@ -447,8 +465,8 @@
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
      <rect>
-      <x>420</x>
-      <y>530</y>
+      <x>410</x>
+      <y>540</y>
       <width>291</width>
       <height>121</height>
      </rect>
@@ -597,6 +615,19 @@
     </property>
     <property name="text">
      <string>Lock</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_encoder_reset">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>520</y>
+      <width>181</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Enable Encoder Reset</string>
     </property>
    </widget>
   </widget>

@@ -154,7 +154,9 @@ class MW(QMainWindow):
         self.btn_exo_resetRAnkS = self.findChild(QPushButton,'btn_resetRAnk')
         self.btn_exo_resetRAnkS.clicked.connect(self.btn_resetRAnkS_clicked)
         
-
+        self.enable_reset_enc = self.findChild(QCheckBox,'checkBox_encoder_reset')
+        self.enable_reset_enc.stateChanged.connect(self.EnableEncReset)
+        
 
         #function checkbox
         self.btn_sendCmd = self.findChild(QPushButton,'btn_sendCmd')
@@ -166,9 +168,9 @@ class MW(QMainWindow):
 
         # self.actLKne_task = self.findChild(QCheckBox,'checkBox_act_LKne')
         # self.actRKne_task = self.findChild(QCheckBox,'checkBox_act_RKne')
-        # self.actLAnk_task = self.findChild(QCheckBox,'checkBox_act_LAnk')
-        # self.actRAnk_task = self.findChild(QCheckBox,'checkBox_act_RAnk')
-        self.checkBox_setLKneMaxPos = self.findChild(QCheckBox,'checkBox_setLKneMaxPos')
+        self.fsm_left_start_task = self.findChild(QCheckBox,'checkBox_fsm_left_start')
+        self.fsm_right_start_task = self.findChild(QCheckBox,'checkBox_fsm_right_start')
+        self.checkBox_setExoNeutralPos = self.findChild(QCheckBox,'checkBox_setExoNeutralPos')
 
         self.walkRec_task = self.findChild(QRadioButton,'radioButton_walkRec')
         self.walkRec_task.toggled.connect(self.radio_walkRec_checked)
@@ -236,10 +238,13 @@ class MW(QMainWindow):
         #     if self.actRAnk_task.isChecked():
         #         self.tcp_port.SendCmd('STR:ACT:RANK',2)
         # self.radio_walkRec_checked()
-
-        if self.checkBox_setLKneMaxPos.isChecked():
-            self.udp_port.udp_cmd_packet.set_joint_pos_flag[JOINT_LKNE]=True
-            self.checkBox_setLKneMaxPos.setChecked(False)
+        if self.checkBox_setExoNeutralPos.isChecked():
+            self.udp_port.udp_cmd_packet.set_neutral_flag = True
+        if self.fsm_left_start_task.isChecked():
+            self.udp_port.udp_cmd_packet.fsm_left_start=True
+        if self.fsm_right_start_task.isChecked():
+            self.udp_port.udp_cmd_packet.fsm_right_start=True
+        self.udp_port.udp_cmd_packet.fsm_start_flag=True
         pass
                 
         
@@ -349,8 +354,8 @@ class MW(QMainWindow):
         self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_FLEX_PWM]=100
         self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_FLEX_PWM]=True
         time.sleep(1)
-        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_ANK_PWM]=100
-        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_ANK_PWM]=True
+        self.udp_port.udp_cmd_packet.pwm_duty_data[RKNE_LANK_PWM]=100
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[RKNE_LANK_PWM]=True
          
     def btn_lock_clicked(self):
         if self.discharge_thread.is_alive():
@@ -361,8 +366,8 @@ class MW(QMainWindow):
         self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXT_PWM]=True
         self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_FLEX_PWM]=0
         self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_FLEX_PWM]=True
-        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_ANK_PWM]=0
-        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_ANK_PWM]=True
+        self.udp_port.udp_cmd_packet.pwm_duty_data[RKNE_LANK_PWM]=0
+        self.udp_port.udp_cmd_packet.pwm_duty_flag[RKNE_LANK_PWM]=True
 
 
             
@@ -422,7 +427,17 @@ class MW(QMainWindow):
                 self.led_mpc_rank.setPixmap(self.off_led)
         self.old_mpc_cond = led_cond
     
-
+    def EnableEncReset(self):
+        if self.checkBox_encoder_reset.isChecked():
+            flag = True
+        else:
+            flag=False
+        self.btn_exo_resetLHipS.setEnabled(flag)
+        self.btn_exo_resetLKneS.setEnabled(flag)
+        self.btn_exo_resetLAnkS.setEnabled(flag)
+        self.btn_exo_resetRHipS.setEnabled(flag)
+        self.btn_exo_resetRKneS.setEnabled(flag)
+        self.btn_exo_resetRAnkS.setEnabled(flag)
 sysData = SystemData()
 
 

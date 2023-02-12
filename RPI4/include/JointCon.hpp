@@ -48,9 +48,12 @@ public:
     static const unsigned  kNumOfChambers = 3;
 
     // void SetControlMode(ControlMode con_mode);
-    void SetControl(ConMode con_mode,PreCon pre_con_type,double des_pre);
+    void SetPreControl(PreCon pre_con_type,double des_pre);
+    // void SetControl(ConMode con_mode,PreCon pre_con_type,double des_pre);
     void SetControl(ConMode con_mode, ForceCon force_con_type,ForceRedType force_red_type,double cmd_value);
-    void SetControl(ConMode con_mode,ForceCon force_con_type,ForceRedType force_red_type,double cmd_val1,double cmd_val2);
+    void SetImpControl(ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_imp, double cmd_init_force);
+    void SetImpControl(ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_imp, double cmd_init_force,double neutral_pos);
+    // void SetControl(ConMode con_mode,ForceCon force_con_type,ForceRedType force_red_type,double cmd_val1,double cmd_val2);
     void ResetControl();
     const ConMode GetControlMode();
     const PreCon GetPreConMode();
@@ -126,6 +129,7 @@ private:
     };
     Imp_FSM imp_fsm_state;
     double vel_th = 300;
+    double neutral_knee_pos;
     // const double kExtImp=2; //   N/mm
     // double imp_deflect_point;
     double recover_imp;

@@ -9,6 +9,7 @@ JointCon::JointCon(ExoConfig::MPC_Params knee_ext_params, ExoConfig::MPC_Params 
       // knee_flex_con(knee_flex_params, joint_con_name + "_knee_flex"),
       ank_ext_con(ank_ext_params, joint_con_name + "_ank_ext"), knee_ank_con(knee_ank_params, joint_con_name + "_knee_ank"), tank_con(tank_params, joint_con_name + "_tank"),
       knee_cyln_params(knee_cyln_params), ank_cyln_params(ank_cyln_params),
+      neutral_knee_pos(knee_cyln_params.neutral_pos),
       vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b), force_pre_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b),
       p_ext_rec_diff_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b),
       joint_con_rec(joint_con_name, "Time,L_ext,L_flex,cur_force,max_spring_compress,delta_x,x_dot,des_force,pre_force,des_ext_pre")
@@ -26,9 +27,9 @@ JointCon::~JointCon()
 {
 }
 
-void JointCon::SetControl(JointCon::ConMode _con_mode, PreCon _pre_con_type, double _cmd_pre)
+void JointCon::SetPreControl(PreCon _pre_con_type, double _cmd_pre)
 {
-    this->con_mode = _con_mode;
+    this->con_mode = ConMode::kPreCon;
     this->pre_con_type = _pre_con_type;
     this->cmd_pre[(unsigned)_pre_con_type] = _cmd_pre;
 }
@@ -42,13 +43,25 @@ void JointCon::SetControl(ConMode _con_mode, ForceCon _force_con_type, ForceRedT
     this->force_con_type = _force_con_type;
     this->force_red_type = _force_red_type;
 }
-void JointCon::SetControl(ConMode _con_mode, ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_imp, double cmd_init_force)
+void JointCon::SetImpControl(ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_imp, double cmd_init_force)
 {
+
     this->cmd_init_force[(unsigned)_force_con_type] = cmd_init_force;
     this->cmd_imp[(unsigned)_force_con_type] = cmd_imp;
-    this->con_mode = _con_mode;
+    this->con_mode = ConMode::kImpCon;
     this->force_con_type = _force_con_type;
     this->force_red_type = _force_red_type;
+    
+}
+void JointCon::SetImpControl(ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_imp, double cmd_init_force,double neutral_pos)
+{
+
+    this->cmd_init_force[(unsigned)_force_con_type] = cmd_init_force;
+    this->cmd_imp[(unsigned)_force_con_type] = cmd_imp;
+    this->con_mode = ConMode::kImpCon;
+    this->force_con_type = _force_con_type;
+    this->force_red_type = _force_red_type;
+    this->neutral_knee_pos = neutral_pos;
 }
 void JointCon::ResetControl()
 {

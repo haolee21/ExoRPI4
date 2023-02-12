@@ -31,6 +31,10 @@ struct UDP_CmdPacket{
     std::array<double,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> init_impact_imp;
     std::array<double,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> restore_imp;
 
+    //fsm
+    bool fsm_left_start,fsm_right_start;
+
+
     //change flags
     std::array<bool,PWM_VAL_NUM> pwm_duty_flag{false};
     std::array<bool,SensorHub::NUMENC> reset_enc_flag{false};
@@ -39,13 +43,15 @@ struct UDP_CmdPacket{
     std::array<bool,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_force_flag{false};
     bool epoch_time_flag = false;
     bool recorder_flag = false;
-    std::array<bool,(unsigned)Valves_hub::KneeAnkPair::kTotal> con_on_off_flag{false};
+    std::array<bool,(unsigned)Valves_hub::KneeAnkPair::kTotal> con_on_off_flag{false}; //TODO: use it or remove it
 
-    std::array<bool,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> set_joint_pos{false};
+    std::array<bool,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> set_joint_pos{false}; //TODO: remove it
     
-    std::array<bool,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> impact_absorb_flag{false};
+    std::array<bool,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> impact_absorb_flag{false}; //TODO: remove it
 
-    
+    //FSM
+    bool set_neutral_pos_flag;
+    bool fsm_start_flag;
 
 };
 // struct UDP_CmdFlag{

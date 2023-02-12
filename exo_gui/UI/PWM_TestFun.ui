@@ -106,7 +106,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Left Knee&lt;-&gt; Ankle PWM Duty</string>
+          <string>Left Knee&lt;-&gt; Right Ankle PWM Duty</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -226,7 +226,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Right Knee&lt;-&gt; Ankle PWM Duty</string>
+          <string>Right Knee&lt;-&gt; Left Ankle PWM Duty</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

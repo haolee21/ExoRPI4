@@ -16,7 +16,7 @@ enum class PWM_ID //sync with the real connection on the PCB
     kRTank=PCB_VAL_3,    //10
     kLKneExt=PCB_VAL_4,  //11
     kLKneFlex=PCB_VAL_5, //12
-    kLKneAnk=PCB_VAL_6,  //13
+    kRKneLAnk=PCB_VAL_6,  //13
     kLAnkExt=PCB_VAL_7,  //14
     kRKneExut=PCB_VAL_8, //15
     kLAnkFlex=PCB_VAL_9,  //0
@@ -24,7 +24,7 @@ enum class PWM_ID //sync with the real connection on the PCB
     kRAnkExut=PCB_VAL_11, //2
     kLAnkExut=PCB_VAL_12, //3
     kRAnkExt=PCB_VAL_13,  //4
-    kRKneAnk=PCB_VAL_14,  //5
+    kLKneRAnk=PCB_VAL_14,  //5
     kRKneFlex=PCB_VAL_15, //6
     kRKneExt=PCB_VAL_16,  //7
     
@@ -45,10 +45,10 @@ private:
     // MPC LTankCon, LKneCon;
 
     JointCon lkra_con, rkla_con; //left-knee-right-ankle, left-knee-right-ankle
-    std::array<double,(unsigned)Valves_hub::KneeAnkPair::kTotal*JointCon::kNumOfChambers> desired_pre{0};
-    std::array<double,(unsigned)Valves_hub::KneeAnkPair::kTotal*JointCon::kNumOfChambers> desired_imp{0};
-    std::array<double,(unsigned)Valves_hub::KneeAnkPair::kTotal*2> desired_force{0}; //subtanks has no force control
-    std::array<double,(unsigned)Valves_hub::KneeAnkPair::kTotal*2> init_force{0};
+    // std::array<double,(unsigned)Valves_hub::KneeAnkPair::kTotal*JointCon::kNumOfChambers> desired_pre{0};
+    // std::array<double,(unsigned)Valves_hub::KneeAnkPair::kTotal*JointCon::kNumOfChambers> desired_imp{0};
+    // std::array<double,(unsigned)Valves_hub::KneeAnkPair::kTotal*2> desired_force{0}; //subtanks has no force control
+    // std::array<double,(unsigned)Valves_hub::KneeAnkPair::kTotal*2> init_force{0};
     
    
     
