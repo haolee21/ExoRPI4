@@ -9,12 +9,12 @@ class FSM
 
 public:
     enum class State{
+        kLeftSwingRightStand,
+        // kLeftPrepRightStand,
         kLeftLoadRightPush,
         kLeftStandRightSwing,
-        kLeftStandRightPrep,
-        kRightLoadLeftPush,
-        kRightStandLeftSwing,
-        kRightStandLeftPrep,
+        // kLeftStandRightPrep,
+        kLeftPushRightLoad,
         kNone
     };
     
@@ -34,16 +34,16 @@ public:
     static void SetImpParams(const double r_kne_imp,const double l_kne_imp,const double r_kne_initF,const double l_kne_initF);
     
 private:
-    std::array<double,(unsigned)State::kNone>swtich_time;
+    std::array<double,(unsigned)State::kNone>swtich_angle_ratio={0.0,0.65,0,0.56};
     FSM(/* args */);
     State cur_state;
-    Recorder<double,8> fsm_rec;
+    Recorder<double,10> fsm_rec;
     void LeftLoadRightPush();
     void LeftStandRightSwing();
-    void LeftStandRightPrep();
-    void RightLoadLeftPush();
-    void RightStandLeftSwing();
-    void RightStandLeftPrep();
+    // void LeftStandRightPrep();
+    void LeftPushRightLoad();
+    void LeftSwingRightStand();
+    // void RightStandLeftPrep();
 
     const std::array<double,SensorHub::NUMENC> &joint_pos;
     const std::array<double,SensorHub::NUMENC> &joint_vel;
@@ -56,8 +56,9 @@ private:
     double l_kne_s_initF,r_kne_s_initF;
 
     double cur_max_lhip_rhip,cur_min_lhip_rhip;
-    double pre_hip_diff_vel,pre_hip_diff_pos;
+    double hip_diff_vel,hip_diff_pos;
     bool leg_switch=true;
+    bool reach_peak = false;
     double cur_stride;
 
 };

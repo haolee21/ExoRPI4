@@ -70,10 +70,6 @@ Valves_hub &hub = Valves_hub::GetInstance();
     //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
     //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
     //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
-
-
-
-        
     // }
     // else if(FSM::GetFSM_State()==FSM::State::kLeftStandRightSwing){
     //     //TODO: maybe enable rkla impedance control with energy recycle from left ankle to right knee
