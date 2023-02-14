@@ -34,6 +34,13 @@ struct UDP_CmdPacket{
     //fsm
     bool fsm_left_start,fsm_right_start;
 
+    double left_swing_left_load_ratio;
+    double right_swing_right_load_ratio;
+    double fsm_left_knee_init_f;
+    double fsm_right_knee_init_f;
+    double fsm_left_knee_imp;
+    double fsm_right_knee_imp;
+
 
     //change flags
     std::array<bool,PWM_VAL_NUM> pwm_duty_flag{false};
@@ -52,6 +59,7 @@ struct UDP_CmdPacket{
     //FSM
     bool set_neutral_pos_flag;
     bool fsm_start_flag;
+    bool fsm_param_change_flag;
 
 };
 // struct UDP_CmdFlag{

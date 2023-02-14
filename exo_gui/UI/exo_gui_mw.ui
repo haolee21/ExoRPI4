@@ -659,6 +659,7 @@
      <string>Robot Settings</string>
     </property>
     <addaction name="actionCylinder_Length"/>
+    <addaction name="actionFSM_Parameter"/>
    </widget>
    <widget class="QMenu" name="menuAction">
     <property name="title">
@@ -729,6 +730,11 @@
   <action name="actionCylinder_Length">
    <property name="text">
     <string>Cylinder Length</string>
+   </property>
+  </action>
+  <action name="actionFSM_Parameter">
+   <property name="text">
+    <string>FSM Parameter</string>
    </property>
   </action>
  </widget>

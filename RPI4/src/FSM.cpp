@@ -185,8 +185,12 @@ void FSM::GetRKneImpParams(double &imp,double &neutral_pos,double &init_force){
     neutral_pos = fsm.r_kne_s_neu;
     init_force = fsm.r_kne_s_initF;
 }
-void FSM::SetImpParams(const double r_kne_imp,const double l_kne_imp,const double r_kne_initF,const double l_kne_initF){
+void FSM::SetImpParams(const double left_swing_left_load_ratio,const double right_swing_right_load_ratio, const double l_kne_imp,const double r_kne_imp,const double l_kne_initF,const double r_kne_initF){
     auto& fsm = FSM::GetInstance();
+
+    fsm.swtich_angle_ratio[(unsigned)FSM::State::kLeftLoadRightPush] = left_swing_left_load_ratio;
+    fsm.swtich_angle_ratio[(unsigned)FSM::State::kLeftPushRightLoad] = right_swing_right_load_ratio;
+
     fsm.r_kne_s_imp = r_kne_imp;
     fsm.l_kne_s_imp = l_kne_imp;
     fsm.r_kne_s_initF = r_kne_initF;

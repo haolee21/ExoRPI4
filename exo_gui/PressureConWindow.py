@@ -68,8 +68,10 @@ class PressureConWindow(QDialog):
 
 
     def PreStartClicked(self,chamber_idx,pre_lineEdit):
-        self.parent().udp_port.udp_cmd_packet.des_pre_data[chamber_idx]=TextToFloat(pre_lineEdit.text())
-        self.parent().udp_port.udp_cmd_packet.des_pre_flag[chamber_idx]=True
+        with parent().udp_port.lock:
+            self.parent().udp_port.udp_cmd_packet.des_pre_data[chamber_idx]=TextToFloat(pre_lineEdit.text())
+            self.parent().udp_port.udp_cmd_packet.des_pre_flag[chamber_idx]=True
     def DutyStopClicked(self,chamber_idx):
-        self.parent().udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx]=0
-        self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx]=True
+        with parent().udp_port.lock:
+            self.parent().udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx]=0
+            self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx]=True

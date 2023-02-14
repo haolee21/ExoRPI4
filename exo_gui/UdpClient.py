@@ -1,10 +1,18 @@
-import ctypes
 import socket
 from ctypes import *
 import numpy as np
-
 from ExoDataStruct import *
-    
+from PyQt5.QtCore import QMutex    
+
+
+class QtLock(QMutex):
+    def __init__(self):
+       super().__init__()
+    def __enter__(self):
+        self.lock()
+    def __exit__(self,*args):
+        self.unlock()
+
 class UdpClient:
     ip_address='192.168.1.4'
     data_port = UDP_DATA_PORT
@@ -17,7 +25,7 @@ class UdpClient:
         self.udp_data_socket = socket.socket(family=socket.AF_INET,type=socket.SOCK_DGRAM)
         self.udp_data_socket.bind(("0.0.0.0",self.data_port)) #python required server listen to 0.0.0.0
         self.udp_data_socket.settimeout(0.01)
-
+        self.lock = QtLock()
         self.disconnect_count=0 #if continuously timeout, disconnect (call disConCcallback)
     def Connect(self):
         
@@ -52,8 +60,11 @@ class UdpClient:
         if self.flag:
             
             server_address=(self.ip_address,UDP_CMD_PORT)
-            send_bytes= self.udp_cmd_socket.sendto(self.udp_cmd_packet,server_address)
+            # self.lock.lock()
+            with self.lock:
+                send_bytes= self.udp_cmd_socket.sendto(self.udp_cmd_packet,server_address)
             
+            # self.lock.unlock()
             #reset all cmd flags after the current one is sent
             # pwm_flag_reset = [False]*PWM_VAL_NUM
             # reset_enc_flag_reset = [False]*NUM_ENC

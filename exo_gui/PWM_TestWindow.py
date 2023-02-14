@@ -1,14 +1,15 @@
 from cgitb import text
 from PyQt5 import uic
-from PyQt5.QtWidgets import QWidget,QLabel,QLineEdit,QPushButton
+from PyQt5.QtWidgets import QWidget,QLabel,QLineEdit,QPushButton,QDialog
 from functools import partial
 # from TCP_Con import TCP, TextToFloat
 from UdpClient import *
 from Common import *
-class PWM_TestWindow(QWidget):
+from PyQt5.QtCore import Qt
+class PWM_TestWindow(QDialog):
     def __init__(self,parent=None):
-        super().__init__()
-        self.parent = parent
+        super().__init__(parent)
+        self.setWindowFlags(Qt.Window)
         uic.loadUi('UI/PWM_TestFun.ui',self)
         self.btn_LKneExtDuty_start = self.findChild(QPushButton,'btn_LKneExtDuty_start')
         self.btn_LKneFlexDuty_start=self.findChild(QPushButton,'btn_LKneFlexDuty_start')
@@ -118,15 +119,16 @@ class PWM_TestWindow(QWidget):
 
 
     def DutyStartClicked(self,chamber_idx,duty_lineEdit):
-       
-        self.parent.udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx] = TextToInt(duty_lineEdit.text())
-        self.parent.udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx] = True
+        with self.parent().udp_port.lock:
+            self.parent().udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx] = TextToInt(duty_lineEdit.text())
+            self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx] = True
         
         
         
     def DutyStopClicked(self,chamber_idx):
-        self.parent.udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx]=0
-        self.parent.udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx]=True
+        with self.parent().udp_port.lock:
+            self.parent().udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx]=0
+            self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx]=True
 
     
         

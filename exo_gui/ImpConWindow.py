@@ -60,13 +60,13 @@ class ImpWindow(QDialog):
         palette.setColor(QPalette.Text,Qt.black)
         line_edit_imp.setPalette(palette)
         line_edit_initF.setPalette(palette)
-
-        self.parent().udp_port.udp_cmd_packet.des_imp_data[joint_idx]=TextToFloat(line_edit_imp.text())
-        self.parent().udp_port.udp_cmd_packet.init_force[joint_idx] = TextToFloat(line_edit_initF.text())
-        self.parent().udp_port.udp_cmd_packet.des_imp_flag[joint_idx]=True
+        with self.parent().udp_port.lock:
+            self.parent().udp_port.udp_cmd_packet.des_imp_data[joint_idx]=TextToFloat(line_edit_imp.text())
+            self.parent().udp_port.udp_cmd_packet.init_force[joint_idx] = TextToFloat(line_edit_initF.text())
+            self.parent().udp_port.udp_cmd_packet.des_imp_flag[joint_idx]=True
     def ImpStop(self,joint_idx):
-        
-        self.parent().udp_port.udp_cmd_packet.con_on_off_data[joint_idx]=False
-        self.parent().udp_port.udp_cmd_packet.con_on_off_flag[joint_idx]=True
+        with self.parent().udp_port.lock:
+            self.parent().udp_port.udp_cmd_packet.con_on_off_data[joint_idx]=False
+            self.parent().udp_port.udp_cmd_packet.con_on_off_flag[joint_idx]=True
         # self.parent().udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx]=0
         # self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx]=True

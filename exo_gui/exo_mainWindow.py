@@ -24,6 +24,7 @@ from PressureConWindow import *
 from ImpactCon import *
 from CylinderCalibrationWindow import *
 from ConfigLoader import *
+from FSM_ParamsWindow import *
 
 import math
 import time
@@ -65,7 +66,7 @@ class MW(QMainWindow):
         self.pre_con_window = PressureConWindow(self)
         self.impact_con_window = ImpactCon(self)
         self.cylinder_calib_window = CylnCalibWindow(self)
-
+        self.fsm_param_window = FSM_ParamWindow(self)
         
         # jointUpdateCB = lambda data:self.joint_plot_window.UpdateData(self,data)
         # preUpdateCB = lambda data:self.pressure_plot_window.UpdateData(self,data)
@@ -104,6 +105,9 @@ class MW(QMainWindow):
         self.act_cylinder_calib = self.findChild(QAction,'actionCylinder_Length')
         self.act_cylinder_calib.triggered.connect(self.cylinder_calib_window.show)
 
+
+        self.act_fsm_param = self.findChild(QAction,'actionFSM_Parameter')
+        self.act_fsm_param.triggered.connect(self.fsm_param_window.show)
         # air reserivor 
         
         self.air_volume = self.findChild(QProgressBar,'air_volumn')

@@ -156,6 +156,13 @@ class UdpCmdPacket(Structure):
               ("restore_imp",(c_double)*(NUM_KNEE_ANK_PAIR*NUM_FORCE_CON)),
               ("fsm_left_start",c_bool),
               ("fsm_right_start",c_bool),
+              ("fsm_left_swing_left_load_ratio",c_double),
+              ("fsm_right_swing_right_load_ratio",c_double),
+              ("fsm_left_knee_init_f",c_double),
+              ("fsm_right_knee_init_f",c_double),
+              ("fsm_left_knee_imp",c_double),
+              ("fsm_right_knee_imp",c_double),
+
 
               ("pwm_duty_flag",(c_bool)*PWM_VAL_NUM),
               ("reset_enc_flag",(c_bool)*NUM_ENC),
@@ -168,7 +175,9 @@ class UdpCmdPacket(Structure):
               ("set_joint_pos_flag",(c_bool)*(NUM_KNEE_ANK_PAIR*NUM_FORCE_CON)),
               ("impact_absorb_flag",(c_bool)*(NUM_KNEE_ANK_PAIR*NUM_FORCE_CON)),
               ("set_neutral_flag",c_bool),
-              ("fsm_start_flag",c_bool),]
+              ("fsm_start_flag",c_bool),
+              ("fsm_param_change_flag",c_bool),
+              ]
     def __init__(self):
         self.pwm_duty_flag=(ctypes.c_bool*PWM_VAL_NUM)((False)*PWM_VAL_NUM)
         self.reset_enc_flag = (ctypes.c_bool*NUM_ENC)((False)*NUM_ENC)

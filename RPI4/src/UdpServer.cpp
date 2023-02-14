@@ -397,5 +397,13 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
             Valves_hub::ResetCon(Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
     }
+    if(cmd_packet.fsm_param_change_flag){
+        FSM::SetImpParams(cmd_packet.left_swing_left_load_ratio,
+                          cmd_packet.right_swing_right_load_ratio,
+                          cmd_packet.fsm_left_knee_imp,
+                          cmd_packet.fsm_right_knee_imp,
+                          cmd_packet.fsm_left_knee_init_f,
+                          cmd_packet.fsm_right_knee_init_f);
+    }
 
 }

@@ -31,7 +31,7 @@ public:
     //FSM control params
     static void GetLKneImpParams(double &imp,double &neutral_pos,double &init_force);
     static void GetRKneImpParams(double &imp,double &neutral_pos,double &init_force);
-    static void SetImpParams(const double r_kne_imp,const double l_kne_imp,const double r_kne_initF,const double l_kne_initF);
+    static void SetImpParams(const double left_swing_left_load_ratio,const double right_swing_right_load_ratio, const double l_kne_imp,const double r_kne_imp,const double l_kne_initF,const double r_kne_initF);
     
 private:
     std::array<double,(unsigned)State::kNone>swtich_angle_ratio={0.0,0.65,0,0.56};
