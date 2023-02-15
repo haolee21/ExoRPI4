@@ -12,7 +12,7 @@ JointCon::JointCon(ExoConfig::MPC_Params knee_ext_params, ExoConfig::MPC_Params 
       neutral_knee_pos(knee_cyln_params.neutral_pos),
       vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b), force_pre_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b),
       p_ext_rec_diff_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b),
-      joint_con_rec(joint_con_name, "Time,L_ext,L_flex,cur_force,max_spring_compress,delta_x,x_dot,des_force,pre_force,des_ext_pre")
+      joint_con_rec(joint_con_name, "Time,KneForce,AnkForce,DesKnePre,DesAnkPre,DesTankPre,KneTotLen,AnkTotLen,KneMomentArm,AnkMomentArm,KneSpringMaxCompress,AnkSpringMaxCompress")
 {
     this->imp_fsm_state = Imp_FSM::kLoadPrep;
     // //setup osqp solver
@@ -91,7 +91,7 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     // calculate force related values
     std::array<double, 2> cur_force = this->force_filter.GetFilteredMea(
         std::array<double, 2>{(p_knee_ext * this->knee_cyln_params.piston_area[0] - p_knee_flex * this->knee_cyln_params.piston_area[1]) * 2.1547177056884764e-05,
-                              p_ank_ext * this->ank_cyln_params.piston_area[0] * 2.1547177056884764e-05});
+                              p_ank_ext * this->ank_cyln_params.piston_area[1] * 2.1547177056884764e-05});
     this->cur_knee_force = cur_force[0];
     this->cur_ank_force = cur_force[1];
 
@@ -132,6 +132,9 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
 
 
     // record old data
+    this->joint_con_rec.PushData(std::array<double,8>{this->cur_knee_force,this->cur_ank_force,knee_tot_len,ank_tot_len,this->knee_moment_arm,this->ankle_moment_arm,this->max_knee_spring_compress,this->max_ank_spring_compress});
+
+
 
     // TODO: add recorder
     this->knee_len_ext_old = this->knee_cyln_ext_len;
@@ -143,7 +146,7 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
 
 void JointCon::RecData()
 {
-
+    
     this->knee_ext_con.RecData();
     // this->knee_flex_con.RecData();
     this->ank_ext_con.RecData();
@@ -224,7 +227,9 @@ void JointCon::GetForceCon(u_int8_t &charge_duty, u_int8_t &rec_duty, u_int8_t &
         // std::cout<<des_pre[i]<<',';
     }
     this->des_force = des_force[0];
-    this->des_ext_pre = des_pre[0];
+
+
+    // this->des_ext_pre = des_pre[0];
     // std::cout<<std::endl;
     // std::cout<<"current pressure: "<<this->pre_ext<<std::endl;
     // std::cout<<"force gap: "<<des_force[0]-this->cur_force<<std::endl;
@@ -394,6 +399,9 @@ void JointCon::GetImpCon(u_int8_t &charge_duty, u_int8_t &rec_duty, u_int8_t &ba
 void JointCon::GetPreCon(u_int8_t &duty, JointCon::PreCon pre_con_mode)
 {
     std::array<double, MPC_TIME_HORIZON> des_pre_array;
+
+
+
     std::fill_n(des_pre_array.begin(), des_pre_array.size(), this->cmd_pre[(unsigned)pre_con_mode]);
     switch (pre_con_mode)
     {
@@ -413,22 +421,22 @@ void JointCon::GetPreCon(u_int8_t &duty, JointCon::PreCon pre_con_mode)
     }
 }
 
-const JointCon::ConMode JointCon::GetControlMode()
-{
-    return this->con_mode;
-}
-const JointCon::PreCon JointCon::GetPreConMode()
-{
-    return this->pre_con_type;
-}
-const JointCon::ForceCon JointCon::GetForceImpConMode()
-{
-    return this->force_con_type;
-}
-const JointCon::ForceRedType JointCon::GetForceImpRedMode()
-{
-    return this->force_red_type;
-}
+// const JointCon::ConMode JointCon::GetControlMode()
+// {
+//     return this->con_mode;
+// }
+// const JointCon::PreCon JointCon::GetPreConMode()
+// {
+//     return this->pre_con_type;
+// }
+// const JointCon::ForceCon JointCon::GetForceImpConMode()
+// {
+//     return this->force_con_type;
+// }
+// const JointCon::ForceRedType JointCon::GetForceImpRedMode()
+// {
+//     return this->force_red_type;
+// }
 
 double JointCon::GetPre_KPa(double pre_adc)
 {

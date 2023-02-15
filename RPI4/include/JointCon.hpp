@@ -55,14 +55,15 @@ public:
     void SetImpControl(ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_imp, double cmd_init_force,double neutral_pos);
     // void SetControl(ConMode con_mode,ForceCon force_con_type,ForceRedType force_red_type,double cmd_val1,double cmd_val2);
     void ResetControl();
-    const ConMode GetControlMode();
-    const PreCon GetPreConMode();
-    const ForceCon GetForceImpConMode();
-    const ForceRedType GetForceImpRedMode();
+    // const ConMode GetControlMode();
+    // const PreCon GetPreConMode();
+    // const ForceCon GetForceImpConMode();
+    // const ForceRedType GetForceImpRedMode();
 
     void GetPreCon(u_int8_t &duty, PreCon pre_con);
     
     void GetForceCon(u_int8_t &charge_duty,u_int8_t &rec_duty,u_int8_t &balance_duty, u_int8_t &tank_duty, ForceCon force_con_type,ForceRedType force_red_type);
+    void GetTorCon(u_int8_t &charge_duty,u_int8_t &rec_duty,u_int8_t &balance_duty, u_int8_t &tank_duty, ForceCon force_con_type,ForceRedType force_red_type);
     // void GetImpCon(double des_imp, u_int8_t& ext_duty, u_int8_t& flex_duty, u_int8_t& tank_duty,ControlMode con_mode,double force_offset=0);
     void GetImpCon(u_int8_t&charge_duty,u_int8_t&rec_duty,u_int8_t &balance_duty,u_int8_t&tank_duty,ForceCon force_con_type,ForceRedType force_red_type);
     
@@ -107,7 +108,11 @@ private:
     
     double cur_pre_force;
     double des_force;
-    double des_ext_pre;
+    // double des_ext_pre;
+
+
+
+
 
     double p_ext_rec_diff;
     // const double volume_slope_6in = 0.0006351973436310972;  // FIXME: these are only used for linear calibrations
@@ -150,7 +155,7 @@ private:
 
     double GetPre_KPa(double pre_adc);
 
-    Recorder<double,9> joint_con_rec;
+    Recorder<double,8> joint_con_rec;
 
    
    

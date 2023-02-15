@@ -40,6 +40,7 @@ struct UDP_CmdPacket{
     double fsm_right_knee_init_f;
     double fsm_left_knee_imp;
     double fsm_right_knee_imp;
+    
 
 
     //change flags
