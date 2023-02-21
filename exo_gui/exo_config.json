@@ -1,1 +1,68 @@
-{"LeftKnee": {"CylnMaxMechLen": 20, "CylnChamberMaxLen": 127, "FrictionCoeff": 14.0058, "PistonArea_mm2": [387.096, 354.838], "SpringConst": 9.702, "CylnEqn": [56745.918935347705, 74823.93929060796, -21.501446494723602], "NeutralPos": 0}, "LeftAnkle": {"CylnMaxMechLen": 20, "CylnChamberMaxLen": 127, "FrictionCoeff": 14.0058, "PistonArea_mm2": [387.096, 354.838], "SpringConst": 9.702, "CylnEqn": [138563.83849117887, 93552.20418097962, 79.59443908884441], "NeutralPos": 0}, "RightKnee": {"CylnMaxMechLen": 20, "CylnChamberMaxLen": 127, "FrictionCoeff": 14.0058, "PistonArea_mm2": [387.096, 354.838], "SpringConst": 9.702, "CylnEqn": [69932.72786233632, 67099.68864107577, -9.572666754751312], "NeutralPos": 0}, "RightAnkle": {"CylnMaxMechLen": 20, "CylnChamberMaxLen": 127, "FrictionCoeff": 14.0058, "PistonArea_mm2": [387.096, 354.838], "SpringConst": 9.702, "CylnEqn": [137859.41015745013, 88811.15844789689, 78.86220464381296], "NeutralPos": 0}}
+{
+    "LeftKnee": {
+        "CylnMaxMechLen": 462.5,
+        "CylnChamberMaxLen": 152.4,
+        "FrictionCoeff": 14.0058,
+        "PistonArea_mm2": [
+            387.096,
+            354.838
+        ],
+        "SpringConst": 9.702,
+        "CylnEqn": [
+            86114.90392343969,
+            -90922.77028079984,
+            -177.37269778037123
+        ],
+        "NeutralPos": 0
+    },
+    "LeftAnkle": {
+        "CylnMaxMechLen": 419.18,
+        "CylnChamberMaxLen": 152.4,
+        "FrictionCoeff": 14.0058,
+        "PistonArea_mm2": [
+            354.838,
+            387.096
+            
+        ],
+        "SpringConst": 9.702,
+        "CylnEqn": [
+            138563.83849117887,
+            93552.20418097962,
+            79.59443908884441
+        ],
+        "NeutralPos": 0
+    },
+    "RightKnee": {
+        "CylnMaxMechLen": 462.5,
+        "CylnChamberMaxLen": 152.4,
+        "FrictionCoeff": 14.0058,
+        "PistonArea_mm2": [
+            387.096,
+            354.838
+        ],
+        "SpringConst": 9.702,
+        "CylnEqn": [
+            124354.51189086656,
+            -80586.09681744975,
+            -151.64405710398978
+        ],
+        "NeutralPos": 0
+    },
+    "RightAnkle": {
+        "CylnMaxMechLen": 419.18,
+        "CylnChamberMaxLen": 152.4,
+        "FrictionCoeff": 14.0058,
+        "PistonArea_mm2": [
+            354.838,
+            387.096
+            
+        ],
+        "SpringConst": 9.702,
+        "CylnEqn": [
+            137859.41015745013,
+            88811.15844789689,
+            78.86220464381296
+        ],
+        "NeutralPos": 0
+    }
+}

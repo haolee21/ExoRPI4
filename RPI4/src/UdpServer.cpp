@@ -350,13 +350,14 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
     if (this->CheckCmdSet(cmd_packet.con_on_off_flag.begin(), cmd_packet.con_on_off_flag.size()))
     {
 
-        if (!cmd_packet.con_on_off[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk])
+        if (cmd_packet.con_on_off_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk])
         {
             Valves_hub::ResetCon(Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
         }
 
-        else if (!cmd_packet.con_on_off[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk])
+        else if (cmd_packet.con_on_off_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk])
         {
+            // std::cout<<"turn off rkla in udp server\n";
             Valves_hub::ResetCon(Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
 

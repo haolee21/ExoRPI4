@@ -55,15 +55,15 @@ class PressureConWindow(QDialog):
         self.btn_RTankPre_start.clicked.connect(partial(self.PreStartClicked,RKLA*NUM_PRE_CON+PRE_CON_SUBTANK,self.RTank_pre))
         ## stop
 
-        self.btn_LKneExtPre_stop.clicked.connect(partial(self.DutyStopClicked,LKNE_EXT_PWM))
-        self.btn_LKneFlexPre_stop.clicked.connect(partial(self.DutyStopClicked,LKNE_FLEX_PWM))
-        self.btn_LAnkExtPre_stop.clicked.connect(partial(self.DutyStopClicked,LANK_EXT_PWM))
-        self.btn_LTankPre_stop.clicked.connect(partial(self.DutyStopClicked,LTANK_PWM))
+        self.btn_LKneExtPre_stop.clicked.connect(partial(self.DutyStopClicked,LKRA))
+        self.btn_LKneFlexPre_stop.clicked.connect(partial(self.DutyStopClicked,LKRA))
+        self.btn_LAnkExtPre_stop.clicked.connect(partial(self.DutyStopClicked,RKLA))
+        self.btn_LTankPre_stop.clicked.connect(partial(self.DutyStopClicked,LKRA))
 
-        self.btn_RKneExtPre_stop.clicked.connect(partial(self.DutyStopClicked,RKNE_EXT_PWM))
-        self.btn_RKneFlexPre_stop.clicked.connect(partial(self.DutyStopClicked,RKNE_FLEX_PWM))
-        self.btn_RAnkExtPre_stop.clicked.connect(partial(self.DutyStopClicked,RANK_EXT_PWM))
-        self.btn_RTankPre_stop.clicked.connect(partial(self.DutyStopClicked,RTANK_PWM))
+        self.btn_RKneExtPre_stop.clicked.connect(partial(self.DutyStopClicked,RKLA))
+        self.btn_RKneFlexPre_stop.clicked.connect(partial(self.DutyStopClicked,RKLA))
+        self.btn_RAnkExtPre_stop.clicked.connect(partial(self.DutyStopClicked,LKRA))
+        self.btn_RTankPre_stop.clicked.connect(partial(self.DutyStopClicked,RKLA))
 
 
 
@@ -73,5 +73,5 @@ class PressureConWindow(QDialog):
             self.parent().udp_port.udp_cmd_packet.des_pre_flag[chamber_idx]=True
     def DutyStopClicked(self,chamber_idx):
         with self.parent().udp_port.lock:
-            self.parent().udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx]=0
-            self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx]=True
+            self.parent().udp_port.udp_cmd_packet.con_on_off_data[chamber_idx] = False
+            self.parent().udp_port.udp_cmd_packet.con_on_off_flag[chamber_idx] = True

@@ -74,7 +74,7 @@ Valves_hub &hub = Valves_hub::GetInstance();
     else if(FSM::GetFSM_State()==FSM::State::kLeftStandRightSwing){
         //TODO: maybe enable rkla impedance control with energy recycle from left ankle to right knee
         //lkra, connect left knee with right ankle (right ankle has residual pressure for ankle push-off)
-        hub.valChanged_flag=true;
+        // hub.valChanged_flag=true;
         hub.lkra_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=100;  //TODO: check if this is controlling the right ankle or the left ankle
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
@@ -132,7 +132,7 @@ Valves_hub &hub = Valves_hub::GetInstance();
     }
     else if(FSM::GetFSM_State()==FSM::State::kLeftSwingRightStand){
         
-        hub.valChanged_flag = true;
+        // hub.valChanged_flag = true;
         hub.rkla_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;  //TODO: check if this is controlling the right ankle or the left ankle
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
@@ -171,8 +171,10 @@ Valves_hub &hub = Valves_hub::GetInstance();
 
 
 
-    hub.valChanged_flag = hub.valChanged_flag || hub.lkra_con.GetValveDuty(hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]);
-    hub.valChanged_flag = hub.valChanged_flag || hub.rkla_con.GetValveDuty(hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex],hub.PWM_Duty[(unsigned)PWM_ID::kRTank],hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]);
+    // hub.valChanged_flag = hub.valChanged_flag || 
+    hub.lkra_con.GetValveDuty(hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLTank],hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]);
+    // hub.valChanged_flag = hub.valChanged_flag || 
+    hub.rkla_con.GetValveDuty(hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex],hub.PWM_Duty[(unsigned)PWM_ID::kRTank],hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]);
 
 
     // auto lkra_con_mode = hub.lkra_con.GetControlMode();
@@ -200,8 +202,8 @@ Valves_hub &hub = Valves_hub::GetInstance();
     //     hub.valChanged_flag = true;
     // }
 
-    if (hub.valChanged_flag)
-    {
+    // if (hub.valChanged_flag)
+    // {
         // std::cout<<"duty: ";
         // check all pwm duty are below 100
         for (int i = 0; i < TeensyI2C::CMDLEN; i++)
@@ -219,8 +221,9 @@ Valves_hub &hub = Valves_hub::GetInstance();
         std::memcpy(cmd.begin(), hub.PWM_Duty.begin(), sizeof(uint8_t) * PWM_VAL_NUM);
 
         hub.teensyValveCon.WriteCmd(cmd);
-        hub.valChanged_flag = false;
-    }
+        // hub.valChanged_flag = false;
+        
+    // }
     // put measurements in mpc controller, we must do this even the controller are not enabled since it relies on the history of the measurements
     hub.lkra_con.RecData();
     hub.rkla_con.RecData();
@@ -229,16 +232,26 @@ Valves_hub &hub = Valves_hub::GetInstance();
 
 void Valves_hub::SetDuty(u_int8_t duty, PWM_ID id, Valves_hub::KneeAnkPair knee_ank_pair)
 {
-    Valves_hub::ResetCon(knee_ank_pair);
+    // Valves_hub::ResetCon(knee_ank_pair);
+    
+        
     Valves_hub &hub = Valves_hub::GetInstance();
+
+    if(knee_ank_pair == KneeAnkPair::kLeftKneeRightAnk){
+        hub.lkra_con.ResetControl();
+    }
+    else{
+        hub.rkla_con.ResetControl();
+    }
+
     hub.PWM_Duty[(unsigned)id] = duty;
-    hub.valChanged_flag = true;
+    // hub.valChanged_flag = true;
 }
 void Valves_hub::SetDuty(const std::array<u_int8_t, PWM_VAL_NUM> duty)
 {
     Valves_hub &hub = Valves_hub::GetInstance();
     std::memcpy(hub.PWM_Duty.begin(), duty.begin(), sizeof(u_int8_t) * PWM_VAL_NUM);
-    hub.valChanged_flag = true;
+    // hub.valChanged_flag = true;
 }
 
 const std::array<uint8_t, PWM_VAL_NUM> &Valves_hub::GetDuty()
@@ -251,10 +264,12 @@ void Valves_hub::ResetCon(KneeAnkPair joint)
     switch (joint)
     {
     case Valves_hub::KneeAnkPair::kLeftKneeRightAnk:
-        hub.lkra_con.ResetControl();
+        // std::cout<<"shutdown lkra\n";
+        hub.lkra_con.ShutDown();
         break;
     case Valves_hub::KneeAnkPair::kRightKneeLeftAnk:
-        hub.rkla_con.ResetControl();
+        // std::cout<<"shutdown rkla\n";
+        hub.rkla_con.ShutDown();
         break;
     default:
         break;

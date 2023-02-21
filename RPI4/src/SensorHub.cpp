@@ -97,6 +97,9 @@ void SensorHub::UpdateLEnc()
     if(ank_s_pos>2048){
         ank_s_pos = ank_s_pos%2048-2048;
     }
+    if(kne_s_pos>2048){
+        kne_s_pos = kne_s_pos%2048-2048;
+    }
 
     double hip_s_pos_f =  -1*hip_s_pos/4096.0*360; 
     double kne_s_pos_f = kne_s_pos/4096.0*360;
@@ -133,6 +136,9 @@ void SensorHub::UpdateREnc()
     }
     if(ank_s_pos>2048){
         ank_s_pos = ank_s_pos%2048-2048;
+    }
+    if(kne_s_pos>2048){
+        kne_s_pos = 2048-kne_s_pos%2048;
     }
 
     double hip_s_pos_f = hip_s_pos/4096.0*360;

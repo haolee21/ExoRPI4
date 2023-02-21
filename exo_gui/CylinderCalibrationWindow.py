@@ -92,7 +92,11 @@ class CylnCalibWindow(QDialog):
             # self.lcd_verify_length.display(math.sqrt(self.beta0_lank-self.beta1_lank*math.cos(math.radians(joint_angle-self.alpha_lank))))
             # self.lcd_verify_length.display(math.sqrt(self.lank_cyln_eqn[0]-self.lank_cyln_eqn[1]*math.cos(math.radians(joint_angle-self.lank_cyln_eqn[2]))))
         elif self.radio_rknee.isChecked():
-            joint_angle=180-enc_data[ENC_RKNE_S]
+            # if enc_data[ENC_RKNE_S]>180:
+            #     joint_angle = 180-enc_data[ENC_RKNE_S]
+            # else:
+            #     joint_angle=180-enc_data[ENC_RKNE_S]
+            joint_angle = 180-enc_data[ENC_RKNE_S]
             cyln_eqn=self.rkne_cyln_eqn
             # self.lcd_verify_ang.display(joint_angle)
             # self.lcd_verify_length.display(math.sqrt(self.beta0_rkne-self.beta1_rkne*math.cos(math.radians(joint_angle-self.alpha_rkne))))

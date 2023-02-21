@@ -105,7 +105,7 @@ private:
 
     std::array<uint8_t, PWM_VAL_NUM> PWM_Duty{0};
 
-    bool valChanged_flag;
+    // bool valChanged_flag;
 
     Recorder<uint8_t, PWM_VAL_NUM> pwmRecorder;
 

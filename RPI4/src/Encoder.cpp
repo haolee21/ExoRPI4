@@ -206,6 +206,9 @@ int Encoder::ReadPos()
                 // when reset encoder, there might be up to 1 ms latency, the threads will pile up
                 // however, the encoder value during reset is not important, we should just use the old value instead
             }
+            else{
+                std::cout<<"not reading\n";
+            }
 
             // usleep(20);
             // The encoder has issues reading two bytes consecutively, you will have to send one byte per time.
