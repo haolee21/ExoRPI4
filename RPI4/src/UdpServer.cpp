@@ -1,4 +1,5 @@
 #include "UdpServer.hpp"
+#include "FSM.hpp"
 UdpServer::UdpServer(/* args */)
 {
     // rx init
@@ -153,9 +154,9 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
             Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLKneFlex], PWM_ID::kLKneFlex, Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
         }
 
-        if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kLKneAnk])
+        if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kRKneLAnk])
         {
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLKneAnk], PWM_ID::kLKneAnk, Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRKneLAnk], PWM_ID::kRKneLAnk, Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
         }
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kLKneExut])
         {
@@ -186,9 +187,9 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
         {
             Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRKneFlex], PWM_ID::kRKneFlex, Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
-        if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kRKneAnk])
+        if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kLKneRAnk])
         {
-            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRKneAnk], PWM_ID::kRKneAnk, Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
+            Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kLKneRAnk], PWM_ID::kLKneRAnk, Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kRKneExut])
         {
@@ -349,13 +350,14 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
     if (this->CheckCmdSet(cmd_packet.con_on_off_flag.begin(), cmd_packet.con_on_off_flag.size()))
     {
 
-        if (!cmd_packet.con_on_off[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk])
+        if (cmd_packet.con_on_off_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk])
         {
             Valves_hub::ResetCon(Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
         }
 
-        else if (!cmd_packet.con_on_off[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk])
+        else if (cmd_packet.con_on_off_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk])
         {
+            // std::cout<<"turn off rkla in udp server\n";
             Valves_hub::ResetCon(Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
 
@@ -380,4 +382,29 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
         //     Valves_hub::SetJointPos(Valves_hub::Joint::kRAnk);
         // }
     }
+
+    if(cmd_packet.set_neutral_pos_flag){
+        FSM::SetNetualPos();
+    }
+
+    if(cmd_packet.fsm_start_flag){
+        if(cmd_packet.fsm_left_start)
+            FSM::FSM_LeftStart();
+        else if(cmd_packet.fsm_right_start)
+            FSM::FSM_RightStart();
+        else{
+            FSM::TurnOffFSM();
+            Valves_hub::ResetCon(Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
+            Valves_hub::ResetCon(Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
+        }
+    }
+    if(cmd_packet.fsm_param_change_flag){
+        FSM::SetImpParams(cmd_packet.left_swing_left_load_ratio,
+                          cmd_packet.right_swing_right_load_ratio,
+                          cmd_packet.fsm_left_knee_imp,
+                          cmd_packet.fsm_right_knee_imp,
+                          cmd_packet.fsm_left_knee_init_f,
+                          cmd_packet.fsm_right_knee_init_f);
+    }
+
 }

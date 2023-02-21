@@ -125,7 +125,7 @@ LTANK_PWM=PCB_VAL_2
 RTANK_PWM=PCB_VAL_3
 LKNE_EXT_PWM=PCB_VAL_4
 LKNE_FLEX_PWM=PCB_VAL_5
-LKNE_ANK_PWM=PCB_VAL_6
+RKNE_LANK_PWM=PCB_VAL_6
 LANK_EXT_PWM=PCB_VAL_7
 RKNE_EXUT_PWM=PCB_VAL_8
 LANK_FLEX_PWM=PCB_VAL_9
@@ -133,7 +133,7 @@ RANK_FLEX_PWM=PCB_VAL_10
 RANK_EXUT_PWM=PCB_VAL_11
 LANK_EXUT_PWM=PCB_VAL_12
 RANK_EXT_PWM=PCB_VAL_13
-RKNE_ANK_PWM=PCB_VAL_14
+LKNE_RANK_PWM=PCB_VAL_14
 RKNE_FLEX_PWM=PCB_VAL_15
 RKNE_EXT_PWM=PCB_VAL_16
 
@@ -154,6 +154,15 @@ class UdpCmdPacket(Structure):
               ("init_force",(c_double)*(NUM_KNEE_ANK_PAIR*NUM_FORCE_CON)),
               ("init_impact_imp",(c_double)*(NUM_KNEE_ANK_PAIR*NUM_FORCE_CON)),
               ("restore_imp",(c_double)*(NUM_KNEE_ANK_PAIR*NUM_FORCE_CON)),
+              ("fsm_left_start",c_bool),
+              ("fsm_right_start",c_bool),
+              ("fsm_left_swing_left_load_ratio",c_double),
+              ("fsm_right_swing_right_load_ratio",c_double),
+              ("fsm_left_knee_init_f",c_double),
+              ("fsm_right_knee_init_f",c_double),
+              ("fsm_left_knee_imp",c_double),
+              ("fsm_right_knee_imp",c_double),
+
 
               ("pwm_duty_flag",(c_bool)*PWM_VAL_NUM),
               ("reset_enc_flag",(c_bool)*NUM_ENC),
@@ -164,7 +173,11 @@ class UdpCmdPacket(Structure):
               ("recorder_flag",c_bool),
               ("con_on_off_flag",(c_bool)*NUM_KNEE_ANK_PAIR),
               ("set_joint_pos_flag",(c_bool)*(NUM_KNEE_ANK_PAIR*NUM_FORCE_CON)),
-              ("impact_absorb_flag",(c_bool)*(NUM_KNEE_ANK_PAIR*NUM_FORCE_CON)),]
+              ("impact_absorb_flag",(c_bool)*(NUM_KNEE_ANK_PAIR*NUM_FORCE_CON)),
+              ("set_neutral_flag",c_bool),
+              ("fsm_start_flag",c_bool),
+              ("fsm_param_change_flag",c_bool),
+              ]
     def __init__(self):
         self.pwm_duty_flag=(ctypes.c_bool*PWM_VAL_NUM)((False)*PWM_VAL_NUM)
         self.reset_enc_flag = (ctypes.c_bool*NUM_ENC)((False)*NUM_ENC)

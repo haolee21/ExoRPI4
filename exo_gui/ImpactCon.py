@@ -58,31 +58,31 @@ class ImpactCon(QDialog):
 
         if joint_idx == LKRA*2+FORCE_CON_KNE_EXT:
             self.parent().udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXT_PWM]=0
-            self.parent().udp_port.udp_cmd_packet.pwm_duty_data[LKNE_ANK_PWM]=0
+            self.parent().udp_port.udp_cmd_packet.pwm_duty_data[RKNE_LANK_PWM]=0
             self.parent().udp_port.udp_cmd_packet.pwm_duty_data[LTANK_PWM]=0
             self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXT_PWM]=True
-            self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_ANK_PWM]=True
+            self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[RKNE_LANK_PWM]=True
             self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[LTANK_PWM]=True
         elif joint_idx == RKLA*2+FORCE_CON_ANK_PLANT:
             self.parent().udp_port.udp_cmd_packet.pwm_duty_data[LANK_EXT_PWM]=0
-            self.parent().udp_port.udp_cmd_packet.pwm_duty_data[LKNE_ANK_PWM]=0
+            self.parent().udp_port.udp_cmd_packet.pwm_duty_data[RKNE_LANK_PWM]=0
             self.parent().udp_port.udp_cmd_packet.pwm_duty_data[LTANK_PWM]=0
             self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[LANK_EXT_PWM]=True
-            self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_ANK_PWM]=True
+            self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[RKNE_LANK_PWM]=True
             self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[LTANK_PWM]=True
         elif joint_idx == RKLA*2+FORCE_CON_KNE_EXT:
             self.parent().udp_port.udp_cmd_packet.pwm_duty_data[RKNE_EXT_PWM]=0
-            self.parent().udp_port.udp_cmd_packet.pwm_duty_data[RKNE_ANK_PWM]=0
+            self.parent().udp_port.udp_cmd_packet.pwm_duty_data[LKNE_RANK_PWM]=0
             self.parent().udp_port.udp_cmd_packet.pwm_duty_data[RTANK_PWM]=0
 
             self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[RKNE_EXT_PWM]=True
-            self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[RKNE_ANK_PWM]=True
+            self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_RANK_PWM]=True
             self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[RTANK_PWM]=True
         elif joint_idx == LKRA*2+FORCE_CON_ANK_PLANT:
             self.parent().udp_port.udp_cmd_packet.pwm_duty_data[RANK_EXT_PWM]=0
-            self.parent().udp_port.udp_cmd_packet.pwm_duty_data[RKNE_ANK_PWM]=0
+            self.parent().udp_port.udp_cmd_packet.pwm_duty_data[LKNE_RANK_PWM]=0
             self.parent().udp_port.udp_cmd_packet.pwm_duty_data[RTANK_PWM]=0
 
             self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[RANK_EXT_PWM]=True
-            self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[RKNE_ANK_PWM]=True
+            self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_RANK_PWM]=True
             self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[RTANK_PWM]=True

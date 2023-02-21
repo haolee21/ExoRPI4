@@ -37,6 +37,7 @@ public:
 
     static SensorHub& GetInstance();
     static const std::array<double,NUMENC>& GetEncData(); //I did not use lock here since they will be read-only arrays
+    static const std::array<double,NUMENC>& GetEncVel();
     static const std::array<double,NUMPRE>& GetPreData(); //While data may not be sync, but it will be the most recent one
     // static const std::array<double,NUMPRE>& GetPreFiltered(); //get the filtered pressure reading
 
@@ -77,9 +78,11 @@ public:
 private:
     
     std::array<double,NUMENC> EncData;
+    std::array<double,NUMENC> EncVel;
     std::array<double,NUMPRE> PreData;
-    Recorder<double,NUMENC/2> LEncRecorder;
-    Recorder<double,NUMENC/2> REncRecorder;
+    Recorder<double,NUMENC> LEncRecorder; //pos+vel
+    Recorder<double,NUMENC> REncRecorder;
+
     Recorder<double,NUMPRE> PreRecorder;
     Recorder<double,NUMPRE> PreRecOri;
 
@@ -96,6 +99,9 @@ private:
     //Butterworth filter for ADC
     // DigitalFilter<double,FilterParam::Filter3Hz::Order,NUMPRE> filter_3_hz;
     DigitalFilter<double,FilterParam::Filter20Hz_2::Order,NUMPRE> digital_filter;
+    DigitalFilter<double,FilterParam::Filter45Hz_2::Order,NUMENC/2> left_enc_vel_filter;
+    DigitalFilter<double,FilterParam::Filter45Hz_2::Order,NUMENC/2> right_enc_vel_filter;
+
    
 
 

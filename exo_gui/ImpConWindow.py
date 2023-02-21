@@ -35,19 +35,19 @@ class ImpWindow(QDialog):
         
         self.lineEdit_lkne_imp.textChanged.connect(partial(self.TextChange,self.lineEdit_lkne_imp,self.lineEdit_lkne_initF))
         self.btn_lkne_set.clicked.connect(partial(self.ImpSet,self.lineEdit_lkne_imp,self.lineEdit_lkne_initF,LKRA*NUM_FORCE_CON+FORCE_CON_KNE_EXT))
-        self.btn_lkne_stop.clicked.connect(partial(self.ImpStop,LKRA*NUM_FORCE_CON+FORCE_CON_KNE_EXT))
+        self.btn_lkne_stop.clicked.connect(partial(self.ImpStop,LKRA))
 
         self.lineEdit_lank_imp.textChanged.connect(partial(self.TextChange,self.lineEdit_lank_imp,self.lineEdit_lank_initF))
         self.btn_lank_set.clicked.connect(partial(self.ImpSet,self.lineEdit_lank_imp,self.lineEdit_lank_initF,RKLA*NUM_FORCE_CON+FORCE_CON_ANK_PLANT))
-        self.btn_lank_stop.clicked.connect(partial(self.ImpStop,RKLA*NUM_FORCE_CON+FORCE_CON_ANK_PLANT))
+        self.btn_lank_stop.clicked.connect(partial(self.ImpStop,RKLA))
 
         self.lineEdit_rkne_imp.textChanged.connect(partial(self.TextChange,self.lineEdit_rkne_imp,self.lineEdit_rkne_initF))
         self.btn_rkne_set.clicked.connect(partial(self.ImpSet,self.lineEdit_rkne_imp,self.lineEdit_rkne_initF,RKLA*NUM_FORCE_CON+FORCE_CON_KNE_EXT))
-        self.btn_rkne_stop.clicked.connect(partial(self.ImpStop,RKLA*NUM_FORCE_CON+FORCE_CON_KNE_EXT))
+        self.btn_rkne_stop.clicked.connect(partial(self.ImpStop,RKLA))
 
         self.lineEdit_rank_imp.textChanged.connect(partial(self.TextChange,self.lineEdit_rank_imp,self.lineEdit_rank_initF))
         self.btn_rank_set.clicked.connect(partial(self.ImpSet,self.lineEdit_rank_imp,self.lineEdit_rank_initF,LKRA*NUM_FORCE_CON+FORCE_CON_ANK_PLANT))
-        self.btn_rank_stop.clicked.connect(partial(self.ImpStop,LKRA*NUM_FORCE_CON+FORCE_CON_ANK_PLANT))
+        self.btn_rank_stop.clicked.connect(partial(self.ImpStop,LKRA))
        
 
     def TextChange(self,line_edit_imp,line_edit_initF):
@@ -60,13 +60,13 @@ class ImpWindow(QDialog):
         palette.setColor(QPalette.Text,Qt.black)
         line_edit_imp.setPalette(palette)
         line_edit_initF.setPalette(palette)
-
-        self.parent().udp_port.udp_cmd_packet.des_imp_data[joint_idx]=TextToFloat(line_edit_imp.text())
-        self.parent().udp_port.udp_cmd_packet.init_force[joint_idx] = TextToFloat(line_edit_initF.text())
-        self.parent().udp_port.udp_cmd_packet.des_imp_flag[joint_idx]=True
+        with self.parent().udp_port.lock:
+            self.parent().udp_port.udp_cmd_packet.des_imp_data[joint_idx]=TextToFloat(line_edit_imp.text())
+            self.parent().udp_port.udp_cmd_packet.init_force[joint_idx] = TextToFloat(line_edit_initF.text())
+            self.parent().udp_port.udp_cmd_packet.des_imp_flag[joint_idx]=True
     def ImpStop(self,joint_idx):
-        
-        self.parent().udp_port.udp_cmd_packet.con_on_off_data[joint_idx]=False
-        self.parent().udp_port.udp_cmd_packet.con_on_off_flag[joint_idx]=True
+        with self.parent().udp_port.lock:
+            self.parent().udp_port.udp_cmd_packet.con_on_off_data[joint_idx]=False
+            self.parent().udp_port.udp_cmd_packet.con_on_off_flag[joint_idx]=True
         # self.parent().udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx]=0
         # self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx]=True

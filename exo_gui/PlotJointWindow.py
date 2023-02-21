@@ -25,7 +25,7 @@ class PlotJointWindow(QWidget):
 
         self.left_plot_widget.nextRow()
         self.left_knee_plot = self.left_plot_widget.addPlot(colspan=1,title='Knee')
-        self.left_knee_plot.setYRange(0,360)
+        self.left_knee_plot.setYRange(0,180)
         self.left_knee_plot.setLabel('left','Angle (deg)')
         self.left_knee_plot.setLabel('bottom','Time (sec)')
         self.left_knee_line = self.left_knee_plot.plot(pen=pg.mkPen('b', width=1))
@@ -49,7 +49,7 @@ class PlotJointWindow(QWidget):
 
         self.right_plot_widget.nextRow()
         self.right_knee_plot = self.right_plot_widget.addPlot(colspan=1,title='Knee',color='b')
-        self.right_knee_plot.setYRange(0,360)
+        self.right_knee_plot.setYRange(0,180)
         self.right_knee_plot.setLabel('left','Angle (deg)')
         self.right_knee_plot.setLabel('bottom','Time (sec)')
         self.right_knee_line = self.right_knee_plot.plot(pen=pg.mkPen('b', width=1))

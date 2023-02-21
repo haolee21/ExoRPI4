@@ -8,7 +8,11 @@
 #define X_LEN 2
 #define NUM_OF_CONS 3
 #define A_MAT_LEN 50
+<<<<<<< HEAD
 #include <osqp/osqp.h>
+=======
+#include "osqp/osqp.h"
+>>>>>>> add matlab function to generate csc matrix
 #include <memory>
 #include <array>
 #include <iostream>

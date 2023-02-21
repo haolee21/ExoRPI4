@@ -278,7 +278,7 @@ namespace MpcInitParam
         1.59151313e-03}
 
     };
-    const std::array<std::array<double,MPC_STATE_NUM>,2> kLKneAnkCh
+    const std::array<std::array<double,MPC_STATE_NUM>,2> kRKneLAnkCh
     {
         std::array<double,MPC_STATE_NUM>{0.00000000e+00,  1.91748026e-04,  0.00000000e+00,  5.30088907e-04,
         0.00000000e+00, -4.91518960e-04,  4.22599517e-05,  0.00000000e+00,
@@ -346,7 +346,7 @@ namespace MpcInitParam
         0.00000000e+00}
 
     };
-    const std::array<std::array<double,MPC_STATE_NUM>,2> kLKneAnkCl
+    const std::array<std::array<double,MPC_STATE_NUM>,2> kRKneLAnkCl
     {
         std::array<double,MPC_STATE_NUM>{-1.47165719e-04, -3.19964441e-05,  0.00000000e+00,  0.00000000e+00,
        -1.67409805e-04, -2.41051305e-05,  0.00000000e+00,  0.00000000e+00,
