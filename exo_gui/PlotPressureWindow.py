@@ -149,9 +149,9 @@ class PlotPressureWindow(QWidget):
         self.l_ank_ext_data.append(data[LANK_EXT_ADC]*0.003125-25)
         self.left_ankle_ext_line.setData(self.l_ank_ext_data)
 
-        # self.l_ank_flex_data.popleft()
-        # self.l_ank_flex_data.append(data[LANK_FLEX_ADC]*0.003125-25)
-        # self.left_ankle_flex_line.setData(self.l_ank_flex_data)
+        self.l_ank_flex_data.popleft()
+        self.l_ank_flex_data.append(data[LANK_FLEX_ADC]*0.003125-25)
+        self.left_ankle_flex_line.setData(self.l_ank_flex_data)
 
         #right, 
         
@@ -172,9 +172,9 @@ class PlotPressureWindow(QWidget):
         self.r_ank_ext_data.append(data[RANK_EXT_ADC]*0.003125-25)
         self.right_ankle_ext_line.setData(self.r_ank_ext_data)
 
-        # self.l_ank_flex_data.popleft()
-        # self.l_ank_flex_data.append(data[LANK_FLEX]*0.003125-25)
-        # self.left_ankle_flex_line.setData(self.l_ank_flex_data)
+        self.r_ank_flex_data.popleft()
+        self.r_ank_flex_data.append(data[RANK_FLEX_ADC]*0.003125-25)
+        self.right_ankle_flex_line.setData(self.r_ank_flex_data)
         
 
         self.parent.app.processEvents()

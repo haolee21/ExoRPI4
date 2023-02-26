@@ -71,7 +71,7 @@ class MW(QMainWindow):
         # jointUpdateCB = lambda data:self.joint_plot_window.UpdateData(self,data)
         # preUpdateCB = lambda data:self.pressure_plot_window.UpdateData(self,data)
         # self.tcp_port.SetCallBack(jointUpdateCB,preUpdateCB)
-        self.udp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn,self.UpdateMPC_LED,self.pwm_value_window.UpdateLCD,self.cylinder_calib_window.UpdateReading)
+        self.udp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn,self.UpdateMPC_LED,self.pwm_value_window.UpdateLCD,self.cylinder_calib_window.UpdateReading,self.update_fsm_state)
         # TCP/IP connection
         
         self.cur_ip = self.findChild(QLabel,'cur_ip_label')
@@ -206,7 +206,8 @@ class MW(QMainWindow):
 
         self.old_mpc_cond = [False]*4
         
-        
+        # fsm state display
+        self.lcd_fsm = self.findChild(QLCDNumber,'lcd_fsm')
 
         self.show()
     def radio_walkRec_checked(self):
@@ -301,7 +302,8 @@ class MW(QMainWindow):
             self.rec_flag=False
             self.btn_rec_start.setText('Rec Start')
      
-        
+    def update_fsm_state(self,state):
+        self.lcd_fsm.display(state)
 
 
     def found_disconnect(self):

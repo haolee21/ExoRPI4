@@ -39,7 +39,7 @@ class UdpClient:
         
         
 
-    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback,recBtnUpdate,conCondUpdate,pwm_lcd_update,calibWindowUpdate):
+    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback,recBtnUpdate,conCondUpdate,pwm_lcd_update,calibWindowUpdate,fsm_update):
         self.updateJoint = updateJointFun
         self.updatePre = updatePreFun
         self.updateTank = updateTankFun
@@ -48,6 +48,7 @@ class UdpClient:
         self.conCondUpdate = conCondUpdate
         self.pwm_lcd_update = pwm_lcd_update
         self.calib_window_update = calibWindowUpdate
+        self.fsm_update = fsm_update
     
     def SetIP_Port(self,address,tx_port,rx_port):
         self.ip_address=address
@@ -92,13 +93,13 @@ class UdpClient:
 
 
     def CheckRecv(self):
-       
+        
         # this function will be periodically called by QTimer
         try:
             data_recv = self.udp_data_socket.recvfrom(ctypes.sizeof(UdpDataPacket))
+            
             if(len(data_recv[0])==ctypes.sizeof(UdpDataPacket)):
                 self.disconnect_count=0
-                
                 udp_data_packet = UdpDataPacket.from_buffer_copy(data_recv[0])
             
                 self.updateJoint(udp_data_packet.enc_data)
@@ -108,8 +109,12 @@ class UdpClient:
                 self.updateTank(udp_data_packet.pre_data1[TANK_ADC]) 
                 self.recBtnUpdate(udp_data_packet.rec_status)
                 self.pwm_lcd_update(udp_data_packet.pwm_duty)
-
+                
+                self.fsm_update(udp_data_packet.fsm_state) #don't know why but if I call fsm later than 
                 self.calib_window_update(udp_data_packet.enc_data)
+                
+                
+                
                 
                 
         except:

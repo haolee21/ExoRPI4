@@ -73,6 +73,7 @@ class CylnCalibWindow(QDialog):
         self.radio_rknee.toggled.connect(self.ResetCalibAll)
         self.radio_rank.toggled.connect(self.ResetCalibAll)
     def UpdateReading(self,enc_data):
+        
         joint_angle=0
         cyln_eqn = None
         if self.radio_lknee.isChecked():
@@ -107,15 +108,18 @@ class CylnCalibWindow(QDialog):
             # self.lcd_verify_ang.display(joint_angle)
             # self.lcd_verify_length.display(math.sqrt(self.beta0_rank-self.beta1_rank*math.cos(math.radians(joint_angle-self.alpha_rank))))
             # self.lcd_verify_length.display(math.sqrt(self.rank_cyln_eqn[0]-self.rank_cyln_eqn[1]*math.cos(math.radians(joint_angle-self.rank_cyln_eqn[2]))))
+        
         self.lcd_verify_ang.display(joint_angle)
-        cyln_len = math.sqrt(cyln_eqn[0]-cyln_eqn[1]*math.cos(math.radians(joint_angle-cyln_eqn[2])))
-        self.lcd_verify_length.display(cyln_len)
-        self.lcd_moment_arm.display(0.5*cyln_eqn[1]*math.sin(math.radians(joint_angle-cyln_eqn[2]))/cyln_len)
-
-
-
+        
+        try:
+            cyln_len = math.sqrt(cyln_eqn[0]-cyln_eqn[1]*math.cos(math.radians(joint_angle-cyln_eqn[2])))
+            self.lcd_verify_length.display(math.sqrt(cyln_len))
+            self.lcd_moment_arm.display(0.5*cyln_eqn[1]*math.sin(math.radians(joint_angle-cyln_eqn[2]))/cyln_len)
+        except:
+            pass
         self.UpdateJointLCD(joint_angle)
-
+        
+        
     def UpdateJointLCD(self,joint_val):
 
         if self.radio_joint1.isChecked() & self.joint_angle_update[0]:

@@ -17,7 +17,7 @@
    <widget class="QProgressBar" name="air_volumn">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>20</x>
       <y>540</y>
       <width>191</width>
       <height>51</height>
@@ -212,7 +212,7 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>50</x>
       <y>520</y>
       <width>141</width>
       <height>16</height>
@@ -472,7 +472,7 @@
      </rect>
     </property>
     <property name="title">
-     <string>Controllers</string>
+     <string>FSM</string>
     </property>
     <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,1" columnstretch="1,2,1,2">
      <item row="0" column="0">
@@ -628,6 +628,32 @@
     </property>
     <property name="text">
      <string>Enable Encoder Reset</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>520</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>FSM</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="lcd_fsm">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>540</y>
+      <width>91</width>
+      <height>41</height>
+     </rect>
     </property>
    </widget>
   </widget>

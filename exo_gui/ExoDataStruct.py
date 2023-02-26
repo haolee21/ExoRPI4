@@ -85,6 +85,8 @@ RKNE_EXT_ADC=PRE_SEN16
 RANK_EXT_ADC=PRE_SEN15
 LKNE_EXT_ADC=PRE_SEN2
 LANK_EXT_ADC=PRE_SEN1
+LANK_FLEX_ADC = PRE_SEN5
+RANK_FLEX_ADC = PRE_SEN6
 
 # LKNE_EXT_ADC=3
 # LANK_EXT_ADC=4
@@ -142,7 +144,8 @@ class UdpDataPacket(Structure):
               ("enc_data",(c_double)*NUM_ENC),
               ("pre_data1",(c_double)*NUM_PRE),
               ("con_status",(c_bool)*NUM_KNEE_ANK_PAIR),
-              ("rec_status",c_bool)]
+              ("rec_status",c_bool),
+              ("fsm_state",c_int)]
 class UdpCmdPacket(Structure):
     _fields_=[("pwm_duty_data",(c_byte)*PWM_VAL_NUM),
               ("des_pre_data",(c_double)*(NUM_PRE_CON*NUM_KNEE_ANK_PAIR)),
