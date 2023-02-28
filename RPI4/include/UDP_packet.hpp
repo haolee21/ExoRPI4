@@ -15,6 +15,7 @@ struct UDP_DataPacket
     std::array<double,SensorHub::NUMPRE> pre_data1;
     std::array<bool,(unsigned)Valves_hub::KneeAnkPair::kTotal> con_status;
     bool recorder;
+    int fsm_state;
 };
 struct UDP_CmdPacket{
     std::array<u_int8_t,PWM_VAL_NUM> pwm_duty;

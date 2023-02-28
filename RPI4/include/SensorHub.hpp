@@ -61,8 +61,10 @@ public:
         RAnkExt = kPreSen15,
         LKneExt = kPreSen2,
         LAnkExt = kPreSen1, //TODO: check it whenever you reconnect the pressure sensors
+        LAnkFlex = kPreSen5,
+        RAnkFlex = kPreSen6,
     };
-    const std::string kAdc_Header = "Time,LAnkExt,LKneExt,na,na,na,na,na,na,RLTank,LKneFlex,RKneFlex,LTank,na,Tank,RAnkExt,RKneExt";
+    const std::string kAdc_Header = "Time,LAnkPla,LKneExt,na,na,LAnkDor,RAnkDor,na,na,RLTank,LKneFlex,RKneFlex,LTank,na,Tank,RAnkPla,RKneExt";
     
     // Pressure sensor index need to be assigned since it is determine by ADC channels
     

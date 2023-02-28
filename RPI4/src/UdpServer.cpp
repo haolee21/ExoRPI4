@@ -64,6 +64,10 @@ void UdpServer::GetDataPacket(UDP_DataPacket &return_packet)
     // std::copy(controller_cond.begin(), controller_cond.end(), return_packet.con_status.begin());
 
     return_packet.recorder = Timer::GetDataRec_flag();
+
+    return_packet.fsm_state = (int)FSM::GetFSM_State();
+   
+
 }
 
 UdpServer::~UdpServer()

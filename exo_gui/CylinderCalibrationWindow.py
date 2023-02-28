@@ -113,7 +113,7 @@ class CylnCalibWindow(QDialog):
         
         try:
             cyln_len = math.sqrt(cyln_eqn[0]-cyln_eqn[1]*math.cos(math.radians(joint_angle-cyln_eqn[2])))
-            self.lcd_verify_length.display(math.sqrt(cyln_len))
+            self.lcd_verify_length.display(cyln_len)
             self.lcd_moment_arm.display(0.5*cyln_eqn[1]*math.sin(math.radians(joint_angle-cyln_eqn[2]))/cyln_len)
         except:
             pass

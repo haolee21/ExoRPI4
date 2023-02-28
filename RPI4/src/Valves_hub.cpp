@@ -44,10 +44,10 @@ Valves_hub &hub = Valves_hub::GetInstance();
     const std::array<double, SensorHub::NUMPRE> &pre_data = SensorHub::GetPreData(); // use ref to avoid copy
     const std::array<double, SensorHub::NUMENC> &enc_data = SensorHub::GetEncData();
     // TODO: fix this recording
-    hub.lkra_con.PushMeas(pre_data[(unsigned)SensorHub::AdcName::LKneExt],pre_data[(unsigned)SensorHub::AdcName::LKneFLex],pre_data[(unsigned)SensorHub::AdcName::RAnkExt],pre_data[(unsigned)SensorHub::AdcName::LTank],pre_data[(unsigned)SensorHub::AdcName::Tank],
+    hub.lkra_con.PushMeas(pre_data[(unsigned)SensorHub::AdcName::LKneExt],pre_data[(unsigned)SensorHub::AdcName::LKneFLex],pre_data[(unsigned)SensorHub::AdcName::RAnkExt],pre_data[(unsigned)SensorHub::AdcName::RAnkFlex],pre_data[(unsigned)SensorHub::AdcName::LTank],pre_data[(unsigned)SensorHub::AdcName::Tank],
     enc_data[SensorHub::EncName::LKneS],enc_data[SensorHub::EncName::RAnkS],hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk],hub.PWM_Duty[(unsigned)PWM_ID::kLTank]);
     
-    hub.rkla_con.PushMeas(pre_data[(unsigned)SensorHub::AdcName::RKneExt],pre_data[(unsigned)SensorHub::AdcName::RKneFlex],pre_data[(unsigned)SensorHub::AdcName::LAnkExt],pre_data[(unsigned)SensorHub::AdcName::RTank],pre_data[(unsigned)SensorHub::AdcName::Tank],
+    hub.rkla_con.PushMeas(pre_data[(unsigned)SensorHub::AdcName::RKneExt],pre_data[(unsigned)SensorHub::AdcName::RKneFlex],pre_data[(unsigned)SensorHub::AdcName::LAnkExt],pre_data[(unsigned)SensorHub::AdcName::LAnkFlex],pre_data[(unsigned)SensorHub::AdcName::RTank],pre_data[(unsigned)SensorHub::AdcName::Tank],
     enc_data[SensorHub::EncName::RKneS],enc_data[SensorHub::EncName::LAnkS],hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk],hub.PWM_Duty[(unsigned)PWM_ID::kRTank]);
 
     FSM::Update();
@@ -59,7 +59,11 @@ Valves_hub &hub = Valves_hub::GetInstance();
         double l_kne_neu_pos;
         FSM::GetLKneImpParams(l_kne_imp,l_kne_neu_pos,l_kne_initF);
         hub.lkra_con.SetImpControl(JointCon::ForceCon::kKneExt,JointCon::ForceRedType::kRec,l_kne_imp,l_kne_initF,l_kne_neu_pos);
-        
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
         //TODO: not sure what rkla should do, right now I believe we should connect both end of the knee cylinder, due to the piston area difference, there will be some resistance 
         hub.rkla_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=100;
@@ -67,9 +71,9 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;
     }
     else if(FSM::GetFSM_State()==FSM::State::kLeftStandRightSwing){
         //TODO: maybe enable rkla impedance control with energy recycle from left ankle to right knee
@@ -86,16 +90,16 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
 
 
-        //rkla, the right knee should be free to flex, the left ankle should be locked to provide some negative work
+        //rkla, the right knee should be free to flex, the left ankle is connected to the right knee to have natural extension
         hub.rkla_con.ResetControl();
-        hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;
 
     }
     // else if(FSM::GetFSM_State()==FSM::State::kLeftStandRightPrep){
@@ -116,7 +120,13 @@ Valves_hub &hub = Valves_hub::GetInstance();
         double r_kne_neu_pos;
         FSM::GetRKneImpParams(r_kne_imp,r_kne_neu_pos,r_kne_initF);
         hub.rkla_con.SetImpControl(JointCon::ForceCon::kKneExt,JointCon::ForceRedType::kRec,r_kne_imp,r_kne_initF,r_kne_neu_pos);
-        
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
+
+
         //TODO: not sure what rkla should do, right now I believe we should connect both end of the knee cylinder, due to the piston area difference, there will be some resistance 
         hub.lkra_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=100;
@@ -124,9 +134,9 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=100;
 
 
     }
@@ -149,10 +159,10 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
 
     }

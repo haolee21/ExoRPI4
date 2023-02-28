@@ -40,7 +40,7 @@ SensorHub::SensorHub() //initialize member in list since Encoder has no default 
     , REncRecorder("EncodersR","Time,RHipS,RKneS,RAnkS,RHipS_v,RKneS_v,RAnkS_v")
     ,PreRecorder("Pressure",kAdc_Header)
     ,PreRecOri("Pressure_ori",kAdc_Header)
-    , LHipS_Enc(Encoder_L::HIP1), LKneS_Enc(Encoder_L::KNEE), LAnkS_Enc(Encoder_L::ANK1), RHipS_Enc(Encoder_R::HIP1), RKneS_Enc(Encoder_R::KNEE), RAnkS_Enc(Encoder_R::ANK1),adc0(0),adc1(1) //, LHipF_Enc(Encoder_L(1)), LAnkF_Enc(Encoder_L(4)), RHipF_Enc(Encoder_R(1)), RAnkF_Enc(Encoder_R(4))
+    , LHipS_Enc(Encoder_L::HIP1), LKneS_Enc(Encoder_L::KNEE), LAnkS_Enc(Encoder_L::ANK1), RHipS_Enc(Encoder_R::HIP1), RKneS_Enc(Encoder_R::HIP2), RAnkS_Enc(Encoder_R::ANK1),adc0(0),adc1(1) //RKNE cannot read, no reason
     // ,filter_3_hz(FilterParam::Filter3Hz::a,FilterParam::Filter3Hz::b)
     ,digital_filter(FilterParam::Filter20Hz_2::a,FilterParam::Filter20Hz_2::b)
     ,left_enc_vel_filter(FilterParam::Filter45Hz_2::a,FilterParam::Filter45Hz_2::b)

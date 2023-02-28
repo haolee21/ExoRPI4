@@ -22,12 +22,13 @@ public:
     static FSM& GetInstance();
     ~FSM();
     static void Update();
-    static State GetFSM_State();
+    static const State GetFSM_State();
+
     static void FSM_LeftStart();
     static void FSM_RightStart();
     static void TurnOffFSM();
     static void SetNetualPos();
-
+    
     //FSM control params
     static void GetLKneImpParams(double &imp,double &neutral_pos,double &init_force);
     static void GetRKneImpParams(double &imp,double &neutral_pos,double &init_force);
@@ -37,7 +38,7 @@ private:
     std::array<double,(unsigned)State::kNone>swtich_angle_ratio={0.0,0.65,0,0.56};
     FSM(/* args */);
     State cur_state;
-    Recorder<double,10> fsm_rec;
+    Recorder<double,12> fsm_rec;
     void LeftLoadRightPush();
     void LeftStandRightSwing();
     // void LeftStandRightPrep();
@@ -48,7 +49,7 @@ private:
     const std::array<double,SensorHub::NUMENC> &joint_pos;
     const std::array<double,SensorHub::NUMENC> &joint_vel;
     const double kVelTh = 0.01; //if less than  1/100 deg/sec, consider stop
-    const double kHipDiff = 10;                                                                            
+    const double kHipDiff = 5;                                                                            
 
     double l_hip_s_neu,l_kne_s_neu,l_ank_s_neu,r_hip_s_neu,r_kne_s_neu,r_ank_s_neu;
 
