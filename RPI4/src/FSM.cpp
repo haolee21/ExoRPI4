@@ -134,7 +134,7 @@ void FSM::LeftStandRightSwing()
     if (this->reach_peak)
     {
         this->cur_state = FSM::State::kLeftPushRightLoad;
-        std::cout << "Phase 3: LeftStandRIghtPrep\n";
+        std::cout << "Phase 3: LeftPushRightLoad\n";
         this->reach_peak = false;
     }
     // }

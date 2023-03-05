@@ -9,7 +9,7 @@ JointCon::JointCon(ExoConfig::MPC_Params knee_ext_params, ExoConfig::MPC_Params 
       // knee_flex_con(knee_flex_params, joint_con_name + "_knee_flex"),
       ank_ext_con(ank_ext_params, joint_con_name + "_ank_ext"), knee_ank_con(knee_ank_params, joint_con_name + "_knee_ank"), tank_con(tank_params, joint_con_name + "_tank"),
       knee_cyln_params(knee_cyln_params), ank_cyln_params(ank_cyln_params),
-      neutral_knee_pos(knee_cyln_params.neutral_pos),
+      neutral_knee_pos(knee_cyln_params.neutral_pos),neutral_ank_pos(ank_cyln_params.neutral_pos),
       vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b), force_pre_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b),
       p_ext_rec_diff_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b),
       joint_con_rec(joint_con_name, "Time,KneForce,AnkForce,KneTotLen,AnkTotLen,KneMomentArm,AnkMomentArm,KneSpringMaxCompress,AnkSpringMaxCompress")
@@ -51,6 +51,7 @@ void JointCon::SetImpControl(ForceCon _force_con_type, ForceRedType _force_red_t
     this->con_mode = ConMode::kImpCon;
     this->force_con_type = _force_con_type;
     this->force_red_type = _force_red_type;
+    
 }
 void JointCon::SetImpControl(ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_imp, double cmd_init_force, double neutral_pos)
 {
@@ -61,6 +62,7 @@ void JointCon::SetImpControl(ForceCon _force_con_type, ForceRedType _force_red_t
     this->force_con_type = _force_con_type;
     this->force_red_type = _force_red_type;
     this->neutral_knee_pos = neutral_pos;
+    
 }
 void JointCon::ResetControl()
 {
@@ -132,6 +134,10 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     // calculate moment arm
     this->knee_moment_arm = 0.5 * this->knee_cyln_params.cyln_eqn[1] * sin((180 - knee_angle - this->knee_cyln_params.cyln_eqn[2]) / 180 * M_PI) / knee_tot_len;
     this->ankle_moment_arm = 0.5 * this->ank_cyln_params.cyln_eqn[1] * sin((ankle_angle + 180 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI) / ank_tot_len;
+
+
+    // std::cout<<"knee moment arm: "<<this->knee_moment_arm<<std::endl;
+    // std::cout<<"ankle moment arm: "<<this->ankle_moment_arm<<std::endl;
 
     // get fsm state
 
@@ -244,7 +250,12 @@ void JointCon::GetForceCon(std::array<double, MPC_TIME_HORIZON> des_force, u_int
             {
                 // std::cout << "increase tank pressure\n";
                 // std::cout<<"ltank pre: "<<this->pre_tank<<", des pre: "<<des_pre[0]<<std::endl;
-                tank_duty = this->tank_con.GetPreControl(des_pre, this->p_sub_tank, this->p_main_tank, 1);
+
+                for(int i=0;i<des_pre.size();i++){
+                    des_pre[i]+=18000;
+                }
+
+                tank_duty = this->tank_con.GetPreControl(des_pre, this->p_sub_tank, this->p_main_tank, 1);//make it 5 psi higher than required
                 charge_duty = 0;
             }
             else
@@ -386,15 +397,18 @@ void JointCon::GetImpCon(double des_imp, double torque_offset, u_int8_t &charge_
     // double des_imp = this->cmd_imp[(unsigned)force_con_type];
     // double force_offset = this->cmd_init_force[(unsigned)force_con_type];
     double des_torque, des_torque_step;
-
+    // std::cout<<"knee pos diff: "<<this->knee_pos_diff<<std::endl;
     if (force_con_type == ForceCon::kKneExt)
     {
-        des_torque = des_imp * (this->cur_knee_ang - this->knee_cyln_params.neutral_pos);
+        des_torque = des_imp * (this->cur_knee_ang - this->neutral_knee_pos)+torque_offset;
         des_torque_step = des_imp * this->knee_pos_diff;
+
+        
+        
     }
     else if (force_con_type == ForceCon::kAnkPlant)
     {
-        des_torque = des_imp * (this->cur_ankle_ang - this->ank_cyln_params.neutral_pos);
+        des_torque = des_imp * (this->cur_ankle_ang - this->neutral_ank_pos)+torque_offset;
         des_torque_step = des_imp * this->ank_pos_diff;
     }
     else
@@ -407,7 +421,7 @@ void JointCon::GetImpCon(double des_imp, double torque_offset, u_int8_t &charge_
     std::array<double, MPC_TIME_HORIZON> des_torque_array;
     for (int i = 0; i < MPC_TIME_HORIZON; i++)
     {
-        des_torque_array[i] = des_torque + torque_offset;
+        des_torque_array[i] = des_torque;
         des_torque += des_torque_step; // TODO: right now I just make it 5% more in the future, note that it will fail when the impedance is negative
     }
     // this->cmd_force[(unsigned)force_con_type] = des_torque_array;
@@ -571,10 +585,12 @@ void JointCon::GetTorCon(std::array<double, MPC_TIME_HORIZON> des_tor, u_int8_t 
         break;
     }
     // std::cout<<"moment arm: "<<moment_arm<<std::endl;
+    // std::cout<<"desired torque: "<<des_tor[0]<<std::endl;
+    // std::cout<<"moment arm: "<<moment_arm<<std::endl;
     // std::cout<<"desired force: ";
     for (unsigned i = 0; i < des_force.size(); i++)
     {
-        des_force[i] = des_tor[i] * moment_arm/1000;
+        des_force[i] = des_tor[i] / moment_arm*1000; //desired torque is in N*m
         // std::cout<<des_force[i]<<',';
         // ideally moment arm should change at different angles, but here we ignore it for simplification
     }

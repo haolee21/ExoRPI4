@@ -117,11 +117,11 @@ class MW(QMainWindow):
         self.value = 0
 
         # exhaust 
-        self.btn_discharge = self.findChild(QPushButton,'btn_discharge')
+        self.btn_relax = self.findChild(QPushButton,'btn_relax')
         self.btn_lock = self.findChild(QPushButton,'btn_lock')
-        self.btn_discharge.clicked.connect(self.btn_discharge_clicked)
+        self.btn_relax.clicked.connect(self.btn_relax_clicked)
         self.btn_lock.clicked.connect(self.btn_lock_clicked)
-        self.discharge_thread = None 
+        # self.discharge_thread = None 
         
         # create exo plot
         self.numJoint=6
@@ -341,39 +341,72 @@ class MW(QMainWindow):
 
 
 
-    def btn_discharge_clicked(self):
+    def btn_relax_clicked(self):
         #add sleep to avoid high instant current
         # the power supply cannot output that much current 
-        if self.discharge_thread:
-            if self.discharge_thread.is_alive():
-                self.discharge_thread.join()
-        self.discharge_thread= threading.Thread(target=self.discharge_process)
-        self.discharge_thread.start()
+        # if self.discharge_thread:
+        #     if self.discharge_thread.is_alive():
+        #         self.discharge_thread.join()
+        # self.discharge_thread= threading.Thread(target=self.discharge_process)
+        # self.discharge_thread.start()
+            #     # self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXUT_PWM]=100
+    #     # self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXUT_PWM]=True
+    #     # time.sleep(1)
+        with self.udp_port.lock:
+            self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXUT_PWM]=100
+            self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXUT_PWM]=True
         
-    def discharge_process(self):
-        # self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXUT_PWM]=100
-        # self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXUT_PWM]=True
-        # time.sleep(1)
-        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXT_PWM]=100
-        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXT_PWM]=True
-        time.sleep(1)
-        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_FLEX_PWM]=100
-        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_FLEX_PWM]=True
-        time.sleep(1)
-        self.udp_port.udp_cmd_packet.pwm_duty_data[RKNE_LANK_PWM]=100
-        self.udp_port.udp_cmd_packet.pwm_duty_flag[RKNE_LANK_PWM]=True
+            self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_FLEX_PWM]=100
+            self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_FLEX_PWM]=True
+            
+            self.udp_port.udp_cmd_packet.pwm_duty_data[LANK_FLEX_PWM]=100
+            self.udp_port.udp_cmd_packet.pwm_duty_flag[LANK_FLEX_PWM]=True
+
+            self.udp_port.udp_cmd_packet.pwm_duty_data[LANK_EXUT_PWM]=100
+            self.udp_port.udp_cmd_packet.pwm_duty_flag[LANK_EXUT_PWM]=True
+
+            self.udp_port.udp_cmd_packet.pwm_duty_data[RKNE_EXUT_PWM]=100
+            self.udp_port.udp_cmd_packet.pwm_duty_flag[RKNE_EXUT_PWM]=True
+        
+            self.udp_port.udp_cmd_packet.pwm_duty_data[RKNE_FLEX_PWM]=100
+            self.udp_port.udp_cmd_packet.pwm_duty_flag[RKNE_FLEX_PWM]=True
+            
+            self.udp_port.udp_cmd_packet.pwm_duty_data[RANK_FLEX_PWM]=100
+            self.udp_port.udp_cmd_packet.pwm_duty_flag[RANK_FLEX_PWM]=True
+
+            self.udp_port.udp_cmd_packet.pwm_duty_data[RANK_EXUT_PWM]=100
+            self.udp_port.udp_cmd_packet.pwm_duty_flag[RANK_EXUT_PWM]=True
+        
+    # def discharge_process(self):
+    #     # self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXUT_PWM]=100
+    #     # self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXUT_PWM]=True
+    #     # time.sleep(1)
+    #     self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXT_PWM]=100
+    #     self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXT_PWM]=True
+    #     time.sleep(1)
+    #     self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_FLEX_PWM]=100
+    #     self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_FLEX_PWM]=True
+    #     time.sleep(1)
+    #     self.udp_port.udp_cmd_packet.pwm_duty_data[RKNE_LANK_PWM]=100
+    #     self.udp_port.udp_cmd_packet.pwm_duty_flag[RKNE_LANK_PWM]=True
          
     def btn_lock_clicked(self):
-        if self.discharge_thread.is_alive():
-            self.discharge_thread.join()
-        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXUT_PWM]=0
-        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXUT_PWM]=True
-        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXT_PWM]=0
-        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXT_PWM]=True
-        self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_FLEX_PWM]=0
-        self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_FLEX_PWM]=True
-        self.udp_port.udp_cmd_packet.pwm_duty_data[RKNE_LANK_PWM]=0
-        self.udp_port.udp_cmd_packet.pwm_duty_flag[RKNE_LANK_PWM]=True
+        # if self.discharge_thread.is_alive():
+        #     self.discharge_thread.join()
+        # self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXUT_PWM]=0
+        # self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXUT_PWM]=True
+        # self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_EXT_PWM]=0
+        # self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_EXT_PWM]=True
+        # self.udp_port.udp_cmd_packet.pwm_duty_data[LKNE_FLEX_PWM]=0
+        # self.udp_port.udp_cmd_packet.pwm_duty_flag[LKNE_FLEX_PWM]=True
+        # self.udp_port.udp_cmd_packet.pwm_duty_data[RKNE_LANK_PWM]=0
+        # self.udp_port.udp_cmd_packet.pwm_duty_flag[RKNE_LANK_PWM]=True
+        print('call lock joint')
+        with self.udp_port.lock:
+            for i in range(len(self.udp_port.udp_cmd_packet.pwm_duty_data)):
+                self.udp_port.udp_cmd_packet.pwm_duty_data[i] = 0
+            for i in range(len(self.udp_port.udp_cmd_packet.pwm_duty_flag)):
+                self.udp_port.udp_cmd_packet.pwm_duty_flag[i]=True
 
 
             

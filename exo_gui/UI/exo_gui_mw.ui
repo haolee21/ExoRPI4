@@ -363,7 +363,7 @@
      <string>Reset RAnkle</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_discharge">
+   <widget class="QPushButton" name="btn_relax">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -373,7 +373,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Discharge</string>
+     <string>Relax</string>
     </property>
    </widget>
    <widget class="QGroupBox" name="groupBox_3">
