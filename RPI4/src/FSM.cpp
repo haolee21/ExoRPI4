@@ -228,7 +228,7 @@ void FSM::GetRKneImpParams(double &imp, double &neutral_pos, double &init_force)
     neutral_pos = fsm.r_kne_s_neu;
     init_force = fsm.r_kne_s_initF;
 }
-void FSM::SetImpParams(const double left_swing_left_load_ratio, const double right_swing_right_load_ratio, const double l_kne_imp, const double r_kne_imp, const double l_kne_initF, const double r_kne_initF)
+void FSM::SetImpParams(const double left_swing_left_load_ratio, const double right_swing_right_load_ratio, const double l_kne_imp, const double r_kne_imp, const double l_kne_initF, const double r_kne_initF,const double l_ank_idle_pre,const double r_ank_idle_pre)
 {
     auto &fsm = FSM::GetInstance();
 
@@ -239,6 +239,9 @@ void FSM::SetImpParams(const double left_swing_left_load_ratio, const double rig
     fsm.l_kne_s_imp = l_kne_imp;
     fsm.r_kne_s_initF = r_kne_initF;
     fsm.l_kne_s_initF = l_kne_initF;
+
+    fsm.l_ank_s_idle_p = l_ank_idle_pre * 320 + 8000; // psi to adc value;
+    fsm.r_ank_s_idle_p = r_ank_idle_pre * 320 + 8000; // psi to adc value;
 }
 void FSM::FSM_LeftStart()
 {
@@ -249,4 +252,10 @@ void FSM::FSM_RightStart()
 {
     FSM::GetInstance().cur_state = FSM::State::kLeftPushRightLoad;
     std::cout << "right start\n";
+}
+double FSM::GetLAnkPreParams(){
+    return FSM::GetInstance().l_ank_s_idle_p;
+}
+double FSM::GetRAnkPreParams(){
+    return FSM::GetInstance().r_ank_s_idle_p;
 }

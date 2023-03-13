@@ -409,7 +409,8 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
                           cmd_packet.fsm_left_knee_imp,
                           cmd_packet.fsm_right_knee_imp,
                           cmd_packet.fsm_left_knee_init_f,
-                          cmd_packet.fsm_right_knee_init_f);
+                          cmd_packet.fsm_right_knee_init_f,
+                          cmd_packet.fsm_left_ank_idle_pre,cmd_packet.fsm_right_ank_idle_pre);
     }
 
 }

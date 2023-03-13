@@ -462,148 +462,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QGroupBox" name="groupBox_4">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>540</y>
-      <width>291</width>
-      <height>121</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>FSM</string>
-    </property>
-    <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,1" columnstretch="1,2,1,2">
-     <item row="0" column="0">
-      <widget class="QLabel" name="LED_LKnee">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap>off_led.png</pixmap>
-       </property>
-       <property name="scaledContents">
-        <bool>true</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="label_4">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>LKnee</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="LED_RKnee">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap>off_led.png</pixmap>
-       </property>
-       <property name="scaledContents">
-        <bool>true</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="3">
-      <widget class="QLabel" name="RKnee_LED">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>RKnee</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="LED_LAnk">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap>off_led.png</pixmap>
-       </property>
-       <property name="scaledContents">
-        <bool>true</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLabel" name="LED_LAnk_2">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>LAnk</string>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QLabel" name="LED_RAnk">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap>off_led.png</pixmap>
-       </property>
-       <property name="scaledContents">
-        <bool>true</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="3">
-      <widget class="QLabel" name="RKnee_LED_2">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>RAnk</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QPushButton" name="btn_lock">
     <property name="geometry">
      <rect>
@@ -656,6 +514,61 @@
      </rect>
     </property>
    </widget>
+   <widget class="QGroupBox" name="groupBox_4">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>530</y>
+      <width>351</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Torque (Nm)</string>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_3">
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Right Knee</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Left Knee</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLCDNumber" name="lcd_right_knee_tor"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLCDNumber" name="lcd_left_knee_tor"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Left Ankle</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLCDNumber" name="lcd_left_ank_tor"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Right Ankle</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QLCDNumber" name="lcd_right_ank_tor"/>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -674,7 +587,7 @@
    </widget>
    <widget class="QMenu" name="menuGraphs">
     <property name="title">
-     <string>Graphs</string>
+     <string>Monitor</string>
     </property>
     <addaction name="actionGraphJoint"/>
     <addaction name="action_plotPressure"/>
@@ -761,6 +674,11 @@
   <action name="actionFSM_Parameter">
    <property name="text">
     <string>FSM Parameter</string>
+   </property>
+  </action>
+  <action name="actionForce_Torque">
+   <property name="text">
+    <string>Force/Torque</string>
    </property>
   </action>
  </widget>

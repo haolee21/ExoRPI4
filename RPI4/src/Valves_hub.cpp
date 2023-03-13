@@ -67,32 +67,6 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
         //TODO: not sure what rkla should do, right now I believe we should connect both end of the knee cylinder, due to the piston area difference, there will be some resistance 
         hub.rkla_con.ResetControl();
-        hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=100;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=100;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;
-    }
-    else if(FSM::GetFSM_State()==FSM::State::kLeftStandRightSwing){
-        //TODO: maybe enable rkla impedance control with energy recycle from left ankle to right knee
-        //lkra, connect left knee with right ankle (right ankle has residual pressure for ankle push-off)
-        // hub.valChanged_flag=true;
-        hub.lkra_con.ResetControl();
-        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=100;  //TODO: check if this is controlling the right ankle or the left ankle
-        hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
-
-
-        //rkla, the right knee should be free to flex, the left ankle is connected to the right knee to have natural extension
-        hub.rkla_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=100;
@@ -101,6 +75,44 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
+    }
+    else if(FSM::GetFSM_State()==FSM::State::kLeftStandRightSwing){
+        //TODO: maybe enable rkla impedance control with energy recycle from left ankle to right knee
+        //lkra, connect left knee with right ankle (right ankle has residual pressure for ankle push-off)
+        // hub.valChanged_flag=true;
+        hub.lkra_con.ResetControl();
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;  //TODO: check if this is controlling the right ankle or the left ankle
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
+
+        // if(pre_data[(unsigned)SensorHub::AdcName::LTank]<FSM::GetRAnkPreParams()+11200){
+        //     hub.lkra_con.SetPreControl(JointCon::PreCon::kSubTank,FSM::GetRAnkPreParams()+11200);
+        // }
+        // else{
+        //     hub.lkra_con.SetPreControl(JointCon::PreCon::kAnkPlant,FSM::GetRAnkPreParams());
+        // }
+        // std::cout<<"ank pla pre: "<<FSM::GetRAnkPreParams()<<std::endl;
+        // hub.lkra_con.SetPreControl(JointCon::PreCon::kSubTank,FSM::GetRAnkPreParams()+11200);
+        if(pre_data[(unsigned)SensorHub::AdcName::RAnkExt]>FSM::GetRAnkPreParams()
+         &&pre_data[(unsigned)SensorHub::AdcName::RAnkExt]>pre_data[(unsigned)SensorHub::AdcName::LKneExt]){
+             hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=100;
+             
+        }
+        //rkla, the right knee should be free to flex, the left ankle is connected to the right knee to have natural extension
+        hub.rkla_con.ResetControl();
+        hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;
 
     }
     // else if(FSM::GetFSM_State()==FSM::State::kLeftStandRightPrep){
@@ -129,16 +141,16 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
 
 
-        //TODO: not sure what rkla should do, right now I believe we should connect both end of the knee cylinder, due to the piston area difference, there will be some resistance 
+         
         hub.lkra_con.ResetControl();
-        hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=100;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
 
 
     }
@@ -146,7 +158,7 @@ Valves_hub &hub = Valves_hub::GetInstance();
         
         // hub.valChanged_flag = true;
         hub.rkla_con.ResetControl();
-        hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;  //TODO: check if this is controlling the right ankle or the left ankle
+        hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;  //TODO: check if this is controlling the right ankle or the left ankle
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=0;
@@ -154,17 +166,29 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
-        
+        //charge ankle during swing phase
+        // hub.rkla_con.SetPreControl(JointCon::PreCon::kAnkPlant,FSM::GetLAnkPreParams());
+        // hub.rkla_con.SetPreControl(JointCon::PreCon::kSubTank,FSM::GetLAnkPreParams()+11200);
 
+        // if(pre_data[(unsigned)SensorHub::AdcName::RTank]<FSM::GetLAnkPreParams()+11200){
+        //     hub.rkla_con.SetPreControl(JointCon::PreCon::kSubTank,FSM::GetLAnkPreParams()+11200);
+        // }
+        // else{
+        //     hub.rkla_con.SetPreControl(JointCon::PreCon::kAnkPlant,FSM::GetLAnkPreParams());
+        // }
+        if(pre_data[(unsigned)SensorHub::AdcName::LAnkExt]>FSM::GetLAnkPreParams()
+         &&pre_data[(unsigned)SensorHub::AdcName::LAnkExt]>pre_data[(unsigned)SensorHub::AdcName::RKneExt]){
+             hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;
+        }
 
         hub.lkra_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=100;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
 
     }

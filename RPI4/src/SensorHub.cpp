@@ -114,7 +114,7 @@ void SensorHub::UpdateLEnc()
     senHub.EncData[SensorHub::LHipS] = hip_s_pos_f; 
     senHub.EncData[SensorHub::LKneS] = kne_s_pos_f;
     senHub.EncData[SensorHub::LAnkS] = ank_s_pos_f;
-    std::array<double,NUMENC> curMea{senHub.EncData[LHipS],senHub.EncData[LKneS],senHub.EncData[LAnkS],senHub.EncVel[LHipS],senHub.EncVel[LKneS],senHub.EncData[LAnkS]};
+    std::array<double,NUMENC> curMea{senHub.EncData[LHipS],senHub.EncData[LKneS],senHub.EncData[LAnkS],senHub.EncVel[LHipS],senHub.EncVel[LKneS],senHub.EncVel[LAnkS]};
     // std::cout<<senHub.EncData[SensorHub::LHipS]<<','<<senHub.EncData[SensorHub::LKneS]<<','<<senHub.EncData[SensorHub::LAnkS]<<std::endl;
     // std::cout<<senHub.EncData[SensorHub::LHipS]<<std::endl;
     senHub.LEncRecorder.PushData(curMea);

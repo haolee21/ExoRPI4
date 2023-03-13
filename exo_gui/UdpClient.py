@@ -39,7 +39,7 @@ class UdpClient:
         
         
 
-    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback,recBtnUpdate,conCondUpdate,pwm_lcd_update,calibWindowUpdate,fsm_update):
+    def SetCallBack(self,updateJointFun,updatePreFun,updateTankFun,disConCallback,recBtnUpdate,conCondUpdate,pwm_lcd_update,calibWindowUpdate,fsm_update,torque_update):
         self.updateJoint = updateJointFun
         self.updatePre = updatePreFun
         self.updateTank = updateTankFun
@@ -49,6 +49,7 @@ class UdpClient:
         self.pwm_lcd_update = pwm_lcd_update
         self.calib_window_update = calibWindowUpdate
         self.fsm_update = fsm_update
+        self.torque_update = torque_update
     
     def SetIP_Port(self,address,tx_port,rx_port):
         self.ip_address=address
@@ -103,8 +104,9 @@ class UdpClient:
                 udp_data_packet = UdpDataPacket.from_buffer_copy(data_recv[0])
             
                 self.updateJoint(udp_data_packet.enc_data)
-                
                 self.updatePre(udp_data_packet.pre_data1)
+
+                self.torque_update(udp_data_packet.enc_data,udp_data_packet.pre_data1)
                 
                 self.updateTank(udp_data_packet.pre_data1[TANK_ADC]) 
                 self.recBtnUpdate(udp_data_packet.rec_status)

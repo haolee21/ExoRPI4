@@ -165,6 +165,8 @@ class UdpCmdPacket(Structure):
               ("fsm_right_knee_init_f",c_double),
               ("fsm_left_knee_imp",c_double),
               ("fsm_right_knee_imp",c_double),
+              ("fsm_left_ank_idle_pre",c_double),
+              ("fsm_right_ank_idle_pre",c_double),
 
 
               ("pwm_duty_flag",(c_bool)*PWM_VAL_NUM),

@@ -32,7 +32,9 @@ public:
     //FSM control params
     static void GetLKneImpParams(double &imp,double &neutral_pos,double &init_force);
     static void GetRKneImpParams(double &imp,double &neutral_pos,double &init_force);
-    static void SetImpParams(const double left_swing_left_load_ratio,const double right_swing_right_load_ratio, const double l_kne_imp,const double r_kne_imp,const double l_kne_initF,const double r_kne_initF);
+    static double GetLAnkPreParams();
+    static double GetRAnkPreParams();
+    static void SetImpParams(const double left_swing_left_load_ratio,const double right_swing_right_load_ratio, const double l_kne_imp,const double r_kne_imp,const double l_kne_initF,const double r_kne_initF,const double l_ank_idle_pre,const double r_ank_idle_pre);
     
 private:
     std::array<double,(unsigned)State::kNone>swtich_angle_ratio={0.0,0.65,0,0.56};
@@ -55,6 +57,8 @@ private:
 
     double l_kne_s_imp,l_ank_s_imp,r_kne_s_imp,r_ank_s_imp;
     double l_kne_s_initF,r_kne_s_initF;
+
+    double l_ank_s_idle_p,r_ank_s_idle_p;
 
     double cur_max_lhip_rhip,cur_min_lhip_rhip;
     double hip_diff_vel,hip_diff_pos;

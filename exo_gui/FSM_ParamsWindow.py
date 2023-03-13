@@ -15,6 +15,10 @@ class FSM_ParamWindow(QDialog):
         self.lineEdit_right_init_f = self.findChild(QLineEdit,'lineEdit_right_knee_initF')
         self.lineEdit_left_knee_imp = self.findChild(QLineEdit,'lineEdit_left_knee_imp')
         self.lineEdit_right_knee_imp = self.findChild(QLineEdit,'lineEdit_right_knee_imp')
+        self.lineEdit_left_ankle_idle_p = self.findChild(QLineEdit,'lineEdit_left_ank_idle_p')
+        self.lineEdit_right_ankle_idle_p = self.findChild(QLineEdit,'lineEdit_right_ank_idle_p')
+
+
 
         self.btn_update_fsm_param = self.findChild(QPushButton,'btn_apply_setting')
         self.btn_cancel = self.findChild(QPushButton,'btn_cancel')
@@ -32,6 +36,10 @@ class FSM_ParamWindow(QDialog):
             self.parent().udp_port.udp_cmd_packet.fsm_right_knee_init_f = TextToFloat(self.lineEdit_right_init_f.text())
             self.parent().udp_port.udp_cmd_packet.fsm_left_knee_imp = TextToFloat(self.lineEdit_left_knee_imp.text())
             self.parent().udp_port.udp_cmd_packet.fsm_right_knee_imp = TextToFloat(self.lineEdit_right_knee_imp.text())
+            self.parent().udp_port.udp_cmd_packet.fsm_left_ank_idle_pre = TextToFloat(self.lineEdit_left_ank_idle_p.text())
+            self.parent().udp_port.udp_cmd_packet.fsm_right_ank_idle_pre = TextToFloat(self.lineEdit_right_ank_idle_p.text())
+
+
             self.parent().udp_port.udp_cmd_packet.fsm_param_change_flag=True
         
 

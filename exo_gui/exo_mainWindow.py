@@ -71,7 +71,7 @@ class MW(QMainWindow):
         # jointUpdateCB = lambda data:self.joint_plot_window.UpdateData(self,data)
         # preUpdateCB = lambda data:self.pressure_plot_window.UpdateData(self,data)
         # self.tcp_port.SetCallBack(jointUpdateCB,preUpdateCB)
-        self.udp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn,self.UpdateMPC_LED,self.pwm_value_window.UpdateLCD,self.cylinder_calib_window.UpdateReading,self.update_fsm_state)
+        self.udp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn,self.UpdateMPC_LED,self.pwm_value_window.UpdateLCD,self.cylinder_calib_window.UpdateReading,self.update_fsm_state,self.Update_torque)
         # TCP/IP connection
         
         self.cur_ip = self.findChild(QLabel,'cur_ip_label')
@@ -189,27 +189,63 @@ class MW(QMainWindow):
         self.label_startTime = self.findChild(QLabel,'label_startTime')
 
 
-        # set MPC condition display
-        self.off_led = QPixmap('Resource/off_led.png')
-        self.on_led = QPixmap('Resource/on_led.png')
-        self.led_mpc_lknee = self.findChild(QLabel,'LED_LKnee')
-        self.led_mpc_rknee = self.findChild(QLabel,'LED_RKnee')
-        self.led_mpc_lank = self.findChild(QLabel,'LED_LAnk')
-        self.led_mpc_rank = self.findChild(QLabel,'LED_RAnk')
+        # # set MPC condition display
+        # self.off_led = QPixmap('Resource/off_led.png')
+        # self.on_led = QPixmap('Resource/on_led.png')
+        # self.led_mpc_lknee = self.findChild(QLabel,'LED_LKnee')
+        # self.led_mpc_rknee = self.findChild(QLabel,'LED_RKnee')
+        # self.led_mpc_lank = self.findChild(QLabel,'LED_LAnk')
+        # self.led_mpc_rank = self.findChild(QLabel,'LED_RAnk')
         
 
 
-        self.led_mpc_lknee.setPixmap(self.off_led)
-        self.led_mpc_rknee.setPixmap(self.off_led)
-        self.led_mpc_lank.setPixmap(self.off_led)
-        self.led_mpc_rank.setPixmap(self.off_led)
+        # self.led_mpc_lknee.setPixmap(self.off_led)
+        # self.led_mpc_rknee.setPixmap(self.off_led)
+        # self.led_mpc_lank.setPixmap(self.off_led)
+        # self.led_mpc_rank.setPixmap(self.off_led)
 
-        self.old_mpc_cond = [False]*4
+        # self.old_mpc_cond = [False]*4
         
         # fsm state display
         self.lcd_fsm = self.findChild(QLCDNumber,'lcd_fsm')
 
+        #joint torque display
+        self.lcd_left_knee_tor = self.findChild(QLCDNumber,'lcd_left_knee_tor')
+        self.lcd_left_ank_tor = self.findChild(QLCDNumber,'lcd_left_ank_tor')
+        self.lcd_right_knee_tor = self.findChild(QLCDNumber,'lcd_right_knee_tor')
+        self.lcd_right_ank_tor = self.findChild(QLCDNumber,'lcd_right_ank_tor')
         self.show()
+
+
+    def Update_torque(self,joint_angle,pre_data):
+        lk_eqn = self.config_loader.phy_param['LeftKnee']['CylnEqn']
+        lk_cyln_len_2 = lk_eqn[0]-lk_eqn[1]*math.cos(math.radians(180-joint_angle[ENC_LKNE_S]-lk_eqn[2]))
+        lk_force = (pre_data[LKNE_EXT_ADC]*self.config_loader.phy_param['LeftKnee']['PistonArea_mm2'][0]-pre_data[LKNE_FLEX_ADC]*self.config_loader.phy_param['LeftKnee']['PistonArea_mm2'][1])*0.000021546
+        if lk_cyln_len_2>0:
+            lk_arm = 0.5*lk_eqn[1]*math.sin(math.radians(180-joint_angle[ENC_LKNE_S]-lk_eqn[2]))/math.sqrt(lk_cyln_len_2)/1000
+            self.lcd_left_knee_tor.display(lk_force*lk_arm)
+            
+        rk_eqn = self.config_loader.phy_param['RightKnee']['CylnEqn']
+        rk_cyln_len_2 = rk_eqn[0]-rk_eqn[1]*math.cos(math.radians(180-joint_angle[ENC_RKNE_S]-rk_eqn[2]))
+        rk_force = (pre_data[RKNE_EXT_ADC]*self.config_loader.phy_param['RightKnee']['PistonArea_mm2'][0]-pre_data[RKNE_FLEX_ADC]*self.config_loader.phy_param['RightKnee']['PistonArea_mm2'][1])*0.000021546
+        if rk_cyln_len_2>0:
+            rk_arm = 0.5*rk_eqn[1]*math.sin(math.radians(180-joint_angle[ENC_RKNE_S]-rk_eqn[2]))/math.sqrt(rk_cyln_len_2)/1000
+            self.lcd_right_knee_tor.display(rk_force*rk_arm)
+        
+        la_eqn = self.config_loader.phy_param['LeftAnkle']['CylnEqn']
+        la_cyln_len_2 = la_eqn[0]-la_eqn[1]*math.cos(math.radians(180+joint_angle[ENC_LANK_S]-la_eqn[2]))
+        la_force = (pre_data[LANK_EXT_ADC]*self.config_loader.phy_param['LeftAnkle']['PistonArea_mm2'][0]-pre_data[LANK_FLEX_ADC]*self.config_loader.phy_param['LeftAnkle']['PistonArea_mm2'][1])*0.000021546
+        if la_cyln_len_2>0:
+            la_arm = 0.5*la_eqn[1]*math.sin(math.radians(180+joint_angle[ENC_LANK_S]-la_eqn[2]))/math.sqrt(la_cyln_len_2)/1000
+            self.lcd_left_ank_tor.display(la_arm*la_force)
+
+
+        ra_eqn = self.config_loader.phy_param['RightAnkle']['CylnEqn']
+        ra_cyln_len_2 = ra_eqn[0]-ra_eqn[1]*math.cos(math.radians(180+joint_angle[ENC_RANK_S]-ra_eqn[2]))
+        ra_force = (pre_data[RANK_EXT_ADC]*self.config_loader.phy_param['RightAnkle']['PistonArea_mm2'][0]-pre_data[RANK_FLEX_ADC]*self.config_loader.phy_param['RightAnkle']['PistonArea_mm2'][1])*0.000021546
+        if ra_cyln_len_2>0:
+            ra_arm = 0.5*ra_eqn[1]*math.sin(math.radians(180+joint_angle[ENC_RANK_S]-ra_eqn[2]))/math.sqrt(ra_cyln_len_2)/1000
+            self.lcd_right_ank_tor.display(ra_arm*ra_force)
     def radio_walkRec_checked(self):
         self.relLKne_task.setChecked(False)
         self.relRKne_task.setChecked(False)

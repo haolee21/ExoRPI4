@@ -12,7 +12,7 @@ JointCon::JointCon(ExoConfig::MPC_Params knee_ext_params, ExoConfig::MPC_Params 
       neutral_knee_pos(knee_cyln_params.neutral_pos),neutral_ank_pos(ank_cyln_params.neutral_pos),
       vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b), force_pre_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b),
       p_ext_rec_diff_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b),
-      joint_con_rec(joint_con_name, "Time,KneForce,AnkForce,KneTotLen,AnkTotLen,KneMomentArm,AnkMomentArm,KneSpringMaxCompress,AnkSpringMaxCompress")
+      joint_con_rec(joint_con_name, "Time,KneForce,AnkForce,KneExtLen,AnkShrkLen,KneMomentArm,AnkMomentArm,KneSpringMaxCompress,AnkSpringMaxCompress")
 {
     this->imp_fsm_state = Imp_FSM::kLoadPrep;
     // //setup osqp solver
@@ -102,7 +102,7 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     // calculate force related values
     std::array<double, 2> cur_force = this->force_filter.GetFilteredMea(
         std::array<double, 2>{(p_knee_ext * this->knee_cyln_params.piston_area[0] - p_knee_flex * this->knee_cyln_params.piston_area[1]) * 2.1547177056884764e-05,
-                              (p_ank_pla * this->ank_cyln_params.piston_area[1]-p_ank_dorsi*this->knee_cyln_params.piston_area[0]) * 2.1547177056884764e-05});
+                              (p_ank_pla * this->ank_cyln_params.piston_area[0]-p_ank_dorsi*this->knee_cyln_params.piston_area[1]) * 2.1547177056884764e-05});
     this->cur_knee_force = cur_force[0];
     this->cur_ank_force = cur_force[1];
 
@@ -144,8 +144,8 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     // record old data
     this->joint_con_rec.PushData(std::array<double, 8>{this->cur_knee_force, 
                                                        this->cur_ank_force, 
-                                                       knee_tot_len, 
-                                                       ank_tot_len, 
+                                                       this->knee_cyln_ext_len, 
+                                                       this->ank_cyln_shrk_len, 
                                                        this->knee_moment_arm, 
                                                        this->ankle_moment_arm, 
                                                        this->max_knee_spring_compress, 
@@ -288,7 +288,7 @@ void JointCon::GetForceCon(std::array<double, MPC_TIME_HORIZON> des_force, u_int
                     // std::cout<<"recycle to another cylinder\n";
                     rec_duty = this->knee_ank_con.GetPreControl(des_pre, *p_act, *p_rec, this->knee_ank_con.GetMpcCalibLen() / *cur_act_chamber_len);
                     // rec_duty = this->flex_con.GetPreControl(des_pre, this->pre_ext, this->pre_rec, 0.6);
-                    // std::cout<<"recycle to rec cylinder\n";
+                    std::cout<<"recycle to rec cylinder\n";
                 }
                 else
                 {
@@ -310,7 +310,7 @@ void JointCon::GetForceCon(std::array<double, MPC_TIME_HORIZON> des_force, u_int
     }
     else
     {
-        std::cout<<"force is close enough\n";
+        // std::cout<<"force is close enough\n";
         charge_duty = 0;
         rec_duty = 0;
         tank_duty = 0;
