@@ -288,7 +288,7 @@ void JointCon::GetForceCon(std::array<double, MPC_TIME_HORIZON> des_force, u_int
                     // std::cout<<"recycle to another cylinder\n";
                     rec_duty = this->knee_ank_con.GetPreControl(des_pre, *p_act, *p_rec, this->knee_ank_con.GetMpcCalibLen() / *cur_act_chamber_len);
                     // rec_duty = this->flex_con.GetPreControl(des_pre, this->pre_ext, this->pre_rec, 0.6);
-                    std::cout<<"recycle to rec cylinder\n";
+                    // std::cout<<"recycle to rec cylinder\n";
                 }
                 else
                 {
@@ -432,25 +432,7 @@ void JointCon::GetImpCon(double des_imp, double torque_offset, u_int8_t &charge_
     // std::cout << std::endl;
     this->GetTorCon(des_torque_array, charge_duty, rec_duty, balance_duty, tank_duty, force_con_type, force_red_type);
 }
-// void JointCon::GetPreCon(const double des_pre, u_int8_t &duty, ControlMode con_mode)
-// {
-//     std::array<double, MPC_TIME_HORIZON> des_pre_array;
-//     std::fill_n(des_pre_array.begin(), des_pre_array.size(), des_pre);
-//     switch (con_mode)
-//     {
 
-//     case JointCon::ControlMode::kPreConKneeExt:
-
-//         duty = this->knee_ext_con.GetPreControl(des_pre_array,this->p_knee_ext, this->p_sub_tank, this->knee_ext_con.GetMpcCalibLen() / this->knee_cyln_ext_len);
-//         break;
-//     case JointCon::ControlMode::kPreConSubTank:
-//         duty = this->tank_con.GetPreControl(des_pre_array, this->p_sub_tank, this->p_main_tank, 1);
-//         break;
-
-//     default:
-//         duty = 0;
-//     }
-// }
 
 void JointCon::GetPreCon(double des_pre, u_int8_t &duty, JointCon::PreCon pre_con_mode)
 {

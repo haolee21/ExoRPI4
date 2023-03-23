@@ -25,6 +25,7 @@ from ImpactCon import *
 from CylinderCalibrationWindow import *
 from ConfigLoader import *
 from FSM_ParamsWindow import *
+from PhasePlotWindow import *
 
 import math
 import time
@@ -67,11 +68,24 @@ class MW(QMainWindow):
         self.impact_con_window = ImpactCon(self)
         self.cylinder_calib_window = CylnCalibWindow(self)
         self.fsm_param_window = FSM_ParamWindow(self)
-        
+        self.phase_plot = PhasePlot(self)
         # jointUpdateCB = lambda data:self.joint_plot_window.UpdateData(self,data)
         # preUpdateCB = lambda data:self.pressure_plot_window.UpdateData(self,data)
         # self.tcp_port.SetCallBack(jointUpdateCB,preUpdateCB)
-        self.udp_port.SetCallBack(self.joint_plot_window.UpdateData,self.pressure_plot_window.UpdateData,self.update_air_volume,self.found_disconnect,self.update_rec_btn,self.UpdateMPC_LED,self.pwm_value_window.UpdateLCD,self.cylinder_calib_window.UpdateReading,self.update_fsm_state,self.Update_torque)
+
+        callback_fun = {}
+        callback_fun['joint_plot_update'] = self.joint_plot_window.UpdateData
+        callback_fun['pressure_plot_update'] = self.pressure_plot_window.UpdateData
+        callback_fun['air_volume_update'] = self.update_air_volume
+        callback_fun['disconnect']=self.found_disconnect
+        callback_fun['rec_btn_update'] = self.update_rec_btn
+        callback_fun['pwm_duty_update']=self.pwm_value_window.UpdateLCD
+        callback_fun['cylncalib_update']=self.cylinder_calib_window.UpdateReading
+        callback_fun['fsm_state_update']=self.update_fsm_state
+        callback_fun['torque_update'] = self.Update_torque
+        callback_fun['phase_plot_update'] = self.phase_plot.Update
+
+        self.udp_port.SetCallBack(callback_fun)
         # TCP/IP connection
         
         self.cur_ip = self.findChild(QLabel,'cur_ip_label')
@@ -108,6 +122,9 @@ class MW(QMainWindow):
 
         self.act_fsm_param = self.findChild(QAction,'actionFSM_Parameter')
         self.act_fsm_param.triggered.connect(self.fsm_param_window.show)
+
+        self.act_phase_plot = self.findChild(QAction,'actionPhase')
+        self.act_phase_plot.triggered.connect(self.phase_plot.show)
         # air reserivor 
         
         self.air_volume = self.findChild(QProgressBar,'air_volumn')

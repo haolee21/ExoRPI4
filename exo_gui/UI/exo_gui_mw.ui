@@ -576,7 +576,7 @@
      <x>0</x>
      <y>0</y>
      <width>795</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuConnection">
@@ -592,6 +592,7 @@
     <addaction name="actionGraphJoint"/>
     <addaction name="action_plotPressure"/>
     <addaction name="actionPWM_Duty"/>
+    <addaction name="actionPhase"/>
    </widget>
    <widget class="QMenu" name="menuTask_Settings">
     <property name="title">
@@ -679,6 +680,11 @@
   <action name="actionForce_Torque">
    <property name="text">
     <string>Force/Torque</string>
+   </property>
+  </action>
+  <action name="actionPhase">
+   <property name="text">
+    <string>Phase </string>
    </property>
   </action>
  </widget>

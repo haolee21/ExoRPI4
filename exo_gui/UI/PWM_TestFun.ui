@@ -76,7 +76,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Left Ankle Ext PWM Duty</string>
+          <string>Left Ankle Pla PWM Duty</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -91,7 +91,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Left Ankle Flex PWM Duty</string>
+          <string>Left Ankle Dor PWM Duty</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -196,7 +196,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Right Ankle Ext PWM Duty</string>
+          <string>Right Ankle Pla PWM Duty</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -211,7 +211,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Right Ankle Flex PWM Duty</string>
+          <string>Right Ankle Dor PWM Duty</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -333,7 +333,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_LKneAnkDuty">
+        <widget class="QLineEdit" name="lineEdit_LKneRAnkDuty">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -423,7 +423,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_RKneAnkDuty">
+        <widget class="QLineEdit" name="lineEdit_RKneLAnkDuty">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -705,7 +705,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_LKneAnkDuty_start">
+        <widget class="QPushButton" name="btn_LKneRAnkDuty_start">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -809,7 +809,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_RKneAnkDuty_start">
+        <widget class="QPushButton" name="btn_RKneLAnkDuty_start">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -917,7 +917,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_LKneAnkDuty_stop">
+        <widget class="QPushButton" name="btn_LKneRAnkDuty_stop">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -1021,7 +1021,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_RKneAnkDuty_stop">
+        <widget class="QPushButton" name="btn_RKneLAnkDuty_stop">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>

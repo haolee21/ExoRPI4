@@ -10,10 +10,10 @@ class FSM
 public:
     enum class State{
         kLeftSwingRightStand,
-        // kLeftPrepRightStand,
+        kLeftPrepRightStand,
         kLeftLoadRightPush,
         kLeftStandRightSwing,
-        // kLeftStandRightPrep,
+        kLeftStandRightPrep,
         kLeftPushRightLoad,
         kNone
     };
@@ -40,12 +40,14 @@ private:
     std::array<double,(unsigned)State::kNone>swtich_angle_ratio={0.0,0.65,0,0.56};
     FSM(/* args */);
     State cur_state;
-    Recorder<double,12> fsm_rec;
-    void LeftLoadRightPush();
-    void LeftStandRightSwing();
+    Recorder<double,7> fsm_rec;
+    // void LeftLoadRightPush();
+    // void LeftExtRightPush();
+    // void LeftStandRightSwing();
     // void LeftStandRightPrep();
-    void LeftPushRightLoad();
-    void LeftSwingRightStand();
+    // void LeftPushRightLoad();
+    // void LeftPushRightExt();
+    // void LeftSwingRightStand();
     // void RightStandLeftPrep();
 
     const std::array<double,SensorHub::NUMENC> &joint_pos;
@@ -54,17 +56,17 @@ private:
     const double kHipDiff = 5;                                                                            
 
     double l_hip_s_neu,l_kne_s_neu,l_ank_s_neu,r_hip_s_neu,r_kne_s_neu,r_ank_s_neu;
+    double l_neu,r_neu;
+
 
     double l_kne_s_imp,l_ank_s_imp,r_kne_s_imp,r_ank_s_imp;
     double l_kne_s_initF,r_kne_s_initF;
 
     double l_ank_s_idle_p,r_ank_s_idle_p;
 
-    double cur_max_lhip_rhip,cur_min_lhip_rhip;
-    double hip_diff_vel,hip_diff_pos;
-    bool leg_switch=true;
-    bool reach_peak = false;
-    double cur_stride;
+    
+
+
 
 };
 

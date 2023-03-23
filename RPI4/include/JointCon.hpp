@@ -57,12 +57,7 @@ public:
     void ResetControl();
     void ShutDown();
 
-    void GetPreCon(double des_pre, u_int8_t &duty, PreCon pre_con);
     
-    void GetForceCon(std::array<double,MPC_TIME_HORIZON> des_force,u_int8_t &charge_duty,u_int8_t &rec_duty,u_int8_t &balance_duty, u_int8_t &tank_duty, ForceCon force_con_type,ForceRedType force_red_type);
-    void GetTorCon(std::array<double,MPC_TIME_HORIZON> des_tor,u_int8_t &charge_duty,u_int8_t &rec_duty,u_int8_t &balance_duty, u_int8_t &tank_duty, ForceCon force_con_type,ForceRedType force_red_type);
-    // void GetImpCon(double des_imp, u_int8_t& ext_duty, u_int8_t& flex_duty, u_int8_t& tank_duty,ControlMode con_mode,double force_offset=0);
-    void GetImpCon(double des_imp, double init_F, u_int8_t&charge_duty,u_int8_t&rec_duty,u_int8_t &balance_duty,u_int8_t&tank_duty,ForceCon force_con_type,ForceRedType force_red_type);
     
     void PushMeas(const double &p_knee_ext,const double &p_knee_flex,const double &p_ank_pla,const double &p_ank_dorsi, const double &p_sub_tank,const double &p_main_tank,const double &knee_angle,const double &ankle_angle,const u_int8_t knee_ext_duty,const u_int8_t knee_flex_duty,const u_int8_t ank_ext_duty, const u_int8_t knee_ank_duty,const u_int8_t tank_duty);
     // void PushMeas(const double &p_joint_ext,const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank,const double &pos,const u_int8_t tank_duty, const u_int8_t knee_ext_duty, const u_int8_t knee_flex_duty,const u_int8_t knee_ank_duty, const u_int8_t ank_ext_duty);
@@ -108,7 +103,10 @@ private:
     // double des_force;
     // double des_ext_pre;
 
-
+    void GetPreCon(double des_pre, u_int8_t &duty, PreCon pre_con);
+    void GetForceCon(std::array<double,MPC_TIME_HORIZON> des_force,u_int8_t &charge_duty,u_int8_t &rec_duty,u_int8_t &balance_duty, u_int8_t &tank_duty, ForceCon force_con_type,ForceRedType force_red_type);
+    void GetTorCon(std::array<double,MPC_TIME_HORIZON> des_tor,u_int8_t &charge_duty,u_int8_t &rec_duty,u_int8_t &balance_duty, u_int8_t &tank_duty, ForceCon force_con_type,ForceRedType force_red_type);
+    void GetImpCon(double des_imp, double init_F, u_int8_t&charge_duty,u_int8_t&rec_duty,u_int8_t &balance_duty,u_int8_t&tank_duty,ForceCon force_con_type,ForceRedType force_red_type);
 
 
 
