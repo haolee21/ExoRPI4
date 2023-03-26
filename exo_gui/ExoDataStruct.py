@@ -1,6 +1,6 @@
 from ctypes import *
 import ctypes
-
+from enum import Enum
 
 # from struct import Struct
 UDP_CMD_PORT=25000
@@ -24,6 +24,16 @@ PRE_CON_KNE_EXT=1
 PRE_CON_ANK_PLANT=2
 PRE_CON_KNE_FLEX=3
 PRE_CON_ANK_DORSI=4
+
+class Chamber(Enum):
+    SubTank=0
+    KneExt=1
+    KneFlex=2
+    AnkPla=3
+    AnkDor=4
+    MainTank=5
+
+
 
 FORCE_CON_KNE_EXT=0
 FORCE_CON_ANK_PLANT=1
@@ -148,7 +158,9 @@ class UdpDataPacket(Structure):
               ("fsm_state",c_int)]
 class UdpCmdPacket(Structure):
     _fields_=[("pwm_duty_data",(c_byte)*PWM_VAL_NUM),
-              ("des_pre_data",(c_double)*(NUM_PRE_CON*NUM_KNEE_ANK_PAIR)),
+              ("lkra_des_pre_data",(c_double)*int(Chamber.MainTank.value)),
+              ("rkla_des_pre_data",(c_double)*int(Chamber.MainTank.value)),
+            #   ("des_pre_data",(c_double)*(NUM_PRE_CON*NUM_KNEE_ANK_PAIR)),
               ("des_imp_data",(c_double)*(NUM_FORCE_CON*NUM_KNEE_ANK_PAIR)),
               ("des_force_data",(c_double)*(NUM_FORCE_CON*NUM_KNEE_ANK_PAIR)),
               ("epoch_time_data",c_double),
@@ -171,7 +183,9 @@ class UdpCmdPacket(Structure):
 
               ("pwm_duty_flag",(c_bool)*PWM_VAL_NUM),
               ("reset_enc_flag",(c_bool)*NUM_ENC),
-              ("des_pre_flag",(c_bool)*(NUM_KNEE_ANK_PAIR*NUM_PRE_CON)),
+            #   ("des_pre_flag",(c_bool)*(NUM_KNEE_ANK_PAIR*NUM_PRE_CON)),
+              ("lkra_des_pre_flag",(c_bool)*int(Chamber.MainTank.value)),
+              ("rkla_des_pre_flag",(c_bool)*int(Chamber.MainTank.value)),
               ("des_imp_flag",(c_bool)*(NUM_KNEE_ANK_PAIR*NUM_FORCE_CON)),
               ("des_force_flag",(c_bool)*(NUM_KNEE_ANK_PAIR*NUM_FORCE_CON)),
               ("epoch_time_flag",c_bool),

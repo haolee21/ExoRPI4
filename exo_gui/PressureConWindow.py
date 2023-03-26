@@ -44,15 +44,15 @@ class PressureConWindow(QDialog):
         self.btn_RTankPre_stop=self.findChild(QPushButton,'btn_RTankPre_stop')
 
         ## start
-        self.btn_LKneExtPre_start.clicked.connect(partial(self.PreStartClicked,LKRA*NUM_PRE_CON+PRE_CON_KNE_EXT,self.LKneExt_pre))
-        self.btn_LKneFlexPre_start.clicked.connect(partial(self.PreStartClicked,LKRA*NUM_PRE_CON+PRE_CON_KNE_FLEX,self.LKneFlex_pre))
-        self.btn_LAnkExtPre_start.clicked.connect(partial(self.PreStartClicked,RKLA*NUM_PRE_CON+PRE_CON_ANK_PLANT,self.LAnkExt_pre))
-        self.btn_LTankPre_start.clicked.connect(partial(self.PreStartClicked,LKRA*NUM_PRE_CON+PRE_CON_SUBTANK,self.LTank_pre))
+        self.btn_LKneExtPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.KneExt.value,self.LKneExt_pre,True))
+        self.btn_LKneFlexPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.KneFlex.value,self.LKneFlex_pre,True))
+        self.btn_LAnkExtPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.AnkPla.value,self.LAnkExt_pre,True))
+        self.btn_LTankPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.SubTank.value,self.LTank_pre,True))
         
-        self.btn_RKneExtPre_start.clicked.connect(partial(self.PreStartClicked,RKLA*NUM_PRE_CON+PRE_CON_KNE_EXT,self.RKneExt_pre))
-        self.btn_RKneFlexPre_start.clicked.connect(partial(self.PreStartClicked,RKLA*NUM_PRE_CON+PRE_CON_KNE_FLEX,self.RKneFlex_pre))
-        self.btn_RAnkExtPre_start.clicked.connect(partial(self.PreStartClicked,LKRA*NUM_PRE_CON+PRE_CON_ANK_PLANT,self.RAnkExt_pre))
-        self.btn_RTankPre_start.clicked.connect(partial(self.PreStartClicked,RKLA*NUM_PRE_CON+PRE_CON_SUBTANK,self.RTank_pre))
+        self.btn_RKneExtPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.KneExt.value,self.RKneExt_pre,False))
+        self.btn_RKneFlexPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.KneFlex.value,self.RKneFlex_pre,False))
+        self.btn_RAnkExtPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.AnkPla.value,self.RAnkExt_pre,False))
+        self.btn_RTankPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.SubTank.value,self.RTank_pre,False))
         ## stop
 
         self.btn_LKneExtPre_stop.clicked.connect(partial(self.DutyStopClicked,LKRA))
@@ -67,10 +67,17 @@ class PressureConWindow(QDialog):
 
 
 
-    def PreStartClicked(self,chamber_idx,pre_lineEdit):
+    def PreStartClicked(self,chamber_idx,pre_lineEdit,is_lkra):
         with self.parent().udp_port.lock:
-            self.parent().udp_port.udp_cmd_packet.des_pre_data[chamber_idx]=TextToFloat(pre_lineEdit.text())
-            self.parent().udp_port.udp_cmd_packet.des_pre_flag[chamber_idx]=True
+            if is_lkra:    
+                pre_data = self.parent().udp_port.udp_cmd_packet.lkra_des_pre_data
+                pre_flag = self.parent().udp_port.udp_cmd_packet.lkra_des_pre_flag
+            else:
+                pre_data = self.parent().udp_port.udp_cmd_packet.rkla_des_pre_data
+                pre_flag = self.parent().udp_port.udp_cmd_packet.rkla_des_pre_flag
+            
+            pre_data[chamber_idx]=TextToFloat(pre_lineEdit.text())
+            pre_flag[chamber_idx]=True
     def DutyStopClicked(self,chamber_idx):
         with self.parent().udp_port.lock:
             self.parent().udp_port.udp_cmd_packet.con_on_off_data[chamber_idx] = False

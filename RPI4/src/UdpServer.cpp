@@ -212,50 +212,35 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
             Valves_hub::SetDuty(cmd_packet.pwm_duty[(unsigned)PWM_ID::kRAnkFlex], PWM_ID::kRAnkFlex, Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
     }
-    if (this->CheckCmdSet(cmd_packet.des_pre_flag.begin(), cmd_packet.des_pre_flag.size()))
-    {
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * (unsigned)JointCon::PreCon::kTotal + (unsigned)JointCon::PreCon::kSubTank])
-        {
-            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * (unsigned)JointCon::PreCon::kTotal + (unsigned)JointCon::PreCon::kSubTank] * 320 + 8000, // psi to adc value
-                                  Valves_hub::KneeAnkPair::kLeftKneeRightAnk, JointCon::PreCon::kSubTank);
+    if(this->CheckCmdSet(cmd_packet.lkra_des_pre_flag.begin(),cmd_packet.lkra_des_pre_flag.size())){
+        if(cmd_packet.lkra_des_pre_flag[(unsigned)JointCon::Chamber::kSubTank]){
+            Valves_hub::EnableCon(cmd_packet.lkra_des_pre[(unsigned)JointCon::Chamber::kSubTank] * 320 + 8000, // psi to adc value
+                                Valves_hub::KneeAnkPair::kLeftKneeRightAnk,JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
         }
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * (unsigned)JointCon::PreCon::kTotal + (unsigned)JointCon::PreCon::kKneExt])
-        {
-            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * (unsigned)JointCon::PreCon::kTotal + (unsigned)JointCon::PreCon::kKneExt] * 320 + 8000,
-                                  Valves_hub::KneeAnkPair::kLeftKneeRightAnk, JointCon::PreCon::kKneExt);
+        else if(cmd_packet.lkra_des_pre_flag[(unsigned)JointCon::Chamber::kKneExt]){
+            Valves_hub::EnableCon(cmd_packet.lkra_des_pre[(unsigned)JointCon::Chamber::kKneExt]*320+8000,
+                                Valves_hub::KneeAnkPair::kLeftKneeRightAnk,JointCon::Chamber::kKneExt,JointCon::Chamber::kSubTank);
         }
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * (unsigned)JointCon::PreCon::kTotal + (unsigned)JointCon::PreCon::kKneFlex])
-        {
-            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * (unsigned)JointCon::PreCon::kTotal + (unsigned)JointCon::PreCon::kKneFlex] * 320 + 8000,
-                                  Valves_hub::KneeAnkPair::kLeftKneeRightAnk, JointCon::PreCon::kKneFlex);
-        }
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * (unsigned)JointCon::PreCon::kTotal + (unsigned)JointCon::PreCon::kAnkPlant])
-        {
-            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk * (unsigned)JointCon::PreCon::kTotal + (unsigned)JointCon::PreCon::kAnkPlant] * 320 + 8000,
-                                  Valves_hub::KneeAnkPair::kLeftKneeRightAnk, JointCon::PreCon::kAnkPlant);
-        }
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk * (unsigned)JointCon::PreCon::kTotal + (unsigned)JointCon::PreCon::kSubTank])
-        {
-            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk * (unsigned)JointCon::PreCon::kTotal + (unsigned)JointCon::PreCon::kSubTank] * 320 + 8000,
-                                  Valves_hub::KneeAnkPair::kRightKneeLeftAnk, JointCon::PreCon::kSubTank);
-            
-        }
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk * (unsigned)JointCon::PreCon::kTotal + (unsigned)JointCon::PreCon::kKneExt])
-        {
-            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk * (unsigned)JointCon::PreCon::kTotal + (unsigned)JointCon::PreCon::kKneExt] * 320 + 8000,
-                                  Valves_hub::KneeAnkPair::kRightKneeLeftAnk, JointCon::PreCon::kKneExt);
-        }
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*(unsigned)JointCon::PreCon::kTotal+(unsigned)JointCon::PreCon::kKneFlex])
-        {
-            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*(unsigned)JointCon::PreCon::kTotal+(unsigned)JointCon::PreCon::kKneFlex]*320+8000,
-                                 Valves_hub::KneeAnkPair::kRightKneeLeftAnk, JointCon::PreCon::kKneFlex);
-        }
-        if (cmd_packet.des_pre_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*(unsigned)JointCon::PreCon::kTotal+(unsigned)JointCon::PreCon::kAnkPlant])
-        {
-            Valves_hub::EnableCon(cmd_packet.des_pre[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk*(unsigned)JointCon::PreCon::kTotal+(unsigned)JointCon::PreCon::kAnkPlant]*320+8000,
-                                 Valves_hub::KneeAnkPair::kRightKneeLeftAnk, JointCon::PreCon::kAnkPlant);
+        else if(cmd_packet.lkra_des_pre_flag[(unsigned)JointCon::Chamber::kAnkPla]){
+            Valves_hub::EnableCon(cmd_packet.lkra_des_pre[(unsigned)JointCon::Chamber::kAnkPla]*320+8000,
+                                Valves_hub::KneeAnkPair::kLeftKneeRightAnk,JointCon::Chamber::kAnkPla,JointCon::Chamber::kSubTank);
         }
     }
+    if(this->CheckCmdSet(cmd_packet.rkla_des_pre_flag.begin(),cmd_packet.rkla_des_pre_flag.size())){
+        if(cmd_packet.rkla_des_pre_flag[(unsigned)JointCon::Chamber::kSubTank]){
+            Valves_hub::EnableCon(cmd_packet.rkla_des_pre[(unsigned)JointCon::Chamber::kSubTank]*320+8000,
+                                Valves_hub::KneeAnkPair::kRightKneeLeftAnk,JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
+        }
+        else if(cmd_packet.rkla_des_pre_flag[(unsigned)JointCon::Chamber::kKneExt]){
+            Valves_hub::EnableCon(cmd_packet.rkla_des_pre[(unsigned)JointCon::Chamber::kKneExt]*320+8000,
+                                Valves_hub::KneeAnkPair::kRightKneeLeftAnk,JointCon::Chamber::kKneExt,JointCon::Chamber::kSubTank);
+        }
+        else if(cmd_packet.rkla_des_pre_flag[(unsigned)JointCon::Chamber::kAnkPla]){
+            Valves_hub::EnableCon(cmd_packet.rkla_des_pre[(unsigned)JointCon::Chamber::kAnkPla]*320+8000,
+                                Valves_hub::KneeAnkPair::kRightKneeLeftAnk,JointCon::Chamber::kAnkPla,JointCon::Chamber::kSubTank);
+        }
+    }
+
 
     // force control
     if (this->CheckCmdSet(cmd_packet.des_force_flag.begin(), cmd_packet.des_force_flag.size()))

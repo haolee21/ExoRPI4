@@ -300,7 +300,7 @@ void Valves_hub::ResetCon(KneeAnkPair joint)
     }
 }
 
-void Valves_hub::EnableCon(double des_pre, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::PreCon pre_con)
+void Valves_hub::EnableCon(double des_pre, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::Chamber controlled, JointCon::Chamber followed)
 {
     FSM::TurnOffFSM();
     
@@ -320,7 +320,7 @@ void Valves_hub::EnableCon(double des_pre, Valves_hub::KneeAnkPair knee_ank_pair
     }
     // auto &knee_ank_con = (knee_ank_pair == Valves_hub::KneeAnkPair::kLeftKneeRightAnk) ? hub.lkra_con : hub.rkla_con; //This may cause problems if one day I have more than two knee_ank pairs
     
-    knee_ank_con->SetPreControl(pre_con, des_pre);
+    knee_ank_con->SetPreControl(des_pre,controlled,followed);
 
 }
 void Valves_hub::EnableCon(double des_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon force_con_type, JointCon::ForceRedType force_red_type)

@@ -25,15 +25,35 @@ public:
         kImpCon,
         kTurnOff
     };
-    enum class PreCon
+
+    enum class Chamber
     {
         kSubTank,
         kKneExt,
-        kAnkPlant,
         kKneFlex,
-        kAnkDorsi,
+        kAnkPla,
+        kAnkDor,
+        kMainTank,  //Must main tank in the end since it is also used for the size of the array
+                    //it is useless since we cannot control the main tank's pressure, but currently I have no better way
+    };
+    
+    enum class ValveDuty
+    {
+        kSubTank,
+        kKneExt,
+        kAnkPla,
+        kKneAnk,
         kTotal
     };
+    // enum class PreCon
+    // {
+    //     kSubTank,
+    //     kKneExt,
+    //     kAnkPlant,
+    //     kKneFlex,
+    //     kAnkDorsi,
+    //     kTotal
+    // };
     enum class ForceCon
     {
         kKneExt,
@@ -48,7 +68,7 @@ public:
     
     static const unsigned  kNumOfChambers = 3;
 
-    void SetPreControl(PreCon pre_con_type,double des_pre);
+    void SetPreControl(double des_pre,Chamber controlled, Chamber followed);
     // void SetControl(ConMode con_mode,PreCon pre_con_type,double des_pre);
     void SetControl(ConMode con_mode, ForceCon force_con_type,ForceRedType force_red_type,double cmd_value);
     void SetImpControl(ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_imp, double cmd_init_force);
@@ -75,11 +95,12 @@ private:
     ExoConfig::CylnPhyParams knee_cyln_params,ank_cyln_params;
 
     ConMode con_mode = ConMode::kNone;
-    PreCon pre_con_type;
+    // PreCon pre_con_type;
+    Chamber controlled_chamber, followed_chamber;
     ForceCon force_con_type;
     ForceRedType force_red_type;
 
-    std::array<double,(unsigned)PreCon::kTotal> cmd_pre;
+    std::array<double,(unsigned)Chamber::kMainTank> cmd_pre;
     std::array<std::array<double,MPC_TIME_HORIZON>,(unsigned)ForceCon::kTotal> cmd_force;
     std::array<double,(unsigned)ForceCon::kTotal> cmd_imp;
     std::array<double,(unsigned)ForceCon::kTotal> cmd_init_force;
@@ -102,11 +123,13 @@ private:
     // double cur_pre_force;
     // double des_force;
     // double des_ext_pre;
+    // void GetPreCon(const std::array<double,MPC_TIME_HORIZON> &des_pre,u_int8)
 
-    void GetPreCon(double des_pre, u_int8_t &duty, PreCon pre_con);
-    void GetForceCon(std::array<double,MPC_TIME_HORIZON> des_force,u_int8_t &charge_duty,u_int8_t &rec_duty,u_int8_t &balance_duty, u_int8_t &tank_duty, ForceCon force_con_type,ForceRedType force_red_type);
-    void GetTorCon(std::array<double,MPC_TIME_HORIZON> des_tor,u_int8_t &charge_duty,u_int8_t &rec_duty,u_int8_t &balance_duty, u_int8_t &tank_duty, ForceCon force_con_type,ForceRedType force_red_type);
-    void GetImpCon(double des_imp, double init_F, u_int8_t&charge_duty,u_int8_t&rec_duty,u_int8_t &balance_duty,u_int8_t&tank_duty,ForceCon force_con_type,ForceRedType force_red_type);
+    void GetPreCon(const std::array<double,MPC_TIME_HORIZON> &des_pre,std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty,Chamber controlled,Chamber followed);
+    void GetForceCon(std::array<double,MPC_TIME_HORIZON> des_force,std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty, ForceCon force_con_type,ForceRedType force_red_type);
+    // void GetTorCon(std::array<double,MPC_TIME_HORIZON> des_tor,u_int8_t &charge_duty,u_int8_t &rec_duty,u_int8_t &balance_duty, u_int8_t &tank_duty, ForceCon force_con_type,ForceRedType force_red_type);
+    void GetTorCon(std::array<double,MPC_TIME_HORIZON> des_tor, std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty, ForceCon force_con_type,ForceRedType force_red_type);
+    void GetImpCon(double des_imp, double init_F, std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty,ForceCon force_con_type,ForceRedType force_red_type);
 
 
 
