@@ -41,7 +41,9 @@ public:
     {
         kSubTank,
         kKneExt,
+        kKneFlex,
         kAnkPla,
+        kAnkDor,
         kKneAnk,
         kTotal
     };

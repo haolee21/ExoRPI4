@@ -39,8 +39,8 @@ class ConfigLoader:
         # self.phy_config_file_modified = False
         # self.mpc_config_file_modified = False
         self.phy_param = {'LeftKnee':PhyParam(),'LeftAnkle':PhyParam(),'RightKnee':PhyParam(),'RightAnkle':PhyParam()}
-        self.mpc_param = {'LTankSubtank':MPC_Param(),'LTankKnee':MPC_Param(),'LTankAnk':MPC_Param(),'LKneeExtFlex':MPC_Param(),'LAnkExtFlex':MPC_Param(),'LKneeAnk':MPC_Param(),
-                          'RTankSubtank':MPC_Param(),'RTankKnee':MPC_Param(),'RTankAnk':MPC_Param(),'RKneeExtFlex':MPC_Param(),'RAnkExtFlex':MPC_Param(),'RKneeAnk':MPC_Param()}
+        self.mpc_param = {'LTankSubtank':MPC_Param(),'LTankKne':MPC_Param(),'LTankRAnk':MPC_Param(),'LKneRAnk':MPC_Param(),
+                          'RTankSubtank':MPC_Param(),'RTankKne':MPC_Param(),'RTankLAnk':MPC_Param(),'RKneLAnk':MPC_Param()}
 
         self.LoadPhyConfig('exo_config.json')
         self.LoadMPC_Config('mpc_config.json')
@@ -77,18 +77,18 @@ class ConfigLoader:
         with open(file_name) as json_file:
             mpc_json = json.load(json_file)
             ConfigLoader.LoadSingleMPC(mpc_json['LTankSubtank'],self.mpc_param['LTankSubtank'])
-            ConfigLoader.LoadSingleMPC(mpc_json['LTankKnee'],self.mpc_param['LTankKnee'])
-            ConfigLoader.LoadSingleMPC(mpc_json['LTankAnk'],self.mpc_param['LTankAnk'])
-            ConfigLoader.LoadSingleMPC(mpc_json['LKneeExtFlex'],self.mpc_param['LKneeExtFlex'])
-            ConfigLoader.LoadSingleMPC(mpc_json['LAnkExtFlex'],self.mpc_param['LAnkExtFlex'])
-            ConfigLoader.LoadSingleMPC(mpc_json['LKneeAnk'],self.mpc_param['LKneeAnk'])
+            ConfigLoader.LoadSingleMPC(mpc_json['LTankKne'],self.mpc_param['LTankKne'])
+            ConfigLoader.LoadSingleMPC(mpc_json['LTankRAnk'],self.mpc_param['LTankRAnk'])
+            # ConfigLoader.LoadSingleMPC(mpc_json['LKneeExtFlex'],self.mpc_param['LKneeExtFlex'])
+            # ConfigLoader.LoadSingleMPC(mpc_json['LAnkExtFlex'],self.mpc_param['LAnkExtFlex'])
+            ConfigLoader.LoadSingleMPC(mpc_json['LKneRAnk'],self.mpc_param['LKneRAnk'])
 
             ConfigLoader.LoadSingleMPC(mpc_json['RTankSubtank'],self.mpc_param['RTankSubtank'])
-            ConfigLoader.LoadSingleMPC(mpc_json['RTankKnee'],self.mpc_param['RTankKnee'])
-            ConfigLoader.LoadSingleMPC(mpc_json['RTankAnk'],self.mpc_param['RTankAnk'])
-            ConfigLoader.LoadSingleMPC(mpc_json['RKneeExtFlex'],self.mpc_param['RKneeExtFlex'])
-            ConfigLoader.LoadSingleMPC(mpc_json['RAnkExtFlex'],self.mpc_param['RAnkExtFlex'])
-            ConfigLoader.LoadSingleMPC(mpc_json['RKneeAnk'],self.mpc_param['RKneeAnk'])
+            ConfigLoader.LoadSingleMPC(mpc_json['RTankKne'],self.mpc_param['RTankKne'])
+            ConfigLoader.LoadSingleMPC(mpc_json['RTankLAnk'],self.mpc_param['RTankLAnk'])
+            # ConfigLoader.LoadSingleMPC(mpc_json['RKneeExtFlex'],self.mpc_param['RKneeExtFlex'])
+            # ConfigLoader.LoadSingleMPC(mpc_json['RAnkExtFlex'],self.mpc_param['RAnkExtFlex'])
+            ConfigLoader.LoadSingleMPC(mpc_json['RKneLAnk'],self.mpc_param['RKneLAnk'])
 
             self.mpc_config_file_load=True
             self.mpc_config_path = os.path.dirname(file_name)

@@ -51,8 +51,8 @@ void FSM::Update()
 
     //record the state so we can see if the FSM switch correctly
     fsm.fsm_rec.PushData(std::array<double, 7>{(double)fsm.cur_state,
-                                                fsm.joint_pos[0] - fsm.l_hip_s_neu, fsm.joint_pos[1] - fsm.l_kne_s_neu, fsm.joint_pos[2] - fsm.l_ank_s_neu,
-                                                fsm.joint_pos[3] - fsm.r_hip_s_neu, fsm.joint_pos[4] - fsm.r_kne_s_neu, fsm.joint_pos[5] - fsm.r_ank_s_neu});
+                                                fsm.l_hip_s_neu, fsm.l_kne_s_neu, fsm.l_ank_s_neu,
+                                                fsm.r_hip_s_neu, fsm.r_kne_s_neu, fsm.r_ank_s_neu});
 
 }
 FSM::FSM(/* args */)
