@@ -20,9 +20,9 @@ const std::array<double, SensorHub::NUMENC> &SensorHub::GetEncData()
 {
     return std::ref(SensorHub::GetInstance().EncData);
 }
-const std::array<double,SensorHub::NUMENC>& SensorHub::GetEncVel()
+const std::array<double,SensorHub::NUMENC>& SensorHub::GetEncDiff()
 {   
-    return std::ref(SensorHub::GetInstance().EncVel);
+    return std::ref(SensorHub::GetInstance().EncDiff);
 }
 const std::array<double, SensorHub::NUMPRE> &SensorHub::GetPreData()
 {
@@ -105,16 +105,16 @@ void SensorHub::UpdateLEnc()
     double kne_s_pos_f = kne_s_pos/4096.0*360;
     double ank_s_pos_f = -1*ank_s_pos/4096.0*360;
 
-    auto cur_enc_vel = senHub.left_enc_vel_filter.GetFilteredMea(std::array<double,3>{hip_s_pos_f- senHub.EncData[LHipS],kne_s_pos_f - senHub.EncData[LKneS],ank_s_pos_f - senHub.EncData[LAnkS]});
-    senHub.EncVel[LHipS]=cur_enc_vel[0];
-    senHub.EncVel[LKneS]=cur_enc_vel[1];
-    senHub.EncVel[LAnkS]=cur_enc_vel[2];
+    auto cur_enc_diff = senHub.left_enc_vel_filter.GetFilteredMea(std::array<double,3>{hip_s_pos_f- senHub.EncData[LHipS],kne_s_pos_f - senHub.EncData[LKneS],ank_s_pos_f - senHub.EncData[LAnkS]});
+    senHub.EncDiff[LHipS]=cur_enc_diff[0];
+    senHub.EncDiff[LKneS]=cur_enc_diff[1];
+    senHub.EncDiff[LAnkS]=cur_enc_diff[2];
 
 
     senHub.EncData[SensorHub::LHipS] = hip_s_pos_f; 
     senHub.EncData[SensorHub::LKneS] = kne_s_pos_f;
     senHub.EncData[SensorHub::LAnkS] = ank_s_pos_f;
-    std::array<double,NUMENC> curMea{senHub.EncData[LHipS],senHub.EncData[LKneS],senHub.EncData[LAnkS],senHub.EncVel[LHipS],senHub.EncVel[LKneS],senHub.EncVel[LAnkS]};
+    std::array<double,NUMENC> curMea{senHub.EncData[LHipS],senHub.EncData[LKneS],senHub.EncData[LAnkS],senHub.EncDiff[LHipS],senHub.EncDiff[LKneS],senHub.EncDiff[LAnkS]};
     // std::cout<<senHub.EncData[SensorHub::LHipS]<<','<<senHub.EncData[SensorHub::LKneS]<<','<<senHub.EncData[SensorHub::LAnkS]<<std::endl;
     // std::cout<<senHub.EncData[SensorHub::LHipS]<<std::endl;
     senHub.LEncRecorder.PushData(curMea);
@@ -145,13 +145,13 @@ void SensorHub::UpdateREnc()
     double kne_s_pos_f = kne_s_pos/4096.0*360;
     double ank_s_pos_f = ank_s_pos/4096.0*360;
     //get velocity
-    auto cur_enc_vel = senHub.right_enc_vel_filter.GetFilteredMea(std::array<double,3>{hip_s_pos_f- senHub.EncData[RHipS],kne_s_pos_f - senHub.EncData[RKneS],ank_s_pos_f - senHub.EncData[RAnkS]});
-    senHub.EncVel[RHipS] = cur_enc_vel[0];
-    senHub.EncVel[RKneS] = cur_enc_vel[1];
-    senHub.EncVel[RAnkS] = cur_enc_vel[2];
+    auto cur_enc_diff = senHub.right_enc_vel_filter.GetFilteredMea(std::array<double,3>{hip_s_pos_f- senHub.EncData[RHipS],kne_s_pos_f - senHub.EncData[RKneS],ank_s_pos_f - senHub.EncData[RAnkS]});
+    senHub.EncDiff[RHipS] = cur_enc_diff[0];
+    senHub.EncDiff[RKneS] = cur_enc_diff[1];
+    senHub.EncDiff[RAnkS] = cur_enc_diff[2];
 
 
-    senHub.EncData[SensorHub::RHipS]=hip_s_pos_f;   ////TODO: read the correct encoder when encoders connected
+    senHub.EncData[SensorHub::RHipS]=hip_s_pos_f; 
     // // senHub.EncData[SensorHub::RHipF]=senHub.RKneS_Enc.ReadPos();
     senHub.EncData[SensorHub::RKneS]=kne_s_pos_f;
     senHub.EncData[SensorHub::RAnkS]=ank_s_pos_f;
@@ -159,7 +159,7 @@ void SensorHub::UpdateREnc()
     // // senHub.EncData[SensorHub::RAnkF]=senHub.RKneS_Enc.ReadPos();
     // // std::cout<<senHub.EncData[SensorHub::RKneS]<<std::endl;
     // // std::cout<<senHub.EncData[SensorHub::RHipS]<<','<<senHub.EncData[SensorHub::RKneS]<<','<<senHub.EncData[SensorHub::RAnkS]<<std::endl;
-    std::array<double,NUMENC> curMea{senHub.EncData[RHipS],senHub.EncData[RKneS],senHub.EncData[RAnkS],senHub.EncVel[RHipS],senHub.EncVel[RKneS],senHub.EncVel[RAnkS]};
+    std::array<double,NUMENC> curMea{senHub.EncData[RHipS],senHub.EncData[RKneS],senHub.EncData[RAnkS],senHub.EncDiff[RHipS],senHub.EncDiff[RKneS],senHub.EncDiff[RAnkS]};
     senHub.REncRecorder.PushData(curMea);
 }
 void SensorHub::UpdatePre()
@@ -179,12 +179,7 @@ void SensorHub::UpdatePre()
         }
 
     }
-    // for(int i=0;i<NUMPRE;i++){
-    //     std::cout<<avg_mea[i]<<',';
-    // }
-    // std::cout<<std::endl;
     
-    // senHub.PreData = senHub.filter_3_hz.GetFilteredMea(cur_mea);
     senHub.PreData = senHub.digital_filter.GetFilteredMea(avg_mea);
 
 

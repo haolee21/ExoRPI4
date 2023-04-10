@@ -70,11 +70,6 @@ void ADC::init_ADC()
 {
     // configure ADC
 
-    // TODO: fix this, for some reason it never works
-    // set ADC select channel 0
-    //  this->txBuf[0] = 0b00000000;
-    //  this->_spiTxRx(1);
-
     // set CFR, enable auto channel, tag mode, basically the default mode. Can be achieved by just reset both adc, yet leave the liberty to set CFR here for future use
     this->txBuf[0] = 0b11101110;
     this->txBuf[1] = 0b11111111;

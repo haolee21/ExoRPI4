@@ -142,7 +142,6 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
     }
     if (this->CheckCmdSet(cmd_packet.pwm_duty_flag.begin(), cmd_packet.pwm_duty_flag.size()))
     {
-
         // we set the JointCon::ControlMode to kNone to turn off other control process
         //  force control, impedance control, pressure control are turned off by setting duty to 0
         if (cmd_packet.pwm_duty_flag[(unsigned)PWM_ID::kLTank])

@@ -6,7 +6,7 @@ Valves_hub::Valves_hub()
                ExoConfig::GetConfig().left_tank_subtank, ExoConfig::GetConfig().left_knee_phy, ExoConfig::GetConfig().right_ankle_phy, "lkra"),
       rkla_con(ExoConfig::GetConfig().right_subtank_knee, ExoConfig::GetConfig().right_subtank_left_ank, ExoConfig::GetConfig().right_knee_left_ank,
                ExoConfig::GetConfig().right_tank_subtank, ExoConfig::GetConfig().right_knee_phy, ExoConfig::GetConfig().left_ankle_phy, "rkla"),
-      pwmRecorder("PWM", PWM_HEADER), // TODO: use correct valve names, perhaps adding it in shared file with Teensy
+      pwmRecorder("PWM", PWM_HEADER), 
       teensyValveCon(1)
 {
     std::cout<<"Valve_hub construct\n";
@@ -19,7 +19,6 @@ Valves_hub::Valves_hub()
 Valves_hub::~Valves_hub()
 {
 
-    // TODO: add air release sequence
     // right now I will just turn off all valves
     std::cout << "Turn off all valves\n";
     Valves_hub::SetDuty(std::array<uint8_t, PWM_VAL_NUM>{0});
@@ -50,8 +49,8 @@ Valves_hub &hub = Valves_hub::GetInstance();
     enc_data[SensorHub::EncName::RKneS],enc_data[SensorHub::EncName::LAnkS],hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex],hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt],hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk],hub.PWM_Duty[(unsigned)PWM_ID::kRTank]);
 
     FSM::Update();
-
-    if(FSM::GetFSM_State()==FSM::State::kLeftSwingRightStand){
+    FSM::State fsm_cur_state = FSM::GetFSM_State();
+    if(fsm_cur_state==FSM::State::kLeftSwingRightStand){
         hub.lkra_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
@@ -73,7 +72,7 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
 
     }
-    else if(FSM::GetFSM_State()==FSM::State::kLeftPrepRightStand){
+    else if(fsm_cur_state==FSM::State::kLeftPrepRightStand){
         hub.lkra_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
@@ -96,9 +95,7 @@ Valves_hub &hub = Valves_hub::GetInstance();
         
     }
 
-    else if(FSM::GetFSM_State()==FSM::State::kLeftLoadRightPush){
-        //TODO: enable lkra knee impedance control with energy recycle
-        
+    else if(fsm_cur_state==FSM::State::kLeftLoadRightPush){
         double l_kne_imp;
         double l_kne_initF;
         double l_kne_neu_pos;
@@ -110,7 +107,7 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
-        //TODO: not sure what rkla should do, right now I believe we should connect both end of the knee cylinder, due to the piston area difference, there will be some resistance 
+        
         hub.rkla_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
@@ -121,7 +118,7 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
     }
-    else if(FSM::GetFSM_State()==FSM::State::kLeftStandRightSwing){
+    else if(fsm_cur_state==FSM::State::kLeftStandRightSwing){
         hub.lkra_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
@@ -143,7 +140,7 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
 
     }
-    else if (FSM::GetFSM_State()==FSM::State::kLeftStandRightPrep){
+    else if (fsm_cur_state==FSM::State::kLeftStandRightPrep){
         hub.lkra_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
@@ -166,7 +163,7 @@ Valves_hub &hub = Valves_hub::GetInstance();
     }
 
 
-    else if(FSM::GetFSM_State()==FSM::State::kLeftPushRightLoad){
+    else if(fsm_cur_state==FSM::State::kLeftPushRightLoad){
         double r_kne_imp;
         double r_kne_initF;
         double r_kne_neu_pos;
@@ -191,6 +188,9 @@ Valves_hub &hub = Valves_hub::GetInstance();
        
 
 
+    }
+    else if(fsm_cur_state == FSM::State::kTurnOff){
+        std::fill_n(hub.PWM_Duty.begin(),hub.PWM_Duty.size(),0);
     }
     
 
@@ -357,70 +357,7 @@ void Valves_hub::EnableCon(double des_imp, double init_force, Valves_hub::KneeAn
     }
     knee_ank_con->SetImpControl(imp_con_type,force_red_type,des_imp,init_force);
 }
-// void Valves_hub::EnableCon(KneeAnkPair knee_ank,JointCon::ConMode mode){
-//     Valves_hub& hub = Valves_hub::SGetInstance();
 
-//     if(knee_ank == Valves_hub::KneeAnkPair::kLeftKneeRightAnk){
-//         hub.lkra_con.SetControlMode(mode);
-//     }
-//     else if(knee_ank ==Valves_hub::KneeAnkPair::kRightKneeLeftAnk){
-//         hub.rkla_con.SetControlMode(mode);
-//     }
-// }
-
-// void Valves_hub::SetDesiredPre(Chamber chamber,double des_pre){
-//     Valves_hub& hub = Valves_hub::GetInstance();
-//     hub.desired_pre[(unsigned)chamber] = des_pre;
-
-// }
-// void Valves_hub::SetDesiredImp(Valves_hub::Joint imp,double imp_val,double init_force){ //TODO: finish it
-//     Valves_hub& hub = Valves_hub::GetInstance();
-//     hub.desired_imp[static_cast<unsigned>(imp)]=imp_val;
-//     hub.init_force[(unsigned)imp]=init_force;
-// }
-// void Valves_hub::SetDesiredForce(Valves_hub::Joint joint, double des_force){
-//     Valves_hub& hub = Valves_hub::GetInstance();
-//     hub.desired_force[(unsigned)joint]=des_force;
-// }
-
-// void Valves_hub::SetCylnMaxPos(Valves_hub::Joint joint){
-//     // switch (joint)
-//     // {
-//     // case Valves_hub::Joint::kLKne:
-//     //     Valves_hub::GetInstance().LKneCon.SetCylinderMaxPos();
-//     //     break;
-//     // //TODO: finish the rest of the joints
-//     // default:
-//     //     break;
-//     // }
-
-// }
-// std::array<bool,(unsigned)Valves_hub::Joint::kTotal>Valves_hub::GetControlCond(){
-//     Valves_hub& hub = Valves_hub::GetInstance();
-//     std::array<bool,(unsigned)Valves_hub::Joint::kTotal> cur_cond{0};
-//     if(hub.left_knee_con.GetControlMode()!=JointCon::ConMode::kNone){
-//         cur_cond[0]=true;
-//     }
-//     if(hub.left_ankle_con.GetControlMode()!=JointCon::ConMode::kNone){
-//         cur_cond[1]=true;
-//     }
-//     return cur_cond;
-// }
-
-// void Valves_hub::SetJointPos(Valves_hub::Joint joint){
-//     auto &valves_hub = Valves_hub::GetInstance();
-//     auto &sensor_hub = SensorHub::GetInstance();
-//     //TODO: fix this
-//     // if(joint == Valves_hub::Joint::kLKne){
-//     //     valves_hub.left_knee_con.SetKneeMaxPos(sensor_hub.GetPreData()[(unsigned)SensorHub::AdcName::Pos]);
-//     // }
-// }
-
-// void Valves_hub::SetImpactAbsorb(Valves_hub::Joint joint, double init_force, double init_imp){
-//     auto &valves_hub = Valves_hub::GetInstance();
-//     valves_hub.init_force[(unsigned)joint]=init_force;
-//     valves_hub.init_imp[(unsigned)joint]=init_imp;
-// }
 
 void Valves_hub::UpdateParams(const ExoConfig::SystemParam &sys_param)
 {

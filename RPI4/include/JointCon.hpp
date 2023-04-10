@@ -47,15 +47,7 @@ public:
         kKneAnk,
         kTotal
     };
-    // enum class PreCon
-    // {
-    //     kSubTank,
-    //     kKneExt,
-    //     kAnkPlant,
-    //     kKneFlex,
-    //     kAnkDorsi,
-    //     kTotal
-    // };
+
     enum class ForceCon
     {
         kKneExt,
@@ -159,7 +151,7 @@ private:
     double neutral_knee_pos,neutral_ank_pos;
     // const double kExtImp=2; //   N/mm
     // double imp_deflect_point;
-    double recover_imp;
+    // double recover_imp;
 
     
     // calculating current cylinder length, external force
@@ -180,6 +172,7 @@ private:
     Recorder<double,8> joint_con_rec;
 
    
+    
    
 
 

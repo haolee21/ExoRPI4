@@ -1,9 +1,12 @@
 #ifndef FSM_HPP
 #define FSM_HPP
+#include <Eigen/Dense>
+
 #include "Recorder.hpp"
 #include "DigitalFilter.hpp"
 #include "FilterParam.hpp"
 #include "SensorHub.hpp"
+
 class FSM
 {
 
@@ -15,6 +18,7 @@ public:
         kLeftStandRightSwing,
         kLeftStandRightPrep,
         kLeftPushRightLoad,
+        kTurnOff,//we need a special state to end all the valve actuation during fsm, but only once 
         kNone
     };
     
@@ -40,18 +44,11 @@ private:
     std::array<double,(unsigned)State::kNone>swtich_angle_ratio={0.0,0.65,0,0.56};
     FSM(/* args */);
     State cur_state;
-    Recorder<double,7> fsm_rec;
-    // void LeftLoadRightPush();
-    // void LeftExtRightPush();
-    // void LeftStandRightSwing();
-    // void LeftStandRightPrep();
-    // void LeftPushRightLoad();
-    // void LeftPushRightExt();
-    // void LeftSwingRightStand();
-    // void RightStandLeftPrep();
+    Recorder<double,10> fsm_rec;
+
 
     const std::array<double,SensorHub::NUMENC> &joint_pos;
-    const std::array<double,SensorHub::NUMENC> &joint_vel;
+    const std::array<double,SensorHub::NUMENC> &joint_diff;
     const double kVelTh = 0.01; //if less than  1/100 deg/sec, consider stop
     const double kHipDiff = 5;                                                                            
 
@@ -65,7 +62,9 @@ private:
     double l_ank_s_idle_p,r_ank_s_idle_p;
 
     
-
+    Eigen::Vector2d exo_momentum;
+    double min_y_momentum,max_y_momentum,pre_y_momentum_loss;
+    bool momentum_erase=true;
 
 
 };

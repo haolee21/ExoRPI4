@@ -37,7 +37,7 @@ public:
 
     static SensorHub& GetInstance();
     static const std::array<double,NUMENC>& GetEncData(); //I did not use lock here since they will be read-only arrays
-    static const std::array<double,NUMENC>& GetEncVel();
+    static const std::array<double,NUMENC>& GetEncDiff();
     static const std::array<double,NUMPRE>& GetPreData(); //While data may not be sync, but it will be the most recent one
     // static const std::array<double,NUMPRE>& GetPreFiltered(); //get the filtered pressure reading
 
@@ -80,7 +80,7 @@ public:
 private:
     
     std::array<double,NUMENC> EncData;
-    std::array<double,NUMENC> EncVel;
+    std::array<double,NUMENC> EncDiff;
     std::array<double,NUMPRE> PreData;
     Recorder<double,NUMENC> LEncRecorder; //pos+vel
     Recorder<double,NUMENC> REncRecorder;

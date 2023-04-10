@@ -298,6 +298,8 @@ class MW(QMainWindow):
         # self.radio_walkRec_checked()
         if self.checkBox_setExoNeutralPos.isChecked():
             self.udp_port.udp_cmd_packet.set_neutral_flag = True
+            self.phase_plot.UpdateNeutralPos()
+            
         if self.fsm_left_start_task.isChecked():
             self.udp_port.udp_cmd_packet.fsm_left_start=True
         if self.fsm_right_start_task.isChecked():

@@ -57,14 +57,14 @@ void* Timer::TimerTick(void*){
 
     //////////////////////////////////////////////////////////
     #ifdef TEST_INTERVAL
-    unsigned timeDiff_idx=0; //TODO: testing loop period only, should be commented in final version
+    unsigned timeDiff_idx=0; // testing loop period only, should be commented in final version
     std::array<double,TOT_RUN_TIME*1000+1000> timeDiff; //can only run around 100 sec
     auto t_start=std::chrono::high_resolution_clock::now();
     auto t_end = std::chrono::high_resolution_clock::now();
     #endif
     ///////////////////////////////////////////////////////////
     //TODO: Need to add init sequence here
-    //we cannot add 
+    
 
 
     Timer &timer = Timer::GetInstance();
@@ -78,10 +78,10 @@ void* Timer::TimerTick(void*){
         for(unsigned i=0;i<timer.senCallbacks.size();i++){
             timer.senFutures[i]=std::async(std::launch::async,timer.senCallbacks[i]);
         }
-        t.tv_nsec+=interval;  //TODO: finish this, need to think about how to make it efficient
+        t.tv_nsec+=interval; 
         Timer::Sleep(&t);
 
-        ///////////////////////////////////////////////// TODO: testing loop period only
+        ///////////////////////////////////////////////// testing loop period only
         #ifdef TEST_INTERVAL
         t_end = std::chrono::high_resolution_clock::now();
         timeDiff[timeDiff_idx++]=std::chrono::duration<double,std::micro>(t_end-t_start).count();
@@ -115,7 +115,7 @@ void* Timer::TimerTick(void*){
 
         timer.timeStamp++;
     }
-    /////////////////////////////////////////// TODO: testing loop period only
+    /////////////////////////////////////////// testing loop period only
     #ifdef TEST_INTERVAL
     std::cout<<"Time diff: \n";
     for(unsigned i=0;i<timeDiff_idx;i++){

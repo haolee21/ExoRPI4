@@ -3,6 +3,7 @@
 
 #include "JointCon.hpp"
 
+
 JointCon::JointCon(ExoConfig::MPC_Params knee_ext_params, ExoConfig::MPC_Params ank_ext_params, ExoConfig::MPC_Params knee_ank_params,
                    ExoConfig::MPC_Params tank_params, ExoConfig::CylnPhyParams knee_cyln_params, ExoConfig::CylnPhyParams ank_cyln_params, std::string joint_con_name)
     : knee_ext_con(knee_ext_params, joint_con_name + "_knee_ext"),
@@ -15,6 +16,7 @@ JointCon::JointCon(ExoConfig::MPC_Params knee_ext_params, ExoConfig::MPC_Params 
       joint_con_rec(joint_con_name, "Time,KneForce,AnkForce,KneExtLen,AnkShrkLen,KneMomentArm,AnkMomentArm,KneSpringMaxCompress,AnkSpringMaxCompress")
 {
     this->imp_fsm_state = Imp_FSM::kLoadPrep;
+    
     // //setup osqp solver
     // this->osqp_data.reset(new OSQPData);
     // this->osqp_settings.reset(new OSQPSettings);
@@ -152,7 +154,7 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
                                                        this->ankle_moment_arm, 
                                                        this->max_knee_spring_compress, 
                                                        this->max_ank_spring_compress});
-    // TODO: add recorder
+    
     this->knee_len_ext_old = this->knee_cyln_ext_len;
     this->ank_len_ext_old = this->ank_cyln_ext_len;
 }
@@ -560,12 +562,14 @@ bool JointCon::GetValveDuty(u_int8_t &knee_ext_duty, u_int8_t &knee_flex_duty, u
     }
 
     // u_int8_t &knee_ext_duty, u_int8_t &knee_flex_duty, u_int8_t &ank_pla_duty, u_int8_t &ank_dor_duty, u_int8_t &sub_tank_duty, u_int8_t &knee_ank_duty
-    sub_tank_duty = valve_duty[(unsigned)ValveDuty::kSubTank];
-    knee_ext_duty = valve_duty[(unsigned)ValveDuty::kKneExt];
-    ank_pla_duty = valve_duty[(unsigned)ValveDuty::kAnkPla];
-    knee_ank_duty = valve_duty[(unsigned)ValveDuty::kKneAnk];
-    knee_flex_duty = valve_duty[(unsigned)ValveDuty::kKneFlex];
-    ank_dor_duty = valve_duty[(unsigned)ValveDuty::kAnkDor];
+    if(this->con_mode!=ConMode::kNone){
+        sub_tank_duty = valve_duty[(unsigned)ValveDuty::kSubTank];
+        knee_ext_duty = valve_duty[(unsigned)ValveDuty::kKneExt];
+        ank_pla_duty = valve_duty[(unsigned)ValveDuty::kAnkPla];
+        knee_ank_duty = valve_duty[(unsigned)ValveDuty::kKneAnk];
+        knee_flex_duty = valve_duty[(unsigned)ValveDuty::kKneFlex];
+        ank_dor_duty = valve_duty[(unsigned)ValveDuty::kAnkDor];
+    }
     return true;
 }
 

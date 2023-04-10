@@ -19,8 +19,10 @@ class PhasePlot(QDialog):
         self.plot.addItem(self.scatter)
         self.phase_plot_widget.setBackground('w')
 
+        print('init set range')
         self.plot.setXRange(-90,90)
         self.plot.setYRange(-90,90)
+
 
         self.x_data = deque([0.0]*1000)
         self.y_data = deque([0.0]*1000)
@@ -31,3 +33,6 @@ class PhasePlot(QDialog):
         self.x_data.append(data[ENC_LHIP_S]-data[ENC_LKNE_S]+data[ENC_LANK_S])
         self.y_data.append(data[ENC_RHIP_S]-data[ENC_RKNE_S]+data[ENC_RANK_S])
         self.scatter.setData(self.x_data, self.y_data)
+    def UpdateNeutralPos(self):
+        self.plot.setXRange(-90+self.x_data[-1],90+self.x_data[-1])
+        self.plot.setYRange(-90+self.y_data[-1],90+self.y_data[-1])

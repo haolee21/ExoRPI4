@@ -36,7 +36,9 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(Include_DIR include)
 set(COMMON_DIR ../RPI_Teensy)
 find_package(Boost 1.75.0 COMPONENTS serialization date_time filesystem REQUIRED)
-find_library(osqp_LIB osqp ${osqp_LIBRARIES})
+# find_library(osqp_LIB osqp ${osqp_LIBRARIES})
+# set(osqp_DIR /home/lowlimb/tools/ARM/osqp/lib/cmake/osqp)
+find_package(osqp REQUIRED PATHS /home/lowlimb/tools/ARM/osqp/lib/cmake/osqp)
 
 
 
@@ -71,10 +73,11 @@ include_directories(
 file(GLOB SRC_FILES 
     # ${Include_DIR}/*.cpp
     src/*.cpp)
-message(STATUS ${SRC_FILES})
+# message(STATUS ${SRC_FILES})
 add_executable(exo_o ${SRC_FILES})
 
-target_link_libraries(exo_o PRIVATE ${Boost_LIBRARIES} ${osqp_LIB}) 
+# target_link_libraries(exo_o PRIVATE ${Boost_LIBRARIES} ${osqp_LIB}) 
+target_link_libraries(exo_o PRIVATE Boost::date_time Boost::filesystem osqp::osqp ) 
 target_precompile_headers(exo_o 
     PUBLIC
         include/ADC.hpp
