@@ -180,8 +180,10 @@ void FSM::FSM_RightStart()
     std::cout << "right start\n";
 }
 double FSM::GetLAnkPreParams(){
+    //return adc value
     return FSM::GetInstance().l_ank_s_idle_p;
 }
 double FSM::GetRAnkPreParams(){
+    //return adc value
     return FSM::GetInstance().r_ank_s_idle_p;
 }

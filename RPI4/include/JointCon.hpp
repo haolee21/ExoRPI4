@@ -54,19 +54,15 @@ public:
         kAnkPlant,
         kTotal
     };
-    enum class ForceRedType //two ways to reduce the force output
-    {
-        kRec,
-        kBalance
-    };
+
     
     static const unsigned  kNumOfChambers = 3;
 
     void SetPreControl(double des_pre,Chamber controlled, Chamber followed);
     // void SetControl(ConMode con_mode,PreCon pre_con_type,double des_pre);
-    void SetControl(ConMode con_mode, ForceCon force_con_type,ForceRedType force_red_type,double cmd_value);
-    void SetImpControl(ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_imp, double cmd_init_force);
-    void SetImpControl(ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_imp, double cmd_init_force,double neutral_knee_pos); //not doing imp control on ankle
+    void SetControl(ConMode con_mode, ForceCon force_con_type,double cmd_value);
+    void SetImpControl(ForceCon _force_con_type, double cmd_imp, double cmd_init_force);
+    void SetImpControl(ForceCon _force_con_type, double cmd_imp, double cmd_init_force,double neutral_knee_pos); //not doing imp control on ankle
     // void SetControl(ConMode con_mode,ForceCon force_con_type,ForceRedType force_red_type,double cmd_val1,double cmd_val2);
     void ResetControl();
     void ShutDown();
@@ -92,7 +88,6 @@ private:
     // PreCon pre_con_type;
     Chamber controlled_chamber, followed_chamber;
     ForceCon force_con_type;
-    ForceRedType force_red_type;
 
     std::array<double,(unsigned)Chamber::kMainTank> cmd_pre;
     std::array<std::array<double,MPC_TIME_HORIZON>,(unsigned)ForceCon::kTotal> cmd_force;
@@ -120,10 +115,10 @@ private:
     // void GetPreCon(const std::array<double,MPC_TIME_HORIZON> &des_pre,u_int8)
 
     void GetPreCon(const std::array<double,MPC_TIME_HORIZON> &des_pre,std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty,Chamber controlled,Chamber followed);
-    void GetForceCon(std::array<double,MPC_TIME_HORIZON> des_force,std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty, ForceCon force_con_type,ForceRedType force_red_type);
+    void GetForceCon(std::array<double,MPC_TIME_HORIZON> des_force,std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty, ForceCon force_con_type);
     // void GetTorCon(std::array<double,MPC_TIME_HORIZON> des_tor,u_int8_t &charge_duty,u_int8_t &rec_duty,u_int8_t &balance_duty, u_int8_t &tank_duty, ForceCon force_con_type,ForceRedType force_red_type);
-    void GetTorCon(std::array<double,MPC_TIME_HORIZON> des_tor, std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty, ForceCon force_con_type,ForceRedType force_red_type);
-    void GetImpCon(double des_imp, double init_F, std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty,ForceCon force_con_type,ForceRedType force_red_type);
+    void GetTorCon(std::array<double,MPC_TIME_HORIZON> des_tor, std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty, ForceCon force_con_type);
+    void GetImpCon(double des_imp, double init_F, std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty,ForceCon force_con_type);
 
 
 

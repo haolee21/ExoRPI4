@@ -60,6 +60,9 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
+        hub.lkra_con.SetPreControl(FSM::GetRAnkPreParams(),JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
+
+
 
         hub.rkla_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
@@ -78,10 +81,14 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
+
+        // if(pre_data[(unsigned)SensorHub::AdcName::RAnkExt]<right_ankle_push_pre)
+        hub.lkra_con.SetPreControl(FSM::GetRAnkPreParams(),JointCon::Chamber::kAnkPla,JointCon::Chamber::kSubTank);
+        
 
         hub.rkla_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
@@ -100,7 +107,7 @@ Valves_hub &hub = Valves_hub::GetInstance();
         double l_kne_initF;
         double l_kne_neu_pos;
         FSM::GetLKneImpParams(l_kne_imp,l_kne_neu_pos,l_kne_initF);
-        hub.lkra_con.SetImpControl(JointCon::ForceCon::kKneExt,JointCon::ForceRedType::kRec,l_kne_imp,l_kne_initF,l_kne_neu_pos);
+        hub.lkra_con.SetImpControl(JointCon::ForceCon::kKneExt,l_kne_imp,l_kne_initF,l_kne_neu_pos);
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=0;
@@ -138,6 +145,10 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
+        
+        hub.rkla_con.SetPreControl(FSM::GetLAnkPreParams(),JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
+
+
 
     }
     else if (fsm_cur_state==FSM::State::kLeftStandRightPrep){
@@ -156,10 +167,13 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
+
+        hub.rkla_con.SetPreControl(FSM::GetLAnkPreParams(),JointCon::Chamber::kAnkPla,JointCon::Chamber::kSubTank);
+
     }
 
 
@@ -168,7 +182,7 @@ Valves_hub &hub = Valves_hub::GetInstance();
         double r_kne_initF;
         double r_kne_neu_pos;
         FSM::GetRKneImpParams(r_kne_imp,r_kne_neu_pos,r_kne_initF);
-        hub.rkla_con.SetImpControl(JointCon::ForceCon::kKneExt,JointCon::ForceRedType::kRec,r_kne_imp,r_kne_initF,r_kne_neu_pos);
+        hub.rkla_con.SetImpControl(JointCon::ForceCon::kKneExt,r_kne_imp,r_kne_initF,r_kne_neu_pos);
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=0;
@@ -323,7 +337,7 @@ void Valves_hub::EnableCon(double des_pre, Valves_hub::KneeAnkPair knee_ank_pair
     knee_ank_con->SetPreControl(des_pre,controlled,followed);
 
 }
-void Valves_hub::EnableCon(double des_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon force_con_type, JointCon::ForceRedType force_red_type)
+void Valves_hub::EnableCon(double des_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon force_con_type)
 {
     FSM::TurnOffFSM();
     JointCon *knee_ank_con;
@@ -338,10 +352,10 @@ void Valves_hub::EnableCon(double des_force, Valves_hub::KneeAnkPair knee_ank_pa
     default:
         return;
     }
-    knee_ank_con->SetControl(JointCon::ConMode::kForceCon,force_con_type,force_red_type,des_force);
+    knee_ank_con->SetControl(JointCon::ConMode::kForceCon,force_con_type,des_force);
 
 }
-void Valves_hub::EnableCon(double des_imp, double init_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon imp_con_type, JointCon::ForceRedType force_red_type){
+void Valves_hub::EnableCon(double des_imp, double init_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon imp_con_type){
     FSM::TurnOffFSM();
     JointCon *knee_ank_con;
     switch (knee_ank_pair)
@@ -355,7 +369,7 @@ void Valves_hub::EnableCon(double des_imp, double init_force, Valves_hub::KneeAn
     default:
         return;
     }
-    knee_ank_con->SetImpControl(imp_con_type,force_red_type,des_imp,init_force);
+    knee_ank_con->SetImpControl(imp_con_type,des_imp,init_force);
 }
 
 

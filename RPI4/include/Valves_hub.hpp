@@ -77,8 +77,8 @@ public:
     // static std::array<bool,(unsigned)Joint::kTotal> GetControlCond();
     static void ResetCon(KneeAnkPair joint);
     static void EnableCon(double des_pre,Valves_hub::KneeAnkPair knee_ank_pair, JointCon::Chamber controlled, JointCon::Chamber followed);
-    static void EnableCon(double des_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon force_con_type, JointCon::ForceRedType force_red_type);
-    static void EnableCon(double des_imp, double init_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon imp_con_type, JointCon::ForceRedType force_red_type);
+    static void EnableCon(double des_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon force_con_type);
+    static void EnableCon(double des_imp, double init_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon imp_con_type);
     //Pressure control
     
     
