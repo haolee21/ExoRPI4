@@ -474,6 +474,7 @@ void JointCon::GetPreCon(const std::array<double,MPC_TIME_HORIZON> &des_pre,std:
         valve_duty[(unsigned)ValveDuty::kKneAnk] = this->knee_ank_con.GetPreControl(des_pre, this->p_knee_ext, this->p_ank_pla,this->knee_cyln_params.chamber_max_len / this->knee_cyln_ext_len/ this->ank_cyln_params.chamber_max_len*this->ank_cyln_shrk_len);
     }
     else if(controlled==Chamber::kAnkPla && followed==Chamber::kKneExt){
+        valve_duty[(unsigned)ValveDuty::kKneAnk] = this->knee_ank_con.GetPreControl(des_pre,this->p_ank_pla,this->p_knee_ext,this->ank_cyln_params.chamber_max_len/this->ank_cyln_shrk_len/this->knee_cyln_params.chamber_max_len *this->knee_cyln_ext_len);
 
     }
 
@@ -483,10 +484,15 @@ double JointCon::GetPre_KPa(double pre_adc)
 {
     return (pre_adc / 65536 * 4.096 - 0.5) * 50 * 6.89476;
 }
-
 bool JointCon::GetValveDuty(u_int8_t &knee_ext_duty, u_int8_t &knee_flex_duty, u_int8_t &ank_pla_duty, u_int8_t &ank_dor_duty, u_int8_t &sub_tank_duty, u_int8_t &knee_ank_duty)
 {
-    std::array<u_int8_t,(unsigned)ValveDuty::kTotal> valve_duty{sub_tank_duty,knee_ext_duty,ank_pla_duty,knee_ank_duty};
+    std::array<u_int8_t,(unsigned)ValveDuty::kTotal> valve_duty;
+    valve_duty[(unsigned)ValveDuty::kSubTank] = sub_tank_duty;
+    valve_duty[(unsigned)ValveDuty::kKneExt] = knee_ext_duty;
+    valve_duty[(unsigned)ValveDuty::kAnkPla] = ank_pla_duty;
+    valve_duty[(unsigned)ValveDuty::kKneAnk] = knee_ank_duty;
+    valve_duty[(unsigned)ValveDuty::kKneFlex] = knee_flex_duty;
+    valve_duty[(unsigned)ValveDuty::kAnkDor] = ank_dor_duty;
     if (this->con_mode == ConMode::kPreCon)
     {
         
@@ -494,6 +500,10 @@ bool JointCon::GetValveDuty(u_int8_t &knee_ext_duty, u_int8_t &knee_flex_duty, u
         std::fill_n(des_pre.begin(),MPC_TIME_HORIZON,this->cmd_pre[(unsigned)this->controlled_chamber]);
         this->GetPreCon(des_pre, valve_duty,this->controlled_chamber,this->followed_chamber);
         
+
+
+
+
         // return true;
     }
     else if (this->con_mode == ConMode::kForceCon)

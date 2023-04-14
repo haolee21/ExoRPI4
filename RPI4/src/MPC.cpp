@@ -521,23 +521,18 @@ void MPC::UpdateHistory(double p_set, double p_tank,double p_des)
     double p_step = (p_des-p_set)/(double)MPC_TIME_HORIZON/65536.0;
     // std::cout<<"p_step: "<<p_step<<std::endl;
 
-    for (int i = 0; i < MPC_DELAY; i++)
+    for (int i = 0; i < MPC_DELAY; i++) //fill the vector with real measurements
     {
         this->p_tank_his[i] = this->p_tank_mem[(this->meas_idx + i) % MPC_DELAY];
         this->p_set_his[i] = this->p_set_mem[(this->meas_idx + i) % MPC_DELAY];
         this->u_his[i] = this->u_mem[(this->meas_idx + i+1) % MPC_DELAY];
     }
 
-    for (int i = 0; i < MPC_TIME_HORIZON; i++)
+    for (int i = 0; i < MPC_TIME_HORIZON; i++) //fill the vector with linearized points, suppose f(x[0]~x[10]), to estimate x[15], we need to f(x[0]~x[10],x_hat[11]~x_hat[15]) for linearization
     {
         this->p_tank_his[i + MPC_DELAY] = (p_tank - 3297.312) / 65536-p_step*i*0.58993; //This literally has no meaning but let's give it a try
         this->p_set_his[i + MPC_DELAY] = (p_set - 3297.312) / 65536+p_step*i;
         this->u_his[i + MPC_DELAY] = MPC::kUBar; // use the lower bound first, in case the previous duty was 0
-
-
-        // this->p_tank_his[i + MPC_DELAY] = (p_tank - 3297.312) / 65536; //This literally has no meaning but let's give it a try
-        // this->p_set_his[i + MPC_DELAY] = (p_set - 3297.312) / 65536;
-        // this->u_his[i + MPC_DELAY] = MPC::kUBar; // use the lower bound first, in case the previous duty was 0
 
     }
 

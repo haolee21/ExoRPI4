@@ -51,7 +51,7 @@ Valves_hub &hub = Valves_hub::GetInstance();
     FSM::Update();
     FSM::State fsm_cur_state = FSM::GetFSM_State();
     if(fsm_cur_state==FSM::State::kLeftSwingRightStand){
-        hub.lkra_con.ResetControl();
+        // hub.lkra_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=100;
@@ -69,10 +69,15 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;
+        // hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
+
+        if(pre_data[(unsigned)SensorHub::AdcName::RKneExt]<pre_data[(unsigned)SensorHub::AdcName::LAnkExt])
+            hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;
+        else
+            hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
 
     }
     else if(fsm_cur_state==FSM::State::kLeftPrepRightStand){
@@ -97,8 +102,8 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=100;
         
     }
 
@@ -120,7 +125,7 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
@@ -131,12 +136,18 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
 
-        hub.rkla_con.ResetControl();
+        if(pre_data[(unsigned)SensorHub::AdcName::LKneExt]<pre_data[(unsigned)SensorHub::AdcName::RAnkExt])
+            hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=100;
+        else
+            hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
+
+
+
+        // hub.rkla_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=100;
@@ -159,8 +170,8 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=100;
 
         hub.rkla_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
@@ -195,7 +206,7 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
@@ -296,7 +307,7 @@ const std::array<uint8_t, PWM_VAL_NUM> &Valves_hub::GetDuty()
 {
     return std::ref(Valves_hub::GetInstance().PWM_Duty);
 }
-void Valves_hub::ResetCon(KneeAnkPair joint)
+void Valves_hub::ShutDownKneAnk(KneeAnkPair joint)
 {
     auto &hub = Valves_hub::GetInstance();
     switch (joint)

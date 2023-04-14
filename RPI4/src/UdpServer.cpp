@@ -340,13 +340,13 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
 
         if (cmd_packet.con_on_off_flag[(unsigned)Valves_hub::KneeAnkPair::kLeftKneeRightAnk])
         {
-            Valves_hub::ResetCon(Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
+            Valves_hub::ShutDownKneAnk(Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
         }
 
         else if (cmd_packet.con_on_off_flag[(unsigned)Valves_hub::KneeAnkPair::kRightKneeLeftAnk])
         {
             // std::cout<<"turn off rkla in udp server\n";
-            Valves_hub::ResetCon(Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
+            Valves_hub::ShutDownKneAnk(Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
 
     }
@@ -382,8 +382,8 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
             FSM::FSM_RightStart();
         else{
             FSM::TurnOffFSM();
-            Valves_hub::ResetCon(Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
-            Valves_hub::ResetCon(Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
+            Valves_hub::ShutDownKneAnk(Valves_hub::KneeAnkPair::kLeftKneeRightAnk);
+            Valves_hub::ShutDownKneAnk(Valves_hub::KneeAnkPair::kRightKneeLeftAnk);
         }
     }
     if(cmd_packet.fsm_param_change_flag){
