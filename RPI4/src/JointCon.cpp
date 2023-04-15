@@ -13,7 +13,7 @@ JointCon::JointCon(ExoConfig::MPC_Params knee_ext_params, ExoConfig::MPC_Params 
       neutral_knee_pos(knee_cyln_params.neutral_pos),neutral_ank_pos(ank_cyln_params.neutral_pos),
       vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b), force_pre_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b),
       p_ext_rec_diff_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b),
-      joint_con_rec(joint_con_name, "Time,KneForce,AnkForce,KneExtLen,AnkShrkLen,KneMomentArm,AnkMomentArm,KneSpringMaxCompress,AnkSpringMaxCompress")
+      joint_con_rec(joint_con_name, "Time,KneForce,AnkForce,KneExtLen,AnkShrkLen,KneMomentArm,AnkMomentArm,KneSpringMaxCompress,AnkSpringMaxCompress,TankDes,KneExtDes,AnkPlaDes")
 {
     this->imp_fsm_state = Imp_FSM::kLoadPrep;
     
@@ -68,6 +68,11 @@ void JointCon::SetImpControl(ForceCon _force_con_type, double cmd_imp, double cm
 void JointCon::ResetControl()
 {
     this->con_mode = ConMode::kNone;
+    this->cmd_pre[(unsigned)Chamber::kSubTank]=0;
+    this->cmd_pre[(unsigned)Chamber::kKneExt]=0;
+    this->cmd_pre[(unsigned)Chamber::kAnkPla]=0;
+    std::cout<<"reset cmd pressure\n";
+
 }
 void JointCon::ShutDown()
 {
@@ -143,14 +148,17 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     // get fsm state
 
     // record old data
-    this->joint_con_rec.PushData(std::array<double, 8>{this->cur_knee_force, 
+    this->joint_con_rec.PushData(std::array<double, 11>{this->cur_knee_force, 
                                                        this->cur_ank_force, 
                                                        this->knee_cyln_ext_len, 
                                                        this->ank_cyln_shrk_len, 
                                                        this->knee_moment_arm, 
                                                        this->ankle_moment_arm, 
                                                        this->max_knee_spring_compress, 
-                                                       this->max_ank_spring_compress});
+                                                       this->max_ank_spring_compress,
+                                                       this->cmd_pre[(unsigned)Chamber::kSubTank],
+                                                       this->cmd_pre[(unsigned)Chamber::kKneExt],
+                                                       this->cmd_pre[(unsigned)Chamber::kAnkPla]});
     
     this->knee_len_ext_old = this->knee_cyln_ext_len;
     this->ank_len_ext_old = this->ank_cyln_ext_len;
@@ -194,6 +202,8 @@ void JointCon::GetForceCon(std::array<double, MPC_TIME_HORIZON> des_force, std::
 
     const ExoConfig::CylnPhyParams *cyln_phy_param;
     const double *pos_diff, *cur_force, *p_act, *p_rec;
+
+    double *cur_cmd_pre;
     // MPC *act_con;
     // const double *cur_act_chamber_len;
     if (force_con_type == ForceCon::kKneExt)
@@ -206,6 +216,8 @@ void JointCon::GetForceCon(std::array<double, MPC_TIME_HORIZON> des_force, std::
         // cur_act_chamber_len = &this->knee_cyln_ext_len;
         p_act = &this->p_knee_ext;
         p_rec = &this->p_ank_pla;
+
+        cur_cmd_pre = &this->cmd_pre[(unsigned)Chamber::kKneExt];
     }
     else if (force_con_type == ForceCon::kAnkPlant)
     {
@@ -216,6 +228,8 @@ void JointCon::GetForceCon(std::array<double, MPC_TIME_HORIZON> des_force, std::
         // cur_act_chamber_len = &this->ank_cyln_ext_len;
         p_act = &this->p_ank_pla;
         p_rec = &this->p_knee_ext;
+
+        cur_cmd_pre = &this->cmd_pre[(unsigned)Chamber::kAnkPla];
     }
     else
     {
@@ -233,6 +247,7 @@ void JointCon::GetForceCon(std::array<double, MPC_TIME_HORIZON> des_force, std::
         // des_pre[i] = ((des_force[i]) / 2.1547177056884764e-05) / this->piston_area_ext + 8000;
         // std::cout<<des_pre[i]<<',';
     }
+    *cur_cmd_pre = des_pre[0];
     // this->des_force = des_force[0];
     // std::cout<<"desired pressure: "<<des_pre[0]<<std::endl;
     // this->des_ext_pre = des_pre[0];
@@ -562,7 +577,8 @@ bool JointCon::GetValveDuty(u_int8_t &knee_ext_duty, u_int8_t &knee_flex_duty, u
         valve_duty[(unsigned)ValveDuty::kKneFlex]=0;
         valve_duty[(unsigned)ValveDuty::kAnkDor]=0;
         
-        this->con_mode = ConMode::kNone;
+        // this->con_mode = ConMode::kNone;
+        this->ResetControl();
 
     }
 
@@ -574,6 +590,8 @@ bool JointCon::GetValveDuty(u_int8_t &knee_ext_duty, u_int8_t &knee_flex_duty, u
         knee_ank_duty = valve_duty[(unsigned)ValveDuty::kKneAnk];
         knee_flex_duty = valve_duty[(unsigned)ValveDuty::kKneFlex];
         ank_dor_duty = valve_duty[(unsigned)ValveDuty::kAnkDor];
+
+        // std::cout<<(int)knee_ext_duty<<std::endl;
     }
     return true;
 }

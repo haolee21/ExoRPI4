@@ -48,7 +48,7 @@ class MW(QMainWindow):
         self.app = QApplication([])
         self.systemInfo = _systemInfo
         super().__init__()
-        uic.loadUi('UI/exo_gui_mw.ui',self)
+        uic.loadUi('UI/exo_gui_mw2.ui',self)
         self.setWindowTitle('Bionics LLExo')
 
         # self.tcp_port = TCP()

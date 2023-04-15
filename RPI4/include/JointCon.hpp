@@ -163,7 +163,7 @@ private:
 
     double GetPre_KPa(double pre_adc);
 
-    Recorder<double,8> joint_con_rec;
+    Recorder<double,11> joint_con_rec;
 
    
     

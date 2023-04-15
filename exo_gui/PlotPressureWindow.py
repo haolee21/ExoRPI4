@@ -1,5 +1,6 @@
 from ctypes.wintypes import DOUBLE
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QDialog
+from PyQt5.QtCore import Qt
 from PyQt5 import uic
 from pyqtgraph import GraphicsLayoutWidget
 import pyqtgraph as pg
@@ -9,17 +10,17 @@ import struct
 from ExoDataStruct import *
 
 
-class PlotPressureWindow(QWidget):
+class PlotPressureWindow(QDialog):
     def __init__(self,parent=None):
-        super().__init__()
-        self.parent = parent
+        super().__init__(parent)
+        self.setWindowFlags(Qt.Window)
         uic.loadUi('UI/two_col_graph.ui',self)
         self.left_plot_widget = self.findChild(GraphicsLayoutWidget,'left_graphicsView')
         self.left_plot_widget.setBackground('w')
 
 
         self.left_tank_plot = self.left_plot_widget.addPlot(colspan=1,title='Left Tank Pressure')
-        self.left_tank_plot.setYRange(-1,self.parent.max_pressure)
+        self.left_tank_plot.setYRange(-1,self.parent().max_pressure)
         self.left_tank_plot.setLabel('left','Pressure (psi)')
         self.left_tank_plot.setLabel('bottom','Time (sec)')
         self.left_tank_line = self.left_tank_plot.plot(pen=pg.mkPen('b', width=1))
@@ -28,7 +29,7 @@ class PlotPressureWindow(QWidget):
 
         self.left_plot_widget.nextRow()
         self.left_knee_ext_plot = self.left_plot_widget.addPlot(colspan=1,title='Knee Extension Pressure')
-        self.left_knee_ext_plot.setYRange(-1,self.parent.max_pressure)
+        self.left_knee_ext_plot.setYRange(-1,self.parent().max_pressure)
         self.left_knee_ext_plot.setLabel('left','Pressure (psi)')
         self.left_knee_ext_plot.setLabel('bottom','Time (sec)')
         self.left_knee_ext_line = self.left_knee_ext_plot.plot(pen=pg.mkPen('b', width=1))
@@ -37,7 +38,7 @@ class PlotPressureWindow(QWidget):
 
         self.left_plot_widget.nextRow()
         self.left_knee_flex_plot = self.left_plot_widget.addPlot(colspan=1,title='Knee Flexion Pressure')
-        self.left_knee_flex_plot.setYRange(-1,self.parent.max_pressure)
+        self.left_knee_flex_plot.setYRange(-1,self.parent().max_pressure)
         self.left_knee_flex_plot.setLabel('left','Pressure (psi)')
         self.left_knee_flex_plot.setLabel('bottom','Time (sec)')
         self.left_knee_flex_line = self.left_knee_flex_plot.plot(pen=pg.mkPen('b', width=1))
@@ -47,7 +48,7 @@ class PlotPressureWindow(QWidget):
 
         self.left_plot_widget.nextRow()
         self.left_ankle_ext_plot = self.left_plot_widget.addPlot(colspan=1,title='Ankle Extension Pressure')
-        self.left_ankle_ext_plot.setYRange(-1,self.parent.max_pressure)
+        self.left_ankle_ext_plot.setYRange(-1,self.parent().max_pressure)
         self.left_ankle_ext_plot.setLabel('left','Pressure (psi)')
         self.left_ankle_ext_plot.setLabel('bottom','Time (sec)')
         self.left_ankle_ext_line = self.left_ankle_ext_plot.plot(pen=pg.mkPen('b', width=1))
@@ -56,7 +57,7 @@ class PlotPressureWindow(QWidget):
 
         self.left_plot_widget.nextRow()
         self.left_ankle_flex_plot = self.left_plot_widget.addPlot(colspan=1,title='Ankle Flexion Pressure')
-        self.left_ankle_flex_plot.setYRange(-1,self.parent.max_pressure)
+        self.left_ankle_flex_plot.setYRange(-1,self.parent().max_pressure)
         self.left_ankle_flex_plot.setLabel('left','Pressure (psi)')
         self.left_ankle_flex_plot.setLabel('bottom','Time (sec)')
         self.left_ankle_flex_line = self.left_ankle_flex_plot.plot(pen=pg.mkPen('b', width=1))
@@ -69,7 +70,7 @@ class PlotPressureWindow(QWidget):
         self.right_plot_widget = self.findChild(GraphicsLayoutWidget,'right_graphicsView')
         self.right_plot_widget.setBackground('w')
         self.right_tank_plot = self.right_plot_widget.addPlot(colspan=1,title='Right Tank Pressure')
-        self.right_tank_plot.setYRange(-1,self.parent.max_pressure)
+        self.right_tank_plot.setYRange(-1,self.parent().max_pressure)
         self.right_tank_plot.setLabel('left','Pressure (psi)')
         self.right_tank_plot.setLabel('bottom','Time (sec)')
         self.right_tank_line = self.right_tank_plot.plot(pen=pg.mkPen('b', width=1))
@@ -78,7 +79,7 @@ class PlotPressureWindow(QWidget):
 
         self.right_plot_widget.nextRow()
         self.right_knee_ext_plot = self.right_plot_widget.addPlot(colspan=1,title='Knee Extension Pressure')
-        self.right_knee_ext_plot.setYRange(-1,self.parent.max_pressure)
+        self.right_knee_ext_plot.setYRange(-1,self.parent().max_pressure)
         self.right_knee_ext_plot.setLabel('left','Pressure (psi)')
         self.right_knee_ext_plot.setLabel('bottom','Time (sec)')
         self.right_knee_ext_line = self.right_knee_ext_plot.plot(pen=pg.mkPen('b', width=1))
@@ -88,7 +89,7 @@ class PlotPressureWindow(QWidget):
 
         self.right_plot_widget.nextRow()
         self.right_knee_flex_plot = self.right_plot_widget.addPlot(colspan=1,title='Knee Flexion Pressure')
-        self.right_knee_flex_plot.setYRange(-1,self.parent.max_pressure)
+        self.right_knee_flex_plot.setYRange(-1,self.parent().max_pressure)
         self.right_knee_flex_plot.setLabel('left','Pressure (psi)')
         self.right_knee_flex_plot.setLabel('bottom','Time (sec)')
         self.right_knee_flex_line = self.right_knee_flex_plot.plot(pen=pg.mkPen('b', width=1))
@@ -97,7 +98,7 @@ class PlotPressureWindow(QWidget):
 
         self.right_plot_widget.nextRow()
         self.right_ankle_ext_plot = self.right_plot_widget.addPlot(colspan=1,title='Ankle Extension Pressure')
-        self.right_ankle_ext_plot.setYRange(-1,self.parent.max_pressure)
+        self.right_ankle_ext_plot.setYRange(-1,self.parent().max_pressure)
         self.right_ankle_ext_plot.setLabel('left','Pressure (psi)')
         self.right_ankle_ext_plot.setLabel('bottom','Time (sec)')
         self.right_ankle_ext_line = self.right_ankle_ext_plot.plot(pen=pg.mkPen('b', width=1))
@@ -107,7 +108,7 @@ class PlotPressureWindow(QWidget):
 
         self.right_plot_widget.nextRow()
         self.right_ankle_flex_plot = self.right_plot_widget.addPlot(colspan=1,title='Ankle Flexion Pressure')
-        self.right_ankle_flex_plot.setYRange(-1,self.parent.max_pressure)
+        self.right_ankle_flex_plot.setYRange(-1,self.parent().max_pressure)
         self.right_ankle_flex_plot.setLabel('left','Pressure (psi)')
         self.right_ankle_flex_plot.setLabel('bottom','Time (sec)')
         self.right_ankle_flex_line = self.right_ankle_flex_plot.plot(pen=pg.mkPen('b', width=1))
@@ -118,17 +119,17 @@ class PlotPressureWindow(QWidget):
 
 
         # init data
-        self.l_tank_data = deque([0.0]*self.parent.dataLen)
-        self.l_kne_ext_data = deque([0.0]*self.parent.dataLen)
-        self.l_kne_flex_data = deque([0.0]*self.parent.dataLen)
-        self.l_ank_ext_data = deque([0.0]*self.parent.dataLen)
-        self.l_ank_flex_data = deque([0.0]*self.parent.dataLen)
+        self.l_tank_data = deque([0.0]*self.parent().dataLen)
+        self.l_kne_ext_data = deque([0.0]*self.parent().dataLen)
+        self.l_kne_flex_data = deque([0.0]*self.parent().dataLen)
+        self.l_ank_ext_data = deque([0.0]*self.parent().dataLen)
+        self.l_ank_flex_data = deque([0.0]*self.parent().dataLen)
 
-        self.r_tank_data = deque([0.0]*self.parent.dataLen)
-        self.r_kne_ext_data = deque([0.0]*self.parent.dataLen)
-        self.r_kne_flex_data = deque([0.0]*self.parent.dataLen)
-        self.r_ank_ext_data = deque([0.0]*self.parent.dataLen)
-        self.r_ank_flex_data = deque([0.0]*self.parent.dataLen)
+        self.r_tank_data = deque([0.0]*self.parent().dataLen)
+        self.r_kne_ext_data = deque([0.0]*self.parent().dataLen)
+        self.r_kne_flex_data = deque([0.0]*self.parent().dataLen)
+        self.r_ank_ext_data = deque([0.0]*self.parent().dataLen)
+        self.r_ank_flex_data = deque([0.0]*self.parent().dataLen)
 
 
     def UpdateData(self,data):
@@ -177,4 +178,4 @@ class PlotPressureWindow(QWidget):
         self.right_ankle_flex_line.setData(self.r_ank_flex_data)
         
 
-        self.parent.app.processEvents()
+        # self.parent().app.processEvents()

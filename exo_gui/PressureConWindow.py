@@ -46,12 +46,12 @@ class PressureConWindow(QDialog):
         ## start
         self.btn_LKneExtPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.KneExt.value,self.LKneExt_pre,True))
         self.btn_LKneFlexPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.KneFlex.value,self.LKneFlex_pre,True))
-        self.btn_LAnkExtPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.AnkPla.value,self.LAnkExt_pre,True))
+        self.btn_LAnkExtPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.AnkPla.value,self.LAnkExt_pre,False))
         self.btn_LTankPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.SubTank.value,self.LTank_pre,True))
         
         self.btn_RKneExtPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.KneExt.value,self.RKneExt_pre,False))
         self.btn_RKneFlexPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.KneFlex.value,self.RKneFlex_pre,False))
-        self.btn_RAnkExtPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.AnkPla.value,self.RAnkExt_pre,False))
+        self.btn_RAnkExtPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.AnkPla.value,self.RAnkExt_pre,True))
         self.btn_RTankPre_start.clicked.connect(partial(self.PreStartClicked,Chamber.SubTank.value,self.RTank_pre,False))
         ## stop
 

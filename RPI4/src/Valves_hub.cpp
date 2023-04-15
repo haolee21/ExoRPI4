@@ -73,7 +73,8 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
-
+        
+        //in this phase, left ankle is in the air, thus any driving force there is unnecessary
         if(pre_data[(unsigned)SensorHub::AdcName::RKneExt]<pre_data[(unsigned)SensorHub::AdcName::LAnkExt])
             hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;
         else
