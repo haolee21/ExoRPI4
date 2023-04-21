@@ -126,12 +126,23 @@ void FSM::TurnOffFSM()
 void FSM::SetNetualPos()
 {
     auto &fsm = FSM::GetInstance();
-    fsm.l_hip_s_neu = fsm.joint_pos[SensorHub::EncName::LHipS];
-    fsm.l_kne_s_neu = fsm.joint_pos[SensorHub::EncName::LKneS];
-    fsm.l_ank_s_neu = fsm.joint_pos[SensorHub::EncName::LAnkS];
-    fsm.r_hip_s_neu = fsm.joint_pos[SensorHub::EncName::RHipS];
-    fsm.r_kne_s_neu = fsm.joint_pos[SensorHub::EncName::RKneS];
-    fsm.r_ank_s_neu = fsm.joint_pos[SensorHub::EncName::RAnkS];
+    //make neutral pos symmetric
+    double hip_neu = (fsm.joint_pos[SensorHub::EncName::LHipS]+fsm.joint_pos[SensorHub::RHipS])/2;
+    fsm.l_hip_s_neu = hip_neu;
+    fsm.r_hip_s_neu = hip_neu;
+    double knee_neu = (fsm.joint_pos[SensorHub::EncName::LKneS]+fsm.joint_pos[SensorHub::RKneS])/2;
+    fsm.l_kne_s_neu = knee_neu;
+    fsm.r_kne_s_neu = knee_neu;
+    double ank_neu = (fsm.joint_pos[SensorHub::EncName::LAnkS]+fsm.joint_pos[SensorHub::RAnkS])/2;
+    fsm.l_ank_s_neu = ank_neu;
+    fsm.r_ank_s_neu = ank_neu;
+
+    // fsm.l_hip_s_neu = fsm.joint_pos[SensorHub::EncName::LHipS];
+    // fsm.l_kne_s_neu = fsm.joint_pos[SensorHub::EncName::LKneS];
+    // fsm.l_ank_s_neu = fsm.joint_pos[SensorHub::EncName::LAnkS];
+    // fsm.r_hip_s_neu = fsm.joint_pos[SensorHub::EncName::RHipS];
+    // fsm.r_kne_s_neu = fsm.joint_pos[SensorHub::EncName::RKneS];
+    // fsm.r_ank_s_neu = fsm.joint_pos[SensorHub::EncName::RAnkS];
     std::cout << "set neutral pos\n";
     std::cout << fsm.l_hip_s_neu << ", " << fsm.l_kne_s_neu << ", " << fsm.l_ank_s_neu << std::endl;
     std::cout << fsm.r_hip_s_neu << ", " << fsm.r_kne_s_neu << ", " << fsm.r_ank_s_neu << std::endl;

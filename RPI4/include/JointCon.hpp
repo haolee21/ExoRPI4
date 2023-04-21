@@ -100,7 +100,7 @@ private:
     double knee_cyln_ext_len,knee_cyln_shrk_len,ank_cyln_ext_len,ank_cyln_shrk_len;  //ext: extend, shrk: shrink, unit: mm
     double knee_moment_arm,ankle_moment_arm;
     double knee_cyln_len_diff, ank_cyln_len_diff; //for calculating frction
-    double knee_len_ext_old,ank_len_ext_old;
+    double knee_len_ext_old,ank_len_shrk_old;
     // const double spring_k = 55.4 * 0.0393701 * 4.44822; // unit: N/mm
     double max_knee_spring_compress,max_ank_spring_compress;
 

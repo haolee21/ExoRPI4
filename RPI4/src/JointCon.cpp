@@ -71,7 +71,6 @@ void JointCon::ResetControl()
     this->cmd_pre[(unsigned)Chamber::kSubTank]=0;
     this->cmd_pre[(unsigned)Chamber::kKneExt]=0;
     this->cmd_pre[(unsigned)Chamber::kAnkPla]=0;
-    std::cout<<"reset cmd pressure\n";
 
 }
 void JointCon::ShutDown()
@@ -124,16 +123,16 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
 
     // std::cout<<"knee angle: "<<knee_angle<<std::endl;
 
-    this->knee_cyln_ext_len = this->knee_cyln_params.chamber_max_len - this->knee_cyln_params.mech_max_len + knee_tot_len - this->max_knee_spring_compress;
+    this->knee_cyln_shrk_len = this->knee_cyln_params.mech_max_len - knee_tot_len - this->max_knee_spring_compress;
+    this->knee_cyln_ext_len = this->knee_cyln_params.chamber_max_len - this->knee_cyln_shrk_len;
     // this->knee_cyln_ext_len = knee_tot_len - this->knee_cyln_params.mech_max_len + this->max_knee_spring_compress;
     // this->ank_cyln_ext_len = ank_tot_len - this->ank_cyln_params.mech_max_len + this->max_ank_spring_compress;
 
-    this->ank_cyln_ext_len = this->ank_cyln_params.chamber_max_len - this->ank_cyln_params.mech_max_len + ank_tot_len - this->max_ank_spring_compress;
+    this->ank_cyln_shrk_len = this->ank_cyln_params.mech_max_len - ank_tot_len - this->max_ank_spring_compress;
+    this->ank_cyln_ext_len = this->ank_cyln_params.chamber_max_len - this->ank_cyln_shrk_len;
 
-    this->knee_cyln_shrk_len = this->knee_cyln_params.chamber_max_len - this->knee_cyln_ext_len;
-    this->ank_cyln_shrk_len = this->ank_cyln_params.chamber_max_len - this->ank_cyln_ext_len;
 
-    std::array<double, 2> cyln_len_diff = this->vel_filter.GetFilteredMea(std::array<double, 2>{this->knee_cyln_ext_len - this->knee_len_ext_old, this->ank_cyln_ext_len - this->ank_len_ext_old});
+    std::array<double, 2> cyln_len_diff = this->vel_filter.GetFilteredMea(std::array<double, 2>{this->knee_cyln_ext_len - this->knee_len_ext_old, this->ank_cyln_shrk_len - this->ank_len_shrk_old});
     this->knee_cyln_len_diff = cyln_len_diff[0];
     this->ank_cyln_len_diff = cyln_len_diff[1];
 
@@ -161,7 +160,7 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
                                                        this->cmd_pre[(unsigned)Chamber::kAnkPla]});
     
     this->knee_len_ext_old = this->knee_cyln_ext_len;
-    this->ank_len_ext_old = this->ank_cyln_ext_len;
+    this->ank_len_shrk_old = this->ank_cyln_shrk_len;
 }
 
 void JointCon::RecData()
@@ -481,12 +480,15 @@ void JointCon::GetPreCon(const std::array<double,MPC_TIME_HORIZON> &des_pre,std:
     }
     else if(controlled==Chamber::kKneExt && followed==Chamber::kSubTank){
         valve_duty[(unsigned)ValveDuty::kKneExt] = this->knee_ext_con.GetPreControl(des_pre, this->p_knee_ext, this->p_sub_tank, this->knee_cyln_params.chamber_max_len / this->knee_cyln_ext_len);
+        
     }
     else if(controlled==Chamber::kAnkPla && followed==Chamber::kSubTank){
         valve_duty[(unsigned)ValveDuty::kAnkPla] = this->ank_ext_con.GetPreControl(des_pre, this->p_ank_pla, this->p_sub_tank, this->ank_cyln_params.chamber_max_len / this->ank_cyln_shrk_len);
+
     }
     else if(controlled==Chamber::kKneExt && followed==Chamber::kAnkPla){
         valve_duty[(unsigned)ValveDuty::kKneAnk] = this->knee_ank_con.GetPreControl(des_pre, this->p_knee_ext, this->p_ank_pla,this->knee_cyln_params.chamber_max_len / this->knee_cyln_ext_len/ this->ank_cyln_params.chamber_max_len*this->ank_cyln_shrk_len);
+        
     }
     else if(controlled==Chamber::kAnkPla && followed==Chamber::kKneExt){
         valve_duty[(unsigned)ValveDuty::kKneAnk] = this->knee_ank_con.GetPreControl(des_pre,this->p_ank_pla,this->p_knee_ext,this->ank_cyln_params.chamber_max_len/this->ank_cyln_shrk_len/this->knee_cyln_params.chamber_max_len *this->knee_cyln_ext_len);

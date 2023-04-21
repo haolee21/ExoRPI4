@@ -58,8 +58,8 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=100;
         hub.lkra_con.SetPreControl(FSM::GetRAnkPreParams(),JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
 
 
@@ -155,8 +155,8 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=100;
         
         hub.rkla_con.SetPreControl(FSM::GetLAnkPreParams(),JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
 
