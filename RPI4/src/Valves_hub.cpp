@@ -60,8 +60,8 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=100;
-        hub.lkra_con.SetPreControl(FSM::GetRAnkPreParams(),JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
-
+        // hub.lkra_con.SetPreControl(FSM::GetRAnkPreParams(),JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
+        
 
 
         hub.rkla_con.ResetControl();
@@ -93,8 +93,9 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
 
         // if(pre_data[(unsigned)SensorHub::AdcName::RAnkExt]<right_ankle_push_pre)
-        hub.lkra_con.SetPreControl(FSM::GetRAnkPreParams(),JointCon::Chamber::kAnkPla,JointCon::Chamber::kSubTank);
-        
+        // hub.lkra_con.SetPreControl(FSM::GetRAnkPreParams(),JointCon::Chamber::kAnkPla,JointCon::Chamber::kSubTank);
+        hub.lkra_con.SetForceControl(JointCon::ForceCon::kAnkPlant,FSM::GetRAnkPreParams());
+
 
         hub.rkla_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
@@ -158,8 +159,8 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=100;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=100;
         
-        hub.rkla_con.SetPreControl(FSM::GetLAnkPreParams(),JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
-
+        // hub.rkla_con.SetPreControl(FSM::GetLAnkPreParams(),JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
+        
 
 
     }
@@ -184,8 +185,8 @@ Valves_hub &hub = Valves_hub::GetInstance();
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
 
-        hub.rkla_con.SetPreControl(FSM::GetLAnkPreParams(),JointCon::Chamber::kAnkPla,JointCon::Chamber::kSubTank);
-
+        // hub.rkla_con.SetPreControl(FSM::GetLAnkPreParams(),JointCon::Chamber::kAnkPla,JointCon::Chamber::kSubTank);
+        hub.rkla_con.SetForceControl(JointCon::ForceCon::kAnkPlant,FSM::GetLAnkPreParams());
     }
 
 
@@ -364,7 +365,7 @@ void Valves_hub::EnableCon(double des_force, Valves_hub::KneeAnkPair knee_ank_pa
     default:
         return;
     }
-    knee_ank_con->SetControl(JointCon::ConMode::kForceCon,force_con_type,des_force);
+    knee_ank_con->SetForceControl(force_con_type,des_force);
 
 }
 void Valves_hub::EnableCon(double des_imp, double init_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon imp_con_type){

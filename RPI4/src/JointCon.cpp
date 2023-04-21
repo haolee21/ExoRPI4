@@ -37,13 +37,13 @@ void JointCon::SetPreControl(double _cmd_pre,Chamber controlled, Chamber followe
     this->followed_chamber = followed;
     this->cmd_pre[(unsigned)controlled] = _cmd_pre;
 }
-void JointCon::SetControl(ConMode _con_mode, ForceCon _force_con_type, double cmd_force)
+void JointCon::SetForceControl(ForceCon _force_con_type, double cmd_force)
 {
     std::array<double, MPC_TIME_HORIZON> cmd_force_array;
 
     std::fill_n(cmd_force_array.begin(), cmd_force_array.size(), cmd_force);
     this->cmd_force[(unsigned)_force_con_type] = cmd_force_array;
-    this->con_mode = _con_mode;
+    this->con_mode = ConMode::kForceCon;
     this->force_con_type = _force_con_type;
 }
 void JointCon::SetImpControl(ForceCon _force_con_type, double cmd_imp, double cmd_init_force)
