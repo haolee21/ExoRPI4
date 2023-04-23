@@ -32,6 +32,19 @@ Valves_hub &Valves_hub::GetInstance()
     static Valves_hub instance;
     return instance;
 }
+void Valves_hub::SetKneeDir(bool is_reverse){
+    Valves_hub::GetInstance().lkra_con.SetKneeReverse(is_reverse);
+    Valves_hub::GetInstance().rkla_con.SetKneeReverse(is_reverse);
+}
+bool Valves_hub::GetKneeDir(){
+    Valves_hub& hub = Valves_hub::GetInstance();
+    bool lkra_reverse = hub.lkra_con.GetKneeReverse();
+    bool rkla_reverse = hub.rkla_con.GetKneeReverse();
+    if(lkra_reverse^rkla_reverse)
+        perror("lkra rkla have different knee direction\n");
+    return lkra_reverse;
+}
+
 
 void Valves_hub::UpdateValve()
 {

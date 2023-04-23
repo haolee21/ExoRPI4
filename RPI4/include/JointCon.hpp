@@ -75,7 +75,9 @@ public:
     
     bool GetValveDuty(u_int8_t &knee_ext_duty,u_int8_t &knee_flex_duty, u_int8_t &ank_pla_duty,u_int8_t &ank_dor_duty, u_int8_t &sub_tank_duty,u_int8_t &knee_ank_duty);
 
-
+    // Reverse knee direction
+    void SetKneeReverse(bool is_reverse); //if the knee is backward, is_reverse=true, else false
+    bool GetKneeReverse(); //return true if knee is configured backward
     
 
 private:
@@ -108,6 +110,8 @@ private:
     double cur_knee_force, cur_ank_force; //unit: N
     
     double p_knee_ext,p_knee_flex,p_ank_pla,p_ank_dorsi,p_sub_tank,p_main_tank;
+
+    bool is_knee_reverse =true; //default knee is reverse
     
     // double cur_pre_force;
     // double des_force;
@@ -150,7 +154,7 @@ private:
 
     
     // calculating current cylinder length, external force
-    double GetExternalForce(double pre_ext, double pre_flex, double delta_x, double x_dot,ExoConfig::CylnPhyParams cyln_params); // unit: newton
+    double GetExternalForce(double pre_ext, double pre_flex, double delta_x, double x_dot,ExoConfig::CylnPhyParams cyln_params,bool is_ankle); // unit: newton
     
     // double GetLenLinear_mm(double pos);
 
@@ -165,6 +169,8 @@ private:
     double GetPre_KPa(double pre_adc);
 
     Recorder<double,11> joint_con_rec;
+
+
 
    
     

@@ -36,9 +36,9 @@ MPC::~MPC()
     if (this->osqp_data.get())
     {
         if (this->osqp_data->A)
-            c_free(this->osqp_data->A);
+            csc_spfree(this->osqp_data->A);
         if (this->osqp_data->P)
-            c_free(this->osqp_data->P);
+            csc_spfree(this->osqp_data->P);
         c_free(this->osqp_data.get());
     }
 }

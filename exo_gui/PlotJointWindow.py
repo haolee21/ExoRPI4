@@ -79,30 +79,28 @@ class PlotJointWindow(QDialog):
         self.r_ankData = deque([0.0]*self.parent().dataLen)
         self.right_ankle_line.setData(self.r_ankData)
         
-    def UpdateData(self,data):
-        
+    def UpdateData(self,data,is_knee_reverse):
         # the encoder are 12 bits, we use two bytes to send the data, 
         # each joint has two bytes, the order is MSB,LSB
         # [l_hip,l_knee,l_ank,r_hip,r_knee,r_ank]
         # print('joint got update')
-
+        self.parent().is_knee_reverse = is_knee_reverse
         # using parent.rt_data is already initialized since we have to manually pressed connect to establish connection
         self.l_hipData.popleft()
-        # self.parent.rtplot_data[0]=int.from_bytes(data[0:2],'little')*0.087890625
         
-
-        # self.parent.rtplot_data[0]=struct.unpack("d",data[0:DOUBLE_SIZE])[0]*0.087890625
+        
         self.parent().rtplot_data[ENC_LHIP_S] = data[ENC_LHIP_S]
         self.l_hipData.append(self.parent().rtplot_data[ENC_LHIP_S])
-
         self.left_hip_line.setData(self.l_hipData)
 
         
 
         self.l_kneeData.popleft()
-        # self.parent.rtplot_data[1]=int.from_bytes(data[2:4],'little')*0.087890625
-        # self.parent.rtplot_data[1]=struct.unpack("d",data[DOUBLE_SIZE*1:DOUBLE_SIZE*2])[0]*0.087890625
-        self.parent().rtplot_data[ENC_LKNE_S] = data[ENC_LKNE_S]
+        
+        if self.parent().is_knee_reverse:
+            self.parent().rtplot_data[ENC_LKNE_S] = data[ENC_LKNE_S]
+        else:
+            self.parent().rtplot_data[ENC_LKNE_S] = -data[ENC_LKNE_S]
         self.l_kneeData.append(self.parent().rtplot_data[ENC_LKNE_S])
         self.left_knee_line.setData(self.l_kneeData)
 
@@ -122,9 +120,10 @@ class PlotJointWindow(QDialog):
         self.right_hip_line.setData(self.r_hipData)
         
         self.r_kneeData.popleft()
-        # self.parent.rtplot_data[4]=int.from_bytes(data[8:10],'little')*0.087890625
-        # self.parent.rtplot_data[4]=struct.unpack("d",data[DOUBLE_SIZE*4:DOUBLE_SIZE*5])[0]*0.087890625
-        self.parent().rtplot_data[ENC_RKNE_S]=data[ENC_RKNE_S]
+        if self.parent().is_knee_reverse:
+            self.parent().rtplot_data[ENC_RKNE_S]=data[ENC_RKNE_S]
+        else:
+            self.parent().rtplot_data[ENC_RKNE_S]=-data[ENC_RKNE_S]
         self.r_kneeData.append(self.parent().rtplot_data[ENC_RKNE_S])
         self.right_knee_line.setData(self.r_kneeData)
         

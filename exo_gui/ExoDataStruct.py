@@ -155,7 +155,8 @@ class UdpDataPacket(Structure):
               ("pre_data1",(c_double)*NUM_PRE),
               ("con_status",(c_bool)*NUM_KNEE_ANK_PAIR),
               ("rec_status",c_bool),
-              ("fsm_state",c_int)]
+              ("fsm_state",c_int),
+              ("is_knee_reverse",c_bool)]
 class UdpCmdPacket(Structure):
     _fields_=[("pwm_duty_data",(c_byte)*PWM_VAL_NUM),
               ("lkra_des_pre_data",(c_double)*int(Chamber.MainTank.value)),
@@ -179,6 +180,7 @@ class UdpCmdPacket(Structure):
               ("fsm_right_knee_imp",c_double),
               ("fsm_left_ank_idle_pre",c_double),
               ("fsm_right_ank_idle_pre",c_double),
+              ("knee_reverse",c_bool),
 
 
               ("pwm_duty_flag",(c_bool)*PWM_VAL_NUM),
@@ -196,6 +198,7 @@ class UdpCmdPacket(Structure):
               ("set_neutral_flag",c_bool),
               ("fsm_start_flag",c_bool),
               ("fsm_param_change_flag",c_bool),
+              ("knee_reverse_flag",c_bool)
               ]
     def __init__(self):
         self.pwm_duty_flag=(ctypes.c_bool*PWM_VAL_NUM)((False)*PWM_VAL_NUM)

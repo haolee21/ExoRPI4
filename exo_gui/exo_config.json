@@ -20,8 +20,9 @@
         "CylnChamberMaxLen": 127,
         "FrictionCoeff": 14.0058,
         "PistonArea_mm2": [
-            354.838,
-            387.096
+            387.096,
+            354.838
+            
         ],
         "SpringConst": 9.702,
         "CylnEqn": [
@@ -52,8 +53,8 @@
         "CylnChamberMaxLen": 127,
         "FrictionCoeff": 14.0058,
         "PistonArea_mm2": [
-            354.838,
-            387.096
+            387.096,
+            354.838
         ],
         "SpringConst": 9.702,
         "CylnEqn": [

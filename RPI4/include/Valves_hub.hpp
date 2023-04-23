@@ -99,6 +99,9 @@ public:
 
     // Update MPC parameters
     static void UpdateParams(const ExoConfig::SystemParam &sys_param);
+    // Update knee direction
+    static void SetKneeDir(bool is_reverse); //backward knee: is_reverse=true
+    static bool GetKneeDir();
 
 private:
     Valves_hub();
@@ -110,6 +113,8 @@ private:
     Recorder<uint8_t, PWM_VAL_NUM> pwmRecorder;
 
     TeensyI2C teensyValveCon;
+
+    
 
     // Recorder<double, 11> mpc_ltank_rec; // record p_tank, p_set(target), p_val, q_val
     // Recorder<double, 11> mpc_lkne_rec;

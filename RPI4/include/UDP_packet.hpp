@@ -16,6 +16,7 @@ struct UDP_DataPacket
     std::array<bool,(unsigned)Valves_hub::KneeAnkPair::kTotal> con_status;
     bool recorder;
     int fsm_state;
+    bool knee_reverse;
 };
 struct UDP_CmdPacket{
     std::array<u_int8_t,PWM_VAL_NUM> pwm_duty;
@@ -47,6 +48,9 @@ struct UDP_CmdPacket{
     double fsm_left_ank_idle_pre;
     double fsm_right_ank_idle_pre;
 
+    //knee direction
+    bool knee_reverse;
+
 
     //change flags
     std::array<bool,PWM_VAL_NUM> pwm_duty_flag{false};
@@ -69,6 +73,9 @@ struct UDP_CmdPacket{
     bool set_neutral_pos_flag;
     bool fsm_start_flag;
     bool fsm_param_change_flag;
+
+    //Change knee direction
+    bool knee_reverse_flag;
 
 };
 // struct UDP_CmdFlag{

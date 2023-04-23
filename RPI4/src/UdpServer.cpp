@@ -66,7 +66,8 @@ void UdpServer::GetDataPacket(UDP_DataPacket &return_packet)
     return_packet.recorder = Timer::GetDataRec_flag();
 
     return_packet.fsm_state = (int)FSM::GetFSM_State();
-   
+    
+    return_packet.knee_reverse = Valves_hub::GetKneeDir();
 
 }
 
@@ -394,6 +395,10 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
                           cmd_packet.fsm_left_knee_init_f,
                           cmd_packet.fsm_right_knee_init_f,
                           cmd_packet.fsm_left_ank_idle_pre,cmd_packet.fsm_right_ank_idle_pre);
+    }
+
+    if(cmd_packet.knee_reverse_flag){
+        Valves_hub::SetKneeDir(cmd_packet.knee_reverse);
     }
 
 }

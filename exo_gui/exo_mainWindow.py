@@ -141,6 +141,10 @@ class MW(QMainWindow):
         # self.discharge_thread = None 
         
         # create exo plot
+        self.is_knee_reverse=True # default knee reverse, but will get update by the udp packet
+        self.btn_reverse_knee = self.findChild(QPushButton,'btn_reverse_knee')
+        self.btn_reverse_knee.clicked.connect(self.ReverseKneeDir)
+
         self.numJoint=6
         self.model_plot_widget = self.findChild(GraphicsLayoutWidget,'exo_rt_plot')
         self.model_plot_widget.setBackground('w')
@@ -182,13 +186,6 @@ class MW(QMainWindow):
         #function checkbox
         self.btn_sendCmd = self.findChild(QPushButton,'btn_sendCmd')
         self.btn_sendCmd.clicked.connect(self.btn_sendCmd_clicked)
-        # self.relLKne_task = self.findChild(QCheckBox,'checkBox_rel_LKne')
-        # self.relRKne_task = self.findChild(QCheckBox,'checkBox_rel_RKne')
-        # self.relLAnk_task = self.findChild(QCheckBox,'checkBox_rel_LAnk')
-        # self.relRAnk_task = self.findChild(QCheckBox,'checkBox_rel_RAnk')
-
-        # self.actLKne_task = self.findChild(QCheckBox,'checkBox_act_LKne')
-        # self.actRKne_task = self.findChild(QCheckBox,'checkBox_act_RKne')
         self.fsm_left_start_task = self.findChild(QCheckBox,'checkBox_fsm_left_start')
         self.fsm_right_start_task = self.findChild(QCheckBox,'checkBox_fsm_right_start')
         self.checkBox_setExoNeutralPos = self.findChild(QCheckBox,'checkBox_setExoNeutralPos')
@@ -205,23 +202,6 @@ class MW(QMainWindow):
 
         self.label_startTime = self.findChild(QLabel,'label_startTime')
 
-
-        # # set MPC condition display
-        # self.off_led = QPixmap('Resource/off_led.png')
-        # self.on_led = QPixmap('Resource/on_led.png')
-        # self.led_mpc_lknee = self.findChild(QLabel,'LED_LKnee')
-        # self.led_mpc_rknee = self.findChild(QLabel,'LED_RKnee')
-        # self.led_mpc_lank = self.findChild(QLabel,'LED_LAnk')
-        # self.led_mpc_rank = self.findChild(QLabel,'LED_RAnk')
-        
-
-
-        # self.led_mpc_lknee.setPixmap(self.off_led)
-        # self.led_mpc_rknee.setPixmap(self.off_led)
-        # self.led_mpc_lank.setPixmap(self.off_led)
-        # self.led_mpc_rank.setPixmap(self.off_led)
-
-        # self.old_mpc_cond = [False]*4
         
         # fsm state display
         self.lcd_fsm = self.findChild(QLCDNumber,'lcd_fsm')
@@ -532,6 +512,11 @@ class MW(QMainWindow):
         self.btn_exo_resetRHipS.setEnabled(flag)
         self.btn_exo_resetRKneS.setEnabled(flag)
         self.btn_exo_resetRAnkS.setEnabled(flag)
+    def ReverseKneeDir(self):
+        with self.udp_port.lock:
+            self.udp_port.udp_cmd_packet.knee_reverse = not self.is_knee_reverse
+            self.udp_port.udp_cmd_packet.knee_reverse_flag = True
+            self.is_knee_reverse = not self.is_knee_reverse
 sysData = SystemData()
 
 

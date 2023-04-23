@@ -104,7 +104,7 @@ class UdpClient:
             if(len(data_recv[0])==ctypes.sizeof(UdpDataPacket)):
                 self.disconnect_count=0
                 udp_data_packet = UdpDataPacket.from_buffer_copy(data_recv[0])
-                self.callback_fun['joint_plot_update'](udp_data_packet.enc_data)
+                self.callback_fun['joint_plot_update'](udp_data_packet.enc_data,udp_data_packet.is_knee_reverse)
                 self.callback_fun['pressure_plot_update'](udp_data_packet.pre_data1)
                 self.callback_fun['torque_update'](udp_data_packet.enc_data,udp_data_packet.pre_data1)
                 self.callback_fun['air_volume_update'](udp_data_packet.pre_data1[TANK_ADC])
@@ -116,6 +116,7 @@ class UdpClient:
                 self.callback_fun['cylncalib_update'](udp_data_packet.enc_data)
                 
                 self.callback_fun['phase_plot_update'](udp_data_packet.enc_data)
+                
                 
                 
                 
