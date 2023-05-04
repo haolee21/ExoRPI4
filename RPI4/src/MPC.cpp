@@ -10,8 +10,8 @@ using namespace std;
 
 MPC::MPC(ExoConfig::MPC_Params _mpc_params,std::string file_name)
     : mpc_params(_mpc_params),ah(_mpc_params.ch[0]), bh(_mpc_params.ch[1]), al(_mpc_params.cl[0]), bl(_mpc_params.cl[1]),
-      mpc_rec(file_name, MPC_HEAD),
-      mpc_model_rec(file_name+std::string("_model"),MPC_MODEL_HEAD)
+      mpc_rec(file_name, MPC_HEAD)
+    //   mpc_model_rec(file_name+std::string("_model"),MPC_MODEL_HEAD)
 
 {
     // this->max_pos = param.max_pos;
@@ -491,7 +491,7 @@ void MPC::UpdateMeas(double p_set,double p_tank,u_int8_t duty)
     else{
         pre_dF = this->UpdateF(this->p_set_his.begin(),this->p_tank_his.begin(),this->u_his.begin(),this->al,this->bl);
     }
-    this->mpc_model_rec.PushData(std::array<double,2>{pre_dF.coeff(0),pre_dF.coeff(1)},1); //this is actually the rate of change in the previous time step
+    // this->mpc_model_rec.PushData(std::array<double,2>{pre_dF.coeff(0),pre_dF.coeff(1)},1); //this is actually the rate of change in the previous time step
 
 
     this->p_tank_mem[this->meas_idx] = ((double)p_tank - 3297.312) / 65536.0; // the substraction is to remove the 0.5 V pressure sensor bias and add 1 atm to the equation

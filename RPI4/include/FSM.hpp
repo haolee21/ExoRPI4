@@ -12,12 +12,12 @@ class FSM
 
 public:
     enum class State{
-        kLeftSwingRightStand,
-        kLeftPrepRightStand,
-        kLeftLoadRightPush,
-        kLeftStandRightSwing,
-        kLeftStandRightPrep,
-        kLeftPushRightLoad,
+        kLeftAnkPushOff,
+        kLeftToeOff,
+        kDDLeftFrontRightRear, //double support with left leg front
+        kRightAnkPushOff,
+        kRightToeOff,
+        kDDRightFrontLeftRear,
         kTurnOff,//we need a special state to end all the valve actuation during fsm, but only once 
         kNone
     };
@@ -41,7 +41,6 @@ public:
     static void SetImpParams(const double left_swing_left_load_ratio,const double right_swing_right_load_ratio, const double l_kne_imp,const double r_kne_imp,const double l_kne_initF,const double r_kne_initF,const double l_ank_idle_pre,const double r_ank_idle_pre);
     
 private:
-    std::array<double,(unsigned)State::kNone>swtich_angle_ratio={0.0,0.65,0,0.56};
     FSM(/* args */);
     State cur_state;
     Recorder<double,10> fsm_rec;
@@ -50,10 +49,10 @@ private:
     const std::array<double,SensorHub::NUMENC> &joint_pos;
     const std::array<double,SensorHub::NUMENC> &joint_diff;
     const double kVelTh = 0.01; //if less than  1/100 deg/sec, consider stop
-    const double kHipDiff = 5;                                                                            
+                                                                          
 
     double l_hip_s_neu,l_kne_s_neu,l_ank_s_neu,r_hip_s_neu,r_kne_s_neu,r_ank_s_neu;
-    double l_neu,r_neu;
+    
 
 
     double l_kne_s_imp,l_ank_s_imp,r_kne_s_imp,r_ank_s_imp;

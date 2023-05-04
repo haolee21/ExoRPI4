@@ -268,9 +268,9 @@ void JointCon::GetForceCon(std::array<double, MPC_TIME_HORIZON> des_force, std::
     std::array<double, MPC_TIME_HORIZON> des_pre;
     for (unsigned i = 0; i < des_pre.size(); i++)
     {
-        des_pre[i] = ((des_force[i] + cyln_phy_param->fri_coeff * (*pos_diff)) / 2.1547177056884764e-05) / *piston_area + 8000;
-        // des_pre[i] = ((des_force[i]) / 2.1547177056884764e-05) / this->piston_area_ext + 8000;
-        // std::cout<<des_pre[i]<<',';
+        // des_pre[i] = ((des_force[i] + cyln_phy_param->fri_coeff * (*pos_diff)) / 2.1547177056884764e-05) / *piston_area + 8000; //I think this line's unit is wrong
+        des_pre[i] = ((des_force[i] + cyln_phy_param->fri_coeff * (*pos_diff)))*4.6415e4 / *piston_area + 8000;
+        
     }
     *cur_cmd_pre = des_pre[0];
     // this->des_force = des_force[0];

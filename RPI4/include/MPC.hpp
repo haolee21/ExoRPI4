@@ -148,7 +148,7 @@ private:
     // const double spring_k = 55.4 * 0.0393701 * 4.44822;
     // const double pre_offset = 0.5 / 4.096 * 65536;
     Recorder<double, 31> mpc_rec;
-    Recorder<double,2> mpc_model_rec; //this recorder records the real gradient estimation from the nonlinear model
+    // Recorder<double,2> mpc_model_rec; //this recorder records the real gradient estimation from the nonlinear model
     
 
 public:

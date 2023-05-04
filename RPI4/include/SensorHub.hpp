@@ -101,8 +101,8 @@ private:
     //Butterworth filter for ADC
     // DigitalFilter<double,FilterParam::Filter3Hz::Order,NUMPRE> filter_3_hz;
     DigitalFilter<double,FilterParam::Filter20Hz_2::Order,NUMPRE> digital_filter;
-    DigitalFilter<double,FilterParam::Filter45Hz_2::Order,NUMENC/2> left_enc_vel_filter;
-    DigitalFilter<double,FilterParam::Filter45Hz_2::Order,NUMENC/2> right_enc_vel_filter;
+    DigitalFilter<double,FilterParam::Filter5Hz_2::Order,NUMENC/2> left_enc_vel_filter;
+    DigitalFilter<double,FilterParam::Filter5Hz_2::Order,NUMENC/2> right_enc_vel_filter;
 
    
 
