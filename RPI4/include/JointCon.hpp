@@ -67,7 +67,8 @@ public:
     void ResetControl();
     void ShutDown();
 
-    
+    //Get the desired subtank pressure when running fsm, will be used to charge the subtank during the swing phase
+    double GetDesSubTankPre();
     
     void PushMeas(const double &p_knee_ext,const double &p_knee_flex,const double &p_ank_pla,const double &p_ank_dorsi, const double &p_sub_tank,const double &p_main_tank,const double &knee_angle,const double &ankle_angle,const u_int8_t knee_ext_duty,const u_int8_t knee_flex_duty,const u_int8_t ank_ext_duty, const u_int8_t knee_ank_duty,const u_int8_t tank_duty);
     // void PushMeas(const double &p_joint_ext,const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank,const double &pos,const u_int8_t tank_duty, const u_int8_t knee_ext_duty, const u_int8_t knee_flex_duty,const u_int8_t knee_ank_duty, const u_int8_t ank_ext_duty);
@@ -168,7 +169,7 @@ private:
 
     double GetPre_KPa(double pre_adc);
 
-    Recorder<double,11> joint_con_rec;
+    Recorder<double,12> joint_con_rec;
 
 
 

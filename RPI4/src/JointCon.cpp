@@ -12,7 +12,7 @@ JointCon::JointCon(ExoConfig::MPC_Params knee_ext_params, ExoConfig::MPC_Params 
       neutral_knee_pos(knee_cyln_params.neutral_pos), neutral_ank_pos(ank_cyln_params.neutral_pos),
       vel_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b), force_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b), force_pre_filter(FilterParam::Filter5Hz_2::a, FilterParam::Filter5Hz_2::b),
       p_ext_rec_diff_filter(FilterParam::Filter20Hz_2::a, FilterParam::Filter20Hz_2::b),
-      joint_con_rec(joint_con_name, "Time,KneForce,AnkForce,KneExtLen,AnkShrkLen,KneMomentArm,AnkMomentArm,KneSpringMaxCompress,AnkSpringMaxCompress,TankDes,KneExtDes,AnkPlaDes")
+      joint_con_rec(joint_con_name, "Time,KneForce,AnkForce,KneExtLen,AnkShrkLen,AnkExtLen,KneMomentArm,AnkMomentArm,KneSpringMaxCompress,AnkSpringMaxCompress,TankDes,KneExtDes,AnkPlaDes")
 {
     this->imp_fsm_state = Imp_FSM::kLoadPrep;
 
@@ -106,11 +106,15 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     this->p_sub_tank = p_sub_tank;
     this->p_main_tank = p_main_tank;
 
+    //if the knee is forward, the ankle angle is 180-ankle_angle
+    double ank_angle = this->is_knee_reverse? ankle_angle:-ankle_angle;
+    
+
     this->knee_pos_diff = knee_angle - this->cur_knee_ang;
-    this->ank_pos_diff = ankle_angle - this->cur_ankle_ang;
+    this->ank_pos_diff = ank_angle - this->cur_ankle_ang;
 
     this->cur_knee_ang = knee_angle;
-    this->cur_ankle_ang = ankle_angle;
+    this->cur_ankle_ang = ank_angle;
     // calculate force related values
 
     std::array<double, 2> cur_force;
@@ -118,13 +122,13 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     {
         cur_force = this->force_filter.GetFilteredMea(
             std::array<double, 2>{(p_knee_ext * this->knee_cyln_params.piston_area[0] - p_knee_flex * this->knee_cyln_params.piston_area[1]) * 2.1547177056884764e-05,
-                                  (p_ank_pla * this->ank_cyln_params.piston_area[0] - p_ank_dorsi * this->knee_cyln_params.piston_area[1]) * 2.1547177056884764e-05});
+                                  (p_ank_pla * this->ank_cyln_params.piston_area[1] - p_ank_dorsi * this->ank_cyln_params.piston_area[0]) * 2.1547177056884764e-05});
     }
     else
     {
         cur_force = this->force_filter.GetFilteredMea(
             std::array<double, 2>{(p_knee_ext * this->knee_cyln_params.piston_area[0] - p_knee_flex * this->knee_cyln_params.piston_area[1]) * 2.1547177056884764e-05,
-                                  (p_ank_pla * this->ank_cyln_params.piston_area[1] - p_ank_dorsi * this->knee_cyln_params.piston_area[0]) * 2.1547177056884764e-05});
+                                  (p_ank_pla * this->ank_cyln_params.piston_area[0] - p_ank_dorsi * this->ank_cyln_params.piston_area[1]) * 2.1547177056884764e-05});
     }
     this->cur_knee_force = cur_force[0];
     this->cur_ank_force = cur_force[1];
@@ -137,8 +141,7 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     this->max_ank_spring_compress = this->cur_ank_force / this->ank_cyln_params.spring_const;
 
     double knee_tot_len = sqrt(this->knee_cyln_params.cyln_eqn[0] - this->knee_cyln_params.cyln_eqn[1] * cos((180 - knee_angle - this->knee_cyln_params.cyln_eqn[2]) / 180 * M_PI)); // the cylinder is calculated by assuming knee angle =180 at full extension
-    double ank_tot_len = sqrt(this->ank_cyln_params.cyln_eqn[0] - this->ank_cyln_params.cyln_eqn[1] * cos((ankle_angle + 180 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI));
-
+    double ank_tot_len = sqrt(this->ank_cyln_params.cyln_eqn[0] - this->ank_cyln_params.cyln_eqn[1] * cos((ank_angle + 180 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI));
     // std::cout<<"knee angle: "<<knee_angle<<std::endl;
 
     this->knee_cyln_shrk_len = this->knee_cyln_params.mech_max_len - knee_tot_len - this->max_knee_spring_compress;
@@ -159,7 +162,7 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
 
     // calculate moment arm
     this->knee_moment_arm = 0.5 * this->knee_cyln_params.cyln_eqn[1] * sin((180 - knee_angle - this->knee_cyln_params.cyln_eqn[2]) / 180 * M_PI) / knee_tot_len;
-    this->ankle_moment_arm = 0.5 * this->ank_cyln_params.cyln_eqn[1] * sin((ankle_angle + 180 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI) / ank_tot_len;
+    this->ankle_moment_arm = 0.5 * this->ank_cyln_params.cyln_eqn[1] * sin((ank_angle + 180 - this->ank_cyln_params.cyln_eqn[2]) / 180 * M_PI) / ank_tot_len;
 
     // std::cout<<"knee moment arm: "<<this->knee_moment_arm<<std::endl;
     // std::cout<<"ankle moment arm: "<<this->ankle_moment_arm<<std::endl;
@@ -167,10 +170,11 @@ void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, con
     // get fsm state
 
     // record old data
-    this->joint_con_rec.PushData(std::array<double, 11>{this->cur_knee_force,
+    this->joint_con_rec.PushData(std::array<double, 12>{this->cur_knee_force,
                                                         this->cur_ank_force,
                                                         this->knee_cyln_ext_len,
                                                         this->ank_cyln_shrk_len,
+                                                        this->ank_cyln_ext_len,
                                                         this->knee_moment_arm,
                                                         this->ankle_moment_arm,
                                                         this->max_knee_spring_compress,
@@ -220,7 +224,7 @@ void JointCon::GetForceCon(std::array<double, MPC_TIME_HORIZON> des_force, std::
 {
 
     const ExoConfig::CylnPhyParams *cyln_phy_param;
-    const double *pos_diff, *cur_force, *p_act, *p_rec, *piston_area;
+    const double *pos_diff, *cur_force, *p_act,*piston_area; // *p_rec, ;
     double *cur_cmd_pre;
     // MPC *act_con;
     // const double *cur_act_chamber_len;
@@ -233,7 +237,7 @@ void JointCon::GetForceCon(std::array<double, MPC_TIME_HORIZON> des_force, std::
 
         // cur_act_chamber_len = &this->knee_cyln_ext_len;
         p_act = &this->p_knee_ext;
-        p_rec = &this->p_ank_pla;
+        // p_rec = &this->p_ank_pla;
 
         cur_cmd_pre = &this->cmd_pre[(unsigned)Chamber::kKneExt];
         piston_area = &cyln_phy_param->piston_area[0];
@@ -246,7 +250,7 @@ void JointCon::GetForceCon(std::array<double, MPC_TIME_HORIZON> des_force, std::
         // act_con = &this->ank_ext_con;
         // cur_act_chamber_len = &this->ank_cyln_ext_len;
         p_act = &this->p_ank_pla;
-        p_rec = &this->p_knee_ext;
+        // p_rec = &this->p_knee_ext;
 
         cur_cmd_pre = &this->cmd_pre[(unsigned)Chamber::kAnkPla];
 
@@ -320,25 +324,25 @@ void JointCon::GetForceCon(std::array<double, MPC_TIME_HORIZON> des_force, std::
             // if the force is too high, we have 3 choices
             //  1. If pre_ext > pre_tank: pump the air in the cylinder back to reservior
             //  2. If pre_ext > pre_rec, pump the air to the recycle end
-            // if (*p_act < this->p_sub_tank)
-            // {
-            //     if (this->p_knee_ext-this->p_ank_pla > 160)
-            //     {
-            //         // std::cout<<"recycle to another cylinder\n";
-            //         this->GetPreCon(des_pre,valve_duty,Chamber::kKneExt,Chamber::kAnkPla);
-            //         // valve_duty[(unsigned)ValveDuty::kKneAnk] = this->knee_ank_con.GetPreControl(des_pre, *p_act, *p_rec, this->knee_ank_con.GetMpcCalibLen() / *cur_act_chamber_len);
-            //         // rec_duty = this->flex_con.GetPreControl(des_pre, this->pre_ext, this->pre_rec, 0.6);
-            //         // std::cout<<"recycle to rec cylinder\n";
-            //     }
-            //     else
-            //     {
-            //         valve_duty[(unsigned)ValveDuty::kKneAnk] = 0;
-            //         // std::cout<<"recycle cylinder pressure is too high\n";
-            //     }
-            //     valve_duty[(unsigned)ValveDuty::kKneExt]=0;
-            //     valve_duty[(unsigned)ValveDuty::kSubTank]=0;
-            // }
-            // else
+            if (*p_act < this->p_sub_tank)
+            {
+                if (this->p_knee_ext-this->p_ank_pla > 50)
+                {
+                    // std::cout<<"recycle to another cylinder\n";
+                    this->GetPreCon(des_pre,valve_duty,Chamber::kKneExt,Chamber::kAnkPla);
+                    // valve_duty[(unsigned)ValveDuty::kKneAnk] = this->knee_ank_con.GetPreControl(des_pre, *p_act, *p_rec, this->knee_ank_con.GetMpcCalibLen() / *cur_act_chamber_len);
+                    // rec_duty = this->flex_con.GetPreControl(des_pre, this->pre_ext, this->pre_rec, 0.6);
+                    // std::cout<<"recycle to rec cylinder\n";
+                }
+                else
+                {
+                    valve_duty[(unsigned)ValveDuty::kKneAnk] = 0;
+                    // std::cout<<"recycle cylinder pressure is too high\n";
+                }
+                valve_duty[(unsigned)ValveDuty::kKneExt]=0;
+                valve_duty[(unsigned)ValveDuty::kSubTank]=0;
+            }
+            else
             {
                 // we can recycle the energy to the tank
                 // std::cout<<"recycle to ltank\n";
@@ -513,15 +517,24 @@ void JointCon::GetPreCon(const std::array<double, MPC_TIME_HORIZON> &des_pre, st
     }
     else if (controlled == Chamber::kAnkPla && followed == Chamber::kSubTank)
     {
-        valve_duty[(unsigned)ValveDuty::kAnkPla] = this->ank_ext_con.GetPreControl(des_pre, this->p_ank_pla, this->p_sub_tank, this->ank_cyln_params.chamber_max_len / this->ank_cyln_shrk_len);
+        if(this->is_knee_reverse)
+            valve_duty[(unsigned)ValveDuty::kAnkPla] = this->ank_ext_con.GetPreControl(des_pre, this->p_ank_pla, this->p_sub_tank, this->ank_cyln_params.chamber_max_len / this->ank_cyln_shrk_len);
+        else
+            valve_duty[(unsigned)ValveDuty::kAnkPla] = this->ank_ext_con.GetPreControl(des_pre, this->p_ank_pla, this->p_sub_tank, this->ank_cyln_params.chamber_max_len / this->ank_cyln_ext_len);
     }
     else if (controlled == Chamber::kKneExt && followed == Chamber::kAnkPla)
     {
-        valve_duty[(unsigned)ValveDuty::kKneAnk] = this->knee_ank_con.GetPreControl(des_pre, this->p_knee_ext, this->p_ank_pla, this->knee_cyln_params.chamber_max_len / this->knee_cyln_ext_len / this->ank_cyln_params.chamber_max_len * this->ank_cyln_shrk_len);
+        if(this->is_knee_reverse)
+            valve_duty[(unsigned)ValveDuty::kKneAnk] = this->knee_ank_con.GetPreControl(des_pre, this->p_knee_ext, this->p_ank_pla, this->knee_cyln_params.chamber_max_len / this->knee_cyln_ext_len / this->ank_cyln_params.chamber_max_len * this->ank_cyln_shrk_len);
+        else
+            valve_duty[(unsigned)ValveDuty::kKneAnk] = this->knee_ank_con.GetPreControl(des_pre, this->p_knee_ext, this->p_ank_pla, this->knee_cyln_params.chamber_max_len / this->knee_cyln_ext_len / this->ank_cyln_params.chamber_max_len * this->ank_cyln_ext_len);
     }
     else if (controlled == Chamber::kAnkPla && followed == Chamber::kKneExt)
     {
-        valve_duty[(unsigned)ValveDuty::kKneAnk] = this->knee_ank_con.GetPreControl(des_pre, this->p_ank_pla, this->p_knee_ext, this->ank_cyln_params.chamber_max_len / this->ank_cyln_shrk_len / this->knee_cyln_params.chamber_max_len * this->knee_cyln_ext_len);
+        if(this->is_knee_reverse)
+            valve_duty[(unsigned)ValveDuty::kKneAnk] = this->knee_ank_con.GetPreControl(des_pre, this->p_ank_pla, this->p_knee_ext, this->ank_cyln_params.chamber_max_len / this->ank_cyln_shrk_len / this->knee_cyln_params.chamber_max_len * this->knee_cyln_ext_len);
+        else
+            valve_duty[(unsigned)ValveDuty::kKneAnk] = this->knee_ank_con.GetPreControl(des_pre, this->p_ank_pla, this->p_knee_ext, this->ank_cyln_params.chamber_max_len / this->ank_cyln_ext_len / this->knee_cyln_params.chamber_max_len * this->knee_cyln_ext_len);
     }
 }
 
@@ -653,4 +666,9 @@ void JointCon::GetTorCon(std::array<double, MPC_TIME_HORIZON> des_tor, std::arra
     // std::cout<<"desired force: "<<des_force[0]<<std::endl;
     // std::cout<<std::endl;
     this->GetForceCon(des_force, valve_duty, force_con_type);
+}
+double JointCon::GetDesSubTankPre(){
+    //this function should be called at the end of double support phase
+    double eng_diff = (this->cmd_pre[(unsigned)Chamber::kKneExt] -this->p_knee_ext)*this->knee_cyln_ext_len*this->knee_cyln_params.piston_area[0];
+    return ((this->cmd_pre[(unsigned)Chamber::kKneExt]-8000)*100000+eng_diff)/100000+8000;
 }

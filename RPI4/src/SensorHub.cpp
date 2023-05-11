@@ -182,7 +182,6 @@ void SensorHub::UpdatePre()
     
     senHub.PreData = senHub.digital_filter.GetFilteredMea(avg_mea);
 
-
     senHub.PreRecorder.PushData(senHub.PreData);
 
     //rec data before filtering

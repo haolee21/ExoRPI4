@@ -25,12 +25,12 @@ void FSM::Update()
         }
         else if (fsm.cur_state == State::kLeftToeOff)
         {
-            if (std::abs(fsm.joint_diff[SensorHub::LKneS]) < fsm.kVelTh)
+            if (std::abs(fsm.joint_diff[SensorHub::LHipS]) < fsm.kVelTh)
                 fsm.cur_state = State::kDDLeftFrontRightRear;
         }
         else if (fsm.cur_state == State::kDDLeftFrontRightRear)
         {
-            if (std::abs(fsm.joint_diff[SensorHub::RKneS]) < fsm.kVelTh)
+            if (std::abs(fsm.joint_diff[SensorHub::RHipS]) < fsm.kVelTh)
                 fsm.cur_state = State::kRightAnkPushOff;
         }
         q = {fsm.joint_pos[SensorHub::LAnkS], fsm.joint_pos[SensorHub::LKneS], fsm.joint_pos[SensorHub::LHipS], fsm.joint_pos[SensorHub::RHipS], fsm.joint_pos[SensorHub::RKneS], fsm.joint_pos[SensorHub::RAnkS]};
@@ -45,12 +45,12 @@ void FSM::Update()
 
         else if (fsm.cur_state == State::kRightToeOff)
         {
-            if (std::abs(fsm.joint_diff[SensorHub::RKneS]) < fsm.kVelTh)
+            if (std::abs(fsm.joint_diff[SensorHub::RHipS]) < fsm.kVelTh)
                 fsm.cur_state = State::kDDRightFrontLeftRear;
         }
         else if (fsm.cur_state == State::kDDRightFrontLeftRear)
         {
-            if (std::abs(fsm.joint_diff[SensorHub::LKneS]) < fsm.kVelTh)
+            if (std::abs(fsm.joint_diff[SensorHub::LHipS]) < fsm.kVelTh)
                 fsm.cur_state = State::kLeftAnkPushOff;
         }
 

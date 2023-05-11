@@ -48,7 +48,7 @@ private:
 
     const std::array<double,SensorHub::NUMENC> &joint_pos;
     const std::array<double,SensorHub::NUMENC> &joint_diff;
-    const double kVelTh = 0.01; //if less than  1/100 deg/sec, consider stop
+    const double kVelTh = 0.1; //if less than  1/100 deg/sec, consider stop
                                                                           
 
     double l_hip_s_neu,l_kne_s_neu,l_ank_s_neu,r_hip_s_neu,r_kne_s_neu,r_ank_s_neu;

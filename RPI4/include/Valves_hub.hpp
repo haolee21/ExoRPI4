@@ -70,8 +70,7 @@ public:
     // TCP_server read valve condition
     const static std::array<u_int8_t, PWM_VAL_NUM> &GetDuty();
 
-    // Basic control function
-    static void ReleasePre();
+  
 
     //Control
     // static std::array<bool,(unsigned)Joint::kTotal> GetControlCond();
@@ -115,6 +114,10 @@ private:
     TeensyI2C teensyValveCon;
 
     
+    //FSM related parameters
+    // desired subtank pressure for the next cycle
+    double des_l_subtank_pre, des_r_subtank_pre; 
+    FSM::State fsm_old_state = FSM::State::kNone;
 
     // Recorder<double, 11> mpc_ltank_rec; // record p_tank, p_set(target), p_val, q_val
     // Recorder<double, 11> mpc_lkne_rec;

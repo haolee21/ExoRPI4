@@ -63,9 +63,11 @@ void Valves_hub::UpdateValve()
 
     FSM::Update();
     FSM::State fsm_cur_state = FSM::GetFSM_State();
+    //if we switch from double support phase to single support, calculate the desired subtank pressure
 
     if (fsm_cur_state == FSM::State::kDDLeftFrontRightRear || fsm_cur_state == FSM::State::kRightAnkPushOff)
     {
+
         // leading knee: impedance control
         // rear ankle: push off
         double l_kne_imp;
@@ -134,15 +136,20 @@ void Valves_hub::UpdateValve()
     }
     else if (fsm_cur_state == FSM::State::kRightToeOff)
     {
-        hub.lkra_con.ResetControl();
+        if(hub.fsm_old_state == FSM::State::kDDLeftFrontRightRear || hub.fsm_old_state==FSM::State::kRightAnkPushOff)
+            hub.des_l_subtank_pre = hub.lkra_con.GetDesSubTankPre();
+
+        hub.lkra_con.SetPreControl(hub.des_l_subtank_pre,JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
         hub.PWM_Duty[(unsigned)PWM_ID::kLTank] = 0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt] = 0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex] = 0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut] = 0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk] = 0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt] = 0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex] = 0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut] = 0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex] = 100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut] = 100;
+
+
 
         hub.rkla_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kRTank] = 0;
@@ -155,15 +162,21 @@ void Valves_hub::UpdateValve()
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut] = 0;
     }
     else if(fsm_cur_state==FSM::State::kLeftToeOff){
-        hub.rkla_con.ResetControl();
+        if(hub.fsm_old_state == FSM::State::kDDRightFrontLeftRear || hub.fsm_old_state==FSM::State::kLeftAnkPushOff)
+            hub.des_r_subtank_pre = hub.rkla_con.GetDesSubTankPre();
+
+        hub.rkla_con.SetPreControl(hub.des_r_subtank_pre,JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
+
+
+        // hub.rkla_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kRTank] = 0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt] = 0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex] = 0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut] = 0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk] = 0;
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt] = 0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex] = 0;
-        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut] = 0;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex] = 100;
+        hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut] = 100;
 
         hub.lkra_con.ResetControl();
         hub.PWM_Duty[(unsigned)PWM_ID::kLTank] = 0;
@@ -175,6 +188,8 @@ void Valves_hub::UpdateValve()
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex] = 0;
         hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut] = 0;
     }
+
+    hub.fsm_old_state = fsm_cur_state;
 
     // if(fsm_cur_state==FSM::State::kLeftSwingRightStand){
     //     // hub.lkra_con.ResetControl();
