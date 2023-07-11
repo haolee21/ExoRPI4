@@ -100,6 +100,14 @@ void Valves_hub::UpdateValve()
         //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex] = 0;
         //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut] = 0;
         // }
+        if(hub.fsm_old_state==FSM::State::kLeftToeOff)
+            hub.des_l_subtank_pre = 0;
+
+        double cur_des_l_subtank_pre = hub.lkra_con.GetDesSubTankPre();
+        if(cur_des_l_subtank_pre>hub.des_l_subtank_pre)
+            hub.des_l_subtank_pre=cur_des_l_subtank_pre;
+
+
     }
     else if (fsm_cur_state == FSM::State::kDDRightFrontLeftRear || fsm_cur_state == FSM::State::kLeftAnkPushOff)
     {
@@ -133,11 +141,17 @@ void Valves_hub::UpdateValve()
         //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex] = 0;
         //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut] = 0;
         // }
+
+        if(hub.fsm_old_state==FSM::State::kRightToeOff)
+            hub.des_r_subtank_pre = 0;
+        double cur_des_r_subtank_pre = hub.rkla_con.GetDesSubTankPre();
+        if(cur_des_r_subtank_pre>hub.des_r_subtank_pre)
+            hub.des_r_subtank_pre = cur_des_r_subtank_pre;
     }
     else if (fsm_cur_state == FSM::State::kRightToeOff)
     {
-        if(hub.fsm_old_state == FSM::State::kDDLeftFrontRightRear || hub.fsm_old_state==FSM::State::kRightAnkPushOff)
-            hub.des_l_subtank_pre = hub.lkra_con.GetDesSubTankPre();
+        // if(hub.fsm_old_state == FSM::State::kDDLeftFrontRightRear || hub.fsm_old_state==FSM::State::kRightAnkPushOff)
+        //     hub.des_l_subtank_pre = hub.lkra_con.GetDesSubTankPre();
 
         hub.lkra_con.SetPreControl(hub.des_l_subtank_pre,JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
         hub.PWM_Duty[(unsigned)PWM_ID::kLTank] = 0;
@@ -162,8 +176,8 @@ void Valves_hub::UpdateValve()
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut] = 0;
     }
     else if(fsm_cur_state==FSM::State::kLeftToeOff){
-        if(hub.fsm_old_state == FSM::State::kDDRightFrontLeftRear || hub.fsm_old_state==FSM::State::kLeftAnkPushOff)
-            hub.des_r_subtank_pre = hub.rkla_con.GetDesSubTankPre();
+        // if(hub.fsm_old_state == FSM::State::kDDRightFrontLeftRear || hub.fsm_old_state==FSM::State::kLeftAnkPushOff)
+        //     hub.des_r_subtank_pre = hub.rkla_con.GetDesSubTankPre();
 
         hub.rkla_con.SetPreControl(hub.des_r_subtank_pre,JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
 

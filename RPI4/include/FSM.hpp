@@ -12,12 +12,20 @@ class FSM
 
 public:
     enum class State{
+        //same state as kDDRightFrontLeftRear
         kLeftAnkPushOff,
+        //
         kLeftToeOff,
+
+        //these two states are considered the same now
         kDDLeftFrontRightRear, //double support with left leg front
         kRightAnkPushOff,
+
         kRightToeOff,
+
+        //same state as kLeftAnkPushOff
         kDDRightFrontLeftRear,
+
         kTurnOff,//we need a special state to end all the valve actuation during fsm, but only once 
         kNone
     };
@@ -48,7 +56,7 @@ private:
 
     const std::array<double,SensorHub::NUMENC> &joint_pos;
     const std::array<double,SensorHub::NUMENC> &joint_diff;
-    const double kVelTh = 0.1; //if less than  1/100 deg/sec, consider stop
+    const double kVelTh = 0.2; //if less than  1/100 deg/sec, consider stop
                                                                           
 
     double l_hip_s_neu,l_kne_s_neu,l_ank_s_neu,r_hip_s_neu,r_kne_s_neu,r_ank_s_neu;
