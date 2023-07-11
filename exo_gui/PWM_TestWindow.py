@@ -122,6 +122,7 @@ class PWM_TestWindow(QDialog):
         with self.parent().udp_port.lock:
             self.parent().udp_port.udp_cmd_packet.pwm_duty_data[chamber_idx] = TextToInt(duty_lineEdit.text())
             self.parent().udp_port.udp_cmd_packet.pwm_duty_flag[chamber_idx] = True
+    
         
         
         

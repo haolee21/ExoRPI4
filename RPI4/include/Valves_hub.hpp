@@ -70,15 +70,14 @@ public:
     // TCP_server read valve condition
     const static std::array<u_int8_t, PWM_VAL_NUM> &GetDuty();
 
-    // Basic control function
-    static void ReleasePre();
+  
 
     //Control
     // static std::array<bool,(unsigned)Joint::kTotal> GetControlCond();
-    static void ResetCon(KneeAnkPair joint);
-    static void EnableCon(double des_pre,Valves_hub::KneeAnkPair knee_ank_pair,JointCon::PreCon pre_con);
-    static void EnableCon(double des_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon force_con_type, JointCon::ForceRedType force_red_type);
-    static void EnableCon(double des_imp, double init_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon imp_con_type, JointCon::ForceRedType force_red_type);
+    static void ShutDownKneAnk(KneeAnkPair joint);
+    static void EnableCon(double des_pre,Valves_hub::KneeAnkPair knee_ank_pair, JointCon::Chamber controlled, JointCon::Chamber followed);
+    static void EnableCon(double des_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon force_con_type);
+    static void EnableCon(double des_imp, double init_force, Valves_hub::KneeAnkPair knee_ank_pair, JointCon::ForceCon imp_con_type);
     //Pressure control
     
     
@@ -99,6 +98,9 @@ public:
 
     // Update MPC parameters
     static void UpdateParams(const ExoConfig::SystemParam &sys_param);
+    // Update knee direction
+    static void SetKneeDir(bool is_reverse); //backward knee: is_reverse=true
+    static bool GetKneeDir();
 
 private:
     Valves_hub();
@@ -110,6 +112,12 @@ private:
     Recorder<uint8_t, PWM_VAL_NUM> pwmRecorder;
 
     TeensyI2C teensyValveCon;
+
+    
+    //FSM related parameters
+    // desired subtank pressure for the next cycle
+    double des_l_subtank_pre, des_r_subtank_pre; 
+    FSM::State fsm_old_state = FSM::State::kNone;
 
     // Recorder<double, 11> mpc_ltank_rec; // record p_tank, p_set(target), p_val, q_val
     // Recorder<double, 11> mpc_lkne_rec;

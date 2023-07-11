@@ -104,25 +104,19 @@ class UdpClient:
             if(len(data_recv[0])==ctypes.sizeof(UdpDataPacket)):
                 self.disconnect_count=0
                 udp_data_packet = UdpDataPacket.from_buffer_copy(data_recv[0])
-
-                self.callback_fun['joint_plot_update'](udp_data_packet.enc_data)
-                # self.updateJoint(udp_data_packet.enc_data)
+                self.callback_fun['joint_plot_update'](udp_data_packet.enc_data,udp_data_packet.is_knee_reverse)
                 self.callback_fun['pressure_plot_update'](udp_data_packet.pre_data1)
-                # self.updatePre(udp_data_packet.pre_data1)
                 self.callback_fun['torque_update'](udp_data_packet.enc_data,udp_data_packet.pre_data1)
-                # self.torque_update(udp_data_packet.enc_data,udp_data_packet.pre_data1)
                 self.callback_fun['air_volume_update'](udp_data_packet.pre_data1[TANK_ADC])
-                # self.updateTank(udp_data_packet.pre_data1[TANK_ADC]) 
+                
 
                 self.callback_fun['rec_btn_update'](udp_data_packet.rec_status)
-                # self.recBtnUpdate(udp_data_packet.rec_status)
                 self.callback_fun['pwm_duty_update'](udp_data_packet.pwm_duty)
-                # self.pwm_lcd_update(udp_data_packet.pwm_duty)
                 self.callback_fun['fsm_state_update'](udp_data_packet.fsm_state)
-                # self.fsm_update(udp_data_packet.fsm_state) 
                 self.callback_fun['cylncalib_update'](udp_data_packet.enc_data)
-                # self.calib_window_update(udp_data_packet.enc_data)
+                
                 self.callback_fun['phase_plot_update'](udp_data_packet.enc_data)
+                
                 
                 
                 

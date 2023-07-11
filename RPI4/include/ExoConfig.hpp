@@ -22,8 +22,8 @@ public:
     };
     struct CylnPhyParams
     {
-        double mech_max_len; // unit: mm, the length excludes the pneumatic chambers
-        double chamber_max_len; //unit: mm, the total length, includes the springs and other parts
+        double mech_max_len; //unit: mm, the total length, includes the springs and other parts
+        double chamber_max_len; // unit: mm, the length excludes the pneumatic chambers, or the stroke length of the cylinder
         
         double fri_coeff;
         std::array<double, 2> piston_area; // unit: mm^2, 0: ext, 1: flex

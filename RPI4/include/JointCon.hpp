@@ -25,47 +25,60 @@ public:
         kImpCon,
         kTurnOff
     };
-    enum class PreCon
+
+    enum class Chamber
     {
         kSubTank,
         kKneExt,
-        kAnkPlant,
         kKneFlex,
-        kAnkDorsi,
+        kAnkPla,
+        kAnkDor,
+        kMainTank,  //Must main tank in the end since it is also used for the size of the array
+                    //it is useless since we cannot control the main tank's pressure, but currently I have no better way
+    };
+    
+    enum class ValveDuty
+    {
+        kSubTank,
+        kKneExt,
+        kKneFlex,
+        kAnkPla,
+        kAnkDor,
+        kKneAnk,
         kTotal
     };
+
     enum class ForceCon
     {
         kKneExt,
         kAnkPlant,
         kTotal
     };
-    enum class ForceRedType //two ways to reduce the force output
-    {
-        kRec,
-        kBalance
-    };
+
     
     static const unsigned  kNumOfChambers = 3;
 
-    void SetPreControl(PreCon pre_con_type,double des_pre);
+    void SetPreControl(double des_pre,Chamber controlled, Chamber followed);
     // void SetControl(ConMode con_mode,PreCon pre_con_type,double des_pre);
-    void SetControl(ConMode con_mode, ForceCon force_con_type,ForceRedType force_red_type,double cmd_value);
-    void SetImpControl(ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_imp, double cmd_init_force);
-    void SetImpControl(ForceCon _force_con_type, ForceRedType _force_red_type, double cmd_imp, double cmd_init_force,double neutral_knee_pos); //not doing imp control on ankle
+    void SetForceControl(ForceCon force_con_type,double cmd_value);
+    void SetImpControl(ForceCon _force_con_type, double cmd_imp, double cmd_init_force);
+    void SetImpControl(ForceCon _force_con_type, double cmd_imp, double cmd_init_force,double neutral_knee_pos); //not doing imp control on ankle
     // void SetControl(ConMode con_mode,ForceCon force_con_type,ForceRedType force_red_type,double cmd_val1,double cmd_val2);
     void ResetControl();
     void ShutDown();
 
-    
+    //Get the desired subtank pressure when running fsm, will be used to charge the subtank during the swing phase
+    double GetDesSubTankPre();
     
     void PushMeas(const double &p_knee_ext,const double &p_knee_flex,const double &p_ank_pla,const double &p_ank_dorsi, const double &p_sub_tank,const double &p_main_tank,const double &knee_angle,const double &ankle_angle,const u_int8_t knee_ext_duty,const u_int8_t knee_flex_duty,const u_int8_t ank_ext_duty, const u_int8_t knee_ank_duty,const u_int8_t tank_duty);
     // void PushMeas(const double &p_joint_ext,const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank,const double &pos,const u_int8_t tank_duty, const u_int8_t knee_ext_duty, const u_int8_t knee_flex_duty,const u_int8_t knee_ank_duty, const u_int8_t ank_ext_duty);
     void RecData();
     
-
     bool GetValveDuty(u_int8_t &knee_ext_duty,u_int8_t &knee_flex_duty, u_int8_t &ank_pla_duty,u_int8_t &ank_dor_duty, u_int8_t &sub_tank_duty,u_int8_t &knee_ank_duty);
 
+    // Reverse knee direction
+    void SetKneeReverse(bool is_reverse); //if the knee is backward, is_reverse=true, else false
+    bool GetKneeReverse(); //return true if knee is configured backward
     
 
 private:
@@ -75,11 +88,11 @@ private:
     ExoConfig::CylnPhyParams knee_cyln_params,ank_cyln_params;
 
     ConMode con_mode = ConMode::kNone;
-    PreCon pre_con_type;
+    // PreCon pre_con_type;
+    Chamber controlled_chamber, followed_chamber;
     ForceCon force_con_type;
-    ForceRedType force_red_type;
 
-    std::array<double,(unsigned)PreCon::kTotal> cmd_pre;
+    std::array<double,(unsigned)Chamber::kMainTank> cmd_pre;
     std::array<std::array<double,MPC_TIME_HORIZON>,(unsigned)ForceCon::kTotal> cmd_force;
     std::array<double,(unsigned)ForceCon::kTotal> cmd_imp;
     std::array<double,(unsigned)ForceCon::kTotal> cmd_init_force;
@@ -91,22 +104,26 @@ private:
     double knee_cyln_ext_len,knee_cyln_shrk_len,ank_cyln_ext_len,ank_cyln_shrk_len;  //ext: extend, shrk: shrink, unit: mm
     double knee_moment_arm,ankle_moment_arm;
     double knee_cyln_len_diff, ank_cyln_len_diff; //for calculating frction
-    double knee_len_ext_old,ank_len_ext_old;
+    double knee_len_ext_old,ank_len_shrk_old;
     // const double spring_k = 55.4 * 0.0393701 * 4.44822; // unit: N/mm
     double max_knee_spring_compress,max_ank_spring_compress;
 
     double cur_knee_force, cur_ank_force; //unit: N
     
     double p_knee_ext,p_knee_flex,p_ank_pla,p_ank_dorsi,p_sub_tank,p_main_tank;
+
+    bool is_knee_reverse =true; //default knee is reverse
     
     // double cur_pre_force;
     // double des_force;
     // double des_ext_pre;
+    // void GetPreCon(const std::array<double,MPC_TIME_HORIZON> &des_pre,u_int8)
 
-    void GetPreCon(double des_pre, u_int8_t &duty, PreCon pre_con);
-    void GetForceCon(std::array<double,MPC_TIME_HORIZON> des_force,u_int8_t &charge_duty,u_int8_t &rec_duty,u_int8_t &balance_duty, u_int8_t &tank_duty, ForceCon force_con_type,ForceRedType force_red_type);
-    void GetTorCon(std::array<double,MPC_TIME_HORIZON> des_tor,u_int8_t &charge_duty,u_int8_t &rec_duty,u_int8_t &balance_duty, u_int8_t &tank_duty, ForceCon force_con_type,ForceRedType force_red_type);
-    void GetImpCon(double des_imp, double init_F, u_int8_t&charge_duty,u_int8_t&rec_duty,u_int8_t &balance_duty,u_int8_t&tank_duty,ForceCon force_con_type,ForceRedType force_red_type);
+    void GetPreCon(const std::array<double,MPC_TIME_HORIZON> &des_pre,std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty,Chamber controlled,Chamber followed);
+    void GetForceCon(std::array<double,MPC_TIME_HORIZON> des_force,std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty, ForceCon force_con_type);
+    // void GetTorCon(std::array<double,MPC_TIME_HORIZON> des_tor,u_int8_t &charge_duty,u_int8_t &rec_duty,u_int8_t &balance_duty, u_int8_t &tank_duty, ForceCon force_con_type,ForceRedType force_red_type);
+    void GetTorCon(std::array<double,MPC_TIME_HORIZON> des_tor, std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty, ForceCon force_con_type);
+    void GetImpCon(double des_imp, double init_F, std::array<u_int8_t,(unsigned)ValveDuty::kTotal> &valve_duty,ForceCon force_con_type);
 
 
 
@@ -134,11 +151,11 @@ private:
     double neutral_knee_pos,neutral_ank_pos;
     // const double kExtImp=2; //   N/mm
     // double imp_deflect_point;
-    double recover_imp;
+    // double recover_imp;
 
     
     // calculating current cylinder length, external force
-    double GetExternalForce(double pre_ext, double pre_flex, double delta_x, double x_dot,ExoConfig::CylnPhyParams cyln_params); // unit: newton
+    double GetExternalForce(double pre_ext, double pre_flex, double delta_x, double x_dot,ExoConfig::CylnPhyParams cyln_params,bool is_ankle); // unit: newton
     
     // double GetLenLinear_mm(double pos);
 
@@ -152,9 +169,12 @@ private:
 
     double GetPre_KPa(double pre_adc);
 
-    Recorder<double,8> joint_con_rec;
+    Recorder<double,12> joint_con_rec;
+
+
 
    
+    
    
 
 

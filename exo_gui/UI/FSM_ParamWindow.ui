@@ -48,6 +48,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="text">
+        <string>0.1</string>
+       </property>
       </widget>
      </item>
      <item row="2" column="3">
@@ -60,8 +63,8 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Left Swing to 
-Left Load Ratio</string>
+        <string>Left Leg
+Absorb Ratio</string>
        </property>
       </widget>
      </item>
@@ -73,13 +76,16 @@ Left Load Ratio</string>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="text">
+        <string>0.1</string>
+       </property>
       </widget>
      </item>
      <item row="0" column="3">
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Right Swing to 
-Right Load Ratio</string>
+        <string>Right Leg 
+Absorb Ratio</string>
        </property>
       </widget>
      </item>
@@ -121,7 +127,7 @@ Right Load Ratio</string>
       <widget class="QLabel" name="label_8">
        <property name="text">
         <string>(na)
-(0.65)</string>
+(0.1)</string>
        </property>
       </widget>
      </item>
@@ -163,7 +169,7 @@ Right Load Ratio</string>
       <widget class="QLabel" name="label_11">
        <property name="text">
         <string>(na)
-(0.56)</string>
+(0.1)</string>
        </property>
       </widget>
      </item>

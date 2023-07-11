@@ -87,7 +87,10 @@ class CylnCalibWindow(QDialog):
 
 
         elif self.radio_lank.isChecked():
-            joint_angle=enc_data[ENC_LANK_S]+180
+            if self.parent().is_knee_reverse:
+                joint_angle=enc_data[ENC_LANK_S]+180
+            else:
+                joint_angle=180-enc_data[ENC_LANK_S]
             # self.lcd_verify_ang.display(joint_angle)
             cyln_eqn = self.lank_cyln_eqn
             # self.lcd_verify_length.display(math.sqrt(self.beta0_lank-self.beta1_lank*math.cos(math.radians(joint_angle-self.alpha_lank))))
@@ -103,7 +106,10 @@ class CylnCalibWindow(QDialog):
             # self.lcd_verify_length.display(math.sqrt(self.beta0_rkne-self.beta1_rkne*math.cos(math.radians(joint_angle-self.alpha_rkne))))
             # self.lcd_verify_length.display(math.sqrt(self.rkne_cyln_eqn[0]-self.rkne_cyln_eqn[1]*math.cos(math.radians(joint_angle-self.rkne_cyln_eqn[2]))))
         elif self.radio_rank.isChecked():
-            joint_angle=enc_data[ENC_RANK_S]+180
+            if self.parent().is_knee_reverse:
+                joint_angle=enc_data[ENC_RANK_S]+180
+            else:
+                joint_angle=180-enc_data[ENC_RANK_S]
             cyln_eqn = self.rank_cyln_eqn
             # self.lcd_verify_ang.display(joint_angle)
             # self.lcd_verify_length.display(math.sqrt(self.beta0_rank-self.beta1_rank*math.cos(math.radians(joint_angle-self.alpha_rank))))
@@ -205,7 +211,7 @@ class CylnCalibWindow(QDialog):
         self.parent().config_loader.LoadPhyConfig(old_config)
 
         if self.radio_lknee.isChecked():
-            self.parent().config_loader.UpdatePhyParam("LeftKnee","CylnEqn",self.lkne_cyln_eqn) #TODO: check if the offset is correct
+            self.parent().config_loader.UpdatePhyParam("LeftKnee","CylnEqn",self.lkne_cyln_eqn) 
         elif self.radio_lank.isChecked():
             self.parent().config_loader.UpdatePhyParam("LeftAnkle","CylnEqn",self.lank_cyln_eqn)
         elif self.radio_rknee.isChecked():

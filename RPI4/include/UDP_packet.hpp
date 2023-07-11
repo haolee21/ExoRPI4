@@ -16,10 +16,14 @@ struct UDP_DataPacket
     std::array<bool,(unsigned)Valves_hub::KneeAnkPair::kTotal> con_status;
     bool recorder;
     int fsm_state;
+    bool knee_reverse;
 };
 struct UDP_CmdPacket{
     std::array<u_int8_t,PWM_VAL_NUM> pwm_duty;
-    std::array<double,(unsigned)JointCon::PreCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_pre;
+    std::array<double,(unsigned)JointCon::Chamber::kMainTank> lkra_des_pre;
+    std::array<double,(unsigned)JointCon::Chamber::kMainTank> rkla_des_pre;
+
+    // std::array<double,(unsigned)JointCon::PreCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_pre;
     std::array<double,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_imp;
     std::array<double,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_force;
     // std::array<bool,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> force_red_rec; //true if recycle, 
@@ -44,11 +48,17 @@ struct UDP_CmdPacket{
     double fsm_left_ank_idle_pre;
     double fsm_right_ank_idle_pre;
 
+    //knee direction
+    bool knee_reverse;
+
 
     //change flags
     std::array<bool,PWM_VAL_NUM> pwm_duty_flag{false};
     std::array<bool,SensorHub::NUMENC> reset_enc_flag{false};
-    std::array<bool,(unsigned)JointCon::PreCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_pre_flag{false};
+    std::array<bool,(unsigned)JointCon::Chamber::kMainTank> lkra_des_pre_flag{false};
+    std::array<bool,(unsigned)JointCon::Chamber::kMainTank> rkla_des_pre_flag{false};
+    // std::array<bool,(unsigned)JointCon::PreCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_pre_flag{false};
+    
     std::array<bool,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_imp_flag{false};
     std::array<bool,(unsigned)JointCon::ForceCon::kTotal*(unsigned)Valves_hub::KneeAnkPair::kTotal> des_force_flag{false};
     bool epoch_time_flag = false;
@@ -63,6 +73,9 @@ struct UDP_CmdPacket{
     bool set_neutral_pos_flag;
     bool fsm_start_flag;
     bool fsm_param_change_flag;
+
+    //Change knee direction
+    bool knee_reverse_flag;
 
 };
 // struct UDP_CmdFlag{

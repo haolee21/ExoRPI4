@@ -26,7 +26,7 @@ class Timer
 {
     //this class has mix usage. Static functions are for real-time clocks nano sleep or number rounding
     //member functions are timer for both SensorHub and ValveHub
-    public:
+public:
     
     ~Timer();
     Timer(const Timer&)=delete;
