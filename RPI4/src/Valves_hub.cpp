@@ -1,6 +1,8 @@
+#include <random>
 #include "Valves_hub.hpp"
 #include "MPC_param.hpp"
 #include "FSM.hpp"
+// #include "Recorder.hpp"
 Valves_hub::Valves_hub()
     : lkra_con(ExoConfig::GetConfig().left_subtank_knee, ExoConfig::GetConfig().left_subtank_right_ank, ExoConfig::GetConfig().left_knee_right_ank,
                ExoConfig::GetConfig().left_tank_subtank, ExoConfig::GetConfig().left_knee_phy, ExoConfig::GetConfig().right_ankle_phy, "lkra"),
@@ -176,8 +178,6 @@ void Valves_hub::UpdateValve()
         hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut] = 0;
     }
     else if(fsm_cur_state==FSM::State::kLeftToeOff){
-        // if(hub.fsm_old_state == FSM::State::kDDRightFrontLeftRear || hub.fsm_old_state==FSM::State::kLeftAnkPushOff)
-        //     hub.des_r_subtank_pre = hub.rkla_con.GetDesSubTankPre();
 
         hub.rkla_con.SetPreControl(hub.des_r_subtank_pre,JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
 
@@ -205,200 +205,25 @@ void Valves_hub::UpdateValve()
 
     hub.fsm_old_state = fsm_cur_state;
 
-    // if(fsm_cur_state==FSM::State::kLeftSwingRightStand){
-    //     // hub.lkra_con.ResetControl();
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=100;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=100;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=100;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=100;
-    //     // hub.lkra_con.SetPreControl(FSM::GetRAnkPreParams(),JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
 
-    //     hub.rkla_con.ResetControl();
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=0;
-    //     // hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
-
-    //     //in this phase, left ankle is in the air, thus any driving force there is unnecessary
-    //     if(pre_data[(unsigned)SensorHub::AdcName::RKneExt]<pre_data[(unsigned)SensorHub::AdcName::LAnkExt])
-    //         hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=100;
-    //     else
-    //         hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
-
-    // }
-    // else if(fsm_cur_state==FSM::State::kLeftPrepRightStand){
-    //     hub.lkra_con.ResetControl();
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
-
-    //     // if(pre_data[(unsigned)SensorHub::AdcName::RAnkExt]<right_ankle_push_pre)
-    //     // hub.lkra_con.SetPreControl(FSM::GetRAnkPreParams(),JointCon::Chamber::kAnkPla,JointCon::Chamber::kSubTank);
-    //     hub.lkra_con.SetForceControl(JointCon::ForceCon::kAnkPlant,FSM::GetRAnkPreParams());
-
-    //     hub.rkla_con.ResetControl();
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=100;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=100;
-
-    // }
-
-    // else if(fsm_cur_state==FSM::State::kLeftLoadRightPush){
-    //     double l_kne_imp;
-    //     double l_kne_initF;
-    //     double l_kne_neu_pos;
-    //     FSM::GetLKneImpParams(l_kne_imp,l_kne_neu_pos,l_kne_initF);
-    //     hub.lkra_con.SetImpControl(JointCon::ForceCon::kKneExt,l_kne_imp,l_kne_initF,l_kne_neu_pos);
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
-
-    //     hub.rkla_con.ResetControl();
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
-    // }
-    // else if(fsm_cur_state==FSM::State::kLeftStandRightSwing){
-    //     hub.lkra_con.ResetControl();
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
-
-    //     if(pre_data[(unsigned)SensorHub::AdcName::LKneExt]<pre_data[(unsigned)SensorHub::AdcName::RAnkExt])
-    //         hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=100;
-    //     else
-    //         hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
-
-    //     // hub.rkla_con.ResetControl();
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=100;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=100;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=100;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=100;
-
-    //     // hub.rkla_con.SetPreControl(FSM::GetLAnkPreParams(),JointCon::Chamber::kSubTank,JointCon::Chamber::kMainTank);
-
-    // }
-    // else if (fsm_cur_state==FSM::State::kLeftStandRightPrep){
-    //     hub.lkra_con.ResetControl();
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=100;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=100;
-
-    //     hub.rkla_con.ResetControl();
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRTank]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
-
-    //     // hub.rkla_con.SetPreControl(FSM::GetLAnkPreParams(),JointCon::Chamber::kAnkPla,JointCon::Chamber::kSubTank);
-    //     hub.rkla_con.SetForceControl(JointCon::ForceCon::kAnkPlant,FSM::GetLAnkPreParams());
-    // }
-
-    // else if(fsm_cur_state==FSM::State::kLeftPushRightLoad){
-    //     double r_kne_imp;
-    //     double r_kne_initF;
-    //     double r_kne_neu_pos;
-    //     FSM::GetRKneImpParams(r_kne_imp,r_kne_neu_pos,r_kne_initF);
-    //     hub.rkla_con.SetImpControl(JointCon::ForceCon::kKneExt,r_kne_imp,r_kne_initF,r_kne_neu_pos);
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExut]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneExut]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]=0;
-
-    //     hub.lkra_con.ResetControl();
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLTank]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneExut]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex]=0;
-    //     hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExut]=0;
-
-    // }
-    // else if(fsm_cur_state == FSM::State::kTurnOff){
-    //     std::fill_n(hub.PWM_Duty.begin(),hub.PWM_Duty.size(),0);
-    // }
-
-    // hub.valChanged_flag = hub.valChanged_flag ||
     hub.lkra_con.GetValveDuty(hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt], hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex], hub.PWM_Duty[(unsigned)PWM_ID::kRAnkExt], hub.PWM_Duty[(unsigned)PWM_ID::kRAnkFlex], hub.PWM_Duty[(unsigned)PWM_ID::kLTank], hub.PWM_Duty[(unsigned)PWM_ID::kLKneRAnk]);
-    // hub.valChanged_flag = hub.valChanged_flag ||
     hub.rkla_con.GetValveDuty(hub.PWM_Duty[(unsigned)PWM_ID::kRKneExt], hub.PWM_Duty[(unsigned)PWM_ID::kRKneFlex], hub.PWM_Duty[(unsigned)PWM_ID::kLAnkExt], hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex], hub.PWM_Duty[(unsigned)PWM_ID::kRTank], hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk]);
 
-    // auto lkra_con_mode = hub.lkra_con.GetControlMode();
 
-    // if (lkra_con_mode == JointCon::ConMode::kForceCon)
-    // {
-    //     auto force_con_mode = hub.lkra_con.GetForceImpConMode();
-    //     auto force_red_mode = hub.lkra_con.GetForceImpRedMode();
-    //     hub.valChanged_flag = true;
-    //     switch (force_con_mode)
-    //     {
-    //     case JointCon::ForceCon::kKneExt:
-    //         hub.lkra_con.GetForceCon(hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt], hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk], hub.PWM_Duty[(unsigned)PWM_ID::kLKneFlex], hub.PWM_Duty[(unsigned)PWM_ID::kLTank], force_con_mode, force_red_mode);
-    //         break;
-    //     default:
-    //         break;
-    //     }
-    // }
+    //Generate mpc training data
+    if(hub.generating_mpc_train){
+        if(hub.train_gen_count<kTrainLen){
+            hub.PWM_Duty[(unsigned)hub.cur_train_pwm]=hub.mpc_train_duty[hub.train_gen_count];
+            hub.train_gen_count++;
+        }
+        else{
+            hub.generating_mpc_train=false;
+            hub.PWM_Duty[(unsigned)hub.cur_train_pwm]=0;
+        }
+    }
 
-    // if (lkra_con_mode == JointCon::ConMode::kImpCon)
-    // {
-    //     auto imp_con_mode = hub.lkra_con.GetForceImpConMode();
-    //     auto imp_red_mode = hub.lkra_con.GetForceImpRedMode();
-    //     hub.lkra_con.GetImpCon(hub.PWM_Duty[(unsigned)PWM_ID::kLKneExt], hub.PWM_Duty[(unsigned)PWM_ID::kRKneLAnk], hub.PWM_Duty[(unsigned)PWM_ID::kLAnkFlex], hub.PWM_Duty[(unsigned)PWM_ID::kLTank], imp_con_mode, imp_red_mode);
-    //     hub.valChanged_flag = true;
-    // }
 
-    // if (hub.valChanged_flag)
-    // {
-    // std::cout<<"duty: ";
-    // check all pwm duty are below 100
+    
     for (int i = 0; i < TeensyI2C::CMDLEN; i++)
     {
         if (hub.PWM_Duty[i] > 100)
@@ -530,4 +355,51 @@ void Valves_hub::EnableCon(double des_imp, double init_force, Valves_hub::KneeAn
 void Valves_hub::UpdateParams(const ExoConfig::SystemParam &sys_param)
 {
     auto &valves_hub = Valves_hub::GetInstance();
+}
+
+void Valves_hub::GenMPC_Train(JointCon::Chamber chamber1, JointCon::Chamber chamber2,bool is_train_lkra){
+    Valves_hub &hub = Valves_hub::GetInstance();
+    if(hub.generating_mpc_train) //return if it is still generating random duty sequence
+        return;
+
+    hub.generating_mpc_train=true;
+    hub.train_gen_count=0;
+    //generate the random duty sequence
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> distribution(15, 80);
+    for(auto& duty:hub.mpc_train_duty){
+        duty = distribution(gen);
+    }
+    std::cout<<"duty: ";
+    for(const auto&duty:hub.mpc_train_duty){
+        std::cout<<duty<<',';
+    }
+    std::cout<<std::endl;
+    if(chamber1==JointCon::Chamber::kMainTank && chamber2==JointCon::Chamber::kSubTank && is_train_lkra){
+        hub.cur_train_pwm = PWM_ID::kLTank;
+    }
+    else if(chamber1==JointCon::Chamber::kMainTank && chamber2==JointCon::Chamber::kSubTank && !is_train_lkra){
+        hub.cur_train_pwm=PWM_ID::kRTank;
+    }
+    else if(chamber1==JointCon::Chamber::kSubTank && chamber2==JointCon::Chamber::kKneExt && is_train_lkra){
+        hub.cur_train_pwm=PWM_ID::kLKneExt;
+    }
+    else if(chamber1==JointCon::Chamber::kSubTank && chamber2==JointCon::Chamber::kKneExt && !is_train_lkra){
+        hub.cur_train_pwm=PWM_ID::kRKneExt;
+    }
+    else if(chamber1==JointCon::Chamber::kKneExt && chamber2==JointCon::Chamber::kAnkPla && is_train_lkra){
+        hub.cur_train_pwm=PWM_ID::kLKneRAnk;
+    }
+    else if(chamber1==JointCon::Chamber::kKneExt && chamber2==JointCon::Chamber::kAnkPla && !is_train_lkra){
+        hub.cur_train_pwm=PWM_ID::kRKneLAnk;
+    }
+    else if(chamber1==JointCon::Chamber::kSubTank && chamber2==JointCon::Chamber::kAnkPla && is_train_lkra){
+        
+        hub.cur_train_pwm=PWM_ID::kLAnkExt;
+    }
+    else if(chamber1==JointCon::Chamber::kSubTank && chamber2==JointCon::Chamber::kAnkPla && !is_train_lkra){
+        hub.cur_train_pwm=PWM_ID::kRAnkExt;
+    }
+
 }

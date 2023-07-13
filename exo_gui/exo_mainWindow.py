@@ -26,6 +26,7 @@ from CylinderCalibrationWindow import *
 from ConfigLoader import *
 from FSM_ParamsWindow import *
 from PhasePlotWindow import *
+from MPC_Training import *
 
 import math
 import time
@@ -69,6 +70,8 @@ class MW(QMainWindow):
         self.cylinder_calib_window = CylnCalibWindow(self)
         self.fsm_param_window = FSM_ParamWindow(self)
         self.phase_plot = PhasePlot(self)
+        self.mpc_train_window = MPC_TrainingWindow(self)
+
         # jointUpdateCB = lambda data:self.joint_plot_window.UpdateData(self,data)
         # preUpdateCB = lambda data:self.pressure_plot_window.UpdateData(self,data)
         # self.tcp_port.SetCallBack(jointUpdateCB,preUpdateCB)
@@ -125,6 +128,11 @@ class MW(QMainWindow):
 
         self.act_phase_plot = self.findChild(QAction,'actionPhase')
         self.act_phase_plot.triggered.connect(self.phase_plot.show)
+
+        self.act_mpc_training = self.findChild(QAction,'actionMPC_Training')
+        self.act_mpc_training.triggered.connect(self.mpc_train_window.show)
+
+
         # air reserivor 
         
         self.air_volume = self.findChild(QProgressBar,'air_volumn')

@@ -503,7 +503,7 @@ Reset</string>
      <x>0</x>
      <y>0</y>
      <width>753</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuConnection">
@@ -527,6 +527,7 @@ Reset</string>
     </property>
     <addaction name="actionCylinder_Length"/>
     <addaction name="actionFSM_Parameter"/>
+    <addaction name="actionMPC_Training"/>
    </widget>
    <widget class="QMenu" name="menuAction">
     <property name="title">
@@ -612,6 +613,11 @@ Reset</string>
   <action name="actionPhase">
    <property name="text">
     <string>Phase </string>
+   </property>
+  </action>
+  <action name="actionMPC_Training">
+   <property name="text">
+    <string>MPC Training</string>
    </property>
   </action>
  </widget>

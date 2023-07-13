@@ -10,7 +10,6 @@
 #include "ExoConfig.hpp"
 enum class PWM_ID //sync with the real connection on the PCB
 {
-
     kLKneExut=PCB_VAL_1,  //8
     kLTank=PCB_VAL_2,     //9
     kRTank=PCB_VAL_3,    //10
@@ -30,7 +29,7 @@ enum class PWM_ID //sync with the real connection on the PCB
     
 };
 #define PWM_HEADER "TIME,LANK_DOR_PWM,RANK_DOR_PWM,RANK_EXUT_PWM,LANK_EXUT_PWM,RANK_PLA_PWM,LKNE_RANK_PWM,RKNE_FLEX_PWM,RKNE_EXT_PWM,LKNE_EXUT_PWM,LTANK_PWM,RTANK_PWM,LKNE_EXT_PWM,LKNE_FLEX_PWM,RKNE_LANK_PWM,LANK_PLA_PWM,RKNE_EXUT_PWM"
-                 
+
 class Valves_hub
 {
 public:
@@ -39,6 +38,8 @@ public:
         kRightKneeLeftAnk,
         kTotal
     };
+    
+
 
 private:
     // MPC Pressure control
@@ -102,6 +103,7 @@ public:
     static void SetKneeDir(bool is_reverse); //backward knee: is_reverse=true
     static bool GetKneeDir();
 
+    static void GenMPC_Train(JointCon::Chamber chamber1, JointCon::Chamber chamber2,bool is_train_lkra);
 private:
     Valves_hub();
 
@@ -119,8 +121,16 @@ private:
     double des_l_subtank_pre, des_r_subtank_pre; 
     FSM::State fsm_old_state = FSM::State::kNone;
 
-    // Recorder<double, 11> mpc_ltank_rec; // record p_tank, p_set(target), p_val, q_val
-    // Recorder<double, 11> mpc_lkne_rec;
+
+    //MPC Param Training
+    constexpr static int kTrainLen=200; //training data is 2 sec with 100 Hz sampling rate
+    int train_gen_count=0; //when generating training sets, it will increase from 0 to 200
+    bool generating_mpc_train=false;
+    
+    PWM_ID cur_train_pwm;
+    JointCon::Chamber mpc_train_chamber1, mpc_train_chamber2;
+    std::array<int,kTrainLen> mpc_train_duty;
+    
 };
 
 #endif

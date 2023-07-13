@@ -50,6 +50,11 @@ struct UDP_CmdPacket{
 
     //knee direction
     bool knee_reverse;
+    //generate training sets
+    int mpc_train_chamber1;
+    int mpc_train_chamber2;
+    bool mpc_train_is_lkra;
+
 
 
     //change flags
@@ -76,6 +81,8 @@ struct UDP_CmdPacket{
 
     //Change knee direction
     bool knee_reverse_flag;
+    //generate training sets
+    bool mpc_train_gen_flag;
 
 };
 // struct UDP_CmdFlag{

@@ -181,6 +181,9 @@ class UdpCmdPacket(Structure):
               ("fsm_left_ank_idle_pre",c_double),
               ("fsm_right_ank_idle_pre",c_double),
               ("knee_reverse",c_bool),
+              ("mpc_train_chamber1",c_int),
+              ("mpc_train_chamber2",c_int),
+              ("mpc_train_is_lkra",c_bool),
 
 
               ("pwm_duty_flag",(c_bool)*PWM_VAL_NUM),
@@ -198,7 +201,8 @@ class UdpCmdPacket(Structure):
               ("set_neutral_flag",c_bool),
               ("fsm_start_flag",c_bool),
               ("fsm_param_change_flag",c_bool),
-              ("knee_reverse_flag",c_bool)
+              ("knee_reverse_flag",c_bool),
+              ("mpc_train_gen_flag",c_bool)
               ]
     def __init__(self):
         self.pwm_duty_flag=(ctypes.c_bool*PWM_VAL_NUM)((False)*PWM_VAL_NUM)

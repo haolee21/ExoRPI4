@@ -401,4 +401,9 @@ void UdpServer::ProcessCmd(UDP_CmdPacket &cmd_packet)
         Valves_hub::SetKneeDir(cmd_packet.knee_reverse);
     }
 
+    if(cmd_packet.mpc_train_gen_flag){
+        
+        Valves_hub::GenMPC_Train((JointCon::Chamber)cmd_packet.mpc_train_chamber1,(JointCon::Chamber)cmd_packet.mpc_train_chamber2,cmd_packet.mpc_train_is_lkra);
+    }
+
 }

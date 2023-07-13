@@ -29,11 +29,10 @@ static const unsigned kPreSen9=8,kPreSen10=9,kPreSen11=10,kPreSen12=11,kPreSen13
 public:
     
     ~SensorHub();
-    const static int NUMENC = 6;    
-    const static int NUMPRE = 16; //always 8 since ADC has 8 channels
-    
-    const double ENC_DEN = 4096.0;
-    const double PRE_DEN = 65536;
+    constexpr static int NUMENC=6;
+    constexpr static int NUMPRE = 16;//always 16 since 2 ADC has 8 channels
+    constexpr static double ENC_DEN = 4096.0;
+    constexpr static double PRE_DEN = 65536;
 
     static SensorHub& GetInstance();
     static const std::array<double,NUMENC>& GetEncData(); //I did not use lock here since they will be read-only arrays
