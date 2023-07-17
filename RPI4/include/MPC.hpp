@@ -130,6 +130,7 @@ private:
     std::array<double, MPC_STATE_NUM> al;
     std::array<double, MPC_STATE_NUM> bl;
 
+    double mpc_calib_len;
     // generate MPC constants
 
     std::unique_ptr<OSQPSettings> osqp_settings;
@@ -155,7 +156,7 @@ public:
     MPC(ExoConfig::MPC_Params mpc_params,std::string file_name);
     ~MPC();
 
-    ExoConfig::MPC_Params mpc_params;
+    // ExoConfig::MPC_Params mpc_params;
     double GetMpcCalibLen(); //get the chamber length when calculating the mpc parameters
     void UpdateParam(ExoConfig::MPC_Params new_params);
     int GetPreControl(const std::array<double, MPC_TIME_HORIZON> &p_des, const double &p_cur, const double &p_tank, double scale); // It requires current pressure value because all the values storaged in the meme are scaled

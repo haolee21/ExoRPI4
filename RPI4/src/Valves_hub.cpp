@@ -2,7 +2,7 @@
 #include "Valves_hub.hpp"
 #include "MPC_param.hpp"
 #include "FSM.hpp"
-// #include "Recorder.hpp"
+#include "Recorder.hpp"
 Valves_hub::Valves_hub()
     : lkra_con(ExoConfig::GetConfig().left_subtank_knee, ExoConfig::GetConfig().left_subtank_right_ank, ExoConfig::GetConfig().left_knee_right_ank,
                ExoConfig::GetConfig().left_tank_subtank, ExoConfig::GetConfig().left_knee_phy, ExoConfig::GetConfig().right_ankle_phy, "lkra"),
@@ -219,7 +219,11 @@ void Valves_hub::UpdateValve()
         else{
             hub.generating_mpc_train=false;
             hub.PWM_Duty[(unsigned)hub.cur_train_pwm]=0;
+            Timer::EndRec(); //we need to end recorder since it auto start recording when triggering mpc_train_data
         }
+        
+
+
     }
 
 
@@ -371,11 +375,6 @@ void Valves_hub::GenMPC_Train(JointCon::Chamber chamber1, JointCon::Chamber cham
     for(auto& duty:hub.mpc_train_duty){
         duty = distribution(gen);
     }
-    std::cout<<"duty: ";
-    for(const auto&duty:hub.mpc_train_duty){
-        std::cout<<duty<<',';
-    }
-    std::cout<<std::endl;
     if(chamber1==JointCon::Chamber::kMainTank && chamber2==JointCon::Chamber::kSubTank && is_train_lkra){
         hub.cur_train_pwm = PWM_ID::kLTank;
     }
@@ -394,12 +393,17 @@ void Valves_hub::GenMPC_Train(JointCon::Chamber chamber1, JointCon::Chamber cham
     else if(chamber1==JointCon::Chamber::kKneExt && chamber2==JointCon::Chamber::kAnkPla && !is_train_lkra){
         hub.cur_train_pwm=PWM_ID::kRKneLAnk;
     }
-    else if(chamber1==JointCon::Chamber::kSubTank && chamber2==JointCon::Chamber::kAnkPla && is_train_lkra){
+    else if(chamber1==JointCon::Chamber::kSubTank && chamber2==JointCon::Chamber::kAnkPla && !is_train_lkra){
         
         hub.cur_train_pwm=PWM_ID::kLAnkExt;
     }
-    else if(chamber1==JointCon::Chamber::kSubTank && chamber2==JointCon::Chamber::kAnkPla && !is_train_lkra){
+    else if(chamber1==JointCon::Chamber::kSubTank && chamber2==JointCon::Chamber::kAnkPla && is_train_lkra){
         hub.cur_train_pwm=PWM_ID::kRAnkExt;
+    }
+    else{
+        std::cout<<"ValveHub Error: cannot find training pairs\n";
+        std::cout<<"Chamber 1: "<<(int)chamber1<<", chamber 2: "<<(int)chamber2<<std::endl;
+        
     }
 
 }

@@ -123,7 +123,7 @@ private:
 
 
     //MPC Param Training
-    constexpr static int kTrainLen=200; //training data is 2 sec with 100 Hz sampling rate
+    constexpr static int kTrainLen=200+MPC_TIME_HORIZON; //training data is 2 sec with 100 Hz sampling rate
     int train_gen_count=0; //when generating training sets, it will increase from 0 to 200
     bool generating_mpc_train=false;
     

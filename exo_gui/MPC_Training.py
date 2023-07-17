@@ -51,25 +51,30 @@ class MPC_TrainingWindow(QDialog):
             return
         
         if self.maintank_check.isChecked() & self.lsubtank_check.isChecked():
+            self.parent().btn_rec_start_clicked()
             with self.parent().udp_port.lock:
                 self.parent().udp_port.udp_cmd_packet.mpc_train_chamber1=int(Chamber.MainTank.value)
                 self.parent().udp_port.udp_cmd_packet.mpc_train_chamber2=int(Chamber.SubTank.value)
                 self.parent().udp_port.udp_cmd_packet.mpc_train_is_lkra=True
                 self.parent().udp_port.udp_cmd_packet.mpc_train_gen_flag=True
+            
         elif self.maintank_check.isChecked() & self.rsubtank_check.isChecked():
+            self.parent().btn_rec_start_clicked()
             with self.parent().udp_port.lock:
                 self.parent().udp_port.udp_cmd_packet.mpc_train_chamber1=int(Chamber.MainTank.value)
                 self.parent().udp_port.udp_cmd_packet.mpc_train_chamber2=int(Chamber.SubTank.value)
                 self.parent().udp_port.udp_cmd_packet.mpc_train_is_lkra=False
                 self.parent().udp_port.udp_cmd_packet.mpc_train_gen_flag=True
-        
+            
         elif self.lsubtank_check.isChecked() & self.lkneext_check.isChecked():
+            self.parent().btn_rec_start_clicked()
             with self.parent().udp_port.lock:
                 self.parent().udp_port.udp_cmd_packet.mpc_train_chamber1=int(Chamber.SubTank.value)
                 self.parent().udp_port.udp_cmd_packet.mpc_train_chamber2=int(Chamber.KneExt.value)
                 self.parent().udp_port.udp_cmd_packet.mpc_train_is_lkra=True
                 self.parent().udp_port.udp_cmd_packet.mpc_train_gen_flag=True
         elif self.rsubtank_check.isChecked() & self.rkneext_check.isChecked():
+            self.parent().btn_rec_start_clicked()
             with self.parent().udp_port.lock:
                 self.parent().udp_port.udp_cmd_packet.mpc_train_chamber1=int(Chamber.SubTank.value)
                 self.parent().udp_port.udp_cmd_packet.mpc_train_chamber2=int(Chamber.KneExt.value)
@@ -78,25 +83,29 @@ class MPC_TrainingWindow(QDialog):
 
         # left knee->right ankle, right knee -> left ankle
         elif self.lkneext_check.isChecked() & self.rankpla_check.isChecked():
+            self.parent().btn_rec_start_clicked()
             with self.parent().udp_port.lock:
-                self.parent().upd_port.upd_cmd_packet.mpc_train_chamber1=int(Chamber.KneExt.value)
+                self.parent().udp_port.udp_cmd_packet.mpc_train_chamber1=int(Chamber.KneExt.value)
                 self.parent().udp_port.udp_cmd_packet.mpc_train_chamber2=int(Chamber.AnkPla.value)
                 self.parent().udp_port.udp_cmd_packet.mpc_train_is_lkra=True
                 self.parent().udp_port.udp_cmd_packet.mpc_train_gen_flag=True
         elif self.rkneext_check.isChecked() & self.lankpla_check.isChecked():
+            self.parent().btn_rec_start_clicked()
             with self.parent().udp_port.lock:
-                self.parent().upd_port.upd_cmd_packet.mpc_train_chamber1=int(Chamber.KneExt.value)
+                self.parent().udp_port.udp_cmd_packet.mpc_train_chamber1=int(Chamber.KneExt.value)
                 self.parent().udp_port.udp_cmd_packet.mpc_train_chamber2=int(Chamber.AnkPla.value)
                 self.parent().udp_port.udp_cmd_packet.mpc_train_is_lkra=False
                 self.parent().udp_port.udp_cmd_packet.mpc_train_gen_flag=True
         
         elif self.lsubtank_check.isChecked() & self.rankpla_check.isChecked():
+            self.parent().btn_rec_start_clicked()
             with self.parent().udp_port.lock:
                 self.parent().udp_port.udp_cmd_packet.mpc_train_chamber1=int(Chamber.SubTank.value)
                 self.parent().udp_port.udp_cmd_packet.mpc_train_chamber2=int(Chamber.AnkPla.value)
                 self.parent().udp_port.udp_cmd_packet.mpc_train_is_lkra=True
                 self.parent().udp_port.udp_cmd_packet.mpc_train_gen_flag=True
         elif self.rsubtank_check.isChecked() & self.lankpla_check.isChecked():
+            self.parent().btn_rec_start_clicked()
             with self.parent().udp_port.lock:
                 self.parent().udp_port.udp_cmd_packet.mpc_train_chamber1=int(Chamber.SubTank.value)
                 self.parent().udp_port.udp_cmd_packet.mpc_train_chamber2=int(Chamber.AnkPla.value)

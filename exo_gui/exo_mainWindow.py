@@ -319,19 +319,22 @@ class MW(QMainWindow):
         self.udp_port.udp_cmd_packet.epoch_time_data = time.time()
         self.udp_port.udp_cmd_packet.epoch_time_flag = True
     def btn_rec_start_clicked(self):
+        
         if(not self.rec_flag):
             # when clicked, start the recording
             self.btn_updateTime_clicked()
-            self.udp_port.udp_cmd_packet.recorder_data=True
-            self.udp_port.udp_cmd_packet.recorder_flag=True
+            with self.udp_port.lock:
+                self.udp_port.udp_cmd_packet.recorder_data=True
+                self.udp_port.udp_cmd_packet.recorder_flag=True
             self.rec_flag=True
             self.btn_rec_start.setText('REC End')
             curTime = datetime.datetime.fromtimestamp(time.time())
             self.label_startTime.setText("%04d-" %(curTime.year) + "%02d%02d-" %(curTime.month,curTime.day) + "%02d%02d-" %(curTime.hour,curTime.minute)+"%02d" %(curTime.second))
         else:
             # when clicked, end the recording
-            self.udp_port.udp_cmd_packet.recorder_data=False
-            self.udp_port.udp_cmd_packet.recorder_flag = True
+            with self.udp_port.lock:
+                self.udp_port.udp_cmd_packet.recorder_data=False
+                self.udp_port.udp_cmd_packet.recorder_flag = True
             self.rec_flag=False
             self.btn_rec_start.setText('REC Start')
     def update_rec_btn(self,flag_read):

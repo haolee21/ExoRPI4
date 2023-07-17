@@ -9,7 +9,8 @@ using namespace std;
 // const double MPC::kArea =  0.31*645.16f;  //unit: mm^2
 
 MPC::MPC(ExoConfig::MPC_Params _mpc_params,std::string file_name)
-    : mpc_params(_mpc_params),ah(_mpc_params.ch[0]), bh(_mpc_params.ch[1]), al(_mpc_params.cl[0]), bl(_mpc_params.cl[1]),
+    :// mpc_params(_mpc_params),
+      ah(_mpc_params.ch[0]), bh(_mpc_params.ch[1]), al(_mpc_params.cl[0]), bl(_mpc_params.cl[1]),mpc_calib_len(_mpc_params.cali_chamber_len),
       mpc_rec(file_name, MPC_HEAD)
     //   mpc_model_rec(file_name+std::string("_model"),MPC_MODEL_HEAD)
 
@@ -44,7 +45,8 @@ MPC::~MPC()
 }
 
 double MPC::GetMpcCalibLen(){
-    return this->mpc_params.cali_chamber_len;
+    return this->mpc_calib_len;
+    // return this->mpc_params.cali_chamber_len;
 }
 void MPC::UpdateParam(ExoConfig::MPC_Params new_params){
     this->ah = new_params.ch[0];
@@ -282,7 +284,7 @@ double MPC::CalculateControl(bool increase_pre, std::array<double, MPC_TIME_HORI
     Eigen::Matrix<double, MPC_TIME_HORIZON, 1> y_des_vec;
     y_des_vec << y_des[0], y_des[1], y_des[2], y_des[3], y_des[4], y_des[5], y_des[6], y_des[7], y_des[8];
 
-    Eigen::DiagonalMatrix<double,MPC_TIME_HORIZON> w_mat{5,1,1,1,1,1,1,1,1};
+    Eigen::DiagonalMatrix<double,MPC_TIME_HORIZON> w_mat{1,1,1,1,1,1,1,1,1};
 
     Eigen::Matrix<double, MPC_TIME_HORIZON, MPC_TIME_HORIZON> P_mat = B_all.transpose() *w_mat* B_all;
     Eigen::Matrix<double, 1, MPC_TIME_HORIZON> q_mat = -1 * y_des_vec.transpose() *w_mat* B_all + A_all.transpose() *w_mat* B_all;
@@ -306,7 +308,7 @@ double MPC::CalculateControl(bool increase_pre, std::array<double, MPC_TIME_HORI
     c_int P_nnz = (MPC_TIME_HORIZON + 1) * MPC_TIME_HORIZON / 2;
     c_float q[MPC_TIME_HORIZON] = {q_mat.coeff(0, 0), q_mat.coeff(0, 1), q_mat.coeff(0, 2), q_mat.coeff(0, 3), q_mat.coeff(0, 4), q_mat.coeff(0, 5), q_mat.coeff(0, 6), q_mat.coeff(0, 7), q_mat.coeff(0, 8)};
 
-    c_int A_nnz = MPC_TIME_HORIZON+2;
+    c_int A_nnz = MPC_TIME_HORIZON+16;
     c_float A_x[MPC_TIME_HORIZON+16] = {1, 1,
                                        1, -1, 1,
                                        1, -1, 1,
@@ -436,7 +438,7 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
         }
         else
         {
-            this->cur_dF =this->cur_dF*0.5; //FIXME: why 0.5???
+            this->cur_dF =this->cur_dF;//*0.5; //FIXME: why 0.5???
             ideal_u=0;
         }
 
@@ -468,13 +470,13 @@ int MPC::GetPreControl(const std::array<double,MPC_TIME_HORIZON> &p_des, const d
     {
         
         // this->cur_F << 0, 0;
-        this->cur_dF =this->cur_dF*0.5;
+        this->cur_dF =this->cur_dF;//*0.5; why 0.5??? 
         this->u_n = 0;
         this->u_n1 = 0;
         this->u_n2 = 0;
         this->cur_u =0;
     }
-    return (int)(this->cur_u*100+0.5);
+    return (int)(this->cur_u*100+0.5);//round the cur_u
 
 }
 
@@ -530,7 +532,7 @@ void MPC::UpdateHistory(double p_set, double p_tank,double p_des)
 
     for (int i = 0; i < MPC_TIME_HORIZON; i++) //fill the vector with linearized points, suppose f(x[0]~x[10]), to estimate x[15], we need to f(x[0]~x[10],x_hat[11]~x_hat[15]) for linearization
     {
-        this->p_tank_his[i + MPC_DELAY] = (p_tank - 3297.312) / 65536-p_step*i*0.58993; //This literally has no meaning but let's give it a try
+        this->p_tank_his[i + MPC_DELAY] = (p_tank - 3297.312) / 65536-p_step*i;//*0.58993; //This literally has no meaning but let's give it a try
         this->p_set_his[i + MPC_DELAY] = (p_set - 3297.312) / 65536+p_step*i;
         this->u_his[i + MPC_DELAY] = MPC::kUBar; // use the lower bound first, in case the previous duty was 0
 

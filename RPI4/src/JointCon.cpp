@@ -93,11 +93,11 @@ bool JointCon::GetKneeReverse()
 // void JointCon::PushMeas(const double &p_joint_ext, const double &p_joint_flex, const double &p_joint_rec, const double &p_tank, const double &p_main_tank, const double &pos, const u_int8_t tank_duty, const u_int8_t knee_ext_duty, const u_int8_t knee_flex_duty, const u_int8_t knee_ank_duty, const u_int8_t ank_ext_duty)
 void JointCon::PushMeas(const double &p_knee_ext, const double &p_knee_flex, const double &p_ank_pla, const double &p_ank_dorsi, const double &p_sub_tank, const double &p_main_tank, const double &knee_angle, const double &ankle_angle, const u_int8_t knee_ext_duty, const u_int8_t knee_flex_duty, const u_int8_t ank_ext_duty, const u_int8_t knee_ank_duty, const u_int8_t tank_duty)
 {
-    this->knee_ext_con.UpdateMeas(p_sub_tank, p_knee_ext, knee_ext_duty);
+    this->knee_ext_con.UpdateMeas(p_knee_ext, p_sub_tank,knee_ext_duty);
     // this->knee_flex_con.UpdateMeas(p_knee_ext, p_knee_flex, knee_flex_duty);
-    this->ank_ext_con.UpdateMeas(p_sub_tank, p_ank_pla, ank_ext_duty);
-    this->knee_ank_con.UpdateMeas(p_knee_ext, p_ank_pla, knee_ank_duty);
-    this->tank_con.UpdateMeas(p_main_tank, p_sub_tank, tank_duty);
+    this->ank_ext_con.UpdateMeas(p_ank_pla, p_sub_tank,  ank_ext_duty);
+    this->knee_ank_con.UpdateMeas(p_ank_pla, p_knee_ext,  knee_ank_duty);
+    this->tank_con.UpdateMeas(p_sub_tank,p_main_tank,  tank_duty);
 
     this->p_knee_ext = p_knee_ext;
     this->p_ank_pla = p_ank_pla;
